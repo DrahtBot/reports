@@ -1,0 +1,369 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - test_bitcoin_coverage.info - src/script/standard.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/script</a> - standard.h<span style="font-size: 80%;"> (source / <a href="standard.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">test_bitcoin_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntry">42</td>
+            <td class="headerCovTableEntryLo">73.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2000-01-01 12:00:00</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">65</td>
+            <td class="headerCovTableEntry">136</td>
+            <td class="headerCovTableEntryLo">47.8 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2009-2010 Satoshi Nakamoto</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Copyright (c) 2009-2020 The Bitcoin Core developers</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="5"><span class="lineNum">       5 </span>                :            : </a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #ifndef BITCOIN_SCRIPT_STANDARD_H</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : #define BITCOIN_SCRIPT_STANDARD_H</a>
+<a name="8"><span class="lineNum">       8 </span>                :            : </a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;script/interpreter.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;uint256.h&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : </a>
+<a name="12"><span class="lineNum">      12 </span>                :            : #include &lt;boost/variant.hpp&gt;</a>
+<a name="13"><span class="lineNum">      13 </span>                :            : </a>
+<a name="14"><span class="lineNum">      14 </span>                :            : #include &lt;string&gt;</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : </a>
+<a name="16"><span class="lineNum">      16 </span>                :            : </a>
+<a name="17"><span class="lineNum">      17 </span>                :            : static const bool DEFAULT_ACCEPT_DATACARRIER = true;</a>
+<a name="18"><span class="lineNum">      18 </span>                :            : </a>
+<a name="19"><span class="lineNum">      19 </span>                :            : class CKeyID;</a>
+<a name="20"><span class="lineNum">      20 </span>                :            : class CScript;</a>
+<a name="21"><span class="lineNum">      21 </span>                :            : struct ScriptHash;</a>
+<a name="22"><span class="lineNum">      22 </span>                :            : </a>
+<a name="23"><span class="lineNum">      23 </span>                :            : template&lt;typename HashType&gt;</a>
+<a name="24"><span class="lineNum">      24 </span>                :            : class BaseHash</a>
+<a name="25"><span class="lineNum">      25 </span>                :            : {</a>
+<a name="26"><span class="lineNum">      26 </span>                :            : protected:</a>
+<a name="27"><span class="lineNum">      27 </span>                :            :     HashType m_hash;</a>
+<a name="28"><span class="lineNum">      28 </span>                :            : </a>
+<a name="29"><span class="lineNum">      29 </span>                :            : public:</a>
+<a name="30"><span class="lineNum">      30 </span>                :<span class="lineCov">      45904 :     BaseHash() : m_hash() {}</span></a>
+<a name="31"><span class="lineNum">      31 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      10171 :     BaseHash(const HashType&amp; in) : m_hash(in) {}</span></a>
+<span class="lineNum">         </span>         <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="32"><span class="lineNum">      32 </span>                :            : </a>
+<a name="33"><span class="lineNum">      33 </span>                :<span class="lineCov">       1165 :     unsigned char* begin()</span></a>
+<a name="34"><span class="lineNum">      34 </span>                :            :     {</a>
+<a name="35"><span class="lineNum">      35 </span>  [<span class="branchCov" title="Branch 0 was taken 902 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineCov">       1165 :         return m_hash.begin();</span></a>
+<a name="36"><span class="lineNum">      36 </span>                :            :     }</a>
+<a name="37"><span class="lineNum">      37 </span>                :            : </a>
+<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">      19110 :     const unsigned char* begin() const</span></a>
+<a name="39"><span class="lineNum">      39 </span>                :            :     {</a>
+<a name="40"><span class="lineNum">      40 </span>  [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      19110 :         return m_hash.begin();</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 20 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 41 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="41"><span class="lineNum">      41 </span>                :            :     }</a>
+<a name="42"><span class="lineNum">      42 </span>                :            : </a>
+<a name="43"><span class="lineNum">      43 </span>                :            :     unsigned char* end()</a>
+<a name="44"><span class="lineNum">      44 </span>                :            :     {</a>
+<a name="45"><span class="lineNum">      45 </span>                :            :         return m_hash.end();</a>
+<a name="46"><span class="lineNum">      46 </span>                :            :     }</a>
+<a name="47"><span class="lineNum">      47 </span>                :            : </a>
+<a name="48"><span class="lineNum">      48 </span>                :<span class="lineCov">      19110 :     const unsigned char* end() const</span></a>
+<a name="49"><span class="lineNum">      49 </span>                :            :     {</a>
+<a name="50"><span class="lineNum">      50 </span>  [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      19110 :         return m_hash.end();</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 20 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 41 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="51"><span class="lineNum">      51 </span>                :            :     }</a>
+<a name="52"><span class="lineNum">      52 </span>                :            : </a>
+<a name="53"><span class="lineNum">      53 </span>                :<span class="lineCov">          2 :     operator std::vector&lt;unsigned char&gt;() const</span></a>
+<a name="54"><span class="lineNum">      54 </span>                :            :     {</a>
+<a name="55"><span class="lineNum">      55 </span>                :<span class="lineCov">          2 :         return std::vector&lt;unsigned char&gt;{m_hash.begin(), m_hash.end()};</span></a>
+<a name="56"><span class="lineNum">      56 </span>                :            :     }</a>
+<a name="57"><span class="lineNum">      57 </span>                :            : </a>
+<a name="58"><span class="lineNum">      58 </span>                :<span class="lineCov">          3 :     std::string ToString() const</span></a>
+<a name="59"><span class="lineNum">      59 </span>                :            :     {</a>
+<a name="60"><span class="lineNum">      60 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          3 :         return m_hash.ToString();</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="61"><span class="lineNum">      61 </span>                :            :     }</a>
+<a name="62"><span class="lineNum">      62 </span>                :            : </a>
+<a name="63"><span class="lineNum">      63 </span>                :<span class="lineCov">        381 :     bool operator==(const BaseHash&lt;HashType&gt;&amp; other) const noexcept</span></a>
+<a name="64"><span class="lineNum">      64 </span>                :            :     {</a>
+<a name="65"><span class="lineNum">      65 </span>  [<span class="branchCov" title="Branch 0 was taken 358 times"> + </span><span class="branchCov" title="Branch 1 was taken 4 times"> + </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchCov" title="Branch 3 was taken 2 times"> + </span> :<span class="lineCov">        381 :         return m_hash == other.m_hash;</span></a>
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 6 was not taken"> - </span><span class="branchCov" title="Branch 7 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 9 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 10 was not taken"> - </span><span class="branchCov" title="Branch 11 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 12 was not taken"> - </span><span class="branchCov" title="Branch 13 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 14 was not taken"> - </span><span class="branchCov" title="Branch 15 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 16 was not taken"> - </span><span class="branchCov" title="Branch 17 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 19 was taken 1 time"> + </span>]
+<a name="66"><span class="lineNum">      66 </span>                :            :     }</a>
+<a name="67"><span class="lineNum">      67 </span>                :            : </a>
+<a name="68"><span class="lineNum">      68 </span>                :<span class="lineNoCov">          0 :     bool operator!=(const BaseHash&lt;HashType&gt;&amp; other) const noexcept</span></a>
+<a name="69"><span class="lineNum">      69 </span>                :            :     {</a>
+<a name="70"><span class="lineNum">      70 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         return !(m_hash == other.m_hash);</span></a>
+<a name="71"><span class="lineNum">      71 </span>                :            :     }</a>
+<a name="72"><span class="lineNum">      72 </span>                :            : </a>
+<a name="73"><span class="lineNum">      73 </span>                :<span class="lineCov">     120901 :     bool operator&lt;(const BaseHash&lt;HashType&gt;&amp; other) const noexcept</span></a>
+<a name="74"><span class="lineNum">      74 </span>                :            :     {</a>
+<a name="75"><span class="lineNum">      75 </span>  [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 4550 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 90 times"> + </span> :<span class="lineCov">     120901 :         return m_hash &lt; other.m_hash;</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 43429 times"> + </span><span class="branchCov" title="Branch 5 was taken 44009 times"> + </span><span class="branchNoCov" title="Branch 6 was not taken"> - </span><span class="branchCov" title="Branch 7 was taken 37 times"> + </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchNoCov" title="Branch 10 was not taken"> - </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchNoCov" title="Branch 12 was not taken"> - </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 775 times"> + </span><span class="branchCov" title="Branch 15 was taken 151 times"> + </span><span class="branchNoCov" title="Branch 16 was not taken"> - </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 98 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 19 was not taken"> - </span><span class="branchCov" title="Branch 20 was taken 9013 times"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span><span class="branchCov" title="Branch 22 was taken 8953 times"> + </span><span class="branchCov" title="Branch 23 was taken 2 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 24 was not taken"> - </span><span class="branchNoCov" title="Branch 25 was not taken"> - </span><span class="branchNoCov" title="Branch 26 was not taken"> - </span><span class="branchNoCov" title="Branch 27 was not taken"> - </span><span class="branchCov" title="Branch 28 was taken 4 times"> + </span> 
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 29 was taken 742 times"> + </span><span class="branchCov" title="Branch 30 was taken 29 times"> + </span><span class="branchCov" title="Branch 31 was taken 3 times"> + </span><span class="branchCov" title="Branch 32 was taken 8984 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 33 was taken 3 times"> + </span>]
+<a name="76"><span class="lineNum">      76 </span>                :            :     }</a>
+<a name="77"><span class="lineNum">      77 </span>                :            : </a>
+<a name="78"><span class="lineNum">      78 </span>                :<span class="lineCov">         19 :     size_t size() const</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :            :     {</a>
+<a name="80"><span class="lineNum">      80 </span>  [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchCov" title="Branch 1 was taken 7 times"> + </span><span class="branchCov" title="Branch 2 was taken 6 times"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">         19 :         return m_hash.size();</span></a>
+<a name="81"><span class="lineNum">      81 </span>                :            :     }</a>
+<a name="82"><span class="lineNum">      82 </span>                :            : </a>
+<a name="83"><span class="lineNum">      83 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :     unsigned char* data() { return m_hash.data(); }</span></a>
+<a name="84"><span class="lineNum">      84 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const unsigned char* data() const { return m_hash.data(); }</span></a>
+<a name="85"><span class="lineNum">      85 </span>                :            : };</a>
+<a name="86"><span class="lineNum">      86 </span>                :            : </a>
+<a name="87"><span class="lineNum">      87 </span>                :            : /** A reference to a CScript: the Hash160 of its serialization (see script.h) */</a>
+<a name="88"><span class="lineNum">      88 </span>                :            : class CScriptID : public BaseHash&lt;uint160&gt;</a>
+<a name="89"><span class="lineNum">      89 </span>                :            : {</a>
+<a name="90"><span class="lineNum">      90 </span>                :            : public:</a>
+<a name="91"><span class="lineNum">      91 </span>  [<span class="branchCov" title="Branch 0 was taken 54 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineCov">      43682 :     CScriptID() : BaseHash() {}</span></a>
+<a name="92"><span class="lineNum">      92 </span>                :            :     explicit CScriptID(const CScript&amp; in);</a>
+<a name="93"><span class="lineNum">      93 </span>  [<span class="branchCov" title="Branch 0 was taken 159 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 384 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">        688 :     explicit CScriptID(const uint160&amp; in) : BaseHash(in) {}</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 145 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="94"><span class="lineNum">      94 </span>                :            :     explicit CScriptID(const ScriptHash&amp; in);</a>
+<a name="95"><span class="lineNum">      95 </span>                :            : };</a>
+<a name="96"><span class="lineNum">      96 </span>                :            : </a>
+<a name="97"><span class="lineNum">      97 </span>                :            : /**</a>
+<a name="98"><span class="lineNum">      98 </span>                :            :  * Default setting for nMaxDatacarrierBytes. 80 bytes of data, +1 for OP_RETURN,</a>
+<a name="99"><span class="lineNum">      99 </span>                :            :  * +2 for the pushdata opcodes.</a>
+<a name="100"><span class="lineNum">     100 </span>                :            :  */</a>
+<a name="101"><span class="lineNum">     101 </span>                :            : static const unsigned int MAX_OP_RETURN_RELAY = 83;</a>
+<a name="102"><span class="lineNum">     102 </span>                :            : </a>
+<a name="103"><span class="lineNum">     103 </span>                :            : /**</a>
+<a name="104"><span class="lineNum">     104 </span>                :            :  * A data carrying output is an unspendable output containing data. The script</a>
+<a name="105"><span class="lineNum">     105 </span>                :            :  * type is designated as TxoutType::NULL_DATA.</a>
+<a name="106"><span class="lineNum">     106 </span>                :            :  */</a>
+<a name="107"><span class="lineNum">     107 </span>                :            : extern bool fAcceptDatacarrier;</a>
+<a name="108"><span class="lineNum">     108 </span>                :            : </a>
+<a name="109"><span class="lineNum">     109 </span>                :            : /** Maximum size of TxoutType::NULL_DATA scripts that this node considers standard. */</a>
+<a name="110"><span class="lineNum">     110 </span>                :            : extern unsigned nMaxDatacarrierBytes;</a>
+<a name="111"><span class="lineNum">     111 </span>                :            : </a>
+<a name="112"><span class="lineNum">     112 </span>                :            : /**</a>
+<a name="113"><span class="lineNum">     113 </span>                :            :  * Mandatory script verification flags that all new blocks must comply with for</a>
+<a name="114"><span class="lineNum">     114 </span>                :            :  * them to be valid. (but old blocks may not comply with) Currently just P2SH,</a>
+<a name="115"><span class="lineNum">     115 </span>                :            :  * but in the future other flags may be added.</a>
+<a name="116"><span class="lineNum">     116 </span>                :            :  *</a>
+<a name="117"><span class="lineNum">     117 </span>                :            :  * Failing one of these tests may trigger a DoS ban - see CheckInputScripts() for</a>
+<a name="118"><span class="lineNum">     118 </span>                :            :  * details.</a>
+<a name="119"><span class="lineNum">     119 </span>                :            :  */</a>
+<a name="120"><span class="lineNum">     120 </span>                :            : static const unsigned int MANDATORY_SCRIPT_VERIFY_FLAGS = SCRIPT_VERIFY_P2SH;</a>
+<a name="121"><span class="lineNum">     121 </span>                :            : </a>
+<a name="122"><span class="lineNum">     122 </span>                :            : enum class TxoutType {</a>
+<a name="123"><span class="lineNum">     123 </span>                :            :     NONSTANDARD,</a>
+<a name="124"><span class="lineNum">     124 </span>                :            :     // 'standard' transaction types:</a>
+<a name="125"><span class="lineNum">     125 </span>                :            :     PUBKEY,</a>
+<a name="126"><span class="lineNum">     126 </span>                :            :     PUBKEYHASH,</a>
+<a name="127"><span class="lineNum">     127 </span>                :            :     SCRIPTHASH,</a>
+<a name="128"><span class="lineNum">     128 </span>                :            :     MULTISIG,</a>
+<a name="129"><span class="lineNum">     129 </span>                :            :     NULL_DATA, //!&lt; unspendable OP_RETURN script that carries data</a>
+<a name="130"><span class="lineNum">     130 </span>                :            :     WITNESS_V0_SCRIPTHASH,</a>
+<a name="131"><span class="lineNum">     131 </span>                :            :     WITNESS_V0_KEYHASH,</a>
+<a name="132"><span class="lineNum">     132 </span>                :            :     WITNESS_V1_TAPROOT,</a>
+<a name="133"><span class="lineNum">     133 </span>                :            :     WITNESS_UNKNOWN, //!&lt; Only for Witness versions not already defined above</a>
+<a name="134"><span class="lineNum">     134 </span>                :            : };</a>
+<a name="135"><span class="lineNum">     135 </span>                :            : </a>
+<a name="136"><span class="lineNum">     136 </span>                :            : class CNoDestination {</a>
+<a name="137"><span class="lineNum">     137 </span>                :            : public:</a>
+<a name="138"><span class="lineNum">     138 </span>                :<span class="lineNoCov">          0 :     friend bool operator==(const CNoDestination &amp;a, const CNoDestination &amp;b) { return true; }</span></a>
+<a name="139"><span class="lineNum">     139 </span>                :<span class="lineNoCov">          0 :     friend bool operator&lt;(const CNoDestination &amp;a, const CNoDestination &amp;b) { return true; }</span></a>
+<a name="140"><span class="lineNum">     140 </span>                :            : };</a>
+<a name="141"><span class="lineNum">     141 </span>                :            : </a>
+<a name="142"><span class="lineNum">     142 </span>                :            : struct PKHash : public BaseHash&lt;uint160&gt;</a>
+<a name="143"><span class="lineNum">     143 </span>                :            : {</a>
+<a name="144"><span class="lineNum">     144 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     PKHash() : BaseHash() {}</span></a>
+<a name="145"><span class="lineNum">     145 </span>  [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">         72 :     explicit PKHash(const uint160&amp; hash) : BaseHash(hash) {}</span></a>
+<a name="146"><span class="lineNum">     146 </span>                :            :     explicit PKHash(const CPubKey&amp; pubkey);</a>
+<a name="147"><span class="lineNum">     147 </span>                :            :     explicit PKHash(const CKeyID&amp; pubkey_id);</a>
+<a name="148"><span class="lineNum">     148 </span>                :            : };</a>
+<a name="149"><span class="lineNum">     149 </span>                :            : CKeyID ToKeyID(const PKHash&amp; key_hash);</a>
+<a name="150"><span class="lineNum">     150 </span>                :            : </a>
+<a name="151"><span class="lineNum">     151 </span>                :            : struct WitnessV0KeyHash;</a>
+<a name="152"><span class="lineNum">     152 </span>                :            : struct ScriptHash : public BaseHash&lt;uint160&gt;</a>
+<a name="153"><span class="lineNum">     153 </span>                :            : {</a>
+<a name="154"><span class="lineNum">     154 </span>                :            :     ScriptHash() : BaseHash() {}</a>
+<a name="155"><span class="lineNum">     155 </span>                :            :     // These don't do what you'd expect.</a>
+<a name="156"><span class="lineNum">     156 </span>                :            :     // Use ScriptHash(GetScriptForDestination(...)) instead.</a>
+<a name="157"><span class="lineNum">     157 </span>                :            :     explicit ScriptHash(const WitnessV0KeyHash&amp; hash) = delete;</a>
+<a name="158"><span class="lineNum">     158 </span>                :            :     explicit ScriptHash(const PKHash&amp; hash) = delete;</a>
+<a name="159"><span class="lineNum">     159 </span>                :            : </a>
+<a name="160"><span class="lineNum">     160 </span>                :<span class="lineCov">         36 :     explicit ScriptHash(const uint160&amp; hash) : BaseHash(hash) {}</span></a>
+<a name="161"><span class="lineNum">     161 </span>                :            :     explicit ScriptHash(const CScript&amp; script);</a>
+<a name="162"><span class="lineNum">     162 </span>                :            :     explicit ScriptHash(const CScriptID&amp; script);</a>
+<a name="163"><span class="lineNum">     163 </span>                :            : };</a>
+<a name="164"><span class="lineNum">     164 </span>                :            : </a>
+<a name="165"><span class="lineNum">     165 </span>                :            : struct WitnessV0ScriptHash : public BaseHash&lt;uint256&gt;</a>
+<a name="166"><span class="lineNum">     166 </span>                :            : {</a>
+<a name="167"><span class="lineNum">     167 </span>        [<span class="branchCov" title="Branch 0 was taken 854 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">       1722 :     WitnessV0ScriptHash() : BaseHash() {}</span></a>
+<a name="168"><span class="lineNum">     168 </span>                :            :     explicit WitnessV0ScriptHash(const uint256&amp; hash) : BaseHash(hash) {}</a>
+<a name="169"><span class="lineNum">     169 </span>                :            :     explicit WitnessV0ScriptHash(const CScript&amp; script);</a>
+<a name="170"><span class="lineNum">     170 </span>                :            : };</a>
+<a name="171"><span class="lineNum">     171 </span>                :            : </a>
+<a name="172"><span class="lineNum">     172 </span>                :            : struct WitnessV0KeyHash : public BaseHash&lt;uint160&gt;</a>
+<a name="173"><span class="lineNum">     173 </span>                :            : {</a>
+<a name="174"><span class="lineNum">     174 </span>        [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchCov" title="Branch 1 was taken 7 times"> + </span>]:<span class="lineCov">         32 :     WitnessV0KeyHash() : BaseHash() {}</span></a>
+<a name="175"><span class="lineNum">     175 </span>  [<span class="branchCov" title="Branch 0 was taken 9141 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 285 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       9426 :     explicit WitnessV0KeyHash(const uint160&amp; hash) : BaseHash(hash) {}</span></a>
+<a name="176"><span class="lineNum">     176 </span>                :            :     explicit WitnessV0KeyHash(const CPubKey&amp; pubkey);</a>
+<a name="177"><span class="lineNum">     177 </span>                :            :     explicit WitnessV0KeyHash(const PKHash&amp; pubkey_hash);</a>
+<a name="178"><span class="lineNum">     178 </span>                :            : };</a>
+<a name="179"><span class="lineNum">     179 </span>                :            : CKeyID ToKeyID(const WitnessV0KeyHash&amp; key_hash);</a>
+<a name="180"><span class="lineNum">     180 </span>                :            : </a>
+<a name="181"><span class="lineNum">     181 </span>                :            : //! CTxDestination subtype to encode any future Witness version</a>
+<a name="182"><span class="lineNum">     182 </span>                :            : struct WitnessUnknown</a>
+<a name="183"><span class="lineNum">     183 </span>                :            : {</a>
+<a name="184"><span class="lineNum">     184 </span>                :            :     unsigned int version;</a>
+<a name="185"><span class="lineNum">     185 </span>                :            :     unsigned int length;</a>
+<a name="186"><span class="lineNum">     186 </span>                :            :     unsigned char program[40];</a>
+<a name="187"><span class="lineNum">     187 </span>                :            : </a>
+<a name="188"><span class="lineNum">     188 </span>                :<span class="lineCov">          1 :     friend bool operator==(const WitnessUnknown&amp; w1, const WitnessUnknown&amp; w2) {</span></a>
+<a name="189"><span class="lineNum">     189 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :         if (w1.version != w2.version) return false;</span></a>
+<a name="190"><span class="lineNum">     190 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :         if (w1.length != w2.length) return false;</span></a>
+<a name="191"><span class="lineNum">     191 </span>                :<span class="lineCov">          1 :         return std::equal(w1.program, w1.program + w1.length, w2.program);</span></a>
+<a name="192"><span class="lineNum">     192 </span>                :            :     }</a>
+<a name="193"><span class="lineNum">     193 </span>                :            : </a>
+<a name="194"><span class="lineNum">     194 </span>                :<span class="lineNoCov">          0 :     friend bool operator&lt;(const WitnessUnknown&amp; w1, const WitnessUnknown&amp; w2) {</span></a>
+<a name="195"><span class="lineNum">     195 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (w1.version &lt; w2.version) return true;</span></a>
+<a name="196"><span class="lineNum">     196 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (w1.version &gt; w2.version) return false;</span></a>
+<a name="197"><span class="lineNum">     197 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (w1.length &lt; w2.length) return true;</span></a>
+<a name="198"><span class="lineNum">     198 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (w1.length &gt; w2.length) return false;</span></a>
+<a name="199"><span class="lineNum">     199 </span>                :<span class="lineNoCov">          0 :         return std::lexicographical_compare(w1.program, w1.program + w1.length, w2.program, w2.program + w2.length);</span></a>
+<a name="200"><span class="lineNum">     200 </span>                :            :     }</a>
+<a name="201"><span class="lineNum">     201 </span>                :            : };</a>
+<a name="202"><span class="lineNum">     202 </span>                :            : </a>
+<a name="203"><span class="lineNum">     203 </span>                :            : /**</a>
+<a name="204"><span class="lineNum">     204 </span>                :            :  * A txout script template with a specific destination. It is either:</a>
+<a name="205"><span class="lineNum">     205 </span>                :            :  *  * CNoDestination: no destination set</a>
+<a name="206"><span class="lineNum">     206 </span>                :            :  *  * PKHash: TxoutType::PUBKEYHASH destination (P2PKH)</a>
+<a name="207"><span class="lineNum">     207 </span>                :            :  *  * ScriptHash: TxoutType::SCRIPTHASH destination (P2SH)</a>
+<a name="208"><span class="lineNum">     208 </span>                :            :  *  * WitnessV0ScriptHash: TxoutType::WITNESS_V0_SCRIPTHASH destination (P2WSH)</a>
+<a name="209"><span class="lineNum">     209 </span>                :            :  *  * WitnessV0KeyHash: TxoutType::WITNESS_V0_KEYHASH destination (P2WPKH)</a>
+<a name="210"><span class="lineNum">     210 </span>                :            :  *  * WitnessUnknown: TxoutType::WITNESS_UNKNOWN/WITNESS_V1_TAPROOT destination (P2W???)</a>
+<a name="211"><span class="lineNum">     211 </span>                :            :  *    (taproot outputs do not require their own type as long as no wallet support exists)</a>
+<a name="212"><span class="lineNum">     212 </span>                :            :  *  A CTxDestination is the internal data type encoded in a bitcoin address</a>
+<a name="213"><span class="lineNum">     213 </span>                :            :  */</a>
+<a name="214"><span class="lineNum">     214 </span>                :            : typedef boost::variant&lt;CNoDestination, PKHash, ScriptHash, WitnessV0ScriptHash, WitnessV0KeyHash, WitnessUnknown&gt; CTxDestination;</a>
+<a name="215"><span class="lineNum">     215 </span>                :            : </a>
+<a name="216"><span class="lineNum">     216 </span>                :            : /** Check whether a CTxDestination is a CNoDestination. */</a>
+<a name="217"><span class="lineNum">     217 </span>                :            : bool IsValidDestination(const CTxDestination&amp; dest);</a>
+<a name="218"><span class="lineNum">     218 </span>                :            : </a>
+<a name="219"><span class="lineNum">     219 </span>                :            : /** Get the name of a TxoutType as a string */</a>
+<a name="220"><span class="lineNum">     220 </span>                :            : std::string GetTxnOutputType(TxoutType t);</a>
+<a name="221"><span class="lineNum">     221 </span>                :            : </a>
+<a name="222"><span class="lineNum">     222 </span>                :            : /**</a>
+<a name="223"><span class="lineNum">     223 </span>                :            :  * Parse a scriptPubKey and identify script type for standard scripts. If</a>
+<a name="224"><span class="lineNum">     224 </span>                :            :  * successful, returns script type and parsed pubkeys or hashes, depending on</a>
+<a name="225"><span class="lineNum">     225 </span>                :            :  * the type. For example, for a P2SH script, vSolutionsRet will contain the</a>
+<a name="226"><span class="lineNum">     226 </span>                :            :  * script hash, for P2PKH it will contain the key hash, etc.</a>
+<a name="227"><span class="lineNum">     227 </span>                :            :  *</a>
+<a name="228"><span class="lineNum">     228 </span>                :            :  * @param[in]   scriptPubKey   Script to parse</a>
+<a name="229"><span class="lineNum">     229 </span>                :            :  * @param[out]  vSolutionsRet  Vector of parsed pubkeys and hashes</a>
+<a name="230"><span class="lineNum">     230 </span>                :            :  * @return                     The script type. TxoutType::NONSTANDARD represents a failed solve.</a>
+<a name="231"><span class="lineNum">     231 </span>                :            :  */</a>
+<a name="232"><span class="lineNum">     232 </span>                :            : TxoutType Solver(const CScript&amp; scriptPubKey, std::vector&lt;std::vector&lt;unsigned char&gt;&gt;&amp; vSolutionsRet);</a>
+<a name="233"><span class="lineNum">     233 </span>                :            : </a>
+<a name="234"><span class="lineNum">     234 </span>                :            : /**</a>
+<a name="235"><span class="lineNum">     235 </span>                :            :  * Parse a standard scriptPubKey for the destination address. Assigns result to</a>
+<a name="236"><span class="lineNum">     236 </span>                :            :  * the addressRet parameter and returns true if successful. For multisig</a>
+<a name="237"><span class="lineNum">     237 </span>                :            :  * scripts, instead use ExtractDestinations. Currently only works for P2PK,</a>
+<a name="238"><span class="lineNum">     238 </span>                :            :  * P2PKH, P2SH, P2WPKH, and P2WSH scripts.</a>
+<a name="239"><span class="lineNum">     239 </span>                :            :  */</a>
+<a name="240"><span class="lineNum">     240 </span>                :            : bool ExtractDestination(const CScript&amp; scriptPubKey, CTxDestination&amp; addressRet);</a>
+<a name="241"><span class="lineNum">     241 </span>                :            : </a>
+<a name="242"><span class="lineNum">     242 </span>                :            : /**</a>
+<a name="243"><span class="lineNum">     243 </span>                :            :  * Parse a standard scriptPubKey with one or more destination addresses. For</a>
+<a name="244"><span class="lineNum">     244 </span>                :            :  * multisig scripts, this populates the addressRet vector with the pubkey IDs</a>
+<a name="245"><span class="lineNum">     245 </span>                :            :  * and nRequiredRet with the n required to spend. For other destinations,</a>
+<a name="246"><span class="lineNum">     246 </span>                :            :  * addressRet is populated with a single value and nRequiredRet is set to 1.</a>
+<a name="247"><span class="lineNum">     247 </span>                :            :  * Returns true if successful.</a>
+<a name="248"><span class="lineNum">     248 </span>                :            :  *</a>
+<a name="249"><span class="lineNum">     249 </span>                :            :  * Note: this function confuses destinations (a subset of CScripts that are</a>
+<a name="250"><span class="lineNum">     250 </span>                :            :  * encodable as an address) with key identifiers (of keys involved in a</a>
+<a name="251"><span class="lineNum">     251 </span>                :            :  * CScript), and its use should be phased out.</a>
+<a name="252"><span class="lineNum">     252 </span>                :            :  */</a>
+<a name="253"><span class="lineNum">     253 </span>                :            : bool ExtractDestinations(const CScript&amp; scriptPubKey, TxoutType&amp; typeRet, std::vector&lt;CTxDestination&gt;&amp; addressRet, int&amp; nRequiredRet);</a>
+<a name="254"><span class="lineNum">     254 </span>                :            : </a>
+<a name="255"><span class="lineNum">     255 </span>                :            : /**</a>
+<a name="256"><span class="lineNum">     256 </span>                :            :  * Generate a Bitcoin scriptPubKey for the given CTxDestination. Returns a P2PKH</a>
+<a name="257"><span class="lineNum">     257 </span>                :            :  * script for a CKeyID destination, a P2SH script for a CScriptID, and an empty</a>
+<a name="258"><span class="lineNum">     258 </span>                :            :  * script for CNoDestination.</a>
+<a name="259"><span class="lineNum">     259 </span>                :            :  */</a>
+<a name="260"><span class="lineNum">     260 </span>                :            : CScript GetScriptForDestination(const CTxDestination&amp; dest);</a>
+<a name="261"><span class="lineNum">     261 </span>                :            : </a>
+<a name="262"><span class="lineNum">     262 </span>                :            : /** Generate a P2PK script for the given pubkey. */</a>
+<a name="263"><span class="lineNum">     263 </span>                :            : CScript GetScriptForRawPubKey(const CPubKey&amp; pubkey);</a>
+<a name="264"><span class="lineNum">     264 </span>                :            : </a>
+<a name="265"><span class="lineNum">     265 </span>                :            : /** Generate a multisig script. */</a>
+<a name="266"><span class="lineNum">     266 </span>                :            : CScript GetScriptForMultisig(int nRequired, const std::vector&lt;CPubKey&gt;&amp; keys);</a>
+<a name="267"><span class="lineNum">     267 </span>                :            : </a>
+<a name="268"><span class="lineNum">     268 </span>                :            : #endif // BITCOIN_SCRIPT_STANDARD_H</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
