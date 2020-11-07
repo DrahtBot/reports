@@ -31,27 +31,27 @@
             <td class="headerValue">fuzz_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">20</td>
             <td class="headerCovTableEntry">42</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntryLo">47.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-11-07 11:34:23</td>
+            <td class="headerValue">2020-11-07 12:05:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">11</td>
             <td class="headerCovTableEntry">23</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntryLo">47.8 %</td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryLo">25.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -170,7 +170,7 @@
 <a name="99"><span class="lineNum">      99 </span>                :            :     // this used to call `GetCheapHash()` in uint256, which was later moved; the</a>
 <a name="100"><span class="lineNum">     100 </span>                :            :     // cheap hash function simply calls ReadLE64() however, so the end result is</a>
 <a name="101"><span class="lineNum">     101 </span>                :            :     // identical</a>
-<a name="102"><span class="lineNum">     102 </span>                :<span class="lineNoCov">          0 :     size_t operator()(const uint256&amp; hash) const { return ReadLE64(hash.begin()); }</span></a>
+<a name="102"><span class="lineNum">     102 </span>                :<span class="lineCov">     639518 :     size_t operator()(const uint256&amp; hash) const { return ReadLE64(hash.begin()); }</span></a>
 <a name="103"><span class="lineNum">     103 </span>                :            : };</a>
 <a name="104"><span class="lineNum">     104 </span>                :            : </a>
 <a name="105"><span class="lineNum">     105 </span>                :            : /** Current sync state passed to tip changed callbacks. */</a>
@@ -423,7 +423,7 @@
 <a name="352"><span class="lineNum">     352 </span>                :            :  * This data is used mostly in `CChainState` - information about, e.g.,</a>
 <a name="353"><span class="lineNum">     353 </span>                :            :  * candidate tips is not maintained here.</a>
 <a name="354"><span class="lineNum">     354 </span>                :            :  */</a>
-<a name="355"><span class="lineNum">     355 </span>                :<span class="lineNoCov">          0 : class BlockManager</span></a>
+<a name="355"><span class="lineNum">     355 </span>                :<span class="lineCov">         95 : class BlockManager</span></a>
 <a name="356"><span class="lineNum">     356 </span>                :            : {</a>
 <a name="357"><span class="lineNum">     357 </span>                :            :     friend CChainState;</a>
 <a name="358"><span class="lineNum">     358 </span>                :            : </a>
@@ -511,9 +511,9 @@
 <a name="440"><span class="lineNum">     440 </span>                :            :         const CChainParams&amp; chainparams,</a>
 <a name="441"><span class="lineNum">     441 </span>                :            :         CBlockIndex** ppindex) EXCLUSIVE_LOCKS_REQUIRED(cs_main);</a>
 <a name="442"><span class="lineNum">     442 </span>                :            : </a>
-<a name="443"><span class="lineNum">     443 </span>                :<span class="lineNoCov">          0 :     ~BlockManager() {</span></a>
-<a name="444"><span class="lineNum">     444 </span>                :<span class="lineNoCov">          0 :         Unload();</span></a>
-<a name="445"><span class="lineNum">     445 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="443"><span class="lineNum">     443 </span>                :<span class="lineCov">         95 :     ~BlockManager() {</span></a>
+<a name="444"><span class="lineNum">     444 </span>                :<span class="lineCov">         95 :         Unload();</span></a>
+<a name="445"><span class="lineNum">     445 </span>                :<span class="lineCov">         95 :     }</span></a>
 <a name="446"><span class="lineNum">     446 </span>                :            : };</a>
 <a name="447"><span class="lineNum">     447 </span>                :            : </a>
 <a name="448"><span class="lineNum">     448 </span>                :            : /**</a>
@@ -525,7 +525,7 @@
 <a name="454"><span class="lineNum">     454 </span>                :            :  * ultimately falling back on cache misses to the canonical store of UTXOs on</a>
 <a name="455"><span class="lineNum">     455 </span>                :            :  * disk, `m_dbview`.</a>
 <a name="456"><span class="lineNum">     456 </span>                :            :  */</a>
-<a name="457"><span class="lineNum">     457 </span>                :<span class="lineNoCov">          0 : class CoinsViews {</span></a>
+<a name="457"><span class="lineNum">     457 </span>                :<span class="lineCov">         26 : class CoinsViews {</span></a>
 <a name="458"><span class="lineNum">     458 </span>                :            : </a>
 <a name="459"><span class="lineNum">     459 </span>                :            : public:</a>
 <a name="460"><span class="lineNum">     460 </span>                :            :     //! The lowest level of the CoinsViews cache hierarchy sits in a leveldb database on disk.</a>
@@ -574,7 +574,7 @@
 <a name="503"><span class="lineNum">     503 </span>                :            :  * whereas block information and metadata independent of the current tip is</a>
 <a name="504"><span class="lineNum">     504 </span>                :            :  * kept in `BlockMetadataManager`.</a>
 <a name="505"><span class="lineNum">     505 </span>                :            :  */</a>
-<a name="506"><span class="lineNum">     506 </span>                :<span class="lineNoCov">          0 : class CChainState</span></a>
+<a name="506"><span class="lineNum">     506 </span>                :<span class="lineCov">         26 : class CChainState</span></a>
 <a name="507"><span class="lineNum">     507 </span>                :            : {</a>
 <a name="508"><span class="lineNum">     508 </span>                :            : protected:</a>
 <a name="509"><span class="lineNum">     509 </span>                :            :     /**</a>
@@ -635,8 +635,8 @@
 <a name="564"><span class="lineNum">     564 </span>                :            : </a>
 <a name="565"><span class="lineNum">     565 </span>                :            :     //! @returns whether or not the CoinsViews object has been fully initialized and we can</a>
 <a name="566"><span class="lineNum">     566 </span>                :            :     //!          safely flush this object to disk.</a>
-<a name="567"><span class="lineNum">     567 </span>                :<span class="lineNoCov">          0 :     bool CanFlushToDisk() EXCLUSIVE_LOCKS_REQUIRED(cs_main) {</span></a>
-<a name="568"><span class="lineNum">     568 </span>                :<span class="lineNoCov">          0 :         return m_coins_views &amp;&amp; m_coins_views-&gt;m_cacheview;</span></a>
+<a name="567"><span class="lineNum">     567 </span>                :<span class="lineCov">      31179 :     bool CanFlushToDisk() EXCLUSIVE_LOCKS_REQUIRED(cs_main) {</span></a>
+<a name="568"><span class="lineNum">     568 </span>        [<span class="branchCov" title="Branch 0 was taken 31179 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      31179 :         return m_coins_views &amp;&amp; m_coins_views-&gt;m_cacheview;</span></a>
 <a name="569"><span class="lineNum">     569 </span>                :            :     }</a>
 <a name="570"><span class="lineNum">     570 </span>                :            : </a>
 <a name="571"><span class="lineNum">     571 </span>                :            :     //! The current chain of blockheaders we consult and build on.</a>
@@ -658,10 +658,10 @@
 <a name="587"><span class="lineNum">     587 </span>                :            :     std::set&lt;CBlockIndex*, CBlockIndexWorkComparator&gt; setBlockIndexCandidates;</a>
 <a name="588"><span class="lineNum">     588 </span>                :            : </a>
 <a name="589"><span class="lineNum">     589 </span>                :            :     //! @returns A reference to the in-memory cache of the UTXO set.</a>
-<a name="590"><span class="lineNum">     590 </span>                :<span class="lineNoCov">          0 :     CCoinsViewCache&amp; CoinsTip() EXCLUSIVE_LOCKS_REQUIRED(cs_main)</span></a>
+<a name="590"><span class="lineNum">     590 </span>                :<span class="lineCov">     160088 :     CCoinsViewCache&amp; CoinsTip() EXCLUSIVE_LOCKS_REQUIRED(cs_main)</span></a>
 <a name="591"><span class="lineNum">     591 </span>                :            :     {</a>
-<a name="592"><span class="lineNum">     592 </span>                :<span class="lineNoCov">          0 :         assert(m_coins_views-&gt;m_cacheview);</span></a>
-<a name="593"><span class="lineNum">     593 </span>                :<span class="lineNoCov">          0 :         return *m_coins_views-&gt;m_cacheview.get();</span></a>
+<a name="592"><span class="lineNum">     592 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 160088 times"> + </span>]:<span class="lineCov">     160088 :         assert(m_coins_views-&gt;m_cacheview);</span></a>
+<a name="593"><span class="lineNum">     593 </span>                :<span class="lineCov">     160088 :         return *m_coins_views-&gt;m_cacheview.get();</span></a>
 <a name="594"><span class="lineNum">     594 </span>                :            :     }</a>
 <a name="595"><span class="lineNum">     595 </span>                :            : </a>
 <a name="596"><span class="lineNum">     596 </span>                :            :     //! @returns A reference to the on-disk UTXO set database.</a>
@@ -849,7 +849,7 @@
 <a name="778"><span class="lineNum">     778 </span>                :            :  *   have been downloaded and validated (via background validation), otherwise</a>
 <a name="779"><span class="lineNum">     779 </span>                :            :  *   it will be the IBD chainstate.</a>
 <a name="780"><span class="lineNum">     780 </span>                :            :  */</a>
-<a name="781"><span class="lineNum">     781 </span>                :<span class="lineNoCov">          0 : class ChainstateManager</span></a>
+<a name="781"><span class="lineNum">     781 </span>                :<span class="lineCov">        190 : class ChainstateManager</span></a>
 <a name="782"><span class="lineNum">     782 </span>                :            : {</a>
 <a name="783"><span class="lineNum">     783 </span>                :            : private:</a>
 <a name="784"><span class="lineNum">     784 </span>                :            :     //! The chainstate used under normal operation (i.e. &quot;regular&quot; IBD) or, if</a>
@@ -895,11 +895,11 @@
 <a name="824"><span class="lineNum">     824 </span>                :            :     //! This is especially important when, e.g., calling ActivateBestChain()</a>
 <a name="825"><span class="lineNum">     825 </span>                :            :     //! on all chainstates because we are not able to hold ::cs_main going into</a>
 <a name="826"><span class="lineNum">     826 </span>                :            :     //! that call.</a>
-<a name="827"><span class="lineNum">     827 </span>                :<span class="lineNoCov">          0 :     CChainState* m_active_chainstate{nullptr};</span></a>
+<a name="827"><span class="lineNum">     827 </span>                :<span class="lineCov">         95 :     CChainState* m_active_chainstate{nullptr};</span></a>
 <a name="828"><span class="lineNum">     828 </span>                :            : </a>
 <a name="829"><span class="lineNum">     829 </span>                :            :     //! If true, the assumed-valid chainstate has been fully validated</a>
 <a name="830"><span class="lineNum">     830 </span>                :            :     //! by the background validation chainstate.</a>
-<a name="831"><span class="lineNum">     831 </span>                :<span class="lineNoCov">          0 :     bool m_snapshot_validated{false};</span></a>
+<a name="831"><span class="lineNum">     831 </span>                :<span class="lineCov">         95 :     bool m_snapshot_validated{false};</span></a>
 <a name="832"><span class="lineNum">     832 </span>                :            : </a>
 <a name="833"><span class="lineNum">     833 </span>                :            :     // For access to m_active_chainstate.</a>
 <a name="834"><span class="lineNum">     834 </span>                :            :     friend CChainState&amp; ChainstateActive();</a>
@@ -912,11 +912,11 @@
 <a name="841"><span class="lineNum">     841 </span>                :            : </a>
 <a name="842"><span class="lineNum">     842 </span>                :            :     //! The total number of bytes available for us to use across all in-memory</a>
 <a name="843"><span class="lineNum">     843 </span>                :            :     //! coins caches. This will be split somehow across chainstates.</a>
-<a name="844"><span class="lineNum">     844 </span>                :<span class="lineNoCov">          0 :     int64_t m_total_coinstip_cache{0};</span></a>
+<a name="844"><span class="lineNum">     844 </span>                :<span class="lineCov">         95 :     int64_t m_total_coinstip_cache{0};</span></a>
 <a name="845"><span class="lineNum">     845 </span>                :            :     //</a>
 <a name="846"><span class="lineNum">     846 </span>                :            :     //! The total number of bytes available for us to use across all leveldb</a>
 <a name="847"><span class="lineNum">     847 </span>                :            :     //! coins databases. This will be split somehow across chainstates.</a>
-<a name="848"><span class="lineNum">     848 </span>                :<span class="lineNoCov">          0 :     int64_t m_total_coinsdb_cache{0};</span></a>
+<a name="848"><span class="lineNum">     848 </span>                :<span class="lineCov">         95 :     int64_t m_total_coinsdb_cache{0};</span></a>
 <a name="849"><span class="lineNum">     849 </span>                :            : </a>
 <a name="850"><span class="lineNum">     850 </span>                :            :     //! Instantiate a new chainstate and assign it based upon whether it is</a>
 <a name="851"><span class="lineNum">     851 </span>                :            :     //! from a snapshot.</a>
@@ -937,9 +937,9 @@
 <a name="866"><span class="lineNum">     866 </span>                :            :     int ActiveHeight() const { return ActiveChain().Height(); }</a>
 <a name="867"><span class="lineNum">     867 </span>                :            :     CBlockIndex* ActiveTip() const { return ActiveChain().Tip(); }</a>
 <a name="868"><span class="lineNum">     868 </span>                :            : </a>
-<a name="869"><span class="lineNum">     869 </span>                :<span class="lineNoCov">          0 :     BlockMap&amp; BlockIndex() EXCLUSIVE_LOCKS_REQUIRED(::cs_main)</span></a>
+<a name="869"><span class="lineNum">     869 </span>                :<span class="lineCov">    1146232 :     BlockMap&amp; BlockIndex() EXCLUSIVE_LOCKS_REQUIRED(::cs_main)</span></a>
 <a name="870"><span class="lineNum">     870 </span>                :            :     {</a>
-<a name="871"><span class="lineNum">     871 </span>                :<span class="lineNoCov">          0 :         return m_blockman.m_block_index;</span></a>
+<a name="871"><span class="lineNum">     871 </span>                :<span class="lineCov">    1146232 :         return m_blockman.m_block_index;</span></a>
 <a name="872"><span class="lineNum">     872 </span>                :            :     }</a>
 <a name="873"><span class="lineNum">     873 </span>                :            : </a>
 <a name="874"><span class="lineNum">     874 </span>                :            :     bool IsSnapshotActive() const;</a>
@@ -947,7 +947,7 @@
 <a name="876"><span class="lineNum">     876 </span>                :            :     Optional&lt;uint256&gt; SnapshotBlockhash() const;</a>
 <a name="877"><span class="lineNum">     877 </span>                :            : </a>
 <a name="878"><span class="lineNum">     878 </span>                :            :     //! Is there a snapshot in use and has it been fully validated?</a>
-<a name="879"><span class="lineNum">     879 </span>                :<span class="lineNoCov">          0 :     bool IsSnapshotValidated() const { return m_snapshot_validated; }</span></a>
+<a name="879"><span class="lineNum">     879 </span>                :<span class="lineCov">         26 :     bool IsSnapshotValidated() const { return m_snapshot_validated; }</span></a>
 <a name="880"><span class="lineNum">     880 </span>                :            : </a>
 <a name="881"><span class="lineNum">     881 </span>                :            :     //! @returns true if this chainstate is being used to validate an active</a>
 <a name="882"><span class="lineNum">     882 </span>                :            :     //!          snapshot in the background.</a>
@@ -1049,7 +1049,7 @@
 <a name="978"><span class="lineNum">     978 </span>                :            : //! Check whether the block associated with this index entry is pruned or not.</a>
 <a name="979"><span class="lineNum">     979 </span>                :<span class="lineNoCov">          0 : inline bool IsBlockPruned(const CBlockIndex* pblockindex)</span></a>
 <a name="980"><span class="lineNum">     980 </span>                :            : {</a>
-<a name="981"><span class="lineNum">     981 </span>                :<span class="lineNoCov">          0 :     return (fHavePruned &amp;&amp; !(pblockindex-&gt;nStatus &amp; BLOCK_HAVE_DATA) &amp;&amp; pblockindex-&gt;nTx &gt; 0);</span></a>
+<a name="981"><span class="lineNum">     981 </span>[<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>][<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     return (fHavePruned &amp;&amp; !(pblockindex-&gt;nStatus &amp; BLOCK_HAVE_DATA) &amp;&amp; pblockindex-&gt;nTx &gt; 0);</span></a>
 <a name="982"><span class="lineNum">     982 </span>                :            : }</a>
 <a name="983"><span class="lineNum">     983 </span>                :            : </a>
 <a name="984"><span class="lineNum">     984 </span>                :            : #endif // BITCOIN_VALIDATION_H</a>

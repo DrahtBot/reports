@@ -31,27 +31,27 @@
             <td class="headerValue">fuzz_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">37</td>
             <td class="headerCovTableEntry">40</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntryHi">92.5 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-11-07 11:34:23</td>
+            <td class="headerValue">2020-11-07 12:05:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">53</td>
             <td class="headerCovTableEntry">87</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntryLo">60.9 %</td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntry">82</td>
+            <td class="headerCovTableEntryLo">37.8 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -118,7 +118,7 @@
 <a name="47"><span class="lineNum">      47 </span>                :            :     std::string GetCommand() const;</a>
 <a name="48"><span class="lineNum">      48 </span>                :            :     bool IsCommandValid() const;</a>
 <a name="49"><span class="lineNum">      49 </span>                :            : </a>
-<a name="50"><span class="lineNum">      50 </span>                :<span class="lineNoCov">          0 :     SERIALIZE_METHODS(CMessageHeader, obj) { READWRITE(obj.pchMessageStart, obj.pchCommand, obj.nMessageSize, obj.pchChecksum); }</span></a>
+<a name="50"><span class="lineNum">      50 </span>                :<span class="lineCov">    9305640 :     SERIALIZE_METHODS(CMessageHeader, obj) { READWRITE(obj.pchMessageStart, obj.pchCommand, obj.nMessageSize, obj.pchChecksum); }</span></a>
 <a name="51"><span class="lineNum">      51 </span>                :            : </a>
 <a name="52"><span class="lineNum">      52 </span>                :            :     char pchMessageStart[MESSAGE_START_SIZE];</a>
 <a name="53"><span class="lineNum">      53 </span>                :            :     char pchCommand[COMMAND_SIZE];</a>
@@ -413,62 +413,77 @@
 <a name="342"><span class="lineNum">     342 </span>                :            :  * == GetDesirableServiceFlags(services), ie determines whether the given</a>
 <a name="343"><span class="lineNum">     343 </span>                :            :  * set of service flags are sufficient for a peer to be &quot;relevant&quot;.</a>
 <a name="344"><span class="lineNum">     344 </span>                :            :  */</a>
-<a name="345"><span class="lineNum">     345 </span>                :<span class="lineNoCov">          0 : static inline bool HasAllDesirableServiceFlags(ServiceFlags services)</span></a>
+<a name="345"><span class="lineNum">     345 </span>                :<span class="lineCov">     161168 : static inline bool HasAllDesirableServiceFlags(ServiceFlags services)</span></a>
 <a name="346"><span class="lineNum">     346 </span>                :            : {</a>
-<a name="347"><span class="lineNum">     347 </span>                :<span class="lineNoCov">          0 :     return !(GetDesirableServiceFlags(services) &amp; (~services));</span></a>
+<a name="347"><span class="lineNum">     347 </span>                :<span class="lineCov">     161168 :     return !(GetDesirableServiceFlags(services) &amp; (~services));</span></a>
 <a name="348"><span class="lineNum">     348 </span>                :            : }</a>
 <a name="349"><span class="lineNum">     349 </span>                :            : </a>
 <a name="350"><span class="lineNum">     350 </span>                :            : /**</a>
 <a name="351"><span class="lineNum">     351 </span>                :            :  * Checks if a peer with the given service flags may be capable of having a</a>
 <a name="352"><span class="lineNum">     352 </span>                :            :  * robust address-storage DB.</a>
 <a name="353"><span class="lineNum">     353 </span>                :            :  */</a>
-<a name="354"><span class="lineNum">     354 </span>                :<span class="lineNoCov">          0 : static inline bool MayHaveUsefulAddressDB(ServiceFlags services)</span></a>
+<a name="354"><span class="lineNum">     354 </span>                :<span class="lineCov">     770821 : static inline bool MayHaveUsefulAddressDB(ServiceFlags services)</span></a>
 <a name="355"><span class="lineNum">     355 </span>                :            : {</a>
-<a name="356"><span class="lineNum">     356 </span>                :<span class="lineNoCov">          0 :     return (services &amp; NODE_NETWORK) || (services &amp; NODE_NETWORK_LIMITED);</span></a>
+<a name="356"><span class="lineNum">     356 </span>        [<span class="branchCov" title="Branch 0 was taken 275251 times"> + </span><span class="branchCov" title="Branch 1 was taken 495570 times"> + </span>]:<span class="lineCov">     770821 :     return (services &amp; NODE_NETWORK) || (services &amp; NODE_NETWORK_LIMITED);</span></a>
 <a name="357"><span class="lineNum">     357 </span>                :            : }</a>
 <a name="358"><span class="lineNum">     358 </span>                :            : </a>
 <a name="359"><span class="lineNum">     359 </span>                :            : /** A CService with information about it as peer */</a>
-<a name="360"><span class="lineNum">     360 </span>                :<span class="lineNoCov">          0 : class CAddress : public CService</span></a>
+<a name="360"><span class="lineNum">     360 </span>                :<span class="lineCov">    2442565 : class CAddress : public CService</span></a>
 <a name="361"><span class="lineNum">     361 </span>                :            : {</a>
 <a name="362"><span class="lineNum">     362 </span>                :            :     static constexpr uint32_t TIME_INIT{100000000};</a>
 <a name="363"><span class="lineNum">     363 </span>                :            : </a>
 <a name="364"><span class="lineNum">     364 </span>                :            : public:</a>
-<a name="365"><span class="lineNum">     365 </span>                :<span class="lineNoCov">          0 :     CAddress() : CService{} {};</span></a>
-<a name="366"><span class="lineNum">     366 </span>                :<span class="lineNoCov">          0 :     CAddress(CService ipIn, ServiceFlags nServicesIn) : CService{ipIn}, nServices{nServicesIn} {};</span></a>
+<a name="365"><span class="lineNum">     365 </span>                :<span class="lineCov">    1603071 :     CAddress() : CService{} {};</span></a>
+<a name="366"><span class="lineNum">     366 </span>                :<span class="lineCov">     123531 :     CAddress(CService ipIn, ServiceFlags nServicesIn) : CService{ipIn}, nServices{nServicesIn} {};</span></a>
 <a name="367"><span class="lineNum">     367 </span>                :            :     CAddress(CService ipIn, ServiceFlags nServicesIn, uint32_t nTimeIn) : CService{ipIn}, nTime{nTimeIn}, nServices{nServicesIn} {};</a>
 <a name="368"><span class="lineNum">     368 </span>                :            : </a>
-<a name="369"><span class="lineNum">     369 </span>                :<span class="lineNoCov">          0 :     SERIALIZE_METHODS(CAddress, obj)</span></a>
+<a name="369"><span class="lineNum">     369 </span>                :<span class="lineCov">    3618891 :     SERIALIZE_METHODS(CAddress, obj)</span></a>
 <a name="370"><span class="lineNum">     370 </span>                :            :     {</a>
-<a name="371"><span class="lineNum">     371 </span>                :<span class="lineNoCov">          0 :         SER_READ(obj, obj.nTime = TIME_INIT);</span></a>
-<a name="372"><span class="lineNum">     372 </span>                :<span class="lineNoCov">          0 :         int nVersion = s.GetVersion();</span></a>
-<a name="373"><span class="lineNum">     373 </span>                :<span class="lineNoCov">          0 :         if (s.GetType() &amp; SER_DISK) {</span></a>
+<a name="371"><span class="lineNum">     371 </span>                :<span class="lineCov">    2283714 :         SER_READ(obj, obj.nTime = TIME_INIT);</span></a>
+<a name="372"><span class="lineNum">     372 </span>                :<span class="lineCov">    1206297 :         int nVersion = s.GetVersion();</span></a>
+<a name="373"><span class="lineNum">     373 </span>[<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 209995 times"> + </span>][<span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 47952 times"> + </span>]:<span class="lineCov">    1206297 :         if (s.GetType() &amp; SER_DISK) {</span></a>
+<span class="lineNum">         </span>[<span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 948350 times"> + </span>][<span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">         </span>[<span class="branchNoExec" title="Branch 8 was not executed"> # </span><span class="branchNoExec" title="Branch 9 was not executed"> # </span>][<span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span>]
+<span class="lineNum">         </span>        [<span class="branchNoExec" title="Branch 12 was not executed"> # </span><span class="branchNoExec" title="Branch 13 was not executed"> # </span>]
 <a name="374"><span class="lineNum">     374 </span>                :<span class="lineNoCov">          0 :             READWRITE(nVersion);</span></a>
 <a name="375"><span class="lineNum">     375 </span>                :<span class="lineNoCov">          0 :         }</span></a>
-<a name="376"><span class="lineNum">     376 </span>                :<span class="lineNoCov">          0 :         if ((s.GetType() &amp; SER_DISK) ||</span></a>
-<a name="377"><span class="lineNum">     377 </span>                :<span class="lineNoCov">          0 :             (nVersion != INIT_PROTO_VERSION &amp;&amp; !(s.GetType() &amp; SER_GETHASH))) {</span></a>
+<a name="376"><span class="lineNum">     376 </span>[<span class="branchCov" title="Branch 0 was taken 209995 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 115802 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    2318359 :         if ((s.GetType() &amp; SER_DISK) ||</span></a>
+<span class="lineNum">         </span>[<span class="branchCov" title="Branch 4 was taken 47952 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>][<span class="branchCov" title="Branch 6 was taken 47910 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<span class="lineNum">         </span>[<span class="branchCov" title="Branch 8 was taken 948350 times"> + </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span>][<span class="branchCov" title="Branch 10 was taken 948350 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<span class="lineNum">         </span>[<span class="branchNoExec" title="Branch 12 was not executed"> # </span><span class="branchNoExec" title="Branch 13 was not executed"> # </span>][<span class="branchNoExec" title="Branch 14 was not executed"> # </span><span class="branchNoExec" title="Branch 15 was not executed"> # </span>]
+<span class="lineNum">         </span>[<span class="branchNoExec" title="Branch 16 was not executed"> # </span><span class="branchNoExec" title="Branch 17 was not executed"> # </span>][<span class="branchNoExec" title="Branch 18 was not executed"> # </span><span class="branchNoExec" title="Branch 19 was not executed"> # </span>]
+<span class="lineNum">         </span>[<span class="branchNoExec" title="Branch 20 was not executed"> # </span><span class="branchNoExec" title="Branch 21 was not executed"> # </span>][<span class="branchNoExec" title="Branch 22 was not executed"> # </span><span class="branchNoExec" title="Branch 23 was not executed"> # </span>]
+<span class="lineNum">         </span>[<span class="branchNoExec" title="Branch 24 was not executed"> # </span><span class="branchNoExec" title="Branch 25 was not executed"> # </span>][<span class="branchNoExec" title="Branch 26 was not executed"> # </span><span class="branchNoExec" title="Branch 27 was not executed"> # </span>]
+<a name="377"><span class="lineNum">     377 </span>[<span class="branchCov" title="Branch 0 was taken 115802 times"> + </span><span class="branchCov" title="Branch 1 was taken 94193 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 47910 times"> + </span><span class="branchCov" title="Branch 3 was taken 42 times"> + </span>]:<span class="lineCov">    1206297 :             (nVersion != INIT_PROTO_VERSION &amp;&amp; !(s.GetType() &amp; SER_GETHASH))) {</span></a>
+<span class="lineNum">         </span>[<span class="branchCov" title="Branch 4 was taken 948350 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>][<span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">         </span>[<span class="branchNoExec" title="Branch 8 was not executed"> # </span><span class="branchNoExec" title="Branch 9 was not executed"> # </span>][<span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span>]
+<span class="lineNum">         </span>        [<span class="branchNoExec" title="Branch 12 was not executed"> # </span><span class="branchNoExec" title="Branch 13 was not executed"> # </span>]
 <a name="378"><span class="lineNum">     378 </span>                :            :             // The only time we serialize a CAddress object without nTime is in</a>
 <a name="379"><span class="lineNum">     379 </span>                :            :             // the initial VERSION messages which contain two CAddress records.</a>
 <a name="380"><span class="lineNum">     380 </span>                :            :             // At that point, the serialization version is INIT_PROTO_VERSION.</a>
 <a name="381"><span class="lineNum">     381 </span>                :            :             // After the version handshake, serialization version is &gt;=</a>
 <a name="382"><span class="lineNum">     382 </span>                :            :             // MIN_PEER_PROTO_VERSION and all ADDR messages are serialized with</a>
 <a name="383"><span class="lineNum">     383 </span>                :            :             // nTime.</a>
-<a name="384"><span class="lineNum">     384 </span>                :<span class="lineNoCov">          0 :             READWRITE(obj.nTime);</span></a>
-<a name="385"><span class="lineNum">     385 </span>                :<span class="lineNoCov">          0 :         }</span></a>
-<a name="386"><span class="lineNum">     386 </span>                :<span class="lineNoCov">          0 :         if (nVersion &amp; ADDRV2_FORMAT) {</span></a>
-<a name="387"><span class="lineNum">     387 </span>                :<span class="lineNoCov">          0 :             uint64_t services_tmp;</span></a>
-<a name="388"><span class="lineNum">     388 </span>                :<span class="lineNoCov">          0 :             SER_WRITE(obj, services_tmp = obj.nServices);</span></a>
-<a name="389"><span class="lineNum">     389 </span>                :<span class="lineNoCov">          0 :             READWRITE(Using&lt;CompactSizeFormatter&lt;false&gt;&gt;(services_tmp));</span></a>
-<a name="390"><span class="lineNum">     390 </span>                :<span class="lineNoCov">          0 :             SER_READ(obj, obj.nServices = static_cast&lt;ServiceFlags&gt;(services_tmp));</span></a>
-<a name="391"><span class="lineNum">     391 </span>                :<span class="lineNoCov">          0 :         } else {</span></a>
-<a name="392"><span class="lineNum">     392 </span>                :<span class="lineNoCov">          0 :             READWRITE(Using&lt;CustomUintFormatter&lt;8&gt;&gt;(obj.nServices));</span></a>
+<a name="384"><span class="lineNum">     384 </span>                :<span class="lineCov">    1112062 :             READWRITE(obj.nTime);</span></a>
+<a name="385"><span class="lineNum">     385 </span>                :<span class="lineCov">    1112062 :         }</span></a>
+<a name="386"><span class="lineNum">     386 </span>[<span class="branchCov" title="Branch 0 was taken 729 times"> + </span><span class="branchCov" title="Branch 1 was taken 209241 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 47910 times"> + </span><span class="branchCov" title="Branch 3 was taken 42 times"> + </span>]:<span class="lineCov">    1204840 :         if (nVersion &amp; ADDRV2_FORMAT) {</span></a>
+<span class="lineNum">         </span>[<span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 946918 times"> + </span>][<span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">         </span>[<span class="branchNoExec" title="Branch 8 was not executed"> # </span><span class="branchNoExec" title="Branch 9 was not executed"> # </span>][<span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span>]
+<span class="lineNum">         </span>        [<span class="branchNoExec" title="Branch 12 was not executed"> # </span><span class="branchNoExec" title="Branch 13 was not executed"> # </span>]
+<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">      48639 :             uint64_t services_tmp;</span></a>
+<a name="388"><span class="lineNum">     388 </span>                :<span class="lineCov">      96549 :             SER_WRITE(obj, services_tmp = obj.nServices);</span></a>
+<a name="389"><span class="lineNum">     389 </span>                :<span class="lineCov">      48639 :             READWRITE(Using&lt;CompactSizeFormatter&lt;false&gt;&gt;(services_tmp));</span></a>
+<a name="390"><span class="lineNum">     390 </span>                :<span class="lineCov">      49349 :             SER_READ(obj, obj.nServices = static_cast&lt;ServiceFlags&gt;(services_tmp));</span></a>
+<a name="391"><span class="lineNum">     391 </span>                :<span class="lineCov">      48639 :         } else {</span></a>
+<a name="392"><span class="lineNum">     392 </span>                :<span class="lineCov">    1156201 :             READWRITE(Using&lt;CustomUintFormatter&lt;8&gt;&gt;(obj.nServices));</span></a>
 <a name="393"><span class="lineNum">     393 </span>                :            :         }</a>
-<a name="394"><span class="lineNum">     394 </span>                :<span class="lineNoCov">          0 :         READWRITEAS(CService, obj);</span></a>
-<a name="395"><span class="lineNum">     395 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="394"><span class="lineNum">     394 </span>                :<span class="lineCov">    1195043 :         READWRITEAS(CService, obj);</span></a>
+<a name="395"><span class="lineNum">     395 </span>                :<span class="lineCov">    1195043 :     }</span></a>
 <a name="396"><span class="lineNum">     396 </span>                :            : </a>
 <a name="397"><span class="lineNum">     397 </span>                :            :     // disk and network only</a>
-<a name="398"><span class="lineNum">     398 </span>                :<span class="lineNoCov">          0 :     uint32_t nTime{TIME_INIT};</span></a>
+<a name="398"><span class="lineNum">     398 </span>                :<span class="lineCov">    1726602 :     uint32_t nTime{TIME_INIT};</span></a>
 <a name="399"><span class="lineNum">     399 </span>                :            : </a>
-<a name="400"><span class="lineNum">     400 </span>                :<span class="lineNoCov">          0 :     ServiceFlags nServices{NODE_NONE};</span></a>
+<a name="400"><span class="lineNum">     400 </span>                :<span class="lineCov">    1603071 :     ServiceFlags nServices{NODE_NONE};</span></a>
 <a name="401"><span class="lineNum">     401 </span>                :            : };</a>
 <a name="402"><span class="lineNum">     402 </span>                :            : </a>
 <a name="403"><span class="lineNum">     403 </span>                :            : /** getdata message type flags */</a>
@@ -501,7 +516,7 @@
 <a name="430"><span class="lineNum">     430 </span>                :            :     CInv();</a>
 <a name="431"><span class="lineNum">     431 </span>                :            :     CInv(uint32_t typeIn, const uint256&amp; hashIn);</a>
 <a name="432"><span class="lineNum">     432 </span>                :            : </a>
-<a name="433"><span class="lineNum">     433 </span>                :<span class="lineNoCov">          0 :     SERIALIZE_METHODS(CInv, obj) { READWRITE(obj.type, obj.hash); }</span></a>
+<a name="433"><span class="lineNum">     433 </span>                :<span class="lineCov">   13302879 :     SERIALIZE_METHODS(CInv, obj) { READWRITE(obj.type, obj.hash); }</span></a>
 <a name="434"><span class="lineNum">     434 </span>                :            : </a>
 <a name="435"><span class="lineNum">     435 </span>                :            :     friend bool operator&lt;(const CInv&amp; a, const CInv&amp; b);</a>
 <a name="436"><span class="lineNum">     436 </span>                :            : </a>
@@ -510,20 +525,21 @@
 <a name="439"><span class="lineNum">     439 </span>                :            : </a>
 <a name="440"><span class="lineNum">     440 </span>                :            :     // Single-message helper methods</a>
 <a name="441"><span class="lineNum">     441 </span>                :<span class="lineNoCov">          0 :     bool IsMsgTx() const { return type == MSG_TX; }</span></a>
-<a name="442"><span class="lineNum">     442 </span>                :<span class="lineNoCov">          0 :     bool IsMsgBlk() const { return type == MSG_BLOCK; }</span></a>
-<a name="443"><span class="lineNum">     443 </span>                :<span class="lineNoCov">          0 :     bool IsMsgWtx() const { return type == MSG_WTX; }</span></a>
-<a name="444"><span class="lineNum">     444 </span>                :<span class="lineNoCov">          0 :     bool IsMsgFilteredBlk() const { return type == MSG_FILTERED_BLOCK; }</span></a>
-<a name="445"><span class="lineNum">     445 </span>                :<span class="lineNoCov">          0 :     bool IsMsgCmpctBlk() const { return type == MSG_CMPCT_BLOCK; }</span></a>
-<a name="446"><span class="lineNum">     446 </span>                :<span class="lineNoCov">          0 :     bool IsMsgWitnessBlk() const { return type == MSG_WITNESS_BLOCK; }</span></a>
+<a name="442"><span class="lineNum">     442 </span>                :<span class="lineCov">    3399267 :     bool IsMsgBlk() const { return type == MSG_BLOCK; }</span></a>
+<a name="443"><span class="lineNum">     443 </span>                :<span class="lineCov">    3459066 :     bool IsMsgWtx() const { return type == MSG_WTX; }</span></a>
+<a name="444"><span class="lineNum">     444 </span>                :<span class="lineCov">      63923 :     bool IsMsgFilteredBlk() const { return type == MSG_FILTERED_BLOCK; }</span></a>
+<a name="445"><span class="lineNum">     445 </span>                :<span class="lineCov">       5663 :     bool IsMsgCmpctBlk() const { return type == MSG_CMPCT_BLOCK; }</span></a>
+<a name="446"><span class="lineNum">     446 </span>                :<span class="lineCov">     134768 :     bool IsMsgWitnessBlk() const { return type == MSG_WITNESS_BLOCK; }</span></a>
 <a name="447"><span class="lineNum">     447 </span>                :            : </a>
 <a name="448"><span class="lineNum">     448 </span>                :            :     // Combined-message helper methods</a>
-<a name="449"><span class="lineNum">     449 </span>                :<span class="lineNoCov">          0 :     bool IsGenTxMsg() const</span></a>
+<a name="449"><span class="lineNum">     449 </span>                :<span class="lineCov">    3624120 :     bool IsGenTxMsg() const</span></a>
 <a name="450"><span class="lineNum">     450 </span>                :            :     {</a>
-<a name="451"><span class="lineNum">     451 </span>                :<span class="lineNoCov">          0 :         return type == MSG_TX || type == MSG_WTX || type == MSG_WITNESS_TX;</span></a>
+<a name="451"><span class="lineNum">     451 </span>[<span class="branchCov" title="Branch 0 was taken 3369426 times"> + </span><span class="branchCov" title="Branch 1 was taken 254694 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 3368995 times"> + </span><span class="branchCov" title="Branch 3 was taken 431 times"> + </span>]:<span class="lineCov">    3624120 :         return type == MSG_TX || type == MSG_WTX || type == MSG_WITNESS_TX;</span></a>
 <a name="452"><span class="lineNum">     452 </span>                :            :     }</a>
-<a name="453"><span class="lineNum">     453 </span>                :<span class="lineNoCov">          0 :     bool IsGenBlkMsg() const</span></a>
+<a name="453"><span class="lineNum">     453 </span>                :<span class="lineCov">     121936 :     bool IsGenBlkMsg() const</span></a>
 <a name="454"><span class="lineNum">     454 </span>                :            :     {</a>
-<a name="455"><span class="lineNum">     455 </span>                :<span class="lineNoCov">          0 :         return type == MSG_BLOCK || type == MSG_FILTERED_BLOCK || type == MSG_CMPCT_BLOCK || type == MSG_WITNESS_BLOCK;</span></a>
+<a name="455"><span class="lineNum">     455 </span>[<span class="branchCov" title="Branch 0 was taken 112204 times"> + </span><span class="branchCov" title="Branch 1 was taken 9732 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 34183 times"> + </span><span class="branchCov" title="Branch 3 was taken 78021 times"> + </span>]:<span class="lineCov">     121936 :         return type == MSG_BLOCK || type == MSG_FILTERED_BLOCK || type == MSG_CMPCT_BLOCK || type == MSG_WITNESS_BLOCK;</span></a>
+<span class="lineNum">         </span>        [<span class="branchCov" title="Branch 4 was taken 27250 times"> + </span><span class="branchCov" title="Branch 5 was taken 6933 times"> + </span>]
 <a name="456"><span class="lineNum">     456 </span>                :            :     }</a>
 <a name="457"><span class="lineNum">     457 </span>                :            : </a>
 <a name="458"><span class="lineNum">     458 </span>                :            :     uint32_t type;</a>

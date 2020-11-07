@@ -31,27 +31,27 @@
             <td class="headerValue">fuzz_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntry">23</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-11-07 11:34:23</td>
+            <td class="headerValue">2020-11-07 12:05:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntry">2</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">42</td>
+            <td class="headerCovTableEntryLo">52.4 %</td>
           </tr>
           <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -87,35 +87,39 @@
 <a name="16"><span class="lineNum">      16 </span>                :            : #include &lt;string&gt;</a>
 <a name="17"><span class="lineNum">      17 </span>                :            : #include &lt;vector&gt;</a>
 <a name="18"><span class="lineNum">      18 </span>                :            : </a>
-<a name="19"><span class="lineNum">      19 </span>                :<span class="lineNoCov">          0 : void initialize()</span></a>
+<a name="19"><span class="lineNum">      19 </span>                :<span class="lineCov">          1 : void initialize()</span></a>
 <a name="20"><span class="lineNum">      20 </span>                :            : {</a>
-<a name="21"><span class="lineNum">      21 </span>                :<span class="lineNoCov">          0 :     static const ECCVerifyHandle ecc_verify_handle;</span></a>
-<a name="22"><span class="lineNum">      22 </span>                :<span class="lineNoCov">          0 :     ECC_Start();</span></a>
-<a name="23"><span class="lineNum">      23 </span>                :<span class="lineNoCov">          0 :     SelectParams(CBaseChainParams::REGTEST);</span></a>
-<a name="24"><span class="lineNum">      24 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="21"><span class="lineNum">      21 </span>[<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          1 :     static const ECCVerifyHandle ecc_verify_handle;</span></a>
+<span class="lineNum">         </span>        [<span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="22"><span class="lineNum">      22 </span>                :<span class="lineCov">          1 :     ECC_Start();</span></a>
+<a name="23"><span class="lineNum">      23 </span>                :<span class="lineCov">          1 :     SelectParams(CBaseChainParams::REGTEST);</span></a>
+<a name="24"><span class="lineNum">      24 </span>                :<span class="lineCov">          1 : }</span></a>
 <a name="25"><span class="lineNum">      25 </span>                :            : </a>
-<a name="26"><span class="lineNum">      26 </span>                :<span class="lineNoCov">          0 : void test_one_input(const std::vector&lt;uint8_t&gt;&amp; buffer)</span></a>
+<a name="26"><span class="lineNum">      26 </span>                :<span class="lineCov">        434 : void test_one_input(const std::vector&lt;uint8_t&gt;&amp; buffer)</span></a>
 <a name="27"><span class="lineNum">      27 </span>                :            : {</a>
-<a name="28"><span class="lineNum">      28 </span>                :<span class="lineNoCov">          0 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></a>
-<a name="29"><span class="lineNum">      29 </span>                :<span class="lineNoCov">          0 :     const std::string random_message = fuzzed_data_provider.ConsumeRandomLengthString(1024);</span></a>
+<a name="28"><span class="lineNum">      28 </span>                :<span class="lineCov">        434 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></a>
+<a name="29"><span class="lineNum">      29 </span>                :<span class="lineCov">        434 :     const std::string random_message = fuzzed_data_provider.ConsumeRandomLengthString(1024);</span></a>
 <a name="30"><span class="lineNum">      30 </span>                :            :     {</a>
-<a name="31"><span class="lineNum">      31 </span>                :<span class="lineNoCov">          0 :         const std::vector&lt;uint8_t&gt; random_bytes = ConsumeRandomLengthByteVector(fuzzed_data_provider);</span></a>
-<a name="32"><span class="lineNum">      32 </span>                :<span class="lineNoCov">          0 :         CKey private_key;</span></a>
-<a name="33"><span class="lineNum">      33 </span>                :<span class="lineNoCov">          0 :         private_key.Set(random_bytes.begin(), random_bytes.end(), fuzzed_data_provider.ConsumeBool());</span></a>
-<a name="34"><span class="lineNum">      34 </span>                :<span class="lineNoCov">          0 :         std::string signature;</span></a>
-<a name="35"><span class="lineNum">      35 </span>                :<span class="lineNoCov">          0 :         const bool message_signed = MessageSign(private_key, random_message, signature);</span></a>
-<a name="36"><span class="lineNum">      36 </span>                :<span class="lineNoCov">          0 :         if (private_key.IsValid()) {</span></a>
-<a name="37"><span class="lineNum">      37 </span>                :<span class="lineNoCov">          0 :             assert(message_signed);</span></a>
-<a name="38"><span class="lineNum">      38 </span>                :<span class="lineNoCov">          0 :             const MessageVerificationResult verification_result = MessageVerify(EncodeDestination(PKHash(private_key.GetPubKey().GetID())), signature, random_message);</span></a>
-<a name="39"><span class="lineNum">      39 </span>                :<span class="lineNoCov">          0 :             assert(verification_result == MessageVerificationResult::OK);</span></a>
-<a name="40"><span class="lineNum">      40 </span>                :<span class="lineNoCov">          0 :         }</span></a>
-<a name="41"><span class="lineNum">      41 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="31"><span class="lineNum">      31 </span>                :<span class="lineCov">        434 :         const std::vector&lt;uint8_t&gt; random_bytes = ConsumeRandomLengthByteVector(fuzzed_data_provider);</span></a>
+<a name="32"><span class="lineNum">      32 </span>        [<span class="branchCov" title="Branch 0 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        434 :         CKey private_key;</span></a>
+<a name="33"><span class="lineNum">      33 </span>[<span class="branchCov" title="Branch 0 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        434 :         private_key.Set(random_bytes.begin(), random_bytes.end(), fuzzed_data_provider.ConsumeBool());</span></a>
+<a name="34"><span class="lineNum">      34 </span>                :<span class="lineCov">        434 :         std::string signature;</span></a>
+<a name="35"><span class="lineNum">      35 </span>        [<span class="branchCov" title="Branch 0 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        434 :         const bool message_signed = MessageSign(private_key, random_message, signature);</span></a>
+<a name="36"><span class="lineNum">      36 </span>        [<span class="branchCov" title="Branch 0 was taken 56 times"> + </span><span class="branchCov" title="Branch 1 was taken 378 times"> + </span>]:<span class="lineCov">        434 :         if (private_key.IsValid()) {</span></a>
+<a name="37"><span class="lineNum">      37 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 56 times"> + </span>]:<span class="lineCov">         56 :             assert(message_signed);</span></a>
+<a name="38"><span class="lineNum">      38 </span>[<span class="branchCov" title="Branch 0 was taken 56 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 56 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">         56 :             const MessageVerificationResult verification_result = MessageVerify(EncodeDestination(PKHash(private_key.GetPubKey().GetID())), signature, random_message);</span></a>
+<span class="lineNum">         </span>[<span class="branchCov" title="Branch 4 was taken 56 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>][<span class="branchCov" title="Branch 6 was taken 56 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<span class="lineNum">         </span>[<span class="branchCov" title="Branch 8 was taken 56 times"> + </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span>][<span class="branchCov" title="Branch 10 was taken 56 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<a name="39"><span class="lineNum">      39 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 56 times"> + </span>]:<span class="lineCov">         56 :             assert(verification_result == MessageVerificationResult::OK);</span></a>
+<a name="40"><span class="lineNum">      40 </span>                :<span class="lineCov">         56 :         }</span></a>
+<a name="41"><span class="lineNum">      41 </span>                :<span class="lineCov">        434 :     }</span></a>
 <a name="42"><span class="lineNum">      42 </span>                :            :     {</a>
-<a name="43"><span class="lineNum">      43 </span>                :<span class="lineNoCov">          0 :         (void)MessageHash(random_message);</span></a>
-<a name="44"><span class="lineNum">      44 </span>                :<span class="lineNoCov">          0 :         (void)MessageVerify(fuzzed_data_provider.ConsumeRandomLengthString(1024), fuzzed_data_provider.ConsumeRandomLengthString(1024), random_message);</span></a>
-<a name="45"><span class="lineNum">      45 </span>                :<span class="lineNoCov">          0 :         (void)SigningResultString(fuzzed_data_provider.PickValueInArray({SigningResult::OK, SigningResult::PRIVATE_KEY_NOT_AVAILABLE, SigningResult::SIGNING_FAILED}));</span></a>
+<a name="43"><span class="lineNum">      43 </span>        [<span class="branchCov" title="Branch 0 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        434 :         (void)MessageHash(random_message);</span></a>
+<a name="44"><span class="lineNum">      44 </span>[<span class="branchCov" title="Branch 0 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        434 :         (void)MessageVerify(fuzzed_data_provider.ConsumeRandomLengthString(1024), fuzzed_data_provider.ConsumeRandomLengthString(1024), random_message);</span></a>
+<span class="lineNum">         </span>        [<span class="branchCov" title="Branch 4 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="45"><span class="lineNum">      45 </span>        [<span class="branchCov" title="Branch 0 was taken 434 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        434 :         (void)SigningResultString(fuzzed_data_provider.PickValueInArray({SigningResult::OK, SigningResult::PRIVATE_KEY_NOT_AVAILABLE, SigningResult::SIGNING_FAILED}));</span></a>
 <a name="46"><span class="lineNum">      46 </span>                :            :     }</a>
-<a name="47"><span class="lineNum">      47 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="47"><span class="lineNum">      47 </span>                :<span class="lineCov">        434 : }</span></a>
 </pre>
       </td>
     </tr>

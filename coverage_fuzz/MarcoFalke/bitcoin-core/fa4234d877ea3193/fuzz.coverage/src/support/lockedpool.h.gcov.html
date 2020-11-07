@@ -31,27 +31,27 @@
             <td class="headerValue">fuzz_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntry">6</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-11-07 11:34:23</td>
+            <td class="headerValue">2020-11-07 12:05:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">4</td>
             <td class="headerCovTableEntry">5</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntryMed">80.0 %</td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -87,10 +87,10 @@
 <a name="16"><span class="lineNum">      16 </span>                :            :  * OS-dependent allocation and deallocation of locked/pinned memory pages.</a>
 <a name="17"><span class="lineNum">      17 </span>                :            :  * Abstract base class.</a>
 <a name="18"><span class="lineNum">      18 </span>                :            :  */</a>
-<a name="19"><span class="lineNum">      19 </span>                :<span class="lineNoCov">          0 : class LockedPageAllocator</span></a>
+<a name="19"><span class="lineNum">      19 </span>                :<span class="lineCov">         96 : class LockedPageAllocator</span></a>
 <a name="20"><span class="lineNum">      20 </span>                :            : {</a>
 <a name="21"><span class="lineNum">      21 </span>                :            : public:</a>
-<a name="22"><span class="lineNum">      22 </span>                :<span class="lineNoCov">          0 :     virtual ~LockedPageAllocator() {}</span></a>
+<a name="22"><span class="lineNum">      22 </span>                :<span class="lineCov">         96 :     virtual ~LockedPageAllocator() {}</span></a>
 <a name="23"><span class="lineNum">      23 </span>                :            :     /** Allocate and lock memory pages.</a>
 <a name="24"><span class="lineNum">      24 </span>                :            :      * If len is not a multiple of the system page size, it is rounded up.</a>
 <a name="25"><span class="lineNum">      25 </span>                :            :      * Returns nullptr in case of allocation failure.</a>
@@ -158,7 +158,7 @@
 <a name="87"><span class="lineNum">      87 </span>                :            :      * This returns base &lt;= ptr &lt; (base+size) so only use it for (inclusive)</a>
 <a name="88"><span class="lineNum">      88 </span>                :            :      * chunk starting addresses.</a>
 <a name="89"><span class="lineNum">      89 </span>                :            :      */</a>
-<a name="90"><span class="lineNum">      90 </span>                :<span class="lineNoCov">          0 :     bool addressInArena(void *ptr) const { return ptr &gt;= base &amp;&amp; ptr &lt; end; }</span></a>
+<a name="90"><span class="lineNum">      90 </span>        [<span class="branchCov" title="Branch 0 was taken 14997 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      14997 :     bool addressInArena(void *ptr) const { return ptr &gt;= base &amp;&amp; ptr &lt; end; }</span></a>
 <a name="91"><span class="lineNum">      91 </span>                :            : private:</a>
 <a name="92"><span class="lineNum">      92 </span>                :            :     typedef std::multimap&lt;size_t, char*&gt; SizeToChunkSortedMap;</a>
 <a name="93"><span class="lineNum">      93 </span>                :            :     /** Map to enable O(log(n)) best-fit allocation, as it's sorted by size */</a>
@@ -290,11 +290,11 @@
 <a name="219"><span class="lineNum">     219 </span>                :            : {</a>
 <a name="220"><span class="lineNum">     220 </span>                :            : public:</a>
 <a name="221"><span class="lineNum">     221 </span>                :            :     /** Return the current instance, or create it once */</a>
-<a name="222"><span class="lineNum">     222 </span>                :<span class="lineNoCov">          0 :     static LockedPoolManager&amp; Instance()</span></a>
+<a name="222"><span class="lineNum">     222 </span>                :<span class="lineCov">      29994 :     static LockedPoolManager&amp; Instance()</span></a>
 <a name="223"><span class="lineNum">     223 </span>                :            :     {</a>
 <a name="224"><span class="lineNum">     224 </span>                :            :         static std::once_flag init_flag;</a>
-<a name="225"><span class="lineNum">     225 </span>                :<span class="lineNoCov">          0 :         std::call_once(init_flag, LockedPoolManager::CreateInstance);</span></a>
-<a name="226"><span class="lineNum">     226 </span>                :<span class="lineNoCov">          0 :         return *LockedPoolManager::_instance;</span></a>
+<a name="225"><span class="lineNum">     225 </span>                :<span class="lineCov">      29994 :         std::call_once(init_flag, LockedPoolManager::CreateInstance);</span></a>
+<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">      29994 :         return *LockedPoolManager::_instance;</span></a>
 <a name="227"><span class="lineNum">     227 </span>                :            :     }</a>
 <a name="228"><span class="lineNum">     228 </span>                :            : </a>
 <a name="229"><span class="lineNum">     229 </span>                :            : private:</a>

@@ -31,27 +31,27 @@
             <td class="headerValue">fuzz_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntry">156</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">156</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-11-07 11:34:23</td>
+            <td class="headerValue">2020-11-07 12:05:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntry">25</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">25</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">52</td>
+            <td class="headerCovTableEntry">69</td>
+            <td class="headerCovTableEntryMed">75.4 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -133,7 +133,7 @@
 <a name="62"><span class="lineNum">      62 </span>                :            : </a>
 <a name="63"><span class="lineNum">      63 </span>                :            : namespace {</a>
 <a name="64"><span class="lineNum">      64 </span>                :            : </a>
-<a name="65"><span class="lineNum">      65 </span>                :<span class="lineNoCov">          0 : void RandAddSeedPerfmon(CSHA512&amp; hasher)</span></a>
+<a name="65"><span class="lineNum">      65 </span>                :<span class="lineCov">         96 : void RandAddSeedPerfmon(CSHA512&amp; hasher)</span></a>
 <a name="66"><span class="lineNum">      66 </span>                :            : {</a>
 <a name="67"><span class="lineNum">      67 </span>                :            : #ifdef WIN32</a>
 <a name="68"><span class="lineNum">      68 </span>                :            :     // Seed with the entire set of perfmon data</a>
@@ -170,7 +170,7 @@
 <a name="99"><span class="lineNum">      99 </span>                :            :         // constructors have been invoked.</a>
 <a name="100"><span class="lineNum">     100 </span>                :            :     }</a>
 <a name="101"><span class="lineNum">     101 </span>                :            : #endif</a>
-<a name="102"><span class="lineNum">     102 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="102"><span class="lineNum">     102 </span>                :<span class="lineCov">         96 : }</span></a>
 <a name="103"><span class="lineNum">     103 </span>                :            : </a>
 <a name="104"><span class="lineNum">     104 </span>                :            : /** Helper to easily feed data into a CSHA512.</a>
 <a name="105"><span class="lineNum">     105 </span>                :            :  *</a>
@@ -178,59 +178,59 @@
 <a name="107"><span class="lineNum">     107 </span>                :            :  * Its raw memory representation is used directly.</a>
 <a name="108"><span class="lineNum">     108 </span>                :            :  */</a>
 <a name="109"><span class="lineNum">     109 </span>                :            : template&lt;typename T&gt;</a>
-<a name="110"><span class="lineNum">     110 </span>                :<span class="lineNoCov">          0 : CSHA512&amp; operator&lt;&lt;(CSHA512&amp; hasher, const T&amp; data) {</span></a>
+<a name="110"><span class="lineNum">     110 </span>                :<span class="lineCov">      30432 : CSHA512&amp; operator&lt;&lt;(CSHA512&amp; hasher, const T&amp; data) {</span></a>
 <a name="111"><span class="lineNum">     111 </span>                :            :     static_assert(!std::is_same&lt;typename std::decay&lt;T&gt;::type, char*&gt;::value, &quot;Calling operator&lt;&lt;(CSHA512, char*) is probably not what you want&quot;);</a>
 <a name="112"><span class="lineNum">     112 </span>                :            :     static_assert(!std::is_same&lt;typename std::decay&lt;T&gt;::type, unsigned char*&gt;::value, &quot;Calling operator&lt;&lt;(CSHA512, unsigned char*) is probably not what you want&quot;);</a>
 <a name="113"><span class="lineNum">     113 </span>                :            :     static_assert(!std::is_same&lt;typename std::decay&lt;T&gt;::type, const char*&gt;::value, &quot;Calling operator&lt;&lt;(CSHA512, const char*) is probably not what you want&quot;);</a>
 <a name="114"><span class="lineNum">     114 </span>                :            :     static_assert(!std::is_same&lt;typename std::decay&lt;T&gt;::type, const unsigned char*&gt;::value, &quot;Calling operator&lt;&lt;(CSHA512, const unsigned char*) is probably not what you want&quot;);</a>
-<a name="115"><span class="lineNum">     115 </span>                :<span class="lineNoCov">          0 :     hasher.Write((const unsigned char*)&amp;data, sizeof(data));</span></a>
-<a name="116"><span class="lineNum">     116 </span>                :<span class="lineNoCov">          0 :     return hasher;</span></a>
+<a name="115"><span class="lineNum">     115 </span>                :<span class="lineCov">      30432 :     hasher.Write((const unsigned char*)&amp;data, sizeof(data));</span></a>
+<a name="116"><span class="lineNum">     116 </span>                :<span class="lineCov">      30432 :     return hasher;</span></a>
 <a name="117"><span class="lineNum">     117 </span>                :            : }</a>
 <a name="118"><span class="lineNum">     118 </span>                :            : </a>
 <a name="119"><span class="lineNum">     119 </span>                :            : #ifndef WIN32</a>
-<a name="120"><span class="lineNum">     120 </span>                :<span class="lineNoCov">          0 : void AddSockaddr(CSHA512&amp; hasher, const struct sockaddr *addr)</span></a>
+<a name="120"><span class="lineNum">     120 </span>                :<span class="lineCov">       1728 : void AddSockaddr(CSHA512&amp; hasher, const struct sockaddr *addr)</span></a>
 <a name="121"><span class="lineNum">     121 </span>                :            : {</a>
-<a name="122"><span class="lineNum">     122 </span>                :<span class="lineNoCov">          0 :     if (addr == nullptr) return;</span></a>
-<a name="123"><span class="lineNum">     123 </span>                :<span class="lineNoCov">          0 :     switch (addr-&gt;sa_family) {</span></a>
+<a name="122"><span class="lineNum">     122 </span>        [<span class="branchCov" title="Branch 0 was taken 1344 times"> + </span><span class="branchCov" title="Branch 1 was taken 384 times"> + </span>]:<span class="lineCov">       1728 :     if (addr == nullptr) return;</span></a>
+<a name="123"><span class="lineNum">     123 </span>     [<span class="branchCov" title="Branch 0 was taken 576 times"> + </span><span class="branchCov" title="Branch 1 was taken 384 times"> + </span><span class="branchCov" title="Branch 2 was taken 384 times"> + </span>]:<span class="lineCov">       1344 :     switch (addr-&gt;sa_family) {</span></a>
 <a name="124"><span class="lineNum">     124 </span>                :            :     case AF_INET:</a>
-<a name="125"><span class="lineNum">     125 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)addr, sizeof(sockaddr_in));</span></a>
-<a name="126"><span class="lineNum">     126 </span>                :<span class="lineNoCov">          0 :         break;</span></a>
+<a name="125"><span class="lineNum">     125 </span>                :<span class="lineCov">        576 :         hasher.Write((const unsigned char*)addr, sizeof(sockaddr_in));</span></a>
+<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">        576 :         break;</span></a>
 <a name="127"><span class="lineNum">     127 </span>                :            :     case AF_INET6:</a>
-<a name="128"><span class="lineNum">     128 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)addr, sizeof(sockaddr_in6));</span></a>
-<a name="129"><span class="lineNum">     129 </span>                :<span class="lineNoCov">          0 :         break;</span></a>
+<a name="128"><span class="lineNum">     128 </span>                :<span class="lineCov">        384 :         hasher.Write((const unsigned char*)addr, sizeof(sockaddr_in6));</span></a>
+<a name="129"><span class="lineNum">     129 </span>                :<span class="lineCov">        384 :         break;</span></a>
 <a name="130"><span class="lineNum">     130 </span>                :            :     default:</a>
-<a name="131"><span class="lineNum">     131 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;addr-&gt;sa_family, sizeof(addr-&gt;sa_family));</span></a>
-<a name="132"><span class="lineNum">     132 </span>                :<span class="lineNoCov">          0 :     }</span></a>
-<a name="133"><span class="lineNum">     133 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="131"><span class="lineNum">     131 </span>                :<span class="lineCov">        384 :         hasher.Write((const unsigned char*)&amp;addr-&gt;sa_family, sizeof(addr-&gt;sa_family));</span></a>
+<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">        384 :     }</span></a>
+<a name="133"><span class="lineNum">     133 </span>                :<span class="lineCov">       1728 : }</span></a>
 <a name="134"><span class="lineNum">     134 </span>                :            : </a>
-<a name="135"><span class="lineNum">     135 </span>                :<span class="lineNoCov">          0 : void AddFile(CSHA512&amp; hasher, const char *path)</span></a>
+<a name="135"><span class="lineNum">     135 </span>                :<span class="lineCov">       1728 : void AddFile(CSHA512&amp; hasher, const char *path)</span></a>
 <a name="136"><span class="lineNum">     136 </span>                :            : {</a>
-<a name="137"><span class="lineNum">     137 </span>                :<span class="lineNoCov">          0 :     struct stat sb = {};</span></a>
-<a name="138"><span class="lineNum">     138 </span>                :<span class="lineNoCov">          0 :     int f = open(path, O_RDONLY);</span></a>
+<a name="137"><span class="lineNum">     137 </span>                :<span class="lineCov">       1728 :     struct stat sb = {};</span></a>
+<a name="138"><span class="lineNum">     138 </span>                :<span class="lineCov">       1728 :     int f = open(path, O_RDONLY);</span></a>
 <a name="139"><span class="lineNum">     139 </span>                :            :     size_t total = 0;</a>
-<a name="140"><span class="lineNum">     140 </span>                :<span class="lineNoCov">          0 :     if (f != -1) {</span></a>
-<a name="141"><span class="lineNum">     141 </span>                :<span class="lineNoCov">          0 :         unsigned char fbuf[4096];</span></a>
+<a name="140"><span class="lineNum">     140 </span>        [<span class="branchCov" title="Branch 0 was taken 1728 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1728 :     if (f != -1) {</span></a>
+<a name="141"><span class="lineNum">     141 </span>                :<span class="lineCov">       1728 :         unsigned char fbuf[4096];</span></a>
 <a name="142"><span class="lineNum">     142 </span>                :            :         int n;</a>
-<a name="143"><span class="lineNum">     143 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;f, sizeof(f));</span></a>
-<a name="144"><span class="lineNum">     144 </span>                :<span class="lineNoCov">          0 :         if (fstat(f, &amp;sb) == 0) hasher &lt;&lt; sb;</span></a>
-<a name="145"><span class="lineNum">     145 </span>                :<span class="lineNoCov">          0 :         do {</span></a>
-<a name="146"><span class="lineNum">     146 </span>                :<span class="lineNoCov">          0 :             n = read(f, fbuf, sizeof(fbuf));</span></a>
-<a name="147"><span class="lineNum">     147 </span>                :<span class="lineNoCov">          0 :             if (n &gt; 0) hasher.Write(fbuf, n);</span></a>
-<a name="148"><span class="lineNum">     148 </span>                :<span class="lineNoCov">          0 :             total += n;</span></a>
+<a name="143"><span class="lineNum">     143 </span>                :<span class="lineCov">       1728 :         hasher.Write((const unsigned char*)&amp;f, sizeof(f));</span></a>
+<a name="144"><span class="lineNum">     144 </span>        [<span class="branchCov" title="Branch 0 was taken 1728 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1728 :         if (fstat(f, &amp;sb) == 0) hasher &lt;&lt; sb;</span></a>
+<a name="145"><span class="lineNum">     145 </span>                :<span class="lineCov">       1728 :         do {</span></a>
+<a name="146"><span class="lineNum">     146 </span>                :<span class="lineCov">       1920 :             n = read(f, fbuf, sizeof(fbuf));</span></a>
+<a name="147"><span class="lineNum">     147 </span>        [<span class="branchCov" title="Branch 0 was taken 1920 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1920 :             if (n &gt; 0) hasher.Write(fbuf, n);</span></a>
+<a name="148"><span class="lineNum">     148 </span>                :<span class="lineCov">       1920 :             total += n;</span></a>
 <a name="149"><span class="lineNum">     149 </span>                :            :             /* not bothering with EINTR handling. */</a>
-<a name="150"><span class="lineNum">     150 </span>                :<span class="lineNoCov">          0 :         } while (n == sizeof(fbuf) &amp;&amp; total &lt; 1048576); // Read only the first 1 Mbyte</span></a>
-<a name="151"><span class="lineNum">     151 </span>                :<span class="lineNoCov">          0 :         close(f);</span></a>
-<a name="152"><span class="lineNum">     152 </span>                :<span class="lineNoCov">          0 :     }</span></a>
-<a name="153"><span class="lineNum">     153 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="150"><span class="lineNum">     150 </span>[<span class="branchCov" title="Branch 0 was taken 192 times"> + </span><span class="branchCov" title="Branch 1 was taken 1728 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 192 times"> + </span><span class="branchCov" title="Branch 3 was taken 1728 times"> + </span>]:<span class="lineCov">       1920 :         } while (n == sizeof(fbuf) &amp;&amp; total &lt; 1048576); // Read only the first 1 Mbyte</span></a>
+<a name="151"><span class="lineNum">     151 </span>                :<span class="lineCov">       1728 :         close(f);</span></a>
+<a name="152"><span class="lineNum">     152 </span>                :<span class="lineCov">       1728 :     }</span></a>
+<a name="153"><span class="lineNum">     153 </span>                :<span class="lineCov">       1728 : }</span></a>
 <a name="154"><span class="lineNum">     154 </span>                :            : </a>
-<a name="155"><span class="lineNum">     155 </span>                :<span class="lineNoCov">          0 : void AddPath(CSHA512&amp; hasher, const char *path)</span></a>
+<a name="155"><span class="lineNum">     155 </span>                :<span class="lineCov">        480 : void AddPath(CSHA512&amp; hasher, const char *path)</span></a>
 <a name="156"><span class="lineNum">     156 </span>                :            : {</a>
-<a name="157"><span class="lineNum">     157 </span>                :<span class="lineNoCov">          0 :     struct stat sb = {};</span></a>
-<a name="158"><span class="lineNum">     158 </span>                :<span class="lineNoCov">          0 :     if (stat(path, &amp;sb) == 0) {</span></a>
-<a name="159"><span class="lineNum">     159 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)path, strlen(path) + 1);</span></a>
-<a name="160"><span class="lineNum">     160 </span>                :<span class="lineNoCov">          0 :         hasher &lt;&lt; sb;</span></a>
-<a name="161"><span class="lineNum">     161 </span>                :<span class="lineNoCov">          0 :     }</span></a>
-<a name="162"><span class="lineNum">     162 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="157"><span class="lineNum">     157 </span>                :<span class="lineCov">        480 :     struct stat sb = {};</span></a>
+<a name="158"><span class="lineNum">     158 </span>        [<span class="branchCov" title="Branch 0 was taken 480 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        480 :     if (stat(path, &amp;sb) == 0) {</span></a>
+<a name="159"><span class="lineNum">     159 </span>                :<span class="lineCov">        480 :         hasher.Write((const unsigned char*)path, strlen(path) + 1);</span></a>
+<a name="160"><span class="lineNum">     160 </span>                :<span class="lineCov">        480 :         hasher &lt;&lt; sb;</span></a>
+<a name="161"><span class="lineNum">     161 </span>                :<span class="lineCov">        480 :     }</span></a>
+<a name="162"><span class="lineNum">     162 </span>                :<span class="lineCov">        480 : }</span></a>
 <a name="163"><span class="lineNum">     163 </span>                :            : #endif</a>
 <a name="164"><span class="lineNum">     164 </span>                :            : </a>
 <a name="165"><span class="lineNum">     165 </span>                :            : #if HAVE_SYSCTL</a>
@@ -252,51 +252,52 @@
 <a name="181"><span class="lineNum">     181 </span>                :            : #endif</a>
 <a name="182"><span class="lineNum">     182 </span>                :            : </a>
 <a name="183"><span class="lineNum">     183 </span>                :            : #ifdef HAVE_GETCPUID</a>
-<a name="184"><span class="lineNum">     184 </span>                :<span class="lineNoCov">          0 : void inline AddCPUID(CSHA512&amp; hasher, uint32_t leaf, uint32_t subleaf, uint32_t&amp; ax, uint32_t&amp; bx, uint32_t&amp; cx, uint32_t&amp; dx)</span></a>
+<a name="184"><span class="lineNum">     184 </span>                :<span class="lineCov">       4128 : void inline AddCPUID(CSHA512&amp; hasher, uint32_t leaf, uint32_t subleaf, uint32_t&amp; ax, uint32_t&amp; bx, uint32_t&amp; cx, uint32_t&amp; dx)</span></a>
 <a name="185"><span class="lineNum">     185 </span>                :            : {</a>
-<a name="186"><span class="lineNum">     186 </span>                :<span class="lineNoCov">          0 :     GetCPUID(leaf, subleaf, ax, bx, cx, dx);</span></a>
-<a name="187"><span class="lineNum">     187 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; leaf &lt;&lt; subleaf &lt;&lt; ax &lt;&lt; bx &lt;&lt; cx &lt;&lt; dx;</span></a>
-<a name="188"><span class="lineNum">     188 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="186"><span class="lineNum">     186 </span>                :<span class="lineCov">       4128 :     GetCPUID(leaf, subleaf, ax, bx, cx, dx);</span></a>
+<a name="187"><span class="lineNum">     187 </span>                :<span class="lineCov">       4128 :     hasher &lt;&lt; leaf &lt;&lt; subleaf &lt;&lt; ax &lt;&lt; bx &lt;&lt; cx &lt;&lt; dx;</span></a>
+<a name="188"><span class="lineNum">     188 </span>                :<span class="lineCov">       4128 : }</span></a>
 <a name="189"><span class="lineNum">     189 </span>                :            : </a>
-<a name="190"><span class="lineNum">     190 </span>                :<span class="lineNoCov">          0 : void AddAllCPUID(CSHA512&amp; hasher)</span></a>
+<a name="190"><span class="lineNum">     190 </span>                :<span class="lineCov">         96 : void AddAllCPUID(CSHA512&amp; hasher)</span></a>
 <a name="191"><span class="lineNum">     191 </span>                :            : {</a>
-<a name="192"><span class="lineNum">     192 </span>                :<span class="lineNoCov">          0 :     uint32_t ax, bx, cx, dx;</span></a>
+<a name="192"><span class="lineNum">     192 </span>                :<span class="lineCov">         96 :     uint32_t ax, bx, cx, dx;</span></a>
 <a name="193"><span class="lineNum">     193 </span>                :            :     // Iterate over all standard leaves</a>
-<a name="194"><span class="lineNum">     194 </span>                :<span class="lineNoCov">          0 :     AddCPUID(hasher, 0, 0, ax, bx, cx, dx); // Returns max leaf in ax</span></a>
-<a name="195"><span class="lineNum">     195 </span>                :<span class="lineNoCov">          0 :     uint32_t max = ax;</span></a>
-<a name="196"><span class="lineNum">     196 </span>                :<span class="lineNoCov">          0 :     for (uint32_t leaf = 1; leaf &lt;= max &amp;&amp; leaf &lt;= 0xFF; ++leaf) {</span></a>
-<a name="197"><span class="lineNum">     197 </span>                :<span class="lineNoCov">          0 :         uint32_t maxsub = 0;</span></a>
-<a name="198"><span class="lineNum">     198 </span>                :<span class="lineNoCov">          0 :         for (uint32_t subleaf = 0; subleaf &lt;= 0xFF; ++subleaf) {</span></a>
-<a name="199"><span class="lineNum">     199 </span>                :<span class="lineNoCov">          0 :             AddCPUID(hasher, leaf, subleaf, ax, bx, cx, dx);</span></a>
+<a name="194"><span class="lineNum">     194 </span>                :<span class="lineCov">         96 :     AddCPUID(hasher, 0, 0, ax, bx, cx, dx); // Returns max leaf in ax</span></a>
+<a name="195"><span class="lineNum">     195 </span>                :<span class="lineCov">         96 :     uint32_t max = ax;</span></a>
+<a name="196"><span class="lineNum">     196 </span>[<span class="branchCov" title="Branch 0 was taken 2112 times"> + </span><span class="branchCov" title="Branch 1 was taken 96 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 96 times"> + </span><span class="branchCov" title="Branch 3 was taken 2112 times"> + </span>]:<span class="lineCov">       2208 :     for (uint32_t leaf = 1; leaf &lt;= max &amp;&amp; leaf &lt;= 0xFF; ++leaf) {</span></a>
+<a name="197"><span class="lineNum">     197 </span>                :<span class="lineCov">       3168 :         uint32_t maxsub = 0;</span></a>
+<a name="198"><span class="lineNum">     198 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3168 times"> + </span>]:<span class="lineCov">       3168 :         for (uint32_t subleaf = 0; subleaf &lt;= 0xFF; ++subleaf) {</span></a>
+<a name="199"><span class="lineNum">     199 </span>                :<span class="lineCov">       3168 :             AddCPUID(hasher, leaf, subleaf, ax, bx, cx, dx);</span></a>
 <a name="200"><span class="lineNum">     200 </span>                :            :             // Iterate subleafs for leaf values 4, 7, 11, 13</a>
-<a name="201"><span class="lineNum">     201 </span>                :<span class="lineNoCov">          0 :             if (leaf == 4) {</span></a>
-<a name="202"><span class="lineNum">     202 </span>                :<span class="lineNoCov">          0 :                 if ((ax &amp; 0x1f) == 0) break;</span></a>
-<a name="203"><span class="lineNum">     203 </span>                :<span class="lineNoCov">          0 :             } else if (leaf == 7) {</span></a>
-<a name="204"><span class="lineNum">     204 </span>                :<span class="lineNoCov">          0 :                 if (subleaf == 0) maxsub = ax;</span></a>
-<a name="205"><span class="lineNum">     205 </span>                :<span class="lineNoCov">          0 :                 if (subleaf == maxsub) break;</span></a>
-<a name="206"><span class="lineNum">     206 </span>                :<span class="lineNoCov">          0 :             } else if (leaf == 11) {</span></a>
-<a name="207"><span class="lineNum">     207 </span>                :<span class="lineNoCov">          0 :                 if ((cx &amp; 0xff00) == 0) break;</span></a>
-<a name="208"><span class="lineNum">     208 </span>                :<span class="lineNoCov">          0 :             } else if (leaf == 13) {</span></a>
-<a name="209"><span class="lineNum">     209 </span>                :<span class="lineNoCov">          0 :                 if (ax == 0 &amp;&amp; bx == 0 &amp;&amp; cx == 0 &amp;&amp; dx == 0) break;</span></a>
+<a name="201"><span class="lineNum">     201 </span>        [<span class="branchCov" title="Branch 0 was taken 480 times"> + </span><span class="branchCov" title="Branch 1 was taken 2688 times"> + </span>]:<span class="lineCov">       3168 :             if (leaf == 4) {</span></a>
+<a name="202"><span class="lineNum">     202 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchCov" title="Branch 1 was taken 384 times"> + </span>]:<span class="lineCov">        480 :                 if ((ax &amp; 0x1f) == 0) break;</span></a>
+<a name="203"><span class="lineNum">     203 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchCov" title="Branch 1 was taken 2592 times"> + </span>]:<span class="lineCov">       2688 :             } else if (leaf == 7) {</span></a>
+<a name="204"><span class="lineNum">     204 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :                 if (subleaf == 0) maxsub = ax;</span></a>
+<a name="205"><span class="lineNum">     205 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :                 if (subleaf == maxsub) break;</span></a>
+<a name="206"><span class="lineNum">     206 </span>        [<span class="branchCov" title="Branch 0 was taken 288 times"> + </span><span class="branchCov" title="Branch 1 was taken 2304 times"> + </span>]:<span class="lineCov">       2592 :             } else if (leaf == 11) {</span></a>
+<a name="207"><span class="lineNum">     207 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchCov" title="Branch 1 was taken 192 times"> + </span>]:<span class="lineCov">        288 :                 if ((cx &amp; 0xff00) == 0) break;</span></a>
+<a name="208"><span class="lineNum">     208 </span>        [<span class="branchCov" title="Branch 0 was taken 576 times"> + </span><span class="branchCov" title="Branch 1 was taken 1728 times"> + </span>]:<span class="lineCov">       2304 :             } else if (leaf == 13) {</span></a>
+<a name="209"><span class="lineNum">     209 </span>[<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchCov" title="Branch 1 was taken 480 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        576 :                 if (ax == 0 &amp;&amp; bx == 0 &amp;&amp; cx == 0 &amp;&amp; dx == 0) break;</span></a>
+<span class="lineNum">         </span>[<span class="branchCov" title="Branch 4 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>][<span class="branchCov" title="Branch 6 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
 <a name="210"><span class="lineNum">     210 </span>                :            :             } else {</a>
 <a name="211"><span class="lineNum">     211 </span>                :            :                 // For any other leaf, stop after subleaf 0.</a>
-<a name="212"><span class="lineNum">     212 </span>                :<span class="lineNoCov">          0 :                 break;</span></a>
+<a name="212"><span class="lineNum">     212 </span>                :<span class="lineCov">       1728 :                 break;</span></a>
 <a name="213"><span class="lineNum">     213 </span>                :            :             }</a>
 <a name="214"><span class="lineNum">     214 </span>                :            :         }</a>
 <a name="215"><span class="lineNum">     215 </span>                :            :     }</a>
 <a name="216"><span class="lineNum">     216 </span>                :            :     // Iterate over all extended leaves</a>
-<a name="217"><span class="lineNum">     217 </span>                :<span class="lineNoCov">          0 :     AddCPUID(hasher, 0x80000000, 0, ax, bx, cx, dx); // Returns max extended leaf in ax</span></a>
-<a name="218"><span class="lineNum">     218 </span>                :<span class="lineNoCov">          0 :     uint32_t ext_max = ax;</span></a>
-<a name="219"><span class="lineNum">     219 </span>                :<span class="lineNoCov">          0 :     for (uint32_t leaf = 0x80000001; leaf &lt;= ext_max &amp;&amp; leaf &lt;= 0x800000FF; ++leaf) {</span></a>
-<a name="220"><span class="lineNum">     220 </span>                :<span class="lineNoCov">          0 :         AddCPUID(hasher, leaf, 0, ax, bx, cx, dx);</span></a>
+<a name="217"><span class="lineNum">     217 </span>                :<span class="lineCov">         96 :     AddCPUID(hasher, 0x80000000, 0, ax, bx, cx, dx); // Returns max extended leaf in ax</span></a>
+<a name="218"><span class="lineNum">     218 </span>                :<span class="lineCov">         96 :     uint32_t ext_max = ax;</span></a>
+<a name="219"><span class="lineNum">     219 </span>[<span class="branchCov" title="Branch 0 was taken 768 times"> + </span><span class="branchCov" title="Branch 1 was taken 96 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 96 times"> + </span><span class="branchCov" title="Branch 3 was taken 768 times"> + </span>]:<span class="lineCov">        864 :     for (uint32_t leaf = 0x80000001; leaf &lt;= ext_max &amp;&amp; leaf &lt;= 0x800000FF; ++leaf) {</span></a>
+<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">        768 :         AddCPUID(hasher, leaf, 0, ax, bx, cx, dx);</span></a>
 <a name="221"><span class="lineNum">     221 </span>                :            :     }</a>
-<a name="222"><span class="lineNum">     222 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="222"><span class="lineNum">     222 </span>                :<span class="lineCov">         96 : }</span></a>
 <a name="223"><span class="lineNum">     223 </span>                :            : #endif</a>
 <a name="224"><span class="lineNum">     224 </span>                :            : } // namespace</a>
 <a name="225"><span class="lineNum">     225 </span>                :            : </a>
-<a name="226"><span class="lineNum">     226 </span>                :<span class="lineNoCov">          0 : void RandAddDynamicEnv(CSHA512&amp; hasher)</span></a>
+<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">         96 : void RandAddDynamicEnv(CSHA512&amp; hasher)</span></a>
 <a name="227"><span class="lineNum">     227 </span>                :            : {</a>
-<a name="228"><span class="lineNum">     228 </span>                :<span class="lineNoCov">          0 :     RandAddSeedPerfmon(hasher);</span></a>
+<a name="228"><span class="lineNum">     228 </span>                :<span class="lineCov">         96 :     RandAddSeedPerfmon(hasher);</span></a>
 <a name="229"><span class="lineNum">     229 </span>                :            : </a>
 <a name="230"><span class="lineNum">     230 </span>                :            :     // Various clocks</a>
 <a name="231"><span class="lineNum">     231 </span>                :            : #ifdef WIN32</a>
@@ -304,45 +305,45 @@
 <a name="233"><span class="lineNum">     233 </span>                :            :     GetSystemTimeAsFileTime(&amp;ftime);</a>
 <a name="234"><span class="lineNum">     234 </span>                :            :     hasher &lt;&lt; ftime;</a>
 <a name="235"><span class="lineNum">     235 </span>                :            : #else</a>
-<a name="236"><span class="lineNum">     236 </span>                :<span class="lineNoCov">          0 :     struct timespec ts = {};</span></a>
+<a name="236"><span class="lineNum">     236 </span>                :<span class="lineCov">         96 :     struct timespec ts = {};</span></a>
 <a name="237"><span class="lineNum">     237 </span>                :            : #    ifdef CLOCK_MONOTONIC</a>
-<a name="238"><span class="lineNum">     238 </span>                :<span class="lineNoCov">          0 :     clock_gettime(CLOCK_MONOTONIC, &amp;ts);</span></a>
-<a name="239"><span class="lineNum">     239 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; ts;</span></a>
+<a name="238"><span class="lineNum">     238 </span>                :<span class="lineCov">         96 :     clock_gettime(CLOCK_MONOTONIC, &amp;ts);</span></a>
+<a name="239"><span class="lineNum">     239 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; ts;</span></a>
 <a name="240"><span class="lineNum">     240 </span>                :            : #    endif</a>
 <a name="241"><span class="lineNum">     241 </span>                :            : #    ifdef CLOCK_REALTIME</a>
-<a name="242"><span class="lineNum">     242 </span>                :<span class="lineNoCov">          0 :     clock_gettime(CLOCK_REALTIME, &amp;ts);</span></a>
-<a name="243"><span class="lineNum">     243 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; ts;</span></a>
+<a name="242"><span class="lineNum">     242 </span>                :<span class="lineCov">         96 :     clock_gettime(CLOCK_REALTIME, &amp;ts);</span></a>
+<a name="243"><span class="lineNum">     243 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; ts;</span></a>
 <a name="244"><span class="lineNum">     244 </span>                :            : #    endif</a>
 <a name="245"><span class="lineNum">     245 </span>                :            : #    ifdef CLOCK_BOOTTIME</a>
-<a name="246"><span class="lineNum">     246 </span>                :<span class="lineNoCov">          0 :     clock_gettime(CLOCK_BOOTTIME, &amp;ts);</span></a>
-<a name="247"><span class="lineNum">     247 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; ts;</span></a>
+<a name="246"><span class="lineNum">     246 </span>                :<span class="lineCov">         96 :     clock_gettime(CLOCK_BOOTTIME, &amp;ts);</span></a>
+<a name="247"><span class="lineNum">     247 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; ts;</span></a>
 <a name="248"><span class="lineNum">     248 </span>                :            : #    endif</a>
 <a name="249"><span class="lineNum">     249 </span>                :            :     // gettimeofday is available on all UNIX systems, but only has microsecond precision.</a>
-<a name="250"><span class="lineNum">     250 </span>                :<span class="lineNoCov">          0 :     struct timeval tv = {};</span></a>
-<a name="251"><span class="lineNum">     251 </span>                :<span class="lineNoCov">          0 :     gettimeofday(&amp;tv, nullptr);</span></a>
-<a name="252"><span class="lineNum">     252 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; tv;</span></a>
+<a name="250"><span class="lineNum">     250 </span>                :<span class="lineCov">         96 :     struct timeval tv = {};</span></a>
+<a name="251"><span class="lineNum">     251 </span>                :<span class="lineCov">         96 :     gettimeofday(&amp;tv, nullptr);</span></a>
+<a name="252"><span class="lineNum">     252 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; tv;</span></a>
 <a name="253"><span class="lineNum">     253 </span>                :            : #endif</a>
 <a name="254"><span class="lineNum">     254 </span>                :            :     // Probably redundant, but also use all the clocks C++11 provides:</a>
-<a name="255"><span class="lineNum">     255 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; std::chrono::system_clock::now().time_since_epoch().count();</span></a>
-<a name="256"><span class="lineNum">     256 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; std::chrono::steady_clock::now().time_since_epoch().count();</span></a>
-<a name="257"><span class="lineNum">     257 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; std::chrono::high_resolution_clock::now().time_since_epoch().count();</span></a>
+<a name="255"><span class="lineNum">     255 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; std::chrono::system_clock::now().time_since_epoch().count();</span></a>
+<a name="256"><span class="lineNum">     256 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; std::chrono::steady_clock::now().time_since_epoch().count();</span></a>
+<a name="257"><span class="lineNum">     257 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; std::chrono::high_resolution_clock::now().time_since_epoch().count();</span></a>
 <a name="258"><span class="lineNum">     258 </span>                :            : </a>
 <a name="259"><span class="lineNum">     259 </span>                :            : #ifndef WIN32</a>
 <a name="260"><span class="lineNum">     260 </span>                :            :     // Current resource usage.</a>
-<a name="261"><span class="lineNum">     261 </span>                :<span class="lineNoCov">          0 :     struct rusage usage = {};</span></a>
-<a name="262"><span class="lineNum">     262 </span>                :<span class="lineNoCov">          0 :     if (getrusage(RUSAGE_SELF, &amp;usage) == 0) hasher &lt;&lt; usage;</span></a>
+<a name="261"><span class="lineNum">     261 </span>                :<span class="lineCov">         96 :     struct rusage usage = {};</span></a>
+<a name="262"><span class="lineNum">     262 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :     if (getrusage(RUSAGE_SELF, &amp;usage) == 0) hasher &lt;&lt; usage;</span></a>
 <a name="263"><span class="lineNum">     263 </span>                :            : #endif</a>
 <a name="264"><span class="lineNum">     264 </span>                :            : </a>
 <a name="265"><span class="lineNum">     265 </span>                :            : #ifdef __linux__</a>
-<a name="266"><span class="lineNum">     266 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/diskstats&quot;);</span></a>
-<a name="267"><span class="lineNum">     267 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/vmstat&quot;);</span></a>
-<a name="268"><span class="lineNum">     268 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/schedstat&quot;);</span></a>
-<a name="269"><span class="lineNum">     269 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/zoneinfo&quot;);</span></a>
-<a name="270"><span class="lineNum">     270 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/meminfo&quot;);</span></a>
-<a name="271"><span class="lineNum">     271 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/softirqs&quot;);</span></a>
-<a name="272"><span class="lineNum">     272 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/stat&quot;);</span></a>
-<a name="273"><span class="lineNum">     273 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/self/schedstat&quot;);</span></a>
-<a name="274"><span class="lineNum">     274 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/self/status&quot;);</span></a>
+<a name="266"><span class="lineNum">     266 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/diskstats&quot;);</span></a>
+<a name="267"><span class="lineNum">     267 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/vmstat&quot;);</span></a>
+<a name="268"><span class="lineNum">     268 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/schedstat&quot;);</span></a>
+<a name="269"><span class="lineNum">     269 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/zoneinfo&quot;);</span></a>
+<a name="270"><span class="lineNum">     270 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/meminfo&quot;);</span></a>
+<a name="271"><span class="lineNum">     271 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/softirqs&quot;);</span></a>
+<a name="272"><span class="lineNum">     272 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/stat&quot;);</span></a>
+<a name="273"><span class="lineNum">     273 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/self/schedstat&quot;);</span></a>
+<a name="274"><span class="lineNum">     274 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/self/status&quot;);</span></a>
 <a name="275"><span class="lineNum">     275 </span>                :            : #endif</a>
 <a name="276"><span class="lineNum">     276 </span>                :            : </a>
 <a name="277"><span class="lineNum">     277 </span>                :            : #if HAVE_SYSCTL</a>
@@ -370,113 +371,113 @@
 <a name="299"><span class="lineNum">     299 </span>                :            : #endif</a>
 <a name="300"><span class="lineNum">     300 </span>                :            : </a>
 <a name="301"><span class="lineNum">     301 </span>                :            :     // Stack and heap location</a>
-<a name="302"><span class="lineNum">     302 </span>                :<span class="lineNoCov">          0 :     void* addr = malloc(4097);</span></a>
-<a name="303"><span class="lineNum">     303 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; &amp;addr &lt;&lt; addr;</span></a>
-<a name="304"><span class="lineNum">     304 </span>                :<span class="lineNoCov">          0 :     free(addr);</span></a>
-<a name="305"><span class="lineNum">     305 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="302"><span class="lineNum">     302 </span>                :<span class="lineCov">         96 :     void* addr = malloc(4097);</span></a>
+<a name="303"><span class="lineNum">     303 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; &amp;addr &lt;&lt; addr;</span></a>
+<a name="304"><span class="lineNum">     304 </span>                :<span class="lineCov">         96 :     free(addr);</span></a>
+<a name="305"><span class="lineNum">     305 </span>                :<span class="lineCov">         96 : }</span></a>
 <a name="306"><span class="lineNum">     306 </span>                :            : </a>
-<a name="307"><span class="lineNum">     307 </span>                :<span class="lineNoCov">          0 : void RandAddStaticEnv(CSHA512&amp; hasher)</span></a>
+<a name="307"><span class="lineNum">     307 </span>                :<span class="lineCov">         96 : void RandAddStaticEnv(CSHA512&amp; hasher)</span></a>
 <a name="308"><span class="lineNum">     308 </span>                :            : {</a>
 <a name="309"><span class="lineNum">     309 </span>                :            :     // Some compile-time static properties</a>
-<a name="310"><span class="lineNum">     310 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; (CHAR_MIN &lt; 0) &lt;&lt; sizeof(void*) &lt;&lt; sizeof(long) &lt;&lt; sizeof(int);</span></a>
+<a name="310"><span class="lineNum">     310 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; (CHAR_MIN &lt; 0) &lt;&lt; sizeof(void*) &lt;&lt; sizeof(long) &lt;&lt; sizeof(int);</span></a>
 <a name="311"><span class="lineNum">     311 </span>                :            : #if defined(__GNUC__) &amp;&amp; defined(__GNUC_MINOR__) &amp;&amp; defined(__GNUC_PATCHLEVEL__)</a>
-<a name="312"><span class="lineNum">     312 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; __GNUC__ &lt;&lt; __GNUC_MINOR__ &lt;&lt; __GNUC_PATCHLEVEL__;</span></a>
+<a name="312"><span class="lineNum">     312 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; __GNUC__ &lt;&lt; __GNUC_MINOR__ &lt;&lt; __GNUC_PATCHLEVEL__;</span></a>
 <a name="313"><span class="lineNum">     313 </span>                :            : #endif</a>
 <a name="314"><span class="lineNum">     314 </span>                :            : #ifdef _MSC_VER</a>
 <a name="315"><span class="lineNum">     315 </span>                :            :     hasher &lt;&lt; _MSC_VER;</a>
 <a name="316"><span class="lineNum">     316 </span>                :            : #endif</a>
-<a name="317"><span class="lineNum">     317 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; __cplusplus;</span></a>
+<a name="317"><span class="lineNum">     317 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; __cplusplus;</span></a>
 <a name="318"><span class="lineNum">     318 </span>                :            : #ifdef _XOPEN_VERSION</a>
-<a name="319"><span class="lineNum">     319 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; _XOPEN_VERSION;</span></a>
+<a name="319"><span class="lineNum">     319 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; _XOPEN_VERSION;</span></a>
 <a name="320"><span class="lineNum">     320 </span>                :            : #endif</a>
 <a name="321"><span class="lineNum">     321 </span>                :            : #ifdef __VERSION__</a>
 <a name="322"><span class="lineNum">     322 </span>                :            :     const char* COMPILER_VERSION = __VERSION__;</a>
-<a name="323"><span class="lineNum">     323 </span>                :<span class="lineNoCov">          0 :     hasher.Write((const unsigned char*)COMPILER_VERSION, strlen(COMPILER_VERSION) + 1);</span></a>
+<a name="323"><span class="lineNum">     323 </span>                :<span class="lineCov">         96 :     hasher.Write((const unsigned char*)COMPILER_VERSION, strlen(COMPILER_VERSION) + 1);</span></a>
 <a name="324"><span class="lineNum">     324 </span>                :            : #endif</a>
 <a name="325"><span class="lineNum">     325 </span>                :            : </a>
 <a name="326"><span class="lineNum">     326 </span>                :            :     // Bitcoin client version</a>
-<a name="327"><span class="lineNum">     327 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; CLIENT_VERSION;</span></a>
+<a name="327"><span class="lineNum">     327 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; CLIENT_VERSION;</span></a>
 <a name="328"><span class="lineNum">     328 </span>                :            : </a>
 <a name="329"><span class="lineNum">     329 </span>                :            : #ifdef __linux__</a>
 <a name="330"><span class="lineNum">     330 </span>                :            :     // Information available through getauxval()</a>
 <a name="331"><span class="lineNum">     331 </span>                :            : #  ifdef AT_HWCAP</a>
-<a name="332"><span class="lineNum">     332 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; getauxval(AT_HWCAP);</span></a>
+<a name="332"><span class="lineNum">     332 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; getauxval(AT_HWCAP);</span></a>
 <a name="333"><span class="lineNum">     333 </span>                :            : #  endif</a>
 <a name="334"><span class="lineNum">     334 </span>                :            : #  ifdef AT_HWCAP2</a>
-<a name="335"><span class="lineNum">     335 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; getauxval(AT_HWCAP2);</span></a>
+<a name="335"><span class="lineNum">     335 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; getauxval(AT_HWCAP2);</span></a>
 <a name="336"><span class="lineNum">     336 </span>                :            : #  endif</a>
 <a name="337"><span class="lineNum">     337 </span>                :            : #  ifdef AT_RANDOM</a>
-<a name="338"><span class="lineNum">     338 </span>                :<span class="lineNoCov">          0 :     const unsigned char* random_aux = (const unsigned char*)getauxval(AT_RANDOM);</span></a>
-<a name="339"><span class="lineNum">     339 </span>                :<span class="lineNoCov">          0 :     if (random_aux) hasher.Write(random_aux, 16);</span></a>
+<a name="338"><span class="lineNum">     338 </span>                :<span class="lineCov">         96 :     const unsigned char* random_aux = (const unsigned char*)getauxval(AT_RANDOM);</span></a>
+<a name="339"><span class="lineNum">     339 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :     if (random_aux) hasher.Write(random_aux, 16);</span></a>
 <a name="340"><span class="lineNum">     340 </span>                :            : #  endif</a>
 <a name="341"><span class="lineNum">     341 </span>                :            : #  ifdef AT_PLATFORM</a>
-<a name="342"><span class="lineNum">     342 </span>                :<span class="lineNoCov">          0 :     const char* platform_str = (const char*)getauxval(AT_PLATFORM);</span></a>
-<a name="343"><span class="lineNum">     343 </span>                :<span class="lineNoCov">          0 :     if (platform_str) hasher.Write((const unsigned char*)platform_str, strlen(platform_str) + 1);</span></a>
+<a name="342"><span class="lineNum">     342 </span>                :<span class="lineCov">         96 :     const char* platform_str = (const char*)getauxval(AT_PLATFORM);</span></a>
+<a name="343"><span class="lineNum">     343 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :     if (platform_str) hasher.Write((const unsigned char*)platform_str, strlen(platform_str) + 1);</span></a>
 <a name="344"><span class="lineNum">     344 </span>                :            : #  endif</a>
 <a name="345"><span class="lineNum">     345 </span>                :            : #  ifdef AT_EXECFN</a>
-<a name="346"><span class="lineNum">     346 </span>                :<span class="lineNoCov">          0 :     const char* exec_str = (const char*)getauxval(AT_EXECFN);</span></a>
-<a name="347"><span class="lineNum">     347 </span>                :<span class="lineNoCov">          0 :     if (exec_str) hasher.Write((const unsigned char*)exec_str, strlen(exec_str) + 1);</span></a>
+<a name="346"><span class="lineNum">     346 </span>                :<span class="lineCov">         96 :     const char* exec_str = (const char*)getauxval(AT_EXECFN);</span></a>
+<a name="347"><span class="lineNum">     347 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :     if (exec_str) hasher.Write((const unsigned char*)exec_str, strlen(exec_str) + 1);</span></a>
 <a name="348"><span class="lineNum">     348 </span>                :            : #  endif</a>
 <a name="349"><span class="lineNum">     349 </span>                :            : #endif // __linux__</a>
 <a name="350"><span class="lineNum">     350 </span>                :            : </a>
 <a name="351"><span class="lineNum">     351 </span>                :            : #ifdef HAVE_GETCPUID</a>
-<a name="352"><span class="lineNum">     352 </span>                :<span class="lineNoCov">          0 :     AddAllCPUID(hasher);</span></a>
+<a name="352"><span class="lineNum">     352 </span>                :<span class="lineCov">         96 :     AddAllCPUID(hasher);</span></a>
 <a name="353"><span class="lineNum">     353 </span>                :            : #endif</a>
 <a name="354"><span class="lineNum">     354 </span>                :            : </a>
 <a name="355"><span class="lineNum">     355 </span>                :            :     // Memory locations</a>
-<a name="356"><span class="lineNum">     356 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; &amp;hasher &lt;&lt; &amp;RandAddStaticEnv &lt;&lt; &amp;malloc &lt;&lt; &amp;errno &lt;&lt; &amp;environ;</span></a>
+<a name="356"><span class="lineNum">     356 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; &amp;hasher &lt;&lt; &amp;RandAddStaticEnv &lt;&lt; &amp;malloc &lt;&lt; &amp;errno &lt;&lt; &amp;environ;</span></a>
 <a name="357"><span class="lineNum">     357 </span>                :            : </a>
 <a name="358"><span class="lineNum">     358 </span>                :            :     // Hostname</a>
-<a name="359"><span class="lineNum">     359 </span>                :<span class="lineNoCov">          0 :     char hname[256];</span></a>
-<a name="360"><span class="lineNum">     360 </span>                :<span class="lineNoCov">          0 :     if (gethostname(hname, 256) == 0) {</span></a>
-<a name="361"><span class="lineNum">     361 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)hname, strnlen(hname, 256));</span></a>
-<a name="362"><span class="lineNum">     362 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="359"><span class="lineNum">     359 </span>                :<span class="lineCov">         96 :     char hname[256];</span></a>
+<a name="360"><span class="lineNum">     360 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :     if (gethostname(hname, 256) == 0) {</span></a>
+<a name="361"><span class="lineNum">     361 </span>                :<span class="lineCov">         96 :         hasher.Write((const unsigned char*)hname, strnlen(hname, 256));</span></a>
+<a name="362"><span class="lineNum">     362 </span>                :<span class="lineCov">         96 :     }</span></a>
 <a name="363"><span class="lineNum">     363 </span>                :            : </a>
 <a name="364"><span class="lineNum">     364 </span>                :            : #if HAVE_DECL_GETIFADDRS</a>
 <a name="365"><span class="lineNum">     365 </span>                :            :     // Network interfaces</a>
-<a name="366"><span class="lineNum">     366 </span>                :<span class="lineNoCov">          0 :     struct ifaddrs *ifad = NULL;</span></a>
-<a name="367"><span class="lineNum">     367 </span>                :<span class="lineNoCov">          0 :     getifaddrs(&amp;ifad);</span></a>
-<a name="368"><span class="lineNum">     368 </span>                :<span class="lineNoCov">          0 :     struct ifaddrs *ifit = ifad;</span></a>
-<a name="369"><span class="lineNum">     369 </span>                :<span class="lineNoCov">          0 :     while (ifit != NULL) {</span></a>
-<a name="370"><span class="lineNum">     370 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;ifit, sizeof(ifit));</span></a>
-<a name="371"><span class="lineNum">     371 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)ifit-&gt;ifa_name, strlen(ifit-&gt;ifa_name) + 1);</span></a>
-<a name="372"><span class="lineNum">     372 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;ifit-&gt;ifa_flags, sizeof(ifit-&gt;ifa_flags));</span></a>
-<a name="373"><span class="lineNum">     373 </span>                :<span class="lineNoCov">          0 :         AddSockaddr(hasher, ifit-&gt;ifa_addr);</span></a>
-<a name="374"><span class="lineNum">     374 </span>                :<span class="lineNoCov">          0 :         AddSockaddr(hasher, ifit-&gt;ifa_netmask);</span></a>
-<a name="375"><span class="lineNum">     375 </span>                :<span class="lineNoCov">          0 :         AddSockaddr(hasher, ifit-&gt;ifa_dstaddr);</span></a>
-<a name="376"><span class="lineNum">     376 </span>                :<span class="lineNoCov">          0 :         ifit = ifit-&gt;ifa_next;</span></a>
+<a name="366"><span class="lineNum">     366 </span>                :<span class="lineCov">         96 :     struct ifaddrs *ifad = NULL;</span></a>
+<a name="367"><span class="lineNum">     367 </span>                :<span class="lineCov">         96 :     getifaddrs(&amp;ifad);</span></a>
+<a name="368"><span class="lineNum">     368 </span>                :<span class="lineCov">         96 :     struct ifaddrs *ifit = ifad;</span></a>
+<a name="369"><span class="lineNum">     369 </span>        [<span class="branchCov" title="Branch 0 was taken 576 times"> + </span><span class="branchCov" title="Branch 1 was taken 96 times"> + </span>]:<span class="lineCov">        672 :     while (ifit != NULL) {</span></a>
+<a name="370"><span class="lineNum">     370 </span>                :<span class="lineCov">        576 :         hasher.Write((const unsigned char*)&amp;ifit, sizeof(ifit));</span></a>
+<a name="371"><span class="lineNum">     371 </span>                :<span class="lineCov">        576 :         hasher.Write((const unsigned char*)ifit-&gt;ifa_name, strlen(ifit-&gt;ifa_name) + 1);</span></a>
+<a name="372"><span class="lineNum">     372 </span>                :<span class="lineCov">        576 :         hasher.Write((const unsigned char*)&amp;ifit-&gt;ifa_flags, sizeof(ifit-&gt;ifa_flags));</span></a>
+<a name="373"><span class="lineNum">     373 </span>                :<span class="lineCov">        576 :         AddSockaddr(hasher, ifit-&gt;ifa_addr);</span></a>
+<a name="374"><span class="lineNum">     374 </span>                :<span class="lineCov">        576 :         AddSockaddr(hasher, ifit-&gt;ifa_netmask);</span></a>
+<a name="375"><span class="lineNum">     375 </span>                :<span class="lineCov">        576 :         AddSockaddr(hasher, ifit-&gt;ifa_dstaddr);</span></a>
+<a name="376"><span class="lineNum">     376 </span>                :<span class="lineCov">        576 :         ifit = ifit-&gt;ifa_next;</span></a>
 <a name="377"><span class="lineNum">     377 </span>                :            :     }</a>
-<a name="378"><span class="lineNum">     378 </span>                :<span class="lineNoCov">          0 :     freeifaddrs(ifad);</span></a>
+<a name="378"><span class="lineNum">     378 </span>                :<span class="lineCov">         96 :     freeifaddrs(ifad);</span></a>
 <a name="379"><span class="lineNum">     379 </span>                :            : #endif</a>
 <a name="380"><span class="lineNum">     380 </span>                :            : </a>
 <a name="381"><span class="lineNum">     381 </span>                :            : #ifndef WIN32</a>
 <a name="382"><span class="lineNum">     382 </span>                :            :     // UNIX kernel information</a>
-<a name="383"><span class="lineNum">     383 </span>                :<span class="lineNoCov">          0 :     struct utsname name;</span></a>
-<a name="384"><span class="lineNum">     384 </span>                :<span class="lineNoCov">          0 :     if (uname(&amp;name) != -1) {</span></a>
-<a name="385"><span class="lineNum">     385 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;name.sysname, strlen(name.sysname) + 1);</span></a>
-<a name="386"><span class="lineNum">     386 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;name.nodename, strlen(name.nodename) + 1);</span></a>
-<a name="387"><span class="lineNum">     387 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;name.release, strlen(name.release) + 1);</span></a>
-<a name="388"><span class="lineNum">     388 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;name.version, strlen(name.version) + 1);</span></a>
-<a name="389"><span class="lineNum">     389 </span>                :<span class="lineNoCov">          0 :         hasher.Write((const unsigned char*)&amp;name.machine, strlen(name.machine) + 1);</span></a>
-<a name="390"><span class="lineNum">     390 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="383"><span class="lineNum">     383 </span>                :<span class="lineCov">         96 :     struct utsname name;</span></a>
+<a name="384"><span class="lineNum">     384 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :     if (uname(&amp;name) != -1) {</span></a>
+<a name="385"><span class="lineNum">     385 </span>                :<span class="lineCov">         96 :         hasher.Write((const unsigned char*)&amp;name.sysname, strlen(name.sysname) + 1);</span></a>
+<a name="386"><span class="lineNum">     386 </span>                :<span class="lineCov">         96 :         hasher.Write((const unsigned char*)&amp;name.nodename, strlen(name.nodename) + 1);</span></a>
+<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">         96 :         hasher.Write((const unsigned char*)&amp;name.release, strlen(name.release) + 1);</span></a>
+<a name="388"><span class="lineNum">     388 </span>                :<span class="lineCov">         96 :         hasher.Write((const unsigned char*)&amp;name.version, strlen(name.version) + 1);</span></a>
+<a name="389"><span class="lineNum">     389 </span>                :<span class="lineCov">         96 :         hasher.Write((const unsigned char*)&amp;name.machine, strlen(name.machine) + 1);</span></a>
+<a name="390"><span class="lineNum">     390 </span>                :<span class="lineCov">         96 :     }</span></a>
 <a name="391"><span class="lineNum">     391 </span>                :            : </a>
 <a name="392"><span class="lineNum">     392 </span>                :            :     /* Path and filesystem provided data */</a>
-<a name="393"><span class="lineNum">     393 </span>                :<span class="lineNoCov">          0 :     AddPath(hasher, &quot;/&quot;);</span></a>
-<a name="394"><span class="lineNum">     394 </span>                :<span class="lineNoCov">          0 :     AddPath(hasher, &quot;.&quot;);</span></a>
-<a name="395"><span class="lineNum">     395 </span>                :<span class="lineNoCov">          0 :     AddPath(hasher, &quot;/tmp&quot;);</span></a>
-<a name="396"><span class="lineNum">     396 </span>                :<span class="lineNoCov">          0 :     AddPath(hasher, &quot;/home&quot;);</span></a>
-<a name="397"><span class="lineNum">     397 </span>                :<span class="lineNoCov">          0 :     AddPath(hasher, &quot;/proc&quot;);</span></a>
+<a name="393"><span class="lineNum">     393 </span>                :<span class="lineCov">         96 :     AddPath(hasher, &quot;/&quot;);</span></a>
+<a name="394"><span class="lineNum">     394 </span>                :<span class="lineCov">         96 :     AddPath(hasher, &quot;.&quot;);</span></a>
+<a name="395"><span class="lineNum">     395 </span>                :<span class="lineCov">         96 :     AddPath(hasher, &quot;/tmp&quot;);</span></a>
+<a name="396"><span class="lineNum">     396 </span>                :<span class="lineCov">         96 :     AddPath(hasher, &quot;/home&quot;);</span></a>
+<a name="397"><span class="lineNum">     397 </span>                :<span class="lineCov">         96 :     AddPath(hasher, &quot;/proc&quot;);</span></a>
 <a name="398"><span class="lineNum">     398 </span>                :            : #ifdef __linux__</a>
-<a name="399"><span class="lineNum">     399 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/cmdline&quot;);</span></a>
-<a name="400"><span class="lineNum">     400 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/cpuinfo&quot;);</span></a>
-<a name="401"><span class="lineNum">     401 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/proc/version&quot;);</span></a>
+<a name="399"><span class="lineNum">     399 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/cmdline&quot;);</span></a>
+<a name="400"><span class="lineNum">     400 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/cpuinfo&quot;);</span></a>
+<a name="401"><span class="lineNum">     401 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/proc/version&quot;);</span></a>
 <a name="402"><span class="lineNum">     402 </span>                :            : #endif</a>
-<a name="403"><span class="lineNum">     403 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/etc/passwd&quot;);</span></a>
-<a name="404"><span class="lineNum">     404 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/etc/group&quot;);</span></a>
-<a name="405"><span class="lineNum">     405 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/etc/hosts&quot;);</span></a>
-<a name="406"><span class="lineNum">     406 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/etc/resolv.conf&quot;);</span></a>
-<a name="407"><span class="lineNum">     407 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/etc/timezone&quot;);</span></a>
-<a name="408"><span class="lineNum">     408 </span>                :<span class="lineNoCov">          0 :     AddFile(hasher, &quot;/etc/localtime&quot;);</span></a>
+<a name="403"><span class="lineNum">     403 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/etc/passwd&quot;);</span></a>
+<a name="404"><span class="lineNum">     404 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/etc/group&quot;);</span></a>
+<a name="405"><span class="lineNum">     405 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/etc/hosts&quot;);</span></a>
+<a name="406"><span class="lineNum">     406 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/etc/resolv.conf&quot;);</span></a>
+<a name="407"><span class="lineNum">     407 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/etc/timezone&quot;);</span></a>
+<a name="408"><span class="lineNum">     408 </span>                :<span class="lineCov">         96 :     AddFile(hasher, &quot;/etc/localtime&quot;);</span></a>
 <a name="409"><span class="lineNum">     409 </span>                :            : #endif</a>
 <a name="410"><span class="lineNum">     410 </span>                :            : </a>
 <a name="411"><span class="lineNum">     411 </span>                :            :     // For MacOS/BSDs, gather data through sysctl instead of /proc. Not all of these</a>
@@ -555,20 +556,20 @@
 <a name="484"><span class="lineNum">     484 </span>                :            : #endif</a>
 <a name="485"><span class="lineNum">     485 </span>                :            : </a>
 <a name="486"><span class="lineNum">     486 </span>                :            :     // Env variables</a>
-<a name="487"><span class="lineNum">     487 </span>                :<span class="lineNoCov">          0 :     if (environ) {</span></a>
-<a name="488"><span class="lineNum">     488 </span>                :<span class="lineNoCov">          0 :         for (size_t i = 0; environ[i]; ++i) {</span></a>
-<a name="489"><span class="lineNum">     489 </span>                :<span class="lineNoCov">          0 :             hasher.Write((const unsigned char*)environ[i], strlen(environ[i]));</span></a>
+<a name="487"><span class="lineNum">     487 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         96 :     if (environ) {</span></a>
+<a name="488"><span class="lineNum">     488 </span>        [<span class="branchCov" title="Branch 0 was taken 96 times"> + </span><span class="branchCov" title="Branch 1 was taken 1728 times"> + </span>]:<span class="lineCov">       1824 :         for (size_t i = 0; environ[i]; ++i) {</span></a>
+<a name="489"><span class="lineNum">     489 </span>                :<span class="lineCov">       1728 :             hasher.Write((const unsigned char*)environ[i], strlen(environ[i]));</span></a>
 <a name="490"><span class="lineNum">     490 </span>                :            :         }</a>
-<a name="491"><span class="lineNum">     491 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="491"><span class="lineNum">     491 </span>                :<span class="lineCov">         96 :     }</span></a>
 <a name="492"><span class="lineNum">     492 </span>                :            : </a>
 <a name="493"><span class="lineNum">     493 </span>                :            :     // Process, thread, user, session, group, ... ids.</a>
 <a name="494"><span class="lineNum">     494 </span>                :            : #ifdef WIN32</a>
 <a name="495"><span class="lineNum">     495 </span>                :            :     hasher &lt;&lt; GetCurrentProcessId() &lt;&lt; GetCurrentThreadId();</a>
 <a name="496"><span class="lineNum">     496 </span>                :            : #else</a>
-<a name="497"><span class="lineNum">     497 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; getpid() &lt;&lt; getppid() &lt;&lt; getsid(0) &lt;&lt; getpgid(0) &lt;&lt; getuid() &lt;&lt; geteuid() &lt;&lt; getgid() &lt;&lt; getegid();</span></a>
+<a name="497"><span class="lineNum">     497 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; getpid() &lt;&lt; getppid() &lt;&lt; getsid(0) &lt;&lt; getpgid(0) &lt;&lt; getuid() &lt;&lt; geteuid() &lt;&lt; getgid() &lt;&lt; getegid();</span></a>
 <a name="498"><span class="lineNum">     498 </span>                :            : #endif</a>
-<a name="499"><span class="lineNum">     499 </span>                :<span class="lineNoCov">          0 :     hasher &lt;&lt; std::this_thread::get_id();</span></a>
-<a name="500"><span class="lineNum">     500 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="499"><span class="lineNum">     499 </span>                :<span class="lineCov">         96 :     hasher &lt;&lt; std::this_thread::get_id();</span></a>
+<a name="500"><span class="lineNum">     500 </span>                :<span class="lineCov">         96 : }</span></a>
 </pre>
       </td>
     </tr>

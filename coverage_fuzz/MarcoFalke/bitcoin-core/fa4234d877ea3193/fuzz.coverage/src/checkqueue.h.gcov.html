@@ -31,27 +31,27 @@
             <td class="headerValue">fuzz_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">74</td>
             <td class="headerCovTableEntry">76</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntryHi">97.4 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-11-07 11:34:23</td>
+            <td class="headerValue">2020-11-07 12:05:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">17</td>
             <td class="headerCovTableEntry">19</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntryMed">89.5 %</td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">43</td>
+            <td class="headerCovTableEntry">66</td>
+            <td class="headerCovTableEntryLo">65.2 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -134,102 +134,103 @@
 <a name="63"><span class="lineNum">      63 </span>                :            :     unsigned int nBatchSize;</a>
 <a name="64"><span class="lineNum">      64 </span>                :            : </a>
 <a name="65"><span class="lineNum">      65 </span>                :            :     /** Internal function that does bulk of the verification work. */</a>
-<a name="66"><span class="lineNum">      66 </span>                :<span class="lineNoCov">          0 :     bool Loop(bool fMaster = false)</span></a>
+<a name="66"><span class="lineNum">      66 </span>                :<span class="lineCov">      10640 :     bool Loop(bool fMaster = false)</span></a>
 <a name="67"><span class="lineNum">      67 </span>                :            :     {</a>
-<a name="68"><span class="lineNum">      68 </span>                :<span class="lineNoCov">          0 :         boost::condition_variable&amp; cond = fMaster ? condMaster : condWorker;</span></a>
-<a name="69"><span class="lineNum">      69 </span>                :<span class="lineNoCov">          0 :         std::vector&lt;T&gt; vChecks;</span></a>
-<a name="70"><span class="lineNum">      70 </span>                :<span class="lineNoCov">          0 :         vChecks.reserve(nBatchSize);</span></a>
-<a name="71"><span class="lineNum">      71 </span>                :<span class="lineNoCov">          0 :         unsigned int nNow = 0;</span></a>
-<a name="72"><span class="lineNum">      72 </span>                :<span class="lineNoCov">          0 :         bool fOk = true;</span></a>
-<a name="73"><span class="lineNum">      73 </span>                :<span class="lineNoCov">          0 :         do {</span></a>
+<a name="68"><span class="lineNum">      68 </span>        [<span class="branchCov" title="Branch 0 was taken 10588 times"> + </span><span class="branchCov" title="Branch 1 was taken 52 times"> + </span>]:<span class="lineCov">      10640 :         boost::condition_variable&amp; cond = fMaster ? condMaster : condWorker;</span></a>
+<a name="69"><span class="lineNum">      69 </span>                :<span class="lineCov">      10640 :         std::vector&lt;T&gt; vChecks;</span></a>
+<a name="70"><span class="lineNum">      70 </span>        [<span class="branchCov" title="Branch 0 was taken 10640 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      10640 :         vChecks.reserve(nBatchSize);</span></a>
+<a name="71"><span class="lineNum">      71 </span>                :<span class="lineCov">      14210 :         unsigned int nNow = 0;</span></a>
+<a name="72"><span class="lineNum">      72 </span>                :<span class="lineCov">      14210 :         bool fOk = true;</span></a>
+<a name="73"><span class="lineNum">      73 </span>                :<span class="lineCov">      10640 :         do {</span></a>
 <a name="74"><span class="lineNum">      74 </span>                :            :             {</a>
-<a name="75"><span class="lineNum">      75 </span>                :<span class="lineNoCov">          0 :                 boost::unique_lock&lt;boost::mutex&gt; lock(mutex);</span></a>
+<a name="75"><span class="lineNum">      75 </span>        [<span class="branchCov" title="Branch 0 was taken 14210 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      14210 :                 boost::unique_lock&lt;boost::mutex&gt; lock(mutex);</span></a>
 <a name="76"><span class="lineNum">      76 </span>                :            :                 // first do the clean-up of the previous loop run (allowing us to do it in the same critsect)</a>
-<a name="77"><span class="lineNum">      77 </span>                :<span class="lineNoCov">          0 :                 if (nNow) {</span></a>
-<a name="78"><span class="lineNum">      78 </span>                :<span class="lineNoCov">          0 :                     fAllOk &amp;= fOk;</span></a>
-<a name="79"><span class="lineNum">      79 </span>                :<span class="lineNoCov">          0 :                     nTodo -= nNow;</span></a>
-<a name="80"><span class="lineNum">      80 </span>                :<span class="lineNoCov">          0 :                     if (nTodo == 0 &amp;&amp; !fMaster)</span></a>
+<a name="77"><span class="lineNum">      77 </span>        [<span class="branchCov" title="Branch 0 was taken 3570 times"> + </span><span class="branchCov" title="Branch 1 was taken 10640 times"> + </span>]:<span class="lineCov">      14210 :                 if (nNow) {</span></a>
+<a name="78"><span class="lineNum">      78 </span>                :<span class="lineCov">       3570 :                     fAllOk &amp;= fOk;</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :<span class="lineCov">       3570 :                     nTodo -= nNow;</span></a>
+<a name="80"><span class="lineNum">      80 </span>[<span class="branchCov" title="Branch 0 was taken 125 times"> + </span><span class="branchCov" title="Branch 1 was taken 3445 times"> + </span>][<span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 125 times"> + </span>]:<span class="lineCov">       3570 :                     if (nTodo == 0 &amp;&amp; !fMaster)</span></a>
 <a name="81"><span class="lineNum">      81 </span>                :            :                         // We processed the last element; inform the master it can exit and return the result</a>
 <a name="82"><span class="lineNum">      82 </span>                :<span class="lineNoCov">          0 :                         condMaster.notify_one();</span></a>
 <a name="83"><span class="lineNum">      83 </span>                :            :                 } else {</a>
 <a name="84"><span class="lineNum">      84 </span>                :            :                     // first iteration</a>
-<a name="85"><span class="lineNum">      85 </span>                :<span class="lineNoCov">          0 :                     nTotal++;</span></a>
+<a name="85"><span class="lineNum">      85 </span>                :<span class="lineCov">      10640 :                     nTotal++;</span></a>
 <a name="86"><span class="lineNum">      86 </span>                :            :                 }</a>
 <a name="87"><span class="lineNum">      87 </span>                :            :                 // logically, the do loop starts here</a>
-<a name="88"><span class="lineNum">      88 </span>                :<span class="lineNoCov">          0 :                 while (queue.empty()) {</span></a>
-<a name="89"><span class="lineNum">      89 </span>                :<span class="lineNoCov">          0 :                     if (fMaster &amp;&amp; nTodo == 0) {</span></a>
-<a name="90"><span class="lineNum">      90 </span>                :<span class="lineNoCov">          0 :                         nTotal--;</span></a>
-<a name="91"><span class="lineNum">      91 </span>                :<span class="lineNoCov">          0 :                         bool fRet = fAllOk;</span></a>
+<a name="88"><span class="lineNum">      88 </span>        [<span class="branchCov" title="Branch 0 was taken 10643 times"> + </span><span class="branchCov" title="Branch 1 was taken 3570 times"> + </span>]:<span class="lineCov">      14213 :                 while (queue.empty()) {</span></a>
+<a name="89"><span class="lineNum">      89 </span>[<span class="branchCov" title="Branch 0 was taken 10588 times"> + </span><span class="branchCov" title="Branch 1 was taken 55 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 10588 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      10643 :                     if (fMaster &amp;&amp; nTodo == 0) {</span></a>
+<a name="90"><span class="lineNum">      90 </span>                :<span class="lineCov">      10588 :                         nTotal--;</span></a>
+<a name="91"><span class="lineNum">      91 </span>                :<span class="lineCov">      10588 :                         bool fRet = fAllOk;</span></a>
 <a name="92"><span class="lineNum">      92 </span>                :            :                         // reset the status for new work later</a>
-<a name="93"><span class="lineNum">      93 </span>                :<span class="lineNoCov">          0 :                         fAllOk = true;</span></a>
+<a name="93"><span class="lineNum">      93 </span>                :<span class="lineCov">      10588 :                         fAllOk = true;</span></a>
 <a name="94"><span class="lineNum">      94 </span>                :            :                         // return the current status</a>
 <a name="95"><span class="lineNum">      95 </span>                :            :                         return fRet;</a>
 <a name="96"><span class="lineNum">      96 </span>                :            :                     }</a>
-<a name="97"><span class="lineNum">      97 </span>                :<span class="lineNoCov">          0 :                     nIdle++;</span></a>
-<a name="98"><span class="lineNum">      98 </span>                :<span class="lineNoCov">          0 :                     cond.wait(lock); // wait</span></a>
-<a name="99"><span class="lineNum">      99 </span>                :<span class="lineNoCov">          0 :                     nIdle--;</span></a>
+<a name="97"><span class="lineNum">      97 </span>                :<span class="lineCov">         55 :                     nIdle++;</span></a>
+<a name="98"><span class="lineNum">      98 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 52 times"> + </span>]:<span class="lineCov">         55 :                     cond.wait(lock); // wait</span></a>
+<a name="99"><span class="lineNum">      99 </span>                :<span class="lineCov">          3 :                     nIdle--;</span></a>
 <a name="100"><span class="lineNum">     100 </span>                :            :                 }</a>
 <a name="101"><span class="lineNum">     101 </span>                :            :                 // Decide how many work units to process now.</a>
 <a name="102"><span class="lineNum">     102 </span>                :            :                 // * Do not try to do everything at once, but aim for increasingly smaller batches so</a>
 <a name="103"><span class="lineNum">     103 </span>                :            :                 //   all workers finish approximately simultaneously.</a>
 <a name="104"><span class="lineNum">     104 </span>                :            :                 // * Try to account for idle jobs which will instantly start helping.</a>
 <a name="105"><span class="lineNum">     105 </span>                :            :                 // * Don't do batches smaller than 1 (duh), or larger than nBatchSize.</a>
-<a name="106"><span class="lineNum">     106 </span>                :<span class="lineNoCov">          0 :                 nNow = std::max(1U, std::min(nBatchSize, (unsigned int)queue.size() / (nTotal + nIdle + 1)));</span></a>
-<a name="107"><span class="lineNum">     107 </span>                :<span class="lineNoCov">          0 :                 vChecks.resize(nNow);</span></a>
-<a name="108"><span class="lineNum">     108 </span>                :<span class="lineNoCov">          0 :                 for (unsigned int i = 0; i &lt; nNow; i++) {</span></a>
+<a name="106"><span class="lineNum">     106 </span>                :<span class="lineCov">       3570 :                 nNow = std::max(1U, std::min(nBatchSize, (unsigned int)queue.size() / (nTotal + nIdle + 1)));</span></a>
+<a name="107"><span class="lineNum">     107 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3570 times"> + </span>]:<span class="lineCov">       3570 :                 vChecks.resize(nNow);</span></a>
+<a name="108"><span class="lineNum">     108 </span>        [<span class="branchCov" title="Branch 0 was taken 3570 times"> + </span><span class="branchCov" title="Branch 1 was taken 8636 times"> + </span>]:<span class="lineCov">      12206 :                 for (unsigned int i = 0; i &lt; nNow; i++) {</span></a>
 <a name="109"><span class="lineNum">     109 </span>                :            :                     // We want the lock on the mutex to be as short as possible, so swap jobs from the global</a>
 <a name="110"><span class="lineNum">     110 </span>                :            :                     // queue to the local batch vector instead of copying.</a>
-<a name="111"><span class="lineNum">     111 </span>                :<span class="lineNoCov">          0 :                     vChecks[i].swap(queue.back());</span></a>
-<a name="112"><span class="lineNum">     112 </span>                :<span class="lineNoCov">          0 :                     queue.pop_back();</span></a>
+<a name="111"><span class="lineNum">     111 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineCov">       8636 :                     vChecks[i].swap(queue.back());</span></a>
+<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">       8636 :                     queue.pop_back();</span></a>
 <a name="113"><span class="lineNum">     113 </span>                :            :                 }</a>
 <a name="114"><span class="lineNum">     114 </span>                :            :                 // Check whether we need to do work at all</a>
-<a name="115"><span class="lineNum">     115 </span>                :<span class="lineNoCov">          0 :                 fOk = fAllOk;</span></a>
-<a name="116"><span class="lineNum">     116 </span>                :<span class="lineNoCov">          0 :             }</span></a>
+<a name="115"><span class="lineNum">     115 </span>                :<span class="lineCov">       3570 :                 fOk = fAllOk;</span></a>
+<a name="116"><span class="lineNum">     116 </span>[<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 10400 times"> + </span>][<span class="branchCov" title="Branch 0 was taken 3570 times"> + </span><span class="branchCov" title="Branch 1 was taken 188 times"> + </span>]:<span class="lineCov">      14210 :             }</span></a>
 <a name="117"><span class="lineNum">     117 </span>                :            :             // execute work</a>
-<a name="118"><span class="lineNum">     118 </span>                :<span class="lineNoCov">          0 :             for (T&amp; check : vChecks)</span></a>
-<a name="119"><span class="lineNum">     119 </span>                :<span class="lineNoCov">          0 :                 if (fOk)</span></a>
-<a name="120"><span class="lineNum">     120 </span>                :<span class="lineNoCov">          0 :                     fOk = check();</span></a>
-<a name="121"><span class="lineNum">     121 </span>                :<span class="lineNoCov">          0 :             vChecks.clear();</span></a>
-<a name="122"><span class="lineNum">     122 </span>                :<span class="lineNoCov">          0 :         } while (true);</span></a>
-<a name="123"><span class="lineNum">     123 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="118"><span class="lineNum">     118 </span>        [<span class="branchCov" title="Branch 0 was taken 3570 times"> + </span><span class="branchCov" title="Branch 1 was taken 8636 times"> + </span>]:<span class="lineCov">      12206 :             for (T&amp; check : vChecks)</span></a>
+<a name="119"><span class="lineNum">     119 </span>        [<span class="branchCov" title="Branch 0 was taken 125 times"> + </span><span class="branchCov" title="Branch 1 was taken 8511 times"> + </span>]:<span class="lineCov">       8636 :                 if (fOk)</span></a>
+<a name="120"><span class="lineNum">     120 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineCov">        125 :                     fOk = check();</span></a>
+<a name="121"><span class="lineNum">     121 </span>                :<span class="lineCov">       3570 :             vChecks.clear();</span></a>
+<a name="122"><span class="lineNum">     122 </span>                :<span class="lineCov">       3570 :         } while (true);</span></a>
+<a name="123"><span class="lineNum">     123 </span>                :<span class="lineCov">      10692 :     }</span></a>
 <a name="124"><span class="lineNum">     124 </span>                :            : </a>
 <a name="125"><span class="lineNum">     125 </span>                :            : public:</a>
 <a name="126"><span class="lineNum">     126 </span>                :            :     //! Mutex to ensure only one concurrent CCheckQueueControl</a>
 <a name="127"><span class="lineNum">     127 </span>                :            :     boost::mutex ControlMutex;</a>
 <a name="128"><span class="lineNum">     128 </span>                :            : </a>
 <a name="129"><span class="lineNum">     129 </span>                :            :     //! Create a new check queue</a>
-<a name="130"><span class="lineNum">     130 </span>                :<span class="lineNoCov">          0 :     explicit CCheckQueue(unsigned int nBatchSizeIn) : nIdle(0), nTotal(0), fAllOk(true), nTodo(0), nBatchSize(nBatchSizeIn) {}</span></a>
+<a name="130"><span class="lineNum">     130 </span>[<span class="branchCov" title="Branch 0 was taken 329 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 329 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        329 :     explicit CCheckQueue(unsigned int nBatchSizeIn) : nIdle(0), nTotal(0), fAllOk(true), nTodo(0), nBatchSize(nBatchSizeIn) {}</span></a>
+<span class="lineNum">         </span>        [<span class="branchCov" title="Branch 4 was taken 329 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
 <a name="131"><span class="lineNum">     131 </span>                :            : </a>
 <a name="132"><span class="lineNum">     132 </span>                :            :     //! Worker thread</a>
-<a name="133"><span class="lineNum">     133 </span>                :<span class="lineNoCov">          0 :     void Thread()</span></a>
+<a name="133"><span class="lineNum">     133 </span>                :<span class="lineCov">         52 :     void Thread()</span></a>
 <a name="134"><span class="lineNum">     134 </span>                :            :     {</a>
-<a name="135"><span class="lineNum">     135 </span>                :<span class="lineNoCov">          0 :         Loop();</span></a>
-<a name="136"><span class="lineNum">     136 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="135"><span class="lineNum">     135 </span>                :<span class="lineCov">         52 :         Loop();</span></a>
+<a name="136"><span class="lineNum">     136 </span>                :<span class="lineCov">         52 :     }</span></a>
 <a name="137"><span class="lineNum">     137 </span>                :            : </a>
 <a name="138"><span class="lineNum">     138 </span>                :            :     //! Wait until execution finishes, and return whether all evaluations were successful.</a>
-<a name="139"><span class="lineNum">     139 </span>                :<span class="lineNoCov">          0 :     bool Wait()</span></a>
+<a name="139"><span class="lineNum">     139 </span>                :<span class="lineCov">      10588 :     bool Wait()</span></a>
 <a name="140"><span class="lineNum">     140 </span>                :            :     {</a>
-<a name="141"><span class="lineNum">     141 </span>                :<span class="lineNoCov">          0 :         return Loop(true);</span></a>
+<a name="141"><span class="lineNum">     141 </span>                :<span class="lineCov">      10588 :         return Loop(true);</span></a>
 <a name="142"><span class="lineNum">     142 </span>                :            :     }</a>
 <a name="143"><span class="lineNum">     143 </span>                :            : </a>
 <a name="144"><span class="lineNum">     144 </span>                :            :     //! Add a batch of checks to the queue</a>
-<a name="145"><span class="lineNum">     145 </span>                :<span class="lineNoCov">          0 :     void Add(std::vector&lt;T&gt;&amp; vChecks)</span></a>
+<a name="145"><span class="lineNum">     145 </span>                :<span class="lineCov">        143 :     void Add(std::vector&lt;T&gt;&amp; vChecks)</span></a>
 <a name="146"><span class="lineNum">     146 </span>                :            :     {</a>
-<a name="147"><span class="lineNum">     147 </span>                :<span class="lineNoCov">          0 :         boost::unique_lock&lt;boost::mutex&gt; lock(mutex);</span></a>
-<a name="148"><span class="lineNum">     148 </span>                :<span class="lineNoCov">          0 :         for (T&amp; check : vChecks) {</span></a>
-<a name="149"><span class="lineNum">     149 </span>                :<span class="lineNoCov">          0 :             queue.push_back(T());</span></a>
-<a name="150"><span class="lineNum">     150 </span>                :<span class="lineNoCov">          0 :             check.swap(queue.back());</span></a>
+<a name="147"><span class="lineNum">     147 </span>                :<span class="lineCov">        143 :         boost::unique_lock&lt;boost::mutex&gt; lock(mutex);</span></a>
+<a name="148"><span class="lineNum">     148 </span>        [<span class="branchCov" title="Branch 0 was taken 143 times"> + </span><span class="branchCov" title="Branch 1 was taken 9147 times"> + </span>]:<span class="lineCov">       9290 :         for (T&amp; check : vChecks) {</span></a>
+<a name="149"><span class="lineNum">     149 </span>[<span class="branchCov" title="Branch 0 was taken 9147 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineCov">       9147 :             queue.push_back(T());</span></a>
+<a name="150"><span class="lineNum">     150 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineCov">       9147 :             check.swap(queue.back());</span></a>
 <a name="151"><span class="lineNum">     151 </span>                :            :         }</a>
-<a name="152"><span class="lineNum">     152 </span>                :<span class="lineNoCov">          0 :         nTodo += vChecks.size();</span></a>
-<a name="153"><span class="lineNum">     153 </span>                :<span class="lineNoCov">          0 :         if (vChecks.size() == 1)</span></a>
-<a name="154"><span class="lineNum">     154 </span>                :<span class="lineNoCov">          0 :             condWorker.notify_one();</span></a>
-<a name="155"><span class="lineNum">     155 </span>                :<span class="lineNoCov">          0 :         else if (vChecks.size() &gt; 1)</span></a>
-<a name="156"><span class="lineNum">     156 </span>                :<span class="lineNoCov">          0 :             condWorker.notify_all();</span></a>
-<a name="157"><span class="lineNum">     157 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="152"><span class="lineNum">     152 </span>                :<span class="lineCov">        143 :         nTodo += vChecks.size();</span></a>
+<a name="153"><span class="lineNum">     153 </span>        [<span class="branchCov" title="Branch 0 was taken 8 times"> + </span><span class="branchCov" title="Branch 1 was taken 135 times"> + </span>]:<span class="lineCov">        143 :         if (vChecks.size() == 1)</span></a>
+<a name="154"><span class="lineNum">     154 </span>                :<span class="lineCov">          8 :             condWorker.notify_one();</span></a>
+<a name="155"><span class="lineNum">     155 </span>        [<span class="branchCov" title="Branch 0 was taken 129 times"> + </span><span class="branchCov" title="Branch 1 was taken 6 times"> + </span>]:<span class="lineCov">        135 :         else if (vChecks.size() &gt; 1)</span></a>
+<a name="156"><span class="lineNum">     156 </span>                :<span class="lineCov">        129 :             condWorker.notify_all();</span></a>
+<a name="157"><span class="lineNum">     157 </span>                :<span class="lineCov">        143 :     }</span></a>
 <a name="158"><span class="lineNum">     158 </span>                :            : </a>
-<a name="159"><span class="lineNum">     159 </span>                :<span class="lineNoCov">          0 :     ~CCheckQueue()</span></a>
+<a name="159"><span class="lineNum">     159 </span>                :<span class="lineCov">        329 :     ~CCheckQueue()</span></a>
 <a name="160"><span class="lineNum">     160 </span>                :            :     {</a>
-<a name="161"><span class="lineNum">     161 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="161"><span class="lineNum">     161 </span>                :<span class="lineCov">        329 :     }</span></a>
 <a name="162"><span class="lineNum">     162 </span>                :            : </a>
 <a name="163"><span class="lineNum">     163 </span>                :            : };</a>
 <a name="164"><span class="lineNum">     164 </span>                :            : </a>
@@ -248,37 +249,37 @@
 <a name="177"><span class="lineNum">     177 </span>                :            :     CCheckQueueControl() = delete;</a>
 <a name="178"><span class="lineNum">     178 </span>                :            :     CCheckQueueControl(const CCheckQueueControl&amp;) = delete;</a>
 <a name="179"><span class="lineNum">     179 </span>                :            :     CCheckQueueControl&amp; operator=(const CCheckQueueControl&amp;) = delete;</a>
-<a name="180"><span class="lineNum">     180 </span>                :<span class="lineNoCov">          0 :     explicit CCheckQueueControl(CCheckQueue&lt;T&gt; * const pqueueIn) : pqueue(pqueueIn), fDone(false)</span></a>
+<a name="180"><span class="lineNum">     180 </span>                :<span class="lineCov">      10517 :     explicit CCheckQueueControl(CCheckQueue&lt;T&gt; * const pqueueIn) : pqueue(pqueueIn), fDone(false)</span></a>
 <a name="181"><span class="lineNum">     181 </span>                :            :     {</a>
 <a name="182"><span class="lineNum">     182 </span>                :            :         // passed queue is supposed to be unused, or nullptr</a>
-<a name="183"><span class="lineNum">     183 </span>                :<span class="lineNoCov">          0 :         if (pqueue != nullptr) {</span></a>
-<a name="184"><span class="lineNum">     184 </span>                :<span class="lineNoCov">          0 :             ENTER_CRITICAL_SECTION(pqueue-&gt;ControlMutex);</span></a>
-<a name="185"><span class="lineNum">     185 </span>                :<span class="lineNoCov">          0 :         }</span></a>
-<a name="186"><span class="lineNum">     186 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="183"><span class="lineNum">     183 </span>        [<span class="branchCov" title="Branch 0 was taken 10517 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      10517 :         if (pqueue != nullptr) {</span></a>
+<a name="184"><span class="lineNum">     184 </span>                :<span class="lineCov">      10517 :             ENTER_CRITICAL_SECTION(pqueue-&gt;ControlMutex);</span></a>
+<a name="185"><span class="lineNum">     185 </span>                :<span class="lineCov">      10517 :         }</span></a>
+<a name="186"><span class="lineNum">     186 </span>                :<span class="lineCov">      10517 :     }</span></a>
 <a name="187"><span class="lineNum">     187 </span>                :            : </a>
-<a name="188"><span class="lineNum">     188 </span>                :<span class="lineNoCov">          0 :     bool Wait()</span></a>
+<a name="188"><span class="lineNum">     188 </span>                :<span class="lineCov">      10517 :     bool Wait()</span></a>
 <a name="189"><span class="lineNum">     189 </span>                :            :     {</a>
-<a name="190"><span class="lineNum">     190 </span>                :<span class="lineNoCov">          0 :         if (pqueue == nullptr)</span></a>
+<a name="190"><span class="lineNum">     190 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 10517 times"> + </span>]:<span class="lineCov">      10517 :         if (pqueue == nullptr)</span></a>
 <a name="191"><span class="lineNum">     191 </span>                :<span class="lineNoCov">          0 :             return true;</span></a>
-<a name="192"><span class="lineNum">     192 </span>                :<span class="lineNoCov">          0 :         bool fRet = pqueue-&gt;Wait();</span></a>
-<a name="193"><span class="lineNum">     193 </span>                :<span class="lineNoCov">          0 :         fDone = true;</span></a>
+<a name="192"><span class="lineNum">     192 </span>                :<span class="lineCov">      10517 :         bool fRet = pqueue-&gt;Wait();</span></a>
+<a name="193"><span class="lineNum">     193 </span>                :<span class="lineCov">      10517 :         fDone = true;</span></a>
 <a name="194"><span class="lineNum">     194 </span>                :            :         return fRet;</a>
-<a name="195"><span class="lineNum">     195 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="195"><span class="lineNum">     195 </span>                :<span class="lineCov">      10517 :     }</span></a>
 <a name="196"><span class="lineNum">     196 </span>                :            : </a>
-<a name="197"><span class="lineNum">     197 </span>                :<span class="lineNoCov">          0 :     void Add(std::vector&lt;T&gt;&amp; vChecks)</span></a>
+<a name="197"><span class="lineNum">     197 </span>                :<span class="lineCov">         58 :     void Add(std::vector&lt;T&gt;&amp; vChecks)</span></a>
 <a name="198"><span class="lineNum">     198 </span>                :            :     {</a>
-<a name="199"><span class="lineNum">     199 </span>                :<span class="lineNoCov">          0 :         if (pqueue != nullptr)</span></a>
-<a name="200"><span class="lineNum">     200 </span>                :<span class="lineNoCov">          0 :             pqueue-&gt;Add(vChecks);</span></a>
-<a name="201"><span class="lineNum">     201 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="199"><span class="lineNum">     199 </span>        [<span class="branchCov" title="Branch 0 was taken 58 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         58 :         if (pqueue != nullptr)</span></a>
+<a name="200"><span class="lineNum">     200 </span>                :<span class="lineCov">         58 :             pqueue-&gt;Add(vChecks);</span></a>
+<a name="201"><span class="lineNum">     201 </span>                :<span class="lineCov">         58 :     }</span></a>
 <a name="202"><span class="lineNum">     202 </span>                :            : </a>
-<a name="203"><span class="lineNum">     203 </span>                :<span class="lineNoCov">          0 :     ~CCheckQueueControl()</span></a>
+<a name="203"><span class="lineNum">     203 </span>                :<span class="lineCov">      10517 :     ~CCheckQueueControl()</span></a>
 <a name="204"><span class="lineNum">     204 </span>                :            :     {</a>
-<a name="205"><span class="lineNum">     205 </span>                :<span class="lineNoCov">          0 :         if (!fDone)</span></a>
-<a name="206"><span class="lineNum">     206 </span>                :<span class="lineNoCov">          0 :             Wait();</span></a>
-<a name="207"><span class="lineNum">     207 </span>                :<span class="lineNoCov">          0 :         if (pqueue != nullptr) {</span></a>
-<a name="208"><span class="lineNum">     208 </span>                :<span class="lineNoCov">          0 :             LEAVE_CRITICAL_SECTION(pqueue-&gt;ControlMutex);</span></a>
-<a name="209"><span class="lineNum">     209 </span>                :<span class="lineNoCov">          0 :         }</span></a>
-<a name="210"><span class="lineNum">     210 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="205"><span class="lineNum">     205 </span>        [<span class="branchCov" title="Branch 0 was taken 108 times"> + </span><span class="branchCov" title="Branch 1 was taken 10409 times"> + </span>]:<span class="lineCov">      10517 :         if (!fDone)</span></a>
+<a name="206"><span class="lineNum">     206 </span>        [<span class="branchCov" title="Branch 0 was taken 108 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        108 :             Wait();</span></a>
+<a name="207"><span class="lineNum">     207 </span>        [<span class="branchCov" title="Branch 0 was taken 10517 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      10517 :         if (pqueue != nullptr) {</span></a>
+<a name="208"><span class="lineNum">     208 </span>                :<span class="lineCov">      10517 :             LEAVE_CRITICAL_SECTION(pqueue-&gt;ControlMutex);</span></a>
+<a name="209"><span class="lineNum">     209 </span>                :<span class="lineCov">      10517 :         }</span></a>
+<a name="210"><span class="lineNum">     210 </span>                :<span class="lineCov">      10517 :     }</span></a>
 <a name="211"><span class="lineNum">     211 </span>                :            : };</a>
 <a name="212"><span class="lineNum">     212 </span>                :            : </a>
 <a name="213"><span class="lineNum">     213 </span>                :            : #endif // BITCOIN_CHECKQUEUE_H</a>

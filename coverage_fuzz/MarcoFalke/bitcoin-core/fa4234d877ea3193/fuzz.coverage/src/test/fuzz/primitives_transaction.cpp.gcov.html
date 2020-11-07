@@ -31,27 +31,27 @@
             <td class="headerValue">fuzz_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntry">18</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-11-07 11:34:23</td>
+            <td class="headerValue">2020-11-07 12:05:34</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">0</td>
             <td class="headerCovTableEntry">1</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntryLo">58.8 %</td>
           </tr>
           <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -83,26 +83,29 @@
 <a name="12"><span class="lineNum">      12 </span>                :            : #include &lt;string&gt;</a>
 <a name="13"><span class="lineNum">      13 </span>                :            : #include &lt;vector&gt;</a>
 <a name="14"><span class="lineNum">      14 </span>                :            : </a>
-<a name="15"><span class="lineNum">      15 </span>                :<span class="lineNoCov">          0 : void test_one_input(const std::vector&lt;uint8_t&gt;&amp; buffer)</span></a>
+<a name="15"><span class="lineNum">      15 </span>                :<span class="lineCov">        563 : void test_one_input(const std::vector&lt;uint8_t&gt;&amp; buffer)</span></a>
 <a name="16"><span class="lineNum">      16 </span>                :            : {</a>
-<a name="17"><span class="lineNum">      17 </span>                :<span class="lineNoCov">          0 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></a>
-<a name="18"><span class="lineNum">      18 </span>                :<span class="lineNoCov">          0 :     const CScript script = ConsumeScript(fuzzed_data_provider);</span></a>
-<a name="19"><span class="lineNum">      19 </span>                :<span class="lineNoCov">          0 :     const std::optional&lt;COutPoint&gt; out_point = ConsumeDeserializable&lt;COutPoint&gt;(fuzzed_data_provider);</span></a>
-<a name="20"><span class="lineNum">      20 </span>                :<span class="lineNoCov">          0 :     if (out_point) {</span></a>
-<a name="21"><span class="lineNum">      21 </span>                :<span class="lineNoCov">          0 :         const CTxIn tx_in{*out_point, script, fuzzed_data_provider.ConsumeIntegral&lt;uint32_t&gt;()};</span></a>
+<a name="17"><span class="lineNum">      17 </span>                :<span class="lineCov">        563 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></a>
+<a name="18"><span class="lineNum">      18 </span>                :<span class="lineCov">        563 :     const CScript script = ConsumeScript(fuzzed_data_provider);</span></a>
+<a name="19"><span class="lineNum">      19 </span>                :<span class="lineCov">        563 :     const std::optional&lt;COutPoint&gt; out_point = ConsumeDeserializable&lt;COutPoint&gt;(fuzzed_data_provider);</span></a>
+<a name="20"><span class="lineNum">      20 </span>        [<span class="branchCov" title="Branch 0 was taken 58 times"> + </span><span class="branchCov" title="Branch 1 was taken 505 times"> + </span>]:<span class="lineCov">        563 :     if (out_point) {</span></a>
+<a name="21"><span class="lineNum">      21 </span>[<span class="branchCov" title="Branch 0 was taken 58 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 58 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">         58 :         const CTxIn tx_in{*out_point, script, fuzzed_data_provider.ConsumeIntegral&lt;uint32_t&gt;()};</span></a>
+<span class="lineNum">         </span>        [<span class="branchCov" title="Branch 4 was taken 58 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
 <a name="22"><span class="lineNum">      22 </span>                :            :         (void)tx_in;</a>
-<a name="23"><span class="lineNum">      23 </span>                :<span class="lineNoCov">          0 :     }</span></a>
-<a name="24"><span class="lineNum">      24 </span>                :<span class="lineNoCov">          0 :     const CTxOut tx_out_1{ConsumeMoney(fuzzed_data_provider), script};</span></a>
-<a name="25"><span class="lineNum">      25 </span>                :<span class="lineNoCov">          0 :     const CTxOut tx_out_2{ConsumeMoney(fuzzed_data_provider), ConsumeScript(fuzzed_data_provider)};</span></a>
-<a name="26"><span class="lineNum">      26 </span>                :<span class="lineNoCov">          0 :     assert((tx_out_1 == tx_out_2) != (tx_out_1 != tx_out_2));</span></a>
-<a name="27"><span class="lineNum">      27 </span>                :<span class="lineNoCov">          0 :     const std::optional&lt;CMutableTransaction&gt; mutable_tx_1 = ConsumeDeserializable&lt;CMutableTransaction&gt;(fuzzed_data_provider);</span></a>
-<a name="28"><span class="lineNum">      28 </span>                :<span class="lineNoCov">          0 :     const std::optional&lt;CMutableTransaction&gt; mutable_tx_2 = ConsumeDeserializable&lt;CMutableTransaction&gt;(fuzzed_data_provider);</span></a>
-<a name="29"><span class="lineNum">      29 </span>                :<span class="lineNoCov">          0 :     if (mutable_tx_1 &amp;&amp; mutable_tx_2) {</span></a>
-<a name="30"><span class="lineNum">      30 </span>                :<span class="lineNoCov">          0 :         const CTransaction tx_1{*mutable_tx_1};</span></a>
-<a name="31"><span class="lineNum">      31 </span>                :<span class="lineNoCov">          0 :         const CTransaction tx_2{*mutable_tx_2};</span></a>
-<a name="32"><span class="lineNum">      32 </span>                :<span class="lineNoCov">          0 :         assert((tx_1 == tx_2) != (tx_1 != tx_2));</span></a>
-<a name="33"><span class="lineNum">      33 </span>                :<span class="lineNoCov">          0 :     }</span></a>
-<a name="34"><span class="lineNum">      34 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="23"><span class="lineNum">      23 </span>                :<span class="lineCov">         58 :     }</span></a>
+<a name="24"><span class="lineNum">      24 </span>[<span class="branchCov" title="Branch 0 was taken 563 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 563 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        563 :     const CTxOut tx_out_1{ConsumeMoney(fuzzed_data_provider), script};</span></a>
+<a name="25"><span class="lineNum">      25 </span>        [<span class="branchCov" title="Branch 0 was taken 563 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        563 :     const CTxOut tx_out_2{ConsumeMoney(fuzzed_data_provider), ConsumeScript(fuzzed_data_provider)};</span></a>
+<a name="26"><span class="lineNum">      26 </span>[<span class="branchCov" title="Branch 0 was taken 563 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 563 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        563 :     assert((tx_out_1 == tx_out_2) != (tx_out_1 != tx_out_2));</span></a>
+<span class="lineNum">         </span>        [<span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 563 times"> + </span>]
+<a name="27"><span class="lineNum">      27 </span>                :<span class="lineCov">        563 :     const std::optional&lt;CMutableTransaction&gt; mutable_tx_1 = ConsumeDeserializable&lt;CMutableTransaction&gt;(fuzzed_data_provider);</span></a>
+<a name="28"><span class="lineNum">      28 </span>                :<span class="lineCov">        563 :     const std::optional&lt;CMutableTransaction&gt; mutable_tx_2 = ConsumeDeserializable&lt;CMutableTransaction&gt;(fuzzed_data_provider);</span></a>
+<a name="29"><span class="lineNum">      29 </span>[<span class="branchCov" title="Branch 0 was taken 211 times"> + </span><span class="branchCov" title="Branch 1 was taken 352 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 206 times"> + </span><span class="branchCov" title="Branch 3 was taken 5 times"> + </span>]:<span class="lineCov">        563 :     if (mutable_tx_1 &amp;&amp; mutable_tx_2) {</span></a>
+<a name="30"><span class="lineNum">      30 </span>        [<span class="branchCov" title="Branch 0 was taken 206 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        206 :         const CTransaction tx_1{*mutable_tx_1};</span></a>
+<a name="31"><span class="lineNum">      31 </span>        [<span class="branchCov" title="Branch 0 was taken 206 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        206 :         const CTransaction tx_2{*mutable_tx_2};</span></a>
+<a name="32"><span class="lineNum">      32 </span>[<span class="branchCov" title="Branch 0 was taken 206 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 206 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        206 :         assert((tx_1 == tx_2) != (tx_1 != tx_2));</span></a>
+<span class="lineNum">         </span>        [<span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 206 times"> + </span>]
+<a name="33"><span class="lineNum">      33 </span>                :<span class="lineCov">        206 :     }</span></a>
+<a name="34"><span class="lineNum">      34 </span>                :<span class="lineCov">        563 : }</span></a>
 </pre>
       </td>
     </tr>
