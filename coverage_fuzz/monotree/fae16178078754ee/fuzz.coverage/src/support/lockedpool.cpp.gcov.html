@@ -1,0 +1,497 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/support/lockedpool.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/support</a> - lockedpool.cpp<span style="font-size: 80%;"> (source / <a href="lockedpool.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">129</td>
+            <td class="headerCovTableEntry">171</td>
+            <td class="headerCovTableEntryMed">75.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-03-18 16:41:14</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntryMed">79.2 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntry">88</td>
+            <td class="headerCovTableEntryLo">43.2 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2016-2020 The Bitcoin Core developers</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : #include &lt;support/lockedpool.h&gt;</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #include &lt;support/cleanse.h&gt;</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #if defined(HAVE_CONFIG_H)</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;config/bitcoin-config.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #endif</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : </a>
+<a name="12"><span class="lineNum">      12 </span>                :            : #ifdef WIN32</a>
+<a name="13"><span class="lineNum">      13 </span>                :            : #ifndef NOMINMAX</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : #define NOMINMAX</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : #endif</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : #include &lt;windows.h&gt;</a>
+<a name="17"><span class="lineNum">      17 </span>                :            : #else</a>
+<a name="18"><span class="lineNum">      18 </span>                :            : #include &lt;sys/mman.h&gt; // for mmap</a>
+<a name="19"><span class="lineNum">      19 </span>                :            : #include &lt;sys/resource.h&gt; // for getrlimit</a>
+<a name="20"><span class="lineNum">      20 </span>                :            : #include &lt;limits.h&gt; // for PAGESIZE</a>
+<a name="21"><span class="lineNum">      21 </span>                :            : #include &lt;unistd.h&gt; // for sysconf</a>
+<a name="22"><span class="lineNum">      22 </span>                :            : #endif</a>
+<a name="23"><span class="lineNum">      23 </span>                :            : </a>
+<a name="24"><span class="lineNum">      24 </span>                :            : #include &lt;algorithm&gt;</a>
+<a name="25"><span class="lineNum">      25 </span>                :            : #ifdef ARENA_DEBUG</a>
+<a name="26"><span class="lineNum">      26 </span>                :            : #include &lt;iomanip&gt;</a>
+<a name="27"><span class="lineNum">      27 </span>                :            : #include &lt;iostream&gt;</a>
+<a name="28"><span class="lineNum">      28 </span>                :            : #endif</a>
+<a name="29"><span class="lineNum">      29 </span>                :            : </a>
+<a name="30"><span class="lineNum">      30 </span>                :            : LockedPoolManager* LockedPoolManager::_instance = nullptr;</a>
+<a name="31"><span class="lineNum">      31 </span>                :            : </a>
+<a name="32"><span class="lineNum">      32 </span>                :            : /*******************************************************************************/</a>
+<a name="33"><span class="lineNum">      33 </span>                :            : // Utilities</a>
+<a name="34"><span class="lineNum">      34 </span>                :            : //</a>
+<a name="35"><span class="lineNum">      35 </span>                :            : /** Align up to power of 2 */</a>
+<a name="36"><span class="lineNum">      36 </span>                :<span class="lineCov">          8 : static inline size_t align_up(size_t x, size_t align)</span></a>
+<a name="37"><span class="lineNum">      37 </span>                :            : {</a>
+<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">          8 :     return (x + align - 1) &amp; ~(align - 1);</span></a>
+<a name="39"><span class="lineNum">      39 </span>                :            : }</a>
+<a name="40"><span class="lineNum">      40 </span>                :            : </a>
+<a name="41"><span class="lineNum">      41 </span>                :            : /*******************************************************************************/</a>
+<a name="42"><span class="lineNum">      42 </span>                :            : // Implementation: Arena</a>
+<a name="43"><span class="lineNum">      43 </span>                :            : </a>
+<a name="44"><span class="lineNum">      44 </span>                :<span class="lineCov">          2 : Arena::Arena(void *base_in, size_t size_in, size_t alignment_in):</span></a>
+<a name="45"><span class="lineNum">      45 </span>                :<span class="lineCov">          2 :     base(static_cast&lt;char*&gt;(base_in)), end(static_cast&lt;char*&gt;(base_in) + size_in), alignment(alignment_in)</span></a>
+<a name="46"><span class="lineNum">      46 </span>                :<span class="lineCov">          2 : {</span></a>
+<a name="47"><span class="lineNum">      47 </span>                :            :     // Start with one free chunk that covers the entire arena</a>
+<a name="48"><span class="lineNum">      48 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     auto it = size_to_free_chunk.emplace(size_in, base);</span></a>
+<a name="49"><span class="lineNum">      49 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     chunks_free.emplace(base, it);</span></a>
+<a name="50"><span class="lineNum">      50 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     chunks_free_end.emplace(base + size_in, it);</span></a>
+<a name="51"><span class="lineNum">      51 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="52"><span class="lineNum">      52 </span>                :            : </a>
+<a name="53"><span class="lineNum">      53 </span>                :<span class="lineCov">          2 : Arena::~Arena()</span></a>
+<a name="54"><span class="lineNum">      54 </span>                :<span class="lineCov">          2 : {</span></a>
+<a name="55"><span class="lineNum">      55 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="56"><span class="lineNum">      56 </span>                :            : </a>
+<a name="57"><span class="lineNum">      57 </span>                :<span class="lineCov">          4 : void* Arena::alloc(size_t size)</span></a>
+<a name="58"><span class="lineNum">      58 </span>                :            : {</a>
+<a name="59"><span class="lineNum">      59 </span>                :            :     // Round to next multiple of alignment</a>
+<a name="60"><span class="lineNum">      60 </span>                :<span class="lineCov">          4 :     size = align_up(size, alignment);</span></a>
+<a name="61"><span class="lineNum">      61 </span>                :            : </a>
+<a name="62"><span class="lineNum">      62 </span>                :            :     // Don't handle zero-sized chunks</a>
+<a name="63"><span class="lineNum">      63 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     if (size == 0)</span></a>
+<a name="64"><span class="lineNum">      64 </span>                :<span class="lineNoCov">          0 :         return nullptr;</span></a>
+<a name="65"><span class="lineNum">      65 </span>                :            : </a>
+<a name="66"><span class="lineNum">      66 </span>                :            :     // Pick a large enough free-chunk. Returns an iterator pointing to the first element that is not less than key.</a>
+<a name="67"><span class="lineNum">      67 </span>                :            :     // This allocation strategy is best-fit. According to &quot;Dynamic Storage Allocation: A Survey and Critical Review&quot;,</a>
+<a name="68"><span class="lineNum">      68 </span>                :            :     // Wilson et. al. 1995, https://www.scs.stanford.edu/14wi-cs140/sched/readings/wilson.pdf, best-fit and first-fit</a>
+<a name="69"><span class="lineNum">      69 </span>                :            :     // policies seem to work well in practice.</a>
+<a name="70"><span class="lineNum">      70 </span>                :<span class="lineCov">          4 :     auto size_ptr_it = size_to_free_chunk.lower_bound(size);</span></a>
+<a name="71"><span class="lineNum">      71 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     if (size_ptr_it == size_to_free_chunk.end())</span></a>
+<a name="72"><span class="lineNum">      72 </span>                :<span class="lineNoCov">          0 :         return nullptr;</span></a>
+<a name="73"><span class="lineNum">      73 </span>                :            : </a>
+<a name="74"><span class="lineNum">      74 </span>                :            :     // Create the used-chunk, taking its space from the end of the free-chunk</a>
+<a name="75"><span class="lineNum">      75 </span>                :<span class="lineCov">          4 :     const size_t size_remaining = size_ptr_it-&gt;first - size;</span></a>
+<a name="76"><span class="lineNum">      76 </span>                :<span class="lineCov">          4 :     auto allocated = chunks_used.emplace(size_ptr_it-&gt;second + size_remaining, size).first;</span></a>
+<a name="77"><span class="lineNum">      77 </span>                :<span class="lineCov">          4 :     chunks_free_end.erase(size_ptr_it-&gt;second + size_ptr_it-&gt;first);</span></a>
+<a name="78"><span class="lineNum">      78 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     if (size_ptr_it-&gt;first == size) {</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :            :         // whole chunk is used up</a>
+<a name="80"><span class="lineNum">      80 </span>                :<span class="lineNoCov">          0 :         chunks_free.erase(size_ptr_it-&gt;second);</span></a>
+<a name="81"><span class="lineNum">      81 </span>                :<span class="lineNoCov">          0 :     } else {</span></a>
+<a name="82"><span class="lineNum">      82 </span>                :            :         // still some memory left in the chunk</a>
+<a name="83"><span class="lineNum">      83 </span>                :<span class="lineCov">          4 :         auto it_remaining = size_to_free_chunk.emplace(size_remaining, size_ptr_it-&gt;second);</span></a>
+<a name="84"><span class="lineNum">      84 </span>                :<span class="lineCov">          4 :         chunks_free[size_ptr_it-&gt;second] = it_remaining;</span></a>
+<a name="85"><span class="lineNum">      85 </span>                :<span class="lineCov">          4 :         chunks_free_end.emplace(size_ptr_it-&gt;second + size_remaining, it_remaining);</span></a>
+<a name="86"><span class="lineNum">      86 </span>                :<span class="lineCov">          4 :     }</span></a>
+<a name="87"><span class="lineNum">      87 </span>                :<span class="lineCov">          4 :     size_to_free_chunk.erase(size_ptr_it);</span></a>
+<a name="88"><span class="lineNum">      88 </span>                :            : </a>
+<a name="89"><span class="lineNum">      89 </span>                :<span class="lineCov">          4 :     return reinterpret_cast&lt;void*&gt;(allocated-&gt;first);</span></a>
+<a name="90"><span class="lineNum">      90 </span>                :<span class="lineCov">          4 : }</span></a>
+<a name="91"><span class="lineNum">      91 </span>                :            : </a>
+<a name="92"><span class="lineNum">      92 </span>                :<span class="lineCov">          4 : void Arena::free(void *ptr)</span></a>
+<a name="93"><span class="lineNum">      93 </span>                :            : {</a>
+<a name="94"><span class="lineNum">      94 </span>                :            :     // Freeing the nullptr pointer is OK.</a>
+<a name="95"><span class="lineNum">      95 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     if (ptr == nullptr) {</span></a>
+<a name="96"><span class="lineNum">      96 </span>                :            :         return;</a>
+<a name="97"><span class="lineNum">      97 </span>                :            :     }</a>
+<a name="98"><span class="lineNum">      98 </span>                :            : </a>
+<a name="99"><span class="lineNum">      99 </span>                :            :     // Remove chunk from used map</a>
+<a name="100"><span class="lineNum">     100 </span>                :<span class="lineCov">          4 :     auto i = chunks_used.find(static_cast&lt;char*&gt;(ptr));</span></a>
+<a name="101"><span class="lineNum">     101 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     if (i == chunks_used.end()) {</span></a>
+<a name="102"><span class="lineNum">     102 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(&quot;Arena: invalid or double free&quot;);</span></a>
+<a name="103"><span class="lineNum">     103 </span>                :            :     }</a>
+<a name="104"><span class="lineNum">     104 </span>                :<span class="lineCov">          4 :     std::pair&lt;char*, size_t&gt; freed = *i;</span></a>
+<a name="105"><span class="lineNum">     105 </span>                :<span class="lineCov">          4 :     chunks_used.erase(i);</span></a>
+<a name="106"><span class="lineNum">     106 </span>                :            : </a>
+<a name="107"><span class="lineNum">     107 </span>                :            :     // coalesce freed with previous chunk</a>
+<a name="108"><span class="lineNum">     108 </span>                :<span class="lineCov">          4 :     auto prev = chunks_free_end.find(freed.first);</span></a>
+<a name="109"><span class="lineNum">     109 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          4 :     if (prev != chunks_free_end.end()) {</span></a>
+<a name="110"><span class="lineNum">     110 </span>                :<span class="lineCov">          4 :         freed.first -= prev-&gt;second-&gt;first;</span></a>
+<a name="111"><span class="lineNum">     111 </span>                :<span class="lineCov">          4 :         freed.second += prev-&gt;second-&gt;first;</span></a>
+<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">          4 :         size_to_free_chunk.erase(prev-&gt;second);</span></a>
+<a name="113"><span class="lineNum">     113 </span>                :<span class="lineCov">          4 :         chunks_free_end.erase(prev);</span></a>
+<a name="114"><span class="lineNum">     114 </span>                :<span class="lineCov">          4 :     }</span></a>
+<a name="115"><span class="lineNum">     115 </span>                :            : </a>
+<a name="116"><span class="lineNum">     116 </span>                :            :     // coalesce freed with chunk after freed</a>
+<a name="117"><span class="lineNum">     117 </span>                :<span class="lineCov">          4 :     auto next = chunks_free.find(freed.first + freed.second);</span></a>
+<a name="118"><span class="lineNum">     118 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     if (next != chunks_free.end()) {</span></a>
+<a name="119"><span class="lineNum">     119 </span>                :<span class="lineNoCov">          0 :         freed.second += next-&gt;second-&gt;first;</span></a>
+<a name="120"><span class="lineNum">     120 </span>                :<span class="lineNoCov">          0 :         size_to_free_chunk.erase(next-&gt;second);</span></a>
+<a name="121"><span class="lineNum">     121 </span>                :<span class="lineNoCov">          0 :         chunks_free.erase(next);</span></a>
+<a name="122"><span class="lineNum">     122 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="123"><span class="lineNum">     123 </span>                :            : </a>
+<a name="124"><span class="lineNum">     124 </span>                :            :     // Add/set space with coalesced free chunk</a>
+<a name="125"><span class="lineNum">     125 </span>                :<span class="lineCov">          4 :     auto it = size_to_free_chunk.emplace(freed.second, freed.first);</span></a>
+<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">          4 :     chunks_free[freed.first] = it;</span></a>
+<a name="127"><span class="lineNum">     127 </span>                :<span class="lineCov">          4 :     chunks_free_end[freed.first + freed.second] = it;</span></a>
+<a name="128"><span class="lineNum">     128 </span>                :<span class="lineCov">          4 : }</span></a>
+<a name="129"><span class="lineNum">     129 </span>                :            : </a>
+<a name="130"><span class="lineNum">     130 </span>                :<span class="lineNoCov">          0 : Arena::Stats Arena::stats() const</span></a>
+<a name="131"><span class="lineNum">     131 </span>                :            : {</a>
+<a name="132"><span class="lineNum">     132 </span>                :<span class="lineNoCov">          0 :     Arena::Stats r{ 0, 0, 0, chunks_used.size(), chunks_free.size() };</span></a>
+<a name="133"><span class="lineNum">     133 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     for (const auto&amp; chunk: chunks_used)</span></a>
+<a name="134"><span class="lineNum">     134 </span>                :<span class="lineNoCov">          0 :         r.used += chunk.second;</span></a>
+<a name="135"><span class="lineNum">     135 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     for (const auto&amp; chunk: chunks_free)</span></a>
+<a name="136"><span class="lineNum">     136 </span>                :<span class="lineNoCov">          0 :         r.free += chunk.second-&gt;first;</span></a>
+<a name="137"><span class="lineNum">     137 </span>                :<span class="lineNoCov">          0 :     r.total = r.used + r.free;</span></a>
+<a name="138"><span class="lineNum">     138 </span>                :<span class="lineNoCov">          0 :     return r;</span></a>
+<a name="139"><span class="lineNum">     139 </span>                :            : }</a>
+<a name="140"><span class="lineNum">     140 </span>                :            : </a>
+<a name="141"><span class="lineNum">     141 </span>                :            : #ifdef ARENA_DEBUG</a>
+<a name="142"><span class="lineNum">     142 </span>                :            : static void printchunk(void* base, size_t sz, bool used) {</a>
+<a name="143"><span class="lineNum">     143 </span>                :            :     std::cout &lt;&lt;</a>
+<a name="144"><span class="lineNum">     144 </span>                :            :         &quot;0x&quot; &lt;&lt; std::hex &lt;&lt; std::setw(16) &lt;&lt; std::setfill('0') &lt;&lt; base &lt;&lt;</a>
+<a name="145"><span class="lineNum">     145 </span>                :            :         &quot; 0x&quot; &lt;&lt; std::hex &lt;&lt; std::setw(16) &lt;&lt; std::setfill('0') &lt;&lt; sz &lt;&lt;</a>
+<a name="146"><span class="lineNum">     146 </span>                :            :         &quot; 0x&quot; &lt;&lt; used &lt;&lt; std::endl;</a>
+<a name="147"><span class="lineNum">     147 </span>                :            : }</a>
+<a name="148"><span class="lineNum">     148 </span>                :            : void Arena::walk() const</a>
+<a name="149"><span class="lineNum">     149 </span>                :            : {</a>
+<a name="150"><span class="lineNum">     150 </span>                :            :     for (const auto&amp; chunk: chunks_used)</a>
+<a name="151"><span class="lineNum">     151 </span>                :            :         printchunk(chunk.first, chunk.second, true);</a>
+<a name="152"><span class="lineNum">     152 </span>                :            :     std::cout &lt;&lt; std::endl;</a>
+<a name="153"><span class="lineNum">     153 </span>                :            :     for (const auto&amp; chunk: chunks_free)</a>
+<a name="154"><span class="lineNum">     154 </span>                :            :         printchunk(chunk.first, chunk.second-&gt;first, false);</a>
+<a name="155"><span class="lineNum">     155 </span>                :            :     std::cout &lt;&lt; std::endl;</a>
+<a name="156"><span class="lineNum">     156 </span>                :            : }</a>
+<a name="157"><span class="lineNum">     157 </span>                :            : #endif</a>
+<a name="158"><span class="lineNum">     158 </span>                :            : </a>
+<a name="159"><span class="lineNum">     159 </span>                :            : /*******************************************************************************/</a>
+<a name="160"><span class="lineNum">     160 </span>                :            : // Implementation: Win32LockedPageAllocator</a>
+<a name="161"><span class="lineNum">     161 </span>                :            : </a>
+<a name="162"><span class="lineNum">     162 </span>                :            : #ifdef WIN32</a>
+<a name="163"><span class="lineNum">     163 </span>                :            : /** LockedPageAllocator specialized for Windows.</a>
+<a name="164"><span class="lineNum">     164 </span>                :            :  */</a>
+<a name="165"><span class="lineNum">     165 </span>                :            : class Win32LockedPageAllocator: public LockedPageAllocator</a>
+<a name="166"><span class="lineNum">     166 </span>                :            : {</a>
+<a name="167"><span class="lineNum">     167 </span>                :            : public:</a>
+<a name="168"><span class="lineNum">     168 </span>                :            :     Win32LockedPageAllocator();</a>
+<a name="169"><span class="lineNum">     169 </span>                :            :     void* AllocateLocked(size_t len, bool *lockingSuccess) override;</a>
+<a name="170"><span class="lineNum">     170 </span>                :            :     void FreeLocked(void* addr, size_t len) override;</a>
+<a name="171"><span class="lineNum">     171 </span>                :            :     size_t GetLimit() override;</a>
+<a name="172"><span class="lineNum">     172 </span>                :            : private:</a>
+<a name="173"><span class="lineNum">     173 </span>                :            :     size_t page_size;</a>
+<a name="174"><span class="lineNum">     174 </span>                :            : };</a>
+<a name="175"><span class="lineNum">     175 </span>                :            : </a>
+<a name="176"><span class="lineNum">     176 </span>                :            : Win32LockedPageAllocator::Win32LockedPageAllocator()</a>
+<a name="177"><span class="lineNum">     177 </span>                :            : {</a>
+<a name="178"><span class="lineNum">     178 </span>                :            :     // Determine system page size in bytes</a>
+<a name="179"><span class="lineNum">     179 </span>                :            :     SYSTEM_INFO sSysInfo;</a>
+<a name="180"><span class="lineNum">     180 </span>                :            :     GetSystemInfo(&amp;sSysInfo);</a>
+<a name="181"><span class="lineNum">     181 </span>                :            :     page_size = sSysInfo.dwPageSize;</a>
+<a name="182"><span class="lineNum">     182 </span>                :            : }</a>
+<a name="183"><span class="lineNum">     183 </span>                :            : void *Win32LockedPageAllocator::AllocateLocked(size_t len, bool *lockingSuccess)</a>
+<a name="184"><span class="lineNum">     184 </span>                :            : {</a>
+<a name="185"><span class="lineNum">     185 </span>                :            :     len = align_up(len, page_size);</a>
+<a name="186"><span class="lineNum">     186 </span>                :            :     void *addr = VirtualAlloc(nullptr, len, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);</a>
+<a name="187"><span class="lineNum">     187 </span>                :            :     if (addr) {</a>
+<a name="188"><span class="lineNum">     188 </span>                :            :         // VirtualLock is used to attempt to keep keying material out of swap. Note</a>
+<a name="189"><span class="lineNum">     189 </span>                :            :         // that it does not provide this as a guarantee, but, in practice, memory</a>
+<a name="190"><span class="lineNum">     190 </span>                :            :         // that has been VirtualLock'd almost never gets written to the pagefile</a>
+<a name="191"><span class="lineNum">     191 </span>                :            :         // except in rare circumstances where memory is extremely low.</a>
+<a name="192"><span class="lineNum">     192 </span>                :            :         *lockingSuccess = VirtualLock(const_cast&lt;void*&gt;(addr), len) != 0;</a>
+<a name="193"><span class="lineNum">     193 </span>                :            :     }</a>
+<a name="194"><span class="lineNum">     194 </span>                :            :     return addr;</a>
+<a name="195"><span class="lineNum">     195 </span>                :            : }</a>
+<a name="196"><span class="lineNum">     196 </span>                :            : void Win32LockedPageAllocator::FreeLocked(void* addr, size_t len)</a>
+<a name="197"><span class="lineNum">     197 </span>                :            : {</a>
+<a name="198"><span class="lineNum">     198 </span>                :            :     len = align_up(len, page_size);</a>
+<a name="199"><span class="lineNum">     199 </span>                :            :     memory_cleanse(addr, len);</a>
+<a name="200"><span class="lineNum">     200 </span>                :            :     VirtualUnlock(const_cast&lt;void*&gt;(addr), len);</a>
+<a name="201"><span class="lineNum">     201 </span>                :            : }</a>
+<a name="202"><span class="lineNum">     202 </span>                :            : </a>
+<a name="203"><span class="lineNum">     203 </span>                :            : size_t Win32LockedPageAllocator::GetLimit()</a>
+<a name="204"><span class="lineNum">     204 </span>                :            : {</a>
+<a name="205"><span class="lineNum">     205 </span>                :            :     // TODO is there a limit on Windows, how to get it?</a>
+<a name="206"><span class="lineNum">     206 </span>                :            :     return std::numeric_limits&lt;size_t&gt;::max();</a>
+<a name="207"><span class="lineNum">     207 </span>                :            : }</a>
+<a name="208"><span class="lineNum">     208 </span>                :            : #endif</a>
+<a name="209"><span class="lineNum">     209 </span>                :            : </a>
+<a name="210"><span class="lineNum">     210 </span>                :            : /*******************************************************************************/</a>
+<a name="211"><span class="lineNum">     211 </span>                :            : // Implementation: PosixLockedPageAllocator</a>
+<a name="212"><span class="lineNum">     212 </span>                :            : </a>
+<a name="213"><span class="lineNum">     213 </span>                :            : #ifndef WIN32</a>
+<a name="214"><span class="lineNum">     214 </span>                :            : /** LockedPageAllocator specialized for OSes that don't try to be</a>
+<a name="215"><span class="lineNum">     215 </span>                :            :  * special snowflakes.</a>
+<a name="216"><span class="lineNum">     216 </span>                :            :  */</a>
+<a name="217"><span class="lineNum">     217 </span>                :<span class="lineCov">          2 : class PosixLockedPageAllocator: public LockedPageAllocator</span></a>
+<a name="218"><span class="lineNum">     218 </span>                :            : {</a>
+<a name="219"><span class="lineNum">     219 </span>                :            : public:</a>
+<a name="220"><span class="lineNum">     220 </span>                :            :     PosixLockedPageAllocator();</a>
+<a name="221"><span class="lineNum">     221 </span>                :            :     void* AllocateLocked(size_t len, bool *lockingSuccess) override;</a>
+<a name="222"><span class="lineNum">     222 </span>                :            :     void FreeLocked(void* addr, size_t len) override;</a>
+<a name="223"><span class="lineNum">     223 </span>                :            :     size_t GetLimit() override;</a>
+<a name="224"><span class="lineNum">     224 </span>                :            : private:</a>
+<a name="225"><span class="lineNum">     225 </span>                :            :     size_t page_size;</a>
+<a name="226"><span class="lineNum">     226 </span>                :            : };</a>
+<a name="227"><span class="lineNum">     227 </span>                :            : </a>
+<a name="228"><span class="lineNum">     228 </span>                :<span class="lineCov">          2 : PosixLockedPageAllocator::PosixLockedPageAllocator()</span></a>
+<a name="229"><span class="lineNum">     229 </span>                :<span class="lineCov">          2 : {</span></a>
+<a name="230"><span class="lineNum">     230 </span>                :            :     // Determine system page size in bytes</a>
+<a name="231"><span class="lineNum">     231 </span>                :            : #if defined(PAGESIZE) // defined in limits.h</a>
+<a name="232"><span class="lineNum">     232 </span>                :            :     page_size = PAGESIZE;</a>
+<a name="233"><span class="lineNum">     233 </span>                :            : #else                   // assume some POSIX OS</a>
+<a name="234"><span class="lineNum">     234 </span>                :<span class="lineCov">          2 :     page_size = sysconf(_SC_PAGESIZE);</span></a>
+<a name="235"><span class="lineNum">     235 </span>                :            : #endif</a>
+<a name="236"><span class="lineNum">     236 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="237"><span class="lineNum">     237 </span>                :            : </a>
+<a name="238"><span class="lineNum">     238 </span>                :            : // Some systems (at least OS X) do not define MAP_ANONYMOUS yet and define</a>
+<a name="239"><span class="lineNum">     239 </span>                :            : // MAP_ANON which is deprecated</a>
+<a name="240"><span class="lineNum">     240 </span>                :            : #ifndef MAP_ANONYMOUS</a>
+<a name="241"><span class="lineNum">     241 </span>                :            : #define MAP_ANONYMOUS MAP_ANON</a>
+<a name="242"><span class="lineNum">     242 </span>                :            : #endif</a>
+<a name="243"><span class="lineNum">     243 </span>                :            : </a>
+<a name="244"><span class="lineNum">     244 </span>                :<span class="lineCov">          2 : void *PosixLockedPageAllocator::AllocateLocked(size_t len, bool *lockingSuccess)</span></a>
+<a name="245"><span class="lineNum">     245 </span>                :            : {</a>
+<a name="246"><span class="lineNum">     246 </span>                :            :     void *addr;</a>
+<a name="247"><span class="lineNum">     247 </span>                :<span class="lineCov">          2 :     len = align_up(len, page_size);</span></a>
+<a name="248"><span class="lineNum">     248 </span>                :<span class="lineCov">          2 :     addr = mmap(nullptr, len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);</span></a>
+<a name="249"><span class="lineNum">     249 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          2 :     if (addr == MAP_FAILED) {</span></a>
+<a name="250"><span class="lineNum">     250 </span>                :<span class="lineNoCov">          0 :         return nullptr;</span></a>
+<a name="251"><span class="lineNum">     251 </span>                :            :     }</a>
+<a name="252"><span class="lineNum">     252 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     if (addr) {</span></a>
+<a name="253"><span class="lineNum">     253 </span>                :<span class="lineCov">          2 :         *lockingSuccess = mlock(addr, len) == 0;</span></a>
+<a name="254"><span class="lineNum">     254 </span>                :            : #if defined(MADV_DONTDUMP) // Linux</a>
+<a name="255"><span class="lineNum">     255 </span>                :<span class="lineCov">          2 :         madvise(addr, len, MADV_DONTDUMP);</span></a>
+<a name="256"><span class="lineNum">     256 </span>                :            : #elif defined(MADV_NOCORE) // FreeBSD</a>
+<a name="257"><span class="lineNum">     257 </span>                :            :         madvise(addr, len, MADV_NOCORE);</a>
+<a name="258"><span class="lineNum">     258 </span>                :            : #endif</a>
+<a name="259"><span class="lineNum">     259 </span>                :<span class="lineCov">          2 :     }</span></a>
+<a name="260"><span class="lineNum">     260 </span>                :<span class="lineCov">          2 :     return addr;</span></a>
+<a name="261"><span class="lineNum">     261 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="262"><span class="lineNum">     262 </span>                :<span class="lineCov">          2 : void PosixLockedPageAllocator::FreeLocked(void* addr, size_t len)</span></a>
+<a name="263"><span class="lineNum">     263 </span>                :            : {</a>
+<a name="264"><span class="lineNum">     264 </span>                :<span class="lineCov">          2 :     len = align_up(len, page_size);</span></a>
+<a name="265"><span class="lineNum">     265 </span>                :<span class="lineCov">          2 :     memory_cleanse(addr, len);</span></a>
+<a name="266"><span class="lineNum">     266 </span>                :<span class="lineCov">          2 :     munlock(addr, len);</span></a>
+<a name="267"><span class="lineNum">     267 </span>                :<span class="lineCov">          2 :     munmap(addr, len);</span></a>
+<a name="268"><span class="lineNum">     268 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="269"><span class="lineNum">     269 </span>                :<span class="lineCov">          2 : size_t PosixLockedPageAllocator::GetLimit()</span></a>
+<a name="270"><span class="lineNum">     270 </span>                :            : {</a>
+<a name="271"><span class="lineNum">     271 </span>                :            : #ifdef RLIMIT_MEMLOCK</a>
+<a name="272"><span class="lineNum">     272 </span>                :<span class="lineCov">          2 :     struct rlimit rlim;</span></a>
+<a name="273"><span class="lineNum">     273 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     if (getrlimit(RLIMIT_MEMLOCK, &amp;rlim) == 0) {</span></a>
+<a name="274"><span class="lineNum">     274 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         if (rlim.rlim_cur != RLIM_INFINITY) {</span></a>
+<a name="275"><span class="lineNum">     275 </span>                :<span class="lineCov">          2 :             return rlim.rlim_cur;</span></a>
+<a name="276"><span class="lineNum">     276 </span>                :            :         }</a>
+<a name="277"><span class="lineNum">     277 </span>                :            :     }</a>
+<a name="278"><span class="lineNum">     278 </span>                :            : #endif</a>
+<a name="279"><span class="lineNum">     279 </span>                :<span class="lineNoCov">          0 :     return std::numeric_limits&lt;size_t&gt;::max();</span></a>
+<a name="280"><span class="lineNum">     280 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="281"><span class="lineNum">     281 </span>                :            : #endif</a>
+<a name="282"><span class="lineNum">     282 </span>                :            : </a>
+<a name="283"><span class="lineNum">     283 </span>                :            : /*******************************************************************************/</a>
+<a name="284"><span class="lineNum">     284 </span>                :            : // Implementation: LockedPool</a>
+<a name="285"><span class="lineNum">     285 </span>                :            : </a>
+<a name="286"><span class="lineNum">     286 </span>                :<span class="lineCov">          2 : LockedPool::LockedPool(std::unique_ptr&lt;LockedPageAllocator&gt; allocator_in, LockingFailed_Callback lf_cb_in):</span></a>
+<a name="287"><span class="lineNum">     287 </span>                :<span class="lineCov">          2 :     allocator(std::move(allocator_in)), lf_cb(lf_cb_in), cumulative_bytes_locked(0)</span></a>
+<a name="288"><span class="lineNum">     288 </span>                :            : {</a>
+<a name="289"><span class="lineNum">     289 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="290"><span class="lineNum">     290 </span>                :            : </a>
+<a name="291"><span class="lineNum">     291 </span>                :<span class="lineCov">          2 : LockedPool::~LockedPool()</span></a>
+<a name="292"><span class="lineNum">     292 </span>                :            : {</a>
+<a name="293"><span class="lineNum">     293 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="294"><span class="lineNum">     294 </span>                :<span class="lineCov">          4 : void* LockedPool::alloc(size_t size)</span></a>
+<a name="295"><span class="lineNum">     295 </span>                :            : {</a>
+<a name="296"><span class="lineNum">     296 </span>                :<span class="lineCov">          4 :     std::lock_guard&lt;std::mutex&gt; lock(mutex);</span></a>
+<a name="297"><span class="lineNum">     297 </span>                :            : </a>
+<a name="298"><span class="lineNum">     298 </span>                :            :     // Don't handle impossible sizes</a>
+<a name="299"><span class="lineNum">     299 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     if (size == 0 || size &gt; ARENA_SIZE)</span></a>
+<a name="300"><span class="lineNum">     300 </span>                :<span class="lineNoCov">          0 :         return nullptr;</span></a>
+<a name="301"><span class="lineNum">     301 </span>                :            : </a>
+<a name="302"><span class="lineNum">     302 </span>                :            :     // Try allocating from each current arena</a>
+<a name="303"><span class="lineNum">     303 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          6 :     for (auto &amp;arena: arenas) {</span></a>
+<a name="304"><span class="lineNum">     304 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         void *addr = arena.alloc(size);</span></a>
+<a name="305"><span class="lineNum">     305 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         if (addr) {</span></a>
+<a name="306"><span class="lineNum">     306 </span>                :<span class="lineCov">          2 :             return addr;</span></a>
+<a name="307"><span class="lineNum">     307 </span>                :            :         }</a>
+<a name="308"><span class="lineNum">     308 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="309"><span class="lineNum">     309 </span>                :            :     // If that fails, create a new one</a>
+<a name="310"><span class="lineNum">     310 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          2 :     if (new_arena(ARENA_SIZE, ARENA_ALIGN)) {</span></a>
+<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         return arenas.back().alloc(size);</span></a>
+<a name="312"><span class="lineNum">     312 </span>                :            :     }</a>
+<a name="313"><span class="lineNum">     313 </span>                :<span class="lineNoCov">          0 :     return nullptr;</span></a>
+<a name="314"><span class="lineNum">     314 </span>                :<span class="lineCov">          4 : }</span></a>
+<a name="315"><span class="lineNum">     315 </span>                :            : </a>
+<a name="316"><span class="lineNum">     316 </span>                :<span class="lineCov">          4 : void LockedPool::free(void *ptr)</span></a>
+<a name="317"><span class="lineNum">     317 </span>                :            : {</a>
+<a name="318"><span class="lineNum">     318 </span>                :<span class="lineCov">          4 :     std::lock_guard&lt;std::mutex&gt; lock(mutex);</span></a>
+<a name="319"><span class="lineNum">     319 </span>                :            :     // TODO we can do better than this linear search by keeping a map of arena</a>
+<a name="320"><span class="lineNum">     320 </span>                :            :     // extents to arena, and looking up the address.</a>
+<a name="321"><span class="lineNum">     321 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          8 :     for (auto &amp;arena: arenas) {</span></a>
+<a name="322"><span class="lineNum">     322 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          4 :         if (arena.addressInArena(ptr)) {</span></a>
+<a name="323"><span class="lineNum">     323 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          4 :             arena.free(ptr);</span></a>
+<a name="324"><span class="lineNum">     324 </span>                :<span class="lineCov">          4 :             return;</span></a>
+<a name="325"><span class="lineNum">     325 </span>                :            :         }</a>
+<a name="326"><span class="lineNum">     326 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="327"><span class="lineNum">     327 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     throw std::runtime_error(&quot;LockedPool: invalid address not pointing to any arena&quot;);</span></a>
+<a name="328"><span class="lineNum">     328 </span>                :<span class="lineCov">          4 : }</span></a>
+<a name="329"><span class="lineNum">     329 </span>                :            : </a>
+<a name="330"><span class="lineNum">     330 </span>                :<span class="lineNoCov">          0 : LockedPool::Stats LockedPool::stats() const</span></a>
+<a name="331"><span class="lineNum">     331 </span>                :            : {</a>
+<a name="332"><span class="lineNum">     332 </span>                :<span class="lineNoCov">          0 :     std::lock_guard&lt;std::mutex&gt; lock(mutex);</span></a>
+<a name="333"><span class="lineNum">     333 </span>                :<span class="lineNoCov">          0 :     LockedPool::Stats r{0, 0, 0, cumulative_bytes_locked, 0, 0};</span></a>
+<a name="334"><span class="lineNum">     334 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     for (const auto &amp;arena: arenas) {</span></a>
+<a name="335"><span class="lineNum">     335 </span>                :<span class="lineNoCov">          0 :         Arena::Stats i = arena.stats();</span></a>
+<a name="336"><span class="lineNum">     336 </span>                :<span class="lineNoCov">          0 :         r.used += i.used;</span></a>
+<a name="337"><span class="lineNum">     337 </span>                :<span class="lineNoCov">          0 :         r.free += i.free;</span></a>
+<a name="338"><span class="lineNum">     338 </span>                :<span class="lineNoCov">          0 :         r.total += i.total;</span></a>
+<a name="339"><span class="lineNum">     339 </span>                :<span class="lineNoCov">          0 :         r.chunks_used += i.chunks_used;</span></a>
+<a name="340"><span class="lineNum">     340 </span>                :<span class="lineNoCov">          0 :         r.chunks_free += i.chunks_free;</span></a>
+<a name="341"><span class="lineNum">     341 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="342"><span class="lineNum">     342 </span>                :            :     return r;</a>
+<a name="343"><span class="lineNum">     343 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="344"><span class="lineNum">     344 </span>                :            : </a>
+<a name="345"><span class="lineNum">     345 </span>                :<span class="lineCov">          2 : bool LockedPool::new_arena(size_t size, size_t align)</span></a>
+<a name="346"><span class="lineNum">     346 </span>                :            : {</a>
+<a name="347"><span class="lineNum">     347 </span>                :<span class="lineCov">          2 :     bool locked;</span></a>
+<a name="348"><span class="lineNum">     348 </span>                :            :     // If this is the first arena, handle this specially: Cap the upper size</a>
+<a name="349"><span class="lineNum">     349 </span>                :            :     // by the process limit. This makes sure that the first arena will at least</a>
+<a name="350"><span class="lineNum">     350 </span>                :            :     // be locked. An exception to this is if the process limit is 0:</a>
+<a name="351"><span class="lineNum">     351 </span>                :            :     // in this case no memory can be locked at all so we'll skip past this logic.</a>
+<a name="352"><span class="lineNum">     352 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     if (arenas.empty()) {</span></a>
+<a name="353"><span class="lineNum">     353 </span>                :<span class="lineCov">          2 :         size_t limit = allocator-&gt;GetLimit();</span></a>
+<a name="354"><span class="lineNum">     354 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         if (limit &gt; 0) {</span></a>
+<a name="355"><span class="lineNum">     355 </span>                :<span class="lineCov">          2 :             size = std::min(size, limit);</span></a>
+<a name="356"><span class="lineNum">     356 </span>                :<span class="lineCov">          2 :         }</span></a>
+<a name="357"><span class="lineNum">     357 </span>                :<span class="lineCov">          2 :     }</span></a>
+<a name="358"><span class="lineNum">     358 </span>                :<span class="lineCov">          2 :     void *addr = allocator-&gt;AllocateLocked(size, &amp;locked);</span></a>
+<a name="359"><span class="lineNum">     359 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     if (!addr) {</span></a>
+<a name="360"><span class="lineNum">     360 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
+<a name="361"><span class="lineNum">     361 </span>                :            :     }</a>
+<a name="362"><span class="lineNum">     362 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     if (locked) {</span></a>
+<a name="363"><span class="lineNum">     363 </span>                :<span class="lineCov">          2 :         cumulative_bytes_locked += size;</span></a>
+<a name="364"><span class="lineNum">     364 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineCov">          2 :     } else if (lf_cb) { // Call the locking-failed callback if locking failed</span></a>
+<a name="365"><span class="lineNum">     365 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (!lf_cb()) { // If the callback returns false, free the memory and fail, otherwise consider the user warned and proceed.</span></a>
+<a name="366"><span class="lineNum">     366 </span>                :<span class="lineNoCov">          0 :             allocator-&gt;FreeLocked(addr, size);</span></a>
+<a name="367"><span class="lineNum">     367 </span>                :<span class="lineNoCov">          0 :             return false;</span></a>
+<a name="368"><span class="lineNum">     368 </span>                :            :         }</a>
+<a name="369"><span class="lineNum">     369 </span>                :            :     }</a>
+<a name="370"><span class="lineNum">     370 </span>                :<span class="lineCov">          2 :     arenas.emplace_back(allocator.get(), addr, size, align);</span></a>
+<a name="371"><span class="lineNum">     371 </span>                :<span class="lineCov">          2 :     return true;</span></a>
+<a name="372"><span class="lineNum">     372 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="373"><span class="lineNum">     373 </span>                :            : </a>
+<a name="374"><span class="lineNum">     374 </span>                :<span class="lineCov">          2 : LockedPool::LockedPageArena::LockedPageArena(LockedPageAllocator *allocator_in, void *base_in, size_t size_in, size_t align_in):</span></a>
+<a name="375"><span class="lineNum">     375 </span>                :<span class="lineCov">          4 :     Arena(base_in, size_in, align_in), base(base_in), size(size_in), allocator(allocator_in)</span></a>
+<a name="376"><span class="lineNum">     376 </span>                :<span class="lineCov">          2 : {</span></a>
+<a name="377"><span class="lineNum">     377 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="378"><span class="lineNum">     378 </span>                :<span class="lineCov">          2 : LockedPool::LockedPageArena::~LockedPageArena()</span></a>
+<a name="379"><span class="lineNum">     379 </span>                :<span class="lineCov">          2 : {</span></a>
+<a name="380"><span class="lineNum">     380 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     allocator-&gt;FreeLocked(base, size);</span></a>
+<a name="381"><span class="lineNum">     381 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="382"><span class="lineNum">     382 </span>                :            : </a>
+<a name="383"><span class="lineNum">     383 </span>                :            : /*******************************************************************************/</a>
+<a name="384"><span class="lineNum">     384 </span>                :            : // Implementation: LockedPoolManager</a>
+<a name="385"><span class="lineNum">     385 </span>                :            : //</a>
+<a name="386"><span class="lineNum">     386 </span>                :<span class="lineCov">          2 : LockedPoolManager::LockedPoolManager(std::unique_ptr&lt;LockedPageAllocator&gt; allocator_in):</span></a>
+<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">          2 :     LockedPool(std::move(allocator_in), &amp;LockedPoolManager::LockingFailed)</span></a>
+<a name="388"><span class="lineNum">     388 </span>                :<span class="lineCov">          2 : {</span></a>
+<a name="389"><span class="lineNum">     389 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="390"><span class="lineNum">     390 </span>                :            : </a>
+<a name="391"><span class="lineNum">     391 </span>                :<span class="lineNoCov">          0 : bool LockedPoolManager::LockingFailed()</span></a>
+<a name="392"><span class="lineNum">     392 </span>                :            : {</a>
+<a name="393"><span class="lineNum">     393 </span>                :            :     // TODO: log something but how? without including util.h</a>
+<a name="394"><span class="lineNum">     394 </span>                :<span class="lineNoCov">          0 :     return true;</span></a>
+<a name="395"><span class="lineNum">     395 </span>                :            : }</a>
+<a name="396"><span class="lineNum">     396 </span>                :            : </a>
+<a name="397"><span class="lineNum">     397 </span>                :<span class="lineCov">          2 : void LockedPoolManager::CreateInstance()</span></a>
+<a name="398"><span class="lineNum">     398 </span>                :            : {</a>
+<a name="399"><span class="lineNum">     399 </span>                :            :     // Using a local static instance guarantees that the object is initialized</a>
+<a name="400"><span class="lineNum">     400 </span>                :            :     // when it's first needed and also deinitialized after all objects that use</a>
+<a name="401"><span class="lineNum">     401 </span>                :            :     // it are done with it.  I can think of one unlikely scenario where we may</a>
+<a name="402"><span class="lineNum">     402 </span>                :            :     // have a static deinitialization order/problem, but the check in</a>
+<a name="403"><span class="lineNum">     403 </span>                :            :     // LockedPoolManagerBase's destructor helps us detect if that ever happens.</a>
+<a name="404"><span class="lineNum">     404 </span>                :            : #ifdef WIN32</a>
+<a name="405"><span class="lineNum">     405 </span>                :            :     std::unique_ptr&lt;LockedPageAllocator&gt; allocator(new Win32LockedPageAllocator());</a>
+<a name="406"><span class="lineNum">     406 </span>                :            : #else</a>
+<a name="407"><span class="lineNum">     407 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     std::unique_ptr&lt;LockedPageAllocator&gt; allocator(new PosixLockedPageAllocator());</span></a>
+<a name="408"><span class="lineNum">     408 </span>                :            : #endif</a>
+<a name="409"><span class="lineNum">     409 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          2 :     static LockedPoolManager instance(std::move(allocator));</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="410"><span class="lineNum">     410 </span>                :<span class="lineCov">          2 :     LockedPoolManager::_instance = &amp;instance;</span></a>
+<a name="411"><span class="lineNum">     411 </span>                :<span class="lineCov">          2 : }</span></a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
