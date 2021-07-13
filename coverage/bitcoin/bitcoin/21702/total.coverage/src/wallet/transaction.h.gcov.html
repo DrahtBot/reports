@@ -1,0 +1,469 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/wallet/transaction.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/wallet</a> - transaction.h<span style="font-size: 80%;"> (source / <a href="transaction.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">85</td>
+            <td class="headerCovTableEntry">95</td>
+            <td class="headerCovTableEntryMed">89.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2000-01-01 12:00:00</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">88.9 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">123</td>
+            <td class="headerCovTableEntry">220</td>
+            <td class="headerCovTableEntryLo">55.9 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2021 The Bitcoin Core developers</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : #ifndef BITCOIN_WALLET_TRANSACTION_H</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #define BITCOIN_WALLET_TRANSACTION_H</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #include &lt;amount.h&gt;</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;primitives/transaction.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;serialize.h&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #include &lt;wallet/ismine.h&gt;</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : #include &lt;threadsafety.h&gt;</a>
+<a name="13"><span class="lineNum">      13 </span>                :            : #include &lt;tinyformat.h&gt;</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : #include &lt;util/strencodings.h&gt;</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : #include &lt;util/string.h&gt;</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : </a>
+<a name="17"><span class="lineNum">      17 </span>                :            : #include &lt;list&gt;</a>
+<a name="18"><span class="lineNum">      18 </span>                :            : #include &lt;vector&gt;</a>
+<a name="19"><span class="lineNum">      19 </span>                :            : </a>
+<a name="20"><span class="lineNum">      20 </span>                :            : struct COutputEntry;</a>
+<a name="21"><span class="lineNum">      21 </span>                :            : </a>
+<a name="22"><span class="lineNum">      22 </span>                :            : typedef std::map&lt;std::string, std::string&gt; mapValue_t;</a>
+<a name="23"><span class="lineNum">      23 </span>                :            : </a>
+<a name="24"><span class="lineNum">      24 </span>                :            : //Get the marginal bytes of spending the specified output</a>
+<a name="25"><span class="lineNum">      25 </span>                :            : int CalculateMaximumSignedInputSize(const CTxOut&amp; txout, const CWallet* pwallet, bool use_max_sig = false);</a>
+<a name="26"><span class="lineNum">      26 </span>                :            : </a>
+<a name="27"><span class="lineNum">      27 </span>                :<span class="lineCov">      10276 : static inline void ReadOrderPos(int64_t&amp; nOrderPos, mapValue_t&amp; mapValue)</span></a>
+<a name="28"><span class="lineNum">      28 </span>                :            : {</a>
+<a name="29"><span class="lineNum">      29 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 10276 times"> + </span>]:<span class="lineCov">      10276 :     if (!mapValue.count(&quot;n&quot;))</span></a>
+<a name="30"><span class="lineNum">      30 </span>                :            :     {</a>
+<a name="31"><span class="lineNum">      31 </span>                :<span class="lineNoCov">          0 :         nOrderPos = -1; // TODO: calculate elsewhere</span></a>
+<a name="32"><span class="lineNum">      32 </span>                :<span class="lineNoCov">          0 :         return;</span></a>
+<a name="33"><span class="lineNum">      33 </span>                :            :     }</a>
+<a name="34"><span class="lineNum">      34 </span>  [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      20552 :     nOrderPos = atoi64(mapValue[&quot;n&quot;]);</span></a>
+<a name="35"><span class="lineNum">      35 </span>                :            : }</a>
+<a name="36"><span class="lineNum">      36 </span>                :            : </a>
+<a name="37"><span class="lineNum">      37 </span>                :<span class="lineCov">     144963 : static inline void WriteOrderPos(const int64_t&amp; nOrderPos, mapValue_t&amp; mapValue)</span></a>
+<a name="38"><span class="lineNum">      38 </span>                :            : {</a>
+<a name="39"><span class="lineNum">      39 </span>        [<span class="branchCov" title="Branch 0 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     144963 :     if (nOrderPos == -1)</span></a>
+<a name="40"><span class="lineNum">      40 </span>                :            :         return;</a>
+<a name="41"><span class="lineNum">      41 </span>  [<span class="branchCov" title="Branch 0 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     289926 :     mapValue[&quot;n&quot;] = ToString(nOrderPos);</span></a>
+<a name="42"><span class="lineNum">      42 </span>                :            : }</a>
+<a name="43"><span class="lineNum">      43 </span>                :            : </a>
+<a name="44"><span class="lineNum">      44 </span>                :            : /** Legacy class used for deserializing vtxPrev for backwards compatibility.</a>
+<a name="45"><span class="lineNum">      45 </span>                :            :  * vtxPrev was removed in commit 93a18a3650292afbb441a47d1fa1b94aeb0164e3,</a>
+<a name="46"><span class="lineNum">      46 </span>                :            :  * but old wallet.dat files may still contain vtxPrev vectors of CMerkleTxs.</a>
+<a name="47"><span class="lineNum">      47 </span>                :            :  * These need to get deserialized for field alignment when deserializing</a>
+<a name="48"><span class="lineNum">      48 </span>                :            :  * a CWalletTx, but the deserialized values are discarded.**/</a>
+<a name="49"><span class="lineNum">      49 </span>                :            : class CMerkleTx</a>
+<a name="50"><span class="lineNum">      50 </span>                :            : {</a>
+<a name="51"><span class="lineNum">      51 </span>                :            : public:</a>
+<a name="52"><span class="lineNum">      52 </span>                :            :     template&lt;typename Stream&gt;</a>
+<a name="53"><span class="lineNum">      53 </span>                :<span class="lineNoCov">          0 :     void Unserialize(Stream&amp; s)</span></a>
+<a name="54"><span class="lineNum">      54 </span>                :            :     {</a>
+<a name="55"><span class="lineNum">      55 </span>                :<span class="lineNoCov">          0 :         CTransactionRef tx;</span></a>
+<a name="56"><span class="lineNum">      56 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         uint256 hashBlock;</span></a>
+<a name="57"><span class="lineNum">      57 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         std::vector&lt;uint256&gt; vMerkleBranch;</span></a>
+<a name="58"><span class="lineNum">      58 </span>                :            :         int nIndex;</a>
+<a name="59"><span class="lineNum">      59 </span>                :            : </a>
+<a name="60"><span class="lineNum">      60 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         s &gt;&gt; tx &gt;&gt; hashBlock &gt;&gt; vMerkleBranch &gt;&gt; nIndex;</span></a>
+<span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
+<a name="61"><span class="lineNum">      61 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="62"><span class="lineNum">      62 </span>                :            : };</a>
+<a name="63"><span class="lineNum">      63 </span>                :            : </a>
+<a name="64"><span class="lineNum">      64 </span>                :            : /**</a>
+<a name="65"><span class="lineNum">      65 </span>                :            :  * A transaction with a bunch of additional info that only the owner cares about.</a>
+<a name="66"><span class="lineNum">      66 </span>                :            :  * It includes any unrecorded transactions needed to link it back to the block chain.</a>
+<a name="67"><span class="lineNum">      67 </span>                :            :  */</a>
+<a name="68"><span class="lineNum">      68 </span>                :            : class CWalletTx</a>
+<a name="69"><span class="lineNum">      69 </span>                :            : {</a>
+<a name="70"><span class="lineNum">      70 </span>                :            : private:</a>
+<a name="71"><span class="lineNum">      71 </span>                :            :     const CWallet* const pwallet;</a>
+<a name="72"><span class="lineNum">      72 </span>                :            : </a>
+<a name="73"><span class="lineNum">      73 </span>                :            :     /** Constant used in hashBlock to indicate tx has been abandoned, only used at</a>
+<a name="74"><span class="lineNum">      74 </span>                :            :      * serialization/deserialization to avoid ambiguity with conflicted.</a>
+<a name="75"><span class="lineNum">      75 </span>                :            :      */</a>
+<a name="76"><span class="lineNum">      76 </span>                :            :     static constexpr const uint256&amp; ABANDON_HASH = uint256::ONE;</a>
+<a name="77"><span class="lineNum">      77 </span>                :            : </a>
+<a name="78"><span class="lineNum">      78 </span>                :            : public:</a>
+<a name="79"><span class="lineNum">      79 </span>                :            :     /**</a>
+<a name="80"><span class="lineNum">      80 </span>                :            :      * Key/value map with information about the transaction.</a>
+<a name="81"><span class="lineNum">      81 </span>                :            :      *</a>
+<a name="82"><span class="lineNum">      82 </span>                :            :      * The following keys can be read and written through the map and are</a>
+<a name="83"><span class="lineNum">      83 </span>                :            :      * serialized in the wallet database:</a>
+<a name="84"><span class="lineNum">      84 </span>                :            :      *</a>
+<a name="85"><span class="lineNum">      85 </span>                :            :      *     &quot;comment&quot;, &quot;to&quot;   - comment strings provided to sendtoaddress,</a>
+<a name="86"><span class="lineNum">      86 </span>                :            :      *                         and sendmany wallet RPCs</a>
+<a name="87"><span class="lineNum">      87 </span>                :            :      *     &quot;replaces_txid&quot;   - txid (as HexStr) of transaction replaced by</a>
+<a name="88"><span class="lineNum">      88 </span>                :            :      *                         bumpfee on transaction created by bumpfee</a>
+<a name="89"><span class="lineNum">      89 </span>                :            :      *     &quot;replaced_by_txid&quot; - txid (as HexStr) of transaction created by</a>
+<a name="90"><span class="lineNum">      90 </span>                :            :      *                         bumpfee on transaction replaced by bumpfee</a>
+<a name="91"><span class="lineNum">      91 </span>                :            :      *     &quot;from&quot;, &quot;message&quot; - obsolete fields that could be set in UI prior to</a>
+<a name="92"><span class="lineNum">      92 </span>                :            :      *                         2011 (removed in commit 4d9b223)</a>
+<a name="93"><span class="lineNum">      93 </span>                :            :      *</a>
+<a name="94"><span class="lineNum">      94 </span>                :            :      * The following keys are serialized in the wallet database, but shouldn't</a>
+<a name="95"><span class="lineNum">      95 </span>                :            :      * be read or written through the map (they will be temporarily added and</a>
+<a name="96"><span class="lineNum">      96 </span>                :            :      * removed from the map during serialization):</a>
+<a name="97"><span class="lineNum">      97 </span>                :            :      *</a>
+<a name="98"><span class="lineNum">      98 </span>                :            :      *     &quot;fromaccount&quot;     - serialized strFromAccount value</a>
+<a name="99"><span class="lineNum">      99 </span>                :            :      *     &quot;n&quot;               - serialized nOrderPos value</a>
+<a name="100"><span class="lineNum">     100 </span>                :            :      *     &quot;timesmart&quot;       - serialized nTimeSmart value</a>
+<a name="101"><span class="lineNum">     101 </span>                :            :      *     &quot;spent&quot;           - serialized vfSpent value that existed prior to</a>
+<a name="102"><span class="lineNum">     102 </span>                :            :      *                         2014 (removed in commit 93a18a3)</a>
+<a name="103"><span class="lineNum">     103 </span>                :            :      */</a>
+<a name="104"><span class="lineNum">     104 </span>                :            :     mapValue_t mapValue;</a>
+<a name="105"><span class="lineNum">     105 </span>                :            :     std::vector&lt;std::pair&lt;std::string, std::string&gt; &gt; vOrderForm;</a>
+<a name="106"><span class="lineNum">     106 </span>                :            :     unsigned int fTimeReceivedIsTxTime;</a>
+<a name="107"><span class="lineNum">     107 </span>                :            :     unsigned int nTimeReceived; //!&lt; time received by this node</a>
+<a name="108"><span class="lineNum">     108 </span>                :            :     /**</a>
+<a name="109"><span class="lineNum">     109 </span>                :            :      * Stable timestamp that never changes, and reflects the order a transaction</a>
+<a name="110"><span class="lineNum">     110 </span>                :            :      * was added to the wallet. Timestamp is based on the block time for a</a>
+<a name="111"><span class="lineNum">     111 </span>                :            :      * transaction added as part of a block, or else the time when the</a>
+<a name="112"><span class="lineNum">     112 </span>                :            :      * transaction was received if it wasn't part of a block, with the timestamp</a>
+<a name="113"><span class="lineNum">     113 </span>                :            :      * adjusted in both cases so timestamp order matches the order transactions</a>
+<a name="114"><span class="lineNum">     114 </span>                :            :      * were added to the wallet. More details can be found in</a>
+<a name="115"><span class="lineNum">     115 </span>                :            :      * CWallet::ComputeTimeSmart().</a>
+<a name="116"><span class="lineNum">     116 </span>                :            :      */</a>
+<a name="117"><span class="lineNum">     117 </span>                :            :     unsigned int nTimeSmart;</a>
+<a name="118"><span class="lineNum">     118 </span>                :            :     /**</a>
+<a name="119"><span class="lineNum">     119 </span>                :            :      * From me flag is set to 1 for transactions that were created by the wallet</a>
+<a name="120"><span class="lineNum">     120 </span>                :            :      * on this bitcoin node, and set to 0 for transactions that were created</a>
+<a name="121"><span class="lineNum">     121 </span>                :            :      * externally and came in through the network or sendrawtransaction RPC.</a>
+<a name="122"><span class="lineNum">     122 </span>                :            :      */</a>
+<a name="123"><span class="lineNum">     123 </span>                :            :     bool fFromMe;</a>
+<a name="124"><span class="lineNum">     124 </span>                :            :     int64_t nOrderPos; //!&lt; position in ordered transaction list</a>
+<a name="125"><span class="lineNum">     125 </span>                :            :     std::multimap&lt;int64_t, CWalletTx*&gt;::const_iterator m_it_wtxOrdered;</a>
+<a name="126"><span class="lineNum">     126 </span>                :            : </a>
+<a name="127"><span class="lineNum">     127 </span>                :            :     // memory only</a>
+<a name="128"><span class="lineNum">     128 </span>                :            :     enum AmountType { DEBIT, CREDIT, IMMATURE_CREDIT, AVAILABLE_CREDIT, AMOUNTTYPE_ENUM_ELEMENTS };</a>
+<a name="129"><span class="lineNum">     129 </span>                :            :     CAmount GetCachableAmount(AmountType type, const isminefilter&amp; filter, bool recalculate = false) const;</a>
+<a name="130"><span class="lineNum">     130 </span>                :            :     mutable CachableAmount m_amounts[AMOUNTTYPE_ENUM_ELEMENTS];</a>
+<a name="131"><span class="lineNum">     131 </span>                :            :     /**</a>
+<a name="132"><span class="lineNum">     132 </span>                :            :      * This flag is true if all m_amounts caches are empty. This is particularly</a>
+<a name="133"><span class="lineNum">     133 </span>                :            :      * useful in places where MarkDirty is conditionally called and the</a>
+<a name="134"><span class="lineNum">     134 </span>                :            :      * condition can be expensive and thus can be skipped if the flag is true.</a>
+<a name="135"><span class="lineNum">     135 </span>                :            :      * See MarkDestinationsDirty.</a>
+<a name="136"><span class="lineNum">     136 </span>                :            :      */</a>
+<a name="137"><span class="lineNum">     137 </span>                :            :     mutable bool m_is_cache_empty{true};</a>
+<a name="138"><span class="lineNum">     138 </span>                :            :     mutable bool fChangeCached;</a>
+<a name="139"><span class="lineNum">     139 </span>                :            :     mutable bool fInMempool;</a>
+<a name="140"><span class="lineNum">     140 </span>                :            :     mutable CAmount nChangeCached;</a>
+<a name="141"><span class="lineNum">     141 </span>                :            : </a>
+<a name="142"><span class="lineNum">     142 </span>                :<span class="lineCov">     178971 :     CWalletTx(const CWallet* wallet, CTransactionRef arg)</span></a>
+<a name="143"><span class="lineNum">     143 </span>                :<span class="lineCov">     178971 :         : pwallet(wallet),</span></a>
+<a name="144"><span class="lineNum">     144 </span>        [<span class="branchCov" title="Branch 0 was taken 715884 times"> + </span><span class="branchCov" title="Branch 1 was taken 178971 times"> + </span>]:<span class="lineCov">     894855 :           tx(std::move(arg))</span></a>
+<a name="145"><span class="lineNum">     145 </span>                :            :     {</a>
+<a name="146"><span class="lineNum">     146 </span>                :<span class="lineCov">     178971 :         Init();</span></a>
+<a name="147"><span class="lineNum">     147 </span>                :<span class="lineCov">     178971 :     }</span></a>
+<a name="148"><span class="lineNum">     148 </span>                :            : </a>
+<a name="149"><span class="lineNum">     149 </span>                :<span class="lineCov">     189247 :     void Init()</span></a>
+<a name="150"><span class="lineNum">     150 </span>                :            :     {</a>
+<a name="151"><span class="lineNum">     151 </span>                :<span class="lineCov">     189247 :         mapValue.clear();</span></a>
+<a name="152"><span class="lineNum">     152 </span>                :<span class="lineCov">     189247 :         vOrderForm.clear();</span></a>
+<a name="153"><span class="lineNum">     153 </span>                :<span class="lineCov">     189247 :         fTimeReceivedIsTxTime = false;</span></a>
+<a name="154"><span class="lineNum">     154 </span>                :<span class="lineCov">     189247 :         nTimeReceived = 0;</span></a>
+<a name="155"><span class="lineNum">     155 </span>                :<span class="lineCov">     189247 :         nTimeSmart = 0;</span></a>
+<a name="156"><span class="lineNum">     156 </span>                :<span class="lineCov">     189247 :         fFromMe = false;</span></a>
+<a name="157"><span class="lineNum">     157 </span>                :<span class="lineCov">     189247 :         fChangeCached = false;</span></a>
+<a name="158"><span class="lineNum">     158 </span>                :<span class="lineCov">     189247 :         fInMempool = false;</span></a>
+<a name="159"><span class="lineNum">     159 </span>                :<span class="lineCov">     189247 :         nChangeCached = 0;</span></a>
+<a name="160"><span class="lineNum">     160 </span>                :<span class="lineCov">     189247 :         nOrderPos = -1;</span></a>
+<a name="161"><span class="lineNum">     161 </span>                :<span class="lineCov">     189247 :         m_confirm = Confirmation{};</span></a>
+<a name="162"><span class="lineNum">     162 </span>                :<span class="lineCov">     189247 :     }</span></a>
+<a name="163"><span class="lineNum">     163 </span>                :            : </a>
+<a name="164"><span class="lineNum">     164 </span>                :            :     CTransactionRef tx;</a>
+<a name="165"><span class="lineNum">     165 </span>                :            : </a>
+<a name="166"><span class="lineNum">     166 </span>                :            :     /** New transactions start as UNCONFIRMED. At BlockConnected,</a>
+<a name="167"><span class="lineNum">     167 </span>                :            :      * they will transition to CONFIRMED. In case of reorg, at BlockDisconnected,</a>
+<a name="168"><span class="lineNum">     168 </span>                :            :      * they roll back to UNCONFIRMED. If we detect a conflicting transaction at</a>
+<a name="169"><span class="lineNum">     169 </span>                :            :      * block connection, we update conflicted tx and its dependencies as CONFLICTED.</a>
+<a name="170"><span class="lineNum">     170 </span>                :            :      * If tx isn't confirmed and outside of mempool, the user may switch it to ABANDONED</a>
+<a name="171"><span class="lineNum">     171 </span>                :            :      * by using the abandontransaction call. This last status may be override by a CONFLICTED</a>
+<a name="172"><span class="lineNum">     172 </span>                :            :      * or CONFIRMED transition.</a>
+<a name="173"><span class="lineNum">     173 </span>                :            :      */</a>
+<a name="174"><span class="lineNum">     174 </span>                :            :     enum Status {</a>
+<a name="175"><span class="lineNum">     175 </span>                :            :         UNCONFIRMED,</a>
+<a name="176"><span class="lineNum">     176 </span>                :            :         CONFIRMED,</a>
+<a name="177"><span class="lineNum">     177 </span>                :            :         CONFLICTED,</a>
+<a name="178"><span class="lineNum">     178 </span>                :            :         ABANDONED</a>
+<a name="179"><span class="lineNum">     179 </span>                :            :     };</a>
+<a name="180"><span class="lineNum">     180 </span>                :            : </a>
+<a name="181"><span class="lineNum">     181 </span>                :            :     /** Confirmation includes tx status and a triplet of {block height/block hash/tx index in block}</a>
+<a name="182"><span class="lineNum">     182 </span>                :            :      * at which tx has been confirmed. All three are set to 0 if tx is unconfirmed or abandoned.</a>
+<a name="183"><span class="lineNum">     183 </span>                :            :      * Meaning of these fields changes with CONFLICTED state where they instead point to block hash</a>
+<a name="184"><span class="lineNum">     184 </span>                :            :      * and block height of the deepest conflicting tx.</a>
+<a name="185"><span class="lineNum">     185 </span>                :            :      */</a>
+<a name="186"><span class="lineNum">     186 </span>                :            :     struct Confirmation {</a>
+<a name="187"><span class="lineNum">     187 </span>                :            :         Status status;</a>
+<a name="188"><span class="lineNum">     188 </span>                :            :         int block_height;</a>
+<a name="189"><span class="lineNum">     189 </span>                :            :         uint256 hashBlock;</a>
+<a name="190"><span class="lineNum">     190 </span>                :            :         int nIndex;</a>
+<a name="191"><span class="lineNum">     191 </span>  [<span class="branchCov" title="Branch 0 was taken 112273 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 106103 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     502230 :         Confirmation(Status s = UNCONFIRMED, int b = 0, uint256 h = uint256(), int i = 0) : status(s), block_height(b), hashBlock(h), nIndex(i) {}</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 3816 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 80687 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 12 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 20362 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<a name="192"><span class="lineNum">     192 </span>                :            :     };</a>
+<a name="193"><span class="lineNum">     193 </span>                :            : </a>
+<a name="194"><span class="lineNum">     194 </span>                :            :     Confirmation m_confirm;</a>
+<a name="195"><span class="lineNum">     195 </span>                :            : </a>
+<a name="196"><span class="lineNum">     196 </span>                :            :     template&lt;typename Stream&gt;</a>
+<a name="197"><span class="lineNum">     197 </span>                :<span class="lineCov">     144963 :     void Serialize(Stream&amp; s) const</span></a>
+<a name="198"><span class="lineNum">     198 </span>                :            :     {</a>
+<a name="199"><span class="lineNum">     199 </span>        [<span class="branchCov" title="Branch 0 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     144963 :         mapValue_t mapValueCopy = mapValue;</span></a>
+<a name="200"><span class="lineNum">     200 </span>                :            : </a>
+<a name="201"><span class="lineNum">     201 </span>  [<span class="branchCov" title="Branch 0 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     144963 :         mapValueCopy[&quot;fromaccount&quot;] = &quot;&quot;;</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="202"><span class="lineNum">     202 </span>        [<span class="branchCov" title="Branch 0 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     144963 :         WriteOrderPos(nOrderPos, mapValueCopy);</span></a>
+<a name="203"><span class="lineNum">     203 </span>        [<span class="branchCov" title="Branch 0 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     144963 :         if (nTimeSmart) {</span></a>
+<a name="204"><span class="lineNum">     204 </span>  [<span class="branchCov" title="Branch 0 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     289926 :             mapValueCopy[&quot;timesmart&quot;] = strprintf(&quot;%u&quot;, nTimeSmart);</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 144952 times"> + </span><span class="branchCov" title="Branch 7 was taken 11 times"> + </span>]
+<a name="205"><span class="lineNum">     205 </span>                :            :         }</a>
+<a name="206"><span class="lineNum">     206 </span>                :            : </a>
+<a name="207"><span class="lineNum">     207 </span>                :<span class="lineCov">     144963 :         std::vector&lt;uint8_t&gt; dummy_vector1; //!&lt; Used to be vMerkleBranch</span></a>
+<a name="208"><span class="lineNum">     208 </span>                :<span class="lineCov">     144963 :         std::vector&lt;uint8_t&gt; dummy_vector2; //!&lt; Used to be vtxPrev</span></a>
+<a name="209"><span class="lineNum">     209 </span>                :<span class="lineCov">     144963 :         bool dummy_bool = false; //!&lt; Used to be fSpent</span></a>
+<a name="210"><span class="lineNum">     210 </span>                :<span class="lineCov">     144952 :         uint256 serializedHash = isAbandoned() ? ABANDON_HASH : m_confirm.hashBlock;</span></a>
+<a name="211"><span class="lineNum">     211 </span>                :<span class="lineCov">     144759 :         int serializedIndex = isAbandoned() || isConflicted() ? -1 : m_confirm.nIndex;</span></a>
+<a name="212"><span class="lineNum">     212 </span>  [<span class="branchCov" title="Branch 0 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     289926 :         s &lt;&lt; tx &lt;&lt; serializedHash &lt;&lt; dummy_vector1 &lt;&lt; serializedIndex &lt;&lt; dummy_vector2 &lt;&lt; mapValueCopy &lt;&lt; vOrderForm &lt;&lt; fTimeReceivedIsTxTime &lt;&lt; nTimeReceived &lt;&lt; fFromMe &lt;&lt; dummy_bool;</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 144963 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 144963 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 19 was not taken"> - </span><span class="branchCov" title="Branch 20 was taken 144963 times"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span>]
+<a name="213"><span class="lineNum">     213 </span>                :<span class="lineCov">     144963 :     }</span></a>
+<a name="214"><span class="lineNum">     214 </span>                :            : </a>
+<a name="215"><span class="lineNum">     215 </span>                :            :     template&lt;typename Stream&gt;</a>
+<a name="216"><span class="lineNum">     216 </span>                :<span class="lineCov">      10276 :     void Unserialize(Stream&amp; s)</span></a>
+<a name="217"><span class="lineNum">     217 </span>                :            :     {</a>
+<a name="218"><span class="lineNum">     218 </span>        [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      10276 :         Init();</span></a>
+<a name="219"><span class="lineNum">     219 </span>                :            : </a>
+<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">      20552 :         std::vector&lt;uint256&gt; dummy_vector1; //!&lt; Used to be vMerkleBranch</span></a>
+<a name="221"><span class="lineNum">     221 </span>                :<span class="lineCov">      10276 :         std::vector&lt;CMerkleTx&gt; dummy_vector2; //!&lt; Used to be vtxPrev</span></a>
+<a name="222"><span class="lineNum">     222 </span>                :            :         bool dummy_bool; //! Used to be fSpent</a>
+<a name="223"><span class="lineNum">     223 </span>                :            :         int serializedIndex;</a>
+<a name="224"><span class="lineNum">     224 </span>  [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      10276 :         s &gt;&gt; tx &gt;&gt; m_confirm.hashBlock &gt;&gt; dummy_vector1 &gt;&gt; serializedIndex &gt;&gt; dummy_vector2 &gt;&gt; mapValue &gt;&gt; vOrderForm &gt;&gt; fTimeReceivedIsTxTime &gt;&gt; nTimeReceived &gt;&gt; fFromMe &gt;&gt; dummy_bool;</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 10276 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 10276 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 19 was not taken"> - </span><span class="branchCov" title="Branch 20 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span>]
+<a name="225"><span class="lineNum">     225 </span>                :            : </a>
+<a name="226"><span class="lineNum">     226 </span>                :            :         /* At serialization/deserialization, an nIndex == -1 means that hashBlock refers to</a>
+<a name="227"><span class="lineNum">     227 </span>                :            :          * the earliest block in the chain we know this or any in-wallet ancestor conflicts</a>
+<a name="228"><span class="lineNum">     228 </span>                :            :          * with. If nIndex == -1 and hashBlock is ABANDON_HASH, it means transaction is abandoned.</a>
+<a name="229"><span class="lineNum">     229 </span>                :            :          * In same context, an nIndex &gt;= 0 refers to a confirmed transaction (if hashBlock set) or</a>
+<a name="230"><span class="lineNum">     230 </span>                :            :          * unconfirmed one. Older clients interpret nIndex == -1 as unconfirmed for backward</a>
+<a name="231"><span class="lineNum">     231 </span>                :            :          * compatibility (pre-commit 9ac63d6).</a>
+<a name="232"><span class="lineNum">     232 </span>                :            :          */</a>
+<a name="233"><span class="lineNum">     233 </span>  [<span class="branchCov" title="Branch 0 was taken 116 times"> + </span><span class="branchCov" title="Branch 1 was taken 10160 times"> + </span><span class="branchCov" title="Branch 2 was taken 10 times"> + </span><span class="branchCov" title="Branch 3 was taken 106 times"> + </span>]:<span class="lineCov">      10276 :         if (serializedIndex == -1 &amp;&amp; m_confirm.hashBlock == ABANDON_HASH) {</span></a>
+<a name="234"><span class="lineNum">     234 </span>                :<span class="lineCov">         10 :             setAbandoned();</span></a>
+<a name="235"><span class="lineNum">     235 </span>        [<span class="branchCov" title="Branch 0 was taken 106 times"> + </span><span class="branchCov" title="Branch 1 was taken 10160 times"> + </span>]:<span class="lineCov">      10266 :         } else if (serializedIndex == -1) {</span></a>
+<a name="236"><span class="lineNum">     236 </span>                :<span class="lineCov">      10276 :             setConflicted();</span></a>
+<a name="237"><span class="lineNum">     237 </span>  [<span class="branchCov" title="Branch 0 was taken 13056 times"> + </span><span class="branchCov" title="Branch 1 was taken 93 times"> + </span><span class="branchCov" title="Branch 2 was taken 10067 times"> + </span><span class="branchCov" title="Branch 3 was taken 93 times"> + </span>]:<span class="lineCov">      23216 :         } else if (!m_confirm.hashBlock.IsNull()) {</span></a>
+<a name="238"><span class="lineNum">     238 </span>                :<span class="lineCov">      10067 :             m_confirm.nIndex = serializedIndex;</span></a>
+<a name="239"><span class="lineNum">     239 </span>                :<span class="lineCov">      10276 :             setConfirmed();</span></a>
+<a name="240"><span class="lineNum">     240 </span>                :            :         }</a>
+<a name="241"><span class="lineNum">     241 </span>                :            : </a>
+<a name="242"><span class="lineNum">     242 </span>        [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      10276 :         ReadOrderPos(nOrderPos, mapValue);</span></a>
+<a name="243"><span class="lineNum">     243 </span>  [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      20552 :         nTimeSmart = mapValue.count(&quot;timesmart&quot;) ? (unsigned int)atoi64(mapValue[&quot;timesmart&quot;]) : 0;</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 10276 times"> + </span> 
+<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 10276 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 13 was not taken"> - </span>]
+<a name="244"><span class="lineNum">     244 </span>                :            : </a>
+<a name="245"><span class="lineNum">     245 </span>  [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      20552 :         mapValue.erase(&quot;fromaccount&quot;);</span></a>
+<a name="246"><span class="lineNum">     246 </span>  [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      20552 :         mapValue.erase(&quot;spent&quot;);</span></a>
+<a name="247"><span class="lineNum">     247 </span>  [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      20552 :         mapValue.erase(&quot;n&quot;);</span></a>
+<a name="248"><span class="lineNum">     248 </span>        [<span class="branchCov" title="Branch 0 was taken 10276 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      20552 :         mapValue.erase(&quot;timesmart&quot;);</span></a>
+<a name="249"><span class="lineNum">     249 </span>                :<span class="lineCov">      10276 :     }</span></a>
+<a name="250"><span class="lineNum">     250 </span>                :            : </a>
+<a name="251"><span class="lineNum">     251 </span>                :<span class="lineNoCov">          0 :     void SetTx(CTransactionRef arg)</span></a>
+<a name="252"><span class="lineNum">     252 </span>                :            :     {</a>
+<a name="253"><span class="lineNum">     253 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         tx = std::move(arg);</span></a>
+<a name="254"><span class="lineNum">     254 </span>                :            :     }</a>
+<a name="255"><span class="lineNum">     255 </span>                :            : </a>
+<a name="256"><span class="lineNum">     256 </span>                :            :     //! make sure balances are recalculated</a>
+<a name="257"><span class="lineNum">     257 </span>                :<span class="lineCov">     234559 :     void MarkDirty()</span></a>
+<a name="258"><span class="lineNum">     258 </span>                :            :     {</a>
+<a name="259"><span class="lineNum">     259 </span>  [<span class="branchCov" title="Branch 0 was taken 5105 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 193 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     234559 :         m_amounts[DEBIT].Reset();</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 11 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 29396 times"> + </span><span class="branchCov" title="Branch 7 was taken 139296 times"> + </span>]
+<a name="260"><span class="lineNum">     260 </span>                :<span class="lineCov">     234559 :         m_amounts[CREDIT].Reset();</span></a>
+<a name="261"><span class="lineNum">     261 </span>                :<span class="lineCov">     234559 :         m_amounts[IMMATURE_CREDIT].Reset();</span></a>
+<a name="262"><span class="lineNum">     262 </span>                :<span class="lineCov">     234559 :         m_amounts[AVAILABLE_CREDIT].Reset();</span></a>
+<a name="263"><span class="lineNum">     263 </span>                :<span class="lineCov">     234559 :         fChangeCached = false;</span></a>
+<a name="264"><span class="lineNum">     264 </span>  [<span class="branchCov" title="Branch 0 was taken 5105 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 193 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     195710 :         m_is_cache_empty = true;</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 11 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 29396 times"> + </span><span class="branchCov" title="Branch 7 was taken 139296 times"> + </span>]
+<a name="265"><span class="lineNum">     265 </span>                :<span class="lineCov">      38849 :     }</span></a>
+<a name="266"><span class="lineNum">     266 </span>                :            : </a>
+<a name="267"><span class="lineNum">     267 </span>                :            :     //! filter decides which addresses will count towards the debit</a>
+<a name="268"><span class="lineNum">     268 </span>                :            :     CAmount GetDebit(const isminefilter&amp; filter) const;</a>
+<a name="269"><span class="lineNum">     269 </span>                :            :     CAmount GetCredit(const isminefilter&amp; filter) const;</a>
+<a name="270"><span class="lineNum">     270 </span>                :            :     CAmount GetImmatureCredit(bool fUseCache = true) const;</a>
+<a name="271"><span class="lineNum">     271 </span>                :            :     // TODO: Remove &quot;NO_THREAD_SAFETY_ANALYSIS&quot; and replace it with the correct</a>
+<a name="272"><span class="lineNum">     272 </span>                :            :     // annotation &quot;EXCLUSIVE_LOCKS_REQUIRED(pwallet-&gt;cs_wallet)&quot;. The</a>
+<a name="273"><span class="lineNum">     273 </span>                :            :     // annotation &quot;NO_THREAD_SAFETY_ANALYSIS&quot; was temporarily added to avoid</a>
+<a name="274"><span class="lineNum">     274 </span>                :            :     // having to resolve the issue of member access into incomplete type CWallet.</a>
+<a name="275"><span class="lineNum">     275 </span>                :            :     CAmount GetAvailableCredit(bool fUseCache = true, const isminefilter&amp; filter = ISMINE_SPENDABLE) const NO_THREAD_SAFETY_ANALYSIS;</a>
+<a name="276"><span class="lineNum">     276 </span>                :            :     CAmount GetImmatureWatchOnlyCredit(const bool fUseCache = true) const;</a>
+<a name="277"><span class="lineNum">     277 </span>                :            :     CAmount GetChange() const;</a>
+<a name="278"><span class="lineNum">     278 </span>                :            : </a>
+<a name="279"><span class="lineNum">     279 </span>                :            :     /** Get the marginal bytes if spending the specified output from this transaction */</a>
+<a name="280"><span class="lineNum">     280 </span>                :<span class="lineCov">     490728 :     int GetSpendSize(unsigned int out, bool use_max_sig = false) const</span></a>
+<a name="281"><span class="lineNum">     281 </span>                :            :     {</a>
+<a name="282"><span class="lineNum">     282 </span>                :<span class="lineCov">     490728 :         return CalculateMaximumSignedInputSize(tx-&gt;vout[out], pwallet, use_max_sig);</span></a>
+<a name="283"><span class="lineNum">     283 </span>                :            :     }</a>
+<a name="284"><span class="lineNum">     284 </span>                :            : </a>
+<a name="285"><span class="lineNum">     285 </span>                :            :     void GetAmounts(std::list&lt;COutputEntry&gt;&amp; listReceived,</a>
+<a name="286"><span class="lineNum">     286 </span>                :            :                     std::list&lt;COutputEntry&gt;&amp; listSent, CAmount&amp; nFee, const isminefilter&amp; filter) const;</a>
+<a name="287"><span class="lineNum">     287 </span>                :            : </a>
+<a name="288"><span class="lineNum">     288 </span>                :<span class="lineCov">    1875523 :     bool IsFromMe(const isminefilter&amp; filter) const</span></a>
+<a name="289"><span class="lineNum">     289 </span>                :            :     {</a>
+<a name="290"><span class="lineNum">     290 </span>  [<span class="branchCov" title="Branch 0 was taken 1202894 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1202884 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">    1875523 :         return (GetDebit(filter) &gt; 0);</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 499868 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 481917 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="291"><span class="lineNum">     291 </span>                :            :     }</a>
+<a name="292"><span class="lineNum">     292 </span>                :            : </a>
+<a name="293"><span class="lineNum">     293 </span>                :            :     /** True if only scriptSigs are different */</a>
+<a name="294"><span class="lineNum">     294 </span>                :            :     bool IsEquivalentTo(const CWalletTx&amp; tx) const;</a>
+<a name="295"><span class="lineNum">     295 </span>                :            : </a>
+<a name="296"><span class="lineNum">     296 </span>                :            :     bool InMempool() const;</a>
+<a name="297"><span class="lineNum">     297 </span>                :            :     bool IsTrusted() const;</a>
+<a name="298"><span class="lineNum">     298 </span>                :            : </a>
+<a name="299"><span class="lineNum">     299 </span>                :            :     int64_t GetTxTime() const;</a>
+<a name="300"><span class="lineNum">     300 </span>                :            : </a>
+<a name="301"><span class="lineNum">     301 </span>                :            :     /** Pass this transaction to node for mempool insertion and relay to peers if flag set to true */</a>
+<a name="302"><span class="lineNum">     302 </span>                :            :     bool SubmitMemoryPoolAndRelay(std::string&amp; err_string, bool relay);</a>
+<a name="303"><span class="lineNum">     303 </span>                :            : </a>
+<a name="304"><span class="lineNum">     304 </span>                :            :     // TODO: Remove &quot;NO_THREAD_SAFETY_ANALYSIS&quot; and replace it with the correct</a>
+<a name="305"><span class="lineNum">     305 </span>                :            :     // annotation &quot;EXCLUSIVE_LOCKS_REQUIRED(pwallet-&gt;cs_wallet)&quot;. The annotation</a>
+<a name="306"><span class="lineNum">     306 </span>                :            :     // &quot;NO_THREAD_SAFETY_ANALYSIS&quot; was temporarily added to avoid having to</a>
+<a name="307"><span class="lineNum">     307 </span>                :            :     // resolve the issue of member access into incomplete type CWallet. Note</a>
+<a name="308"><span class="lineNum">     308 </span>                :            :     // that we still have the runtime check &quot;AssertLockHeld(pwallet-&gt;cs_wallet)&quot;</a>
+<a name="309"><span class="lineNum">     309 </span>                :            :     // in place.</a>
+<a name="310"><span class="lineNum">     310 </span>                :            :     std::set&lt;uint256&gt; GetConflicts() const NO_THREAD_SAFETY_ANALYSIS;</a>
+<a name="311"><span class="lineNum">     311 </span>                :            : </a>
+<a name="312"><span class="lineNum">     312 </span>                :            :     /**</a>
+<a name="313"><span class="lineNum">     313 </span>                :            :      * Return depth of transaction in blockchain:</a>
+<a name="314"><span class="lineNum">     314 </span>                :            :      * &lt;0  : conflicts with a transaction this deep in the blockchain</a>
+<a name="315"><span class="lineNum">     315 </span>                :            :      *  0  : in memory pool, waiting to be included in a block</a>
+<a name="316"><span class="lineNum">     316 </span>                :            :      * &gt;=1 : this many blocks deep in the main chain</a>
+<a name="317"><span class="lineNum">     317 </span>                :            :      */</a>
+<a name="318"><span class="lineNum">     318 </span>                :            :     // TODO: Remove &quot;NO_THREAD_SAFETY_ANALYSIS&quot; and replace it with the correct</a>
+<a name="319"><span class="lineNum">     319 </span>                :            :     // annotation &quot;EXCLUSIVE_LOCKS_REQUIRED(pwallet-&gt;cs_wallet)&quot;. The annotation</a>
+<a name="320"><span class="lineNum">     320 </span>                :            :     // &quot;NO_THREAD_SAFETY_ANALYSIS&quot; was temporarily added to avoid having to</a>
+<a name="321"><span class="lineNum">     321 </span>                :            :     // resolve the issue of member access into incomplete type CWallet. Note</a>
+<a name="322"><span class="lineNum">     322 </span>                :            :     // that we still have the runtime check &quot;AssertLockHeld(pwallet-&gt;cs_wallet)&quot;</a>
+<a name="323"><span class="lineNum">     323 </span>                :            :     // in place.</a>
+<a name="324"><span class="lineNum">     324 </span>                :            :     int GetDepthInMainChain() const NO_THREAD_SAFETY_ANALYSIS;</a>
+<a name="325"><span class="lineNum">     325 </span>                :<span class="lineCov">      77142 :     bool IsInMainChain() const { return GetDepthInMainChain() &gt; 0; }</span></a>
+<a name="326"><span class="lineNum">     326 </span>                :            : </a>
+<a name="327"><span class="lineNum">     327 </span>                :            :     /**</a>
+<a name="328"><span class="lineNum">     328 </span>                :            :      * @return number of blocks to maturity for this transaction:</a>
+<a name="329"><span class="lineNum">     329 </span>                :            :      *  0 : is not a coinbase transaction, or is a mature coinbase transaction</a>
+<a name="330"><span class="lineNum">     330 </span>                :            :      * &gt;0 : is a coinbase transaction which matures in this many blocks</a>
+<a name="331"><span class="lineNum">     331 </span>                :            :      */</a>
+<a name="332"><span class="lineNum">     332 </span>                :            :     int GetBlocksToMaturity() const;</a>
+<a name="333"><span class="lineNum">     333 </span>  [<span class="branchCov" title="Branch 0 was taken 3852690 times"> + </span><span class="branchCov" title="Branch 1 was taken 155 times"> + </span><span class="branchCov" title="Branch 2 was taken 169777 times"> + </span><span class="branchCov" title="Branch 3 was taken 11 times"> + </span> :<span class="lineCov">    4291608 :     bool isAbandoned() const { return m_confirm.status == CWalletTx::ABANDONED; }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 2701 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 182 times"> + </span><span class="branchCov" title="Branch 7 was taken 10 times"> + </span><span class="branchNoCov" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 9 was taken 11 times"> + </span><span class="branchNoCov" title="Branch 10 was not taken"> - </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 66 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 13 was taken 266016 times"> + </span>]
+<a name="334"><span class="lineNum">     334 </span>                :<span class="lineCov">         21 :     void setAbandoned()</span></a>
+<a name="335"><span class="lineNum">     335 </span>                :            :     {</a>
+<a name="336"><span class="lineNum">     336 </span>                :<span class="lineCov">         21 :         m_confirm.status = CWalletTx::ABANDONED;</span></a>
+<a name="337"><span class="lineNum">     337 </span>                :<span class="lineCov">         21 :         m_confirm.hashBlock = uint256();</span></a>
+<a name="338"><span class="lineNum">     338 </span>                :<span class="lineCov">         21 :         m_confirm.block_height = 0;</span></a>
+<a name="339"><span class="lineNum">     339 </span>                :<span class="lineCov">         21 :         m_confirm.nIndex = 0;</span></a>
+<a name="340"><span class="lineNum">     340 </span>                :<span class="lineCov">         21 :     }</span></a>
+<a name="341"><span class="lineNum">     341 </span>  [<span class="branchCov" title="Branch 0 was taken 3843914 times"> + </span><span class="branchCov" title="Branch 1 was taken 8137 times"> + </span><span class="branchCov" title="Branch 2 was taken 636 times"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">    3853498 :     bool isConflicted() const { return m_confirm.status == CWalletTx::CONFLICTED; }</span></a>
+<span class="lineNum">         </span>         <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 810 times"> + </span>]
+<a name="342"><span class="lineNum">     342 </span>        [<span class="branchCov" title="Branch 0 was taken 193 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        299 :     void setConflicted() { m_confirm.status = CWalletTx::CONFLICTED; }</span></a>
+<a name="343"><span class="lineNum">     343 </span>  [<span class="branchCov" title="Branch 0 was taken 3707243 times"> + </span><span class="branchCov" title="Branch 1 was taken 588445 times"> + </span><span class="branchCov" title="Branch 2 was taken 24825 times"> + </span><span class="branchCov" title="Branch 3 was taken 114471 times"> + </span>]:<span class="lineCov">    4434984 :     bool isUnconfirmed() const { return m_confirm.status == CWalletTx::UNCONFIRMED; }</span></a>
+<a name="344"><span class="lineNum">     344 </span>                :<span class="lineCov">        540 :     void setUnconfirmed() { m_confirm.status = CWalletTx::UNCONFIRMED; }</span></a>
+<a name="345"><span class="lineNum">     345 </span>        [<span class="branchCov" title="Branch 0 was taken 533 times"> + </span><span class="branchCov" title="Branch 1 was taken 103 times"> + </span>]:<span class="lineCov">        636 :     bool isConfirmed() const { return m_confirm.status == CWalletTx::CONFIRMED; }</span></a>
+<a name="346"><span class="lineNum">     346 </span>                :<span class="lineCov">      10067 :     void setConfirmed() { m_confirm.status = CWalletTx::CONFIRMED; }</span></a>
+<a name="347"><span class="lineNum">     347 </span>  [<span class="branchCov" title="Branch 0 was taken 1212970 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 521968 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">    2281664 :     const uint256&amp; GetHash() const { return tx-&gt;GetHash(); }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 3579 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchNoCov" title="Branch 6 was not taken"> - </span><span class="branchCov" title="Branch 7 was taken 27728 times"> + </span><span class="branchCov" title="Branch 8 was taken 11 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchNoCov" title="Branch 10 was not taken"> - </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<a name="348"><span class="lineNum">     348 </span>  [<span class="branchCov" title="Branch 0 was taken 1169481 times"> + </span><span class="branchCov" title="Branch 1 was taken 640413 times"> + </span><span class="branchCov" title="Branch 2 was taken 12042 times"> + </span><span class="branchCov" title="Branch 3 was taken 7753 times"> + </span> :<span class="lineCov">    2034555 :     bool IsCoinBase() const { return tx-&gt;IsCoinBase(); }</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 4984 times"> + </span><span class="branchCov" title="Branch 5 was taken 27138 times"> + </span><span class="branchCov" title="Branch 6 was taken 120514 times"> + </span><span class="branchCov" title="Branch 7 was taken 32306 times"> + </span>]
+<a name="349"><span class="lineNum">     349 </span>                :            :     bool IsImmatureCoinBase() const;</a>
+<a name="350"><span class="lineNum">     350 </span>                :            : </a>
+<a name="351"><span class="lineNum">     351 </span>                :            :     // Disable copying of CWalletTx objects to prevent bugs where instances get</a>
+<a name="352"><span class="lineNum">     352 </span>                :            :     // copied in and out of the mapWallet map, and fields are updated in the</a>
+<a name="353"><span class="lineNum">     353 </span>                :            :     // wrong copy.</a>
+<a name="354"><span class="lineNum">     354 </span>                :            :     CWalletTx(CWalletTx const &amp;) = delete;</a>
+<a name="355"><span class="lineNum">     355 </span>                :            :     void operator=(CWalletTx const &amp;x) = delete;</a>
+<a name="356"><span class="lineNum">     356 </span>                :            : };</a>
+<a name="357"><span class="lineNum">     357 </span>                :            : </a>
+<a name="358"><span class="lineNum">     358 </span>                :            : #endif // BITCOIN_WALLET_TRANSACTION_H</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
