@@ -219,7 +219,7 @@
 <a name="148"><span class="lineNum">     148 </span>                :            : </a>
 <a name="149"><span class="lineNum">     149 </span>                :            : bool CheckSignatureEncoding(const std::vector&lt;unsigned char&gt; &amp;vchSig, unsigned int flags, ScriptError* serror);</a>
 <a name="150"><span class="lineNum">     150 </span>                :            : </a>
-<a name="151"><span class="lineNum">     151 </span>                :<span class="lineCov">     208724 : struct PrecomputedTransactionData</span></a>
+<a name="151"><span class="lineNum">     151 </span>                :<span class="lineCov">     210051 : struct PrecomputedTransactionData</span></a>
 <a name="152"><span class="lineNum">     152 </span>                :            : {</a>
 <a name="153"><span class="lineNum">     153 </span>                :            :     // BIP341 precomputed data.</a>
 <a name="154"><span class="lineNum">     154 </span>                :            :     // These are single-SHA256, see https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki#cite_note-15.</a>
@@ -245,7 +245,7 @@
 <a name="174"><span class="lineNum">     174 </span>                :            :     //! Whether m_spent_outputs is initialized.</a>
 <a name="175"><span class="lineNum">     175 </span>                :            :     bool m_spent_outputs_ready = false;</a>
 <a name="176"><span class="lineNum">     176 </span>                :            : </a>
-<a name="177"><span class="lineNum">     177 </span>                :<span class="lineCov">    2079410 :     PrecomputedTransactionData() = default;</span></a>
+<a name="177"><span class="lineNum">     177 </span>                :<span class="lineCov">    2092680 :     PrecomputedTransactionData() = default;</span></a>
 <a name="178"><span class="lineNum">     178 </span>                :            : </a>
 <a name="179"><span class="lineNum">     179 </span>                :            :     template &lt;class T&gt;</a>
 <a name="180"><span class="lineNum">     180 </span>                :            :     void Init(const T&amp; tx, std::vector&lt;CTxOut&gt;&amp;&amp; spent_outputs, bool force = false);</a>
@@ -256,193 +256,191 @@
 <a name="185"><span class="lineNum">     185 </span>                :            : </a>
 <a name="186"><span class="lineNum">     186 </span>                :            : /* Standard Template Hash Declarations */</a>
 <a name="187"><span class="lineNum">     187 </span>                :            : template&lt;typename TxType&gt;</a>
-<a name="188"><span class="lineNum">     188 </span>                :            : uint256 GetStandardTemplateHash(const TxType&amp; tx, uint32_t input_index);</a>
-<a name="189"><span class="lineNum">     189 </span>                :            : template&lt;typename TxType&gt;</a>
-<a name="190"><span class="lineNum">     190 </span>                :            : uint256 GetStandardTemplateHash(const TxType&amp; tx, const uint256&amp; outputs_hash, const uint256&amp; sequences_hash,</a>
-<a name="191"><span class="lineNum">     191 </span>                :            :                                 const uint32_t input_index);</a>
-<a name="192"><span class="lineNum">     192 </span>                :            : </a>
-<a name="193"><span class="lineNum">     193 </span>                :            : enum class SigVersion</a>
-<a name="194"><span class="lineNum">     194 </span>                :            : {</a>
-<a name="195"><span class="lineNum">     195 </span>                :            :     BASE = 0,        //!&lt; Bare scripts and BIP16 P2SH-wrapped redeemscripts</a>
-<a name="196"><span class="lineNum">     196 </span>                :            :     WITNESS_V0 = 1,  //!&lt; Witness v0 (P2WPKH and P2WSH); see BIP 141</a>
-<a name="197"><span class="lineNum">     197 </span>                :            :     TAPROOT = 2,     //!&lt; Witness v1 with 32-byte program, not BIP16 P2SH-wrapped, key path spending; see BIP 341</a>
-<a name="198"><span class="lineNum">     198 </span>                :            :     TAPSCRIPT = 3,   //!&lt; Witness v1 with 32-byte program, not BIP16 P2SH-wrapped, script path spending, leaf version 0xc0; see BIP 342</a>
-<a name="199"><span class="lineNum">     199 </span>                :            : };</a>
-<a name="200"><span class="lineNum">     200 </span>                :            : </a>
-<a name="201"><span class="lineNum">     201 </span>                :            : struct ScriptExecutionData</a>
-<a name="202"><span class="lineNum">     202 </span>                :            : {</a>
-<a name="203"><span class="lineNum">     203 </span>                :            :     //! Whether m_tapleaf_hash is initialized.</a>
-<a name="204"><span class="lineNum">     204 </span>                :            :     bool m_tapleaf_hash_init = false;</a>
-<a name="205"><span class="lineNum">     205 </span>                :            :     //! The tapleaf hash.</a>
-<a name="206"><span class="lineNum">     206 </span>                :            :     uint256 m_tapleaf_hash;</a>
-<a name="207"><span class="lineNum">     207 </span>                :            : </a>
-<a name="208"><span class="lineNum">     208 </span>                :            :     //! Whether m_codeseparator_pos is initialized.</a>
-<a name="209"><span class="lineNum">     209 </span>                :            :     bool m_codeseparator_pos_init = false;</a>
-<a name="210"><span class="lineNum">     210 </span>                :            :     //! Opcode position of the last executed OP_CODESEPARATOR (or 0xFFFFFFFF if none executed).</a>
-<a name="211"><span class="lineNum">     211 </span>                :            :     uint32_t m_codeseparator_pos;</a>
-<a name="212"><span class="lineNum">     212 </span>                :            : </a>
-<a name="213"><span class="lineNum">     213 </span>                :            :     //! Whether m_annex_present and (when needed) m_annex_hash are initialized.</a>
-<a name="214"><span class="lineNum">     214 </span>                :            :     bool m_annex_init = false;</a>
-<a name="215"><span class="lineNum">     215 </span>                :            :     //! Whether an annex is present.</a>
-<a name="216"><span class="lineNum">     216 </span>                :            :     bool m_annex_present;</a>
-<a name="217"><span class="lineNum">     217 </span>                :            :     //! Hash of the annex data.</a>
-<a name="218"><span class="lineNum">     218 </span>                :            :     uint256 m_annex_hash;</a>
-<a name="219"><span class="lineNum">     219 </span>                :            : </a>
-<a name="220"><span class="lineNum">     220 </span>                :            :     //! Whether m_validation_weight_left is initialized.</a>
-<a name="221"><span class="lineNum">     221 </span>                :            :     bool m_validation_weight_left_init = false;</a>
-<a name="222"><span class="lineNum">     222 </span>                :            :     //! How much validation weight is left (decremented for every successful non-empty signature check).</a>
-<a name="223"><span class="lineNum">     223 </span>                :            :     int64_t m_validation_weight_left;</a>
-<a name="224"><span class="lineNum">     224 </span>                :            : };</a>
-<a name="225"><span class="lineNum">     225 </span>                :            : </a>
-<a name="226"><span class="lineNum">     226 </span>                :            : /** Signature hash sizes */</a>
-<a name="227"><span class="lineNum">     227 </span>                :            : static constexpr size_t WITNESS_V0_SCRIPTHASH_SIZE = 32;</a>
-<a name="228"><span class="lineNum">     228 </span>                :            : static constexpr size_t WITNESS_V0_KEYHASH_SIZE = 20;</a>
-<a name="229"><span class="lineNum">     229 </span>                :            : static constexpr size_t WITNESS_V1_TAPROOT_SIZE = 32;</a>
-<a name="230"><span class="lineNum">     230 </span>                :            : </a>
-<a name="231"><span class="lineNum">     231 </span>                :            : static constexpr uint8_t TAPROOT_LEAF_MASK = 0xfe;</a>
-<a name="232"><span class="lineNum">     232 </span>                :            : static constexpr uint8_t TAPROOT_LEAF_TAPSCRIPT = 0xc0;</a>
-<a name="233"><span class="lineNum">     233 </span>                :            : static constexpr size_t TAPROOT_CONTROL_BASE_SIZE = 33;</a>
-<a name="234"><span class="lineNum">     234 </span>                :            : static constexpr size_t TAPROOT_CONTROL_NODE_SIZE = 32;</a>
-<a name="235"><span class="lineNum">     235 </span>                :            : static constexpr size_t TAPROOT_CONTROL_MAX_NODE_COUNT = 128;</a>
-<a name="236"><span class="lineNum">     236 </span>                :            : static constexpr size_t TAPROOT_CONTROL_MAX_SIZE = TAPROOT_CONTROL_BASE_SIZE + TAPROOT_CONTROL_NODE_SIZE * TAPROOT_CONTROL_MAX_NODE_COUNT;</a>
-<a name="237"><span class="lineNum">     237 </span>                :            : </a>
-<a name="238"><span class="lineNum">     238 </span>                :            : extern const CHashWriter HASHER_TAPLEAF;    //!&lt; Hasher with tag &quot;TapLeaf&quot; pre-fed to it.</a>
-<a name="239"><span class="lineNum">     239 </span>                :            : extern const CHashWriter HASHER_TAPBRANCH;  //!&lt; Hasher with tag &quot;TapBranch&quot; pre-fed to it.</a>
-<a name="240"><span class="lineNum">     240 </span>                :            : </a>
-<a name="241"><span class="lineNum">     241 </span>                :            : template &lt;class T&gt;</a>
-<a name="242"><span class="lineNum">     242 </span>                :            : uint256 SignatureHash(const CScript&amp; scriptCode, const T&amp; txTo, unsigned int nIn, int nHashType, const CAmount&amp; amount, SigVersion sigversion, const PrecomputedTransactionData* cache = nullptr);</a>
-<a name="243"><span class="lineNum">     243 </span>                :            : </a>
-<a name="244"><span class="lineNum">     244 </span>  [<span class="branchCov" title="Branch 0 was taken 120667 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1227 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     499038 : class BaseSignatureChecker</span></a>
+<a name="188"><span class="lineNum">     188 </span>                :            : uint256 GetStandardTemplateHash(const TxType&amp; tx, const uint256&amp; outputs_hash, const uint256&amp; sequences_hash,</a>
+<a name="189"><span class="lineNum">     189 </span>                :            :                                 const uint32_t input_index);</a>
+<a name="190"><span class="lineNum">     190 </span>                :            : </a>
+<a name="191"><span class="lineNum">     191 </span>                :            : enum class SigVersion</a>
+<a name="192"><span class="lineNum">     192 </span>                :            : {</a>
+<a name="193"><span class="lineNum">     193 </span>                :            :     BASE = 0,        //!&lt; Bare scripts and BIP16 P2SH-wrapped redeemscripts</a>
+<a name="194"><span class="lineNum">     194 </span>                :            :     WITNESS_V0 = 1,  //!&lt; Witness v0 (P2WPKH and P2WSH); see BIP 141</a>
+<a name="195"><span class="lineNum">     195 </span>                :            :     TAPROOT = 2,     //!&lt; Witness v1 with 32-byte program, not BIP16 P2SH-wrapped, key path spending; see BIP 341</a>
+<a name="196"><span class="lineNum">     196 </span>                :            :     TAPSCRIPT = 3,   //!&lt; Witness v1 with 32-byte program, not BIP16 P2SH-wrapped, script path spending, leaf version 0xc0; see BIP 342</a>
+<a name="197"><span class="lineNum">     197 </span>                :            : };</a>
+<a name="198"><span class="lineNum">     198 </span>                :            : </a>
+<a name="199"><span class="lineNum">     199 </span>                :            : struct ScriptExecutionData</a>
+<a name="200"><span class="lineNum">     200 </span>                :            : {</a>
+<a name="201"><span class="lineNum">     201 </span>                :            :     //! Whether m_tapleaf_hash is initialized.</a>
+<a name="202"><span class="lineNum">     202 </span>                :            :     bool m_tapleaf_hash_init = false;</a>
+<a name="203"><span class="lineNum">     203 </span>                :            :     //! The tapleaf hash.</a>
+<a name="204"><span class="lineNum">     204 </span>                :            :     uint256 m_tapleaf_hash;</a>
+<a name="205"><span class="lineNum">     205 </span>                :            : </a>
+<a name="206"><span class="lineNum">     206 </span>                :            :     //! Whether m_codeseparator_pos is initialized.</a>
+<a name="207"><span class="lineNum">     207 </span>                :            :     bool m_codeseparator_pos_init = false;</a>
+<a name="208"><span class="lineNum">     208 </span>                :            :     //! Opcode position of the last executed OP_CODESEPARATOR (or 0xFFFFFFFF if none executed).</a>
+<a name="209"><span class="lineNum">     209 </span>                :            :     uint32_t m_codeseparator_pos;</a>
+<a name="210"><span class="lineNum">     210 </span>                :            : </a>
+<a name="211"><span class="lineNum">     211 </span>                :            :     //! Whether m_annex_present and (when needed) m_annex_hash are initialized.</a>
+<a name="212"><span class="lineNum">     212 </span>                :            :     bool m_annex_init = false;</a>
+<a name="213"><span class="lineNum">     213 </span>                :            :     //! Whether an annex is present.</a>
+<a name="214"><span class="lineNum">     214 </span>                :            :     bool m_annex_present;</a>
+<a name="215"><span class="lineNum">     215 </span>                :            :     //! Hash of the annex data.</a>
+<a name="216"><span class="lineNum">     216 </span>                :            :     uint256 m_annex_hash;</a>
+<a name="217"><span class="lineNum">     217 </span>                :            : </a>
+<a name="218"><span class="lineNum">     218 </span>                :            :     //! Whether m_validation_weight_left is initialized.</a>
+<a name="219"><span class="lineNum">     219 </span>                :            :     bool m_validation_weight_left_init = false;</a>
+<a name="220"><span class="lineNum">     220 </span>                :            :     //! How much validation weight is left (decremented for every successful non-empty signature check).</a>
+<a name="221"><span class="lineNum">     221 </span>                :            :     int64_t m_validation_weight_left;</a>
+<a name="222"><span class="lineNum">     222 </span>                :            : };</a>
+<a name="223"><span class="lineNum">     223 </span>                :            : </a>
+<a name="224"><span class="lineNum">     224 </span>                :            : /** Signature hash sizes */</a>
+<a name="225"><span class="lineNum">     225 </span>                :            : static constexpr size_t WITNESS_V0_SCRIPTHASH_SIZE = 32;</a>
+<a name="226"><span class="lineNum">     226 </span>                :            : static constexpr size_t WITNESS_V0_KEYHASH_SIZE = 20;</a>
+<a name="227"><span class="lineNum">     227 </span>                :            : static constexpr size_t WITNESS_V1_TAPROOT_SIZE = 32;</a>
+<a name="228"><span class="lineNum">     228 </span>                :            : </a>
+<a name="229"><span class="lineNum">     229 </span>                :            : static constexpr uint8_t TAPROOT_LEAF_MASK = 0xfe;</a>
+<a name="230"><span class="lineNum">     230 </span>                :            : static constexpr uint8_t TAPROOT_LEAF_TAPSCRIPT = 0xc0;</a>
+<a name="231"><span class="lineNum">     231 </span>                :            : static constexpr size_t TAPROOT_CONTROL_BASE_SIZE = 33;</a>
+<a name="232"><span class="lineNum">     232 </span>                :            : static constexpr size_t TAPROOT_CONTROL_NODE_SIZE = 32;</a>
+<a name="233"><span class="lineNum">     233 </span>                :            : static constexpr size_t TAPROOT_CONTROL_MAX_NODE_COUNT = 128;</a>
+<a name="234"><span class="lineNum">     234 </span>                :            : static constexpr size_t TAPROOT_CONTROL_MAX_SIZE = TAPROOT_CONTROL_BASE_SIZE + TAPROOT_CONTROL_NODE_SIZE * TAPROOT_CONTROL_MAX_NODE_COUNT;</a>
+<a name="235"><span class="lineNum">     235 </span>                :            : </a>
+<a name="236"><span class="lineNum">     236 </span>                :            : extern const CHashWriter HASHER_TAPLEAF;    //!&lt; Hasher with tag &quot;TapLeaf&quot; pre-fed to it.</a>
+<a name="237"><span class="lineNum">     237 </span>                :            : extern const CHashWriter HASHER_TAPBRANCH;  //!&lt; Hasher with tag &quot;TapBranch&quot; pre-fed to it.</a>
+<a name="238"><span class="lineNum">     238 </span>                :            : </a>
+<a name="239"><span class="lineNum">     239 </span>                :            : template &lt;class T&gt;</a>
+<a name="240"><span class="lineNum">     240 </span>                :            : uint256 SignatureHash(const CScript&amp; scriptCode, const T&amp; txTo, unsigned int nIn, int nHashType, const CAmount&amp; amount, SigVersion sigversion, const PrecomputedTransactionData* cache = nullptr);</a>
+<a name="241"><span class="lineNum">     241 </span>                :            : </a>
+<a name="242"><span class="lineNum">     242 </span>  [<span class="branchCov" title="Branch 0 was taken 136884 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1220 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     521815 : class BaseSignatureChecker</span></a>
 <span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
-<a name="245"><span class="lineNum">     245 </span>                :            : {</a>
-<a name="246"><span class="lineNum">     246 </span>                :            : public:</a>
-<a name="247"><span class="lineNum">     247 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const</span></a>
-<a name="248"><span class="lineNum">     248 </span>                :            :     {</a>
-<a name="249"><span class="lineNum">     249 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
-<a name="250"><span class="lineNum">     250 </span>                :            :     }</a>
-<a name="251"><span class="lineNum">     251 </span>                :            : </a>
-<a name="252"><span class="lineNum">     252 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckSchnorrSignature(Span&lt;const unsigned char&gt; sig, Span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, const ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const</span></a>
-<a name="253"><span class="lineNum">     253 </span>                :            :     {</a>
-<a name="254"><span class="lineNum">     254 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
-<a name="255"><span class="lineNum">     255 </span>                :            :     }</a>
-<a name="256"><span class="lineNum">     256 </span>                :            : </a>
-<a name="257"><span class="lineNum">     257 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckLockTime(const CScriptNum&amp; nLockTime) const</span></a>
-<a name="258"><span class="lineNum">     258 </span>                :            :     {</a>
-<a name="259"><span class="lineNum">     259 </span>                :<span class="lineNoCov">          0 :          return false;</span></a>
-<a name="260"><span class="lineNum">     260 </span>                :            :     }</a>
-<a name="261"><span class="lineNum">     261 </span>                :            : </a>
-<a name="262"><span class="lineNum">     262 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckSequence(const CScriptNum&amp; nSequence) const</span></a>
-<a name="263"><span class="lineNum">     263 </span>                :            :     {</a>
-<a name="264"><span class="lineNum">     264 </span>                :<span class="lineNoCov">          0 :          return false;</span></a>
-<a name="265"><span class="lineNum">     265 </span>                :            :     }</a>
-<a name="266"><span class="lineNum">     266 </span>                :            : </a>
-<a name="267"><span class="lineNum">     267 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckStandardTemplateHash(const std::vector&lt;unsigned char&gt;&amp; hash) const</span></a>
-<a name="268"><span class="lineNum">     268 </span>                :            :     {</a>
-<a name="269"><span class="lineNum">     269 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
-<a name="270"><span class="lineNum">     270 </span>                :            :     }</a>
-<a name="271"><span class="lineNum">     271 </span>                :            : </a>
-<a name="272"><span class="lineNum">     272 </span>  [<span class="branchCov" title="Branch 0 was taken 67545 times"> + </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span><span class="branchCov" title="Branch 2 was taken 1227 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     502664 :     virtual ~BaseSignatureChecker() {}</span></a>
+<a name="243"><span class="lineNum">     243 </span>                :            : {</a>
+<a name="244"><span class="lineNum">     244 </span>                :            : public:</a>
+<a name="245"><span class="lineNum">     245 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const</span></a>
+<a name="246"><span class="lineNum">     246 </span>                :            :     {</a>
+<a name="247"><span class="lineNum">     247 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
+<a name="248"><span class="lineNum">     248 </span>                :            :     }</a>
+<a name="249"><span class="lineNum">     249 </span>                :            : </a>
+<a name="250"><span class="lineNum">     250 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckSchnorrSignature(Span&lt;const unsigned char&gt; sig, Span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, const ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const</span></a>
+<a name="251"><span class="lineNum">     251 </span>                :            :     {</a>
+<a name="252"><span class="lineNum">     252 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
+<a name="253"><span class="lineNum">     253 </span>                :            :     }</a>
+<a name="254"><span class="lineNum">     254 </span>                :            : </a>
+<a name="255"><span class="lineNum">     255 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckLockTime(const CScriptNum&amp; nLockTime) const</span></a>
+<a name="256"><span class="lineNum">     256 </span>                :            :     {</a>
+<a name="257"><span class="lineNum">     257 </span>                :<span class="lineNoCov">          0 :          return false;</span></a>
+<a name="258"><span class="lineNum">     258 </span>                :            :     }</a>
+<a name="259"><span class="lineNum">     259 </span>                :            : </a>
+<a name="260"><span class="lineNum">     260 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckSequence(const CScriptNum&amp; nSequence) const</span></a>
+<a name="261"><span class="lineNum">     261 </span>                :            :     {</a>
+<a name="262"><span class="lineNum">     262 </span>                :<span class="lineNoCov">          0 :          return false;</span></a>
+<a name="263"><span class="lineNum">     263 </span>                :            :     }</a>
+<a name="264"><span class="lineNum">     264 </span>                :            : </a>
+<a name="265"><span class="lineNum">     265 </span>                :<span class="lineNoCov">          0 :     virtual bool CheckStandardTemplateHash(const std::vector&lt;unsigned char&gt;&amp; hash) const</span></a>
+<a name="266"><span class="lineNum">     266 </span>                :            :     {</a>
+<a name="267"><span class="lineNum">     267 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
+<a name="268"><span class="lineNum">     268 </span>                :            :     }</a>
+<a name="269"><span class="lineNum">     269 </span>                :            : </a>
+<a name="270"><span class="lineNum">     270 </span>  [<span class="branchCov" title="Branch 0 was taken 67551 times"> + </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span><span class="branchCov" title="Branch 2 was taken 1220 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     525402 :     virtual ~BaseSignatureChecker() {}</span></a>
 <span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
 <span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
 <span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 1 time"> + </span> 
 <span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 19 was not taken"> - </span>]
-<a name="273"><span class="lineNum">     273 </span>                :            : };</a>
-<a name="274"><span class="lineNum">     274 </span>                :            : </a>
-<a name="275"><span class="lineNum">     275 </span>                :            : /** Enum to specify what *TransactionSignatureChecker's behavior should be</a>
-<a name="276"><span class="lineNum">     276 </span>                :            :  *  when dealing with missing transaction data.</a>
-<a name="277"><span class="lineNum">     277 </span>                :            :  */</a>
-<a name="278"><span class="lineNum">     278 </span>                :            : enum class MissingDataBehavior</a>
-<a name="279"><span class="lineNum">     279 </span>                :            : {</a>
-<a name="280"><span class="lineNum">     280 </span>                :            :     ASSERT_FAIL,  //!&lt; Abort execution through assertion failure (for consensus code)</a>
-<a name="281"><span class="lineNum">     281 </span>                :            :     FAIL,         //!&lt; Just act as if the signature was invalid</a>
-<a name="282"><span class="lineNum">     282 </span>                :            : };</a>
-<a name="283"><span class="lineNum">     283 </span>                :            : </a>
-<a name="284"><span class="lineNum">     284 </span>                :            : template&lt;typename T&gt;</a>
-<a name="285"><span class="lineNum">     285 </span>                :            : bool SignatureHashSchnorr(uint256&amp; hash_out, const ScriptExecutionData&amp; execdata, const T&amp; tx_to, uint32_t in_pos, uint8_t hash_type, SigVersion sigversion, const PrecomputedTransactionData&amp; cache, MissingDataBehavior mdb);</a>
-<a name="286"><span class="lineNum">     286 </span>                :            : </a>
-<a name="287"><span class="lineNum">     287 </span>                :            : template &lt;class T&gt;</a>
-<a name="288"><span class="lineNum">     288 </span>  [<span class="branchCov" title="Branch 0 was taken 22464 times"> + </span><span class="branchCov" title="Branch 1 was taken 30706 times"> + </span><span class="branchCov" title="Branch 2 was taken 7949 times"> + </span><span class="branchCov" title="Branch 3 was taken 4203 times"> + </span> :<span class="lineCov">     576777 : class GenericTransactionSignatureChecker : public BaseSignatureChecker</span></a>
+<a name="271"><span class="lineNum">     271 </span>                :            : };</a>
+<a name="272"><span class="lineNum">     272 </span>                :            : </a>
+<a name="273"><span class="lineNum">     273 </span>                :            : /** Enum to specify what *TransactionSignatureChecker's behavior should be</a>
+<a name="274"><span class="lineNum">     274 </span>                :            :  *  when dealing with missing transaction data.</a>
+<a name="275"><span class="lineNum">     275 </span>                :            :  */</a>
+<a name="276"><span class="lineNum">     276 </span>                :            : enum class MissingDataBehavior</a>
+<a name="277"><span class="lineNum">     277 </span>                :            : {</a>
+<a name="278"><span class="lineNum">     278 </span>                :            :     ASSERT_FAIL,  //!&lt; Abort execution through assertion failure (for consensus code)</a>
+<a name="279"><span class="lineNum">     279 </span>                :            :     FAIL,         //!&lt; Just act as if the signature was invalid</a>
+<a name="280"><span class="lineNum">     280 </span>                :            : };</a>
+<a name="281"><span class="lineNum">     281 </span>                :            : </a>
+<a name="282"><span class="lineNum">     282 </span>                :            : template&lt;typename T&gt;</a>
+<a name="283"><span class="lineNum">     283 </span>                :            : bool SignatureHashSchnorr(uint256&amp; hash_out, const ScriptExecutionData&amp; execdata, const T&amp; tx_to, uint32_t in_pos, uint8_t hash_type, SigVersion sigversion, const PrecomputedTransactionData&amp; cache, MissingDataBehavior mdb);</a>
+<a name="284"><span class="lineNum">     284 </span>                :            : </a>
+<a name="285"><span class="lineNum">     285 </span>                :            : template &lt;class T&gt;</a>
+<a name="286"><span class="lineNum">     286 </span>  [<span class="branchCov" title="Branch 0 was taken 35559 times"> + </span><span class="branchCov" title="Branch 1 was taken 33820 times"> + </span><span class="branchCov" title="Branch 2 was taken 7949 times"> + </span><span class="branchCov" title="Branch 3 was taken 4203 times"> + </span> :<span class="lineCov">     631952 : class GenericTransactionSignatureChecker : public BaseSignatureChecker</span></a>
 <span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
 <span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
 <span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 1 time"> + </span> 
 <span class="lineNum">         </span><span class="branchNoCov" title="Branch 19 was not taken"> - </span><span class="branchCov" title="Branch 20 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span><span class="branchCov" title="Branch 22 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 23 was not taken"> - </span> 
 <span class="lineNum">         </span>   <span class="branchCov" title="Branch 24 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 25 was not taken"> - </span><span class="branchCov" title="Branch 26 was taken 1336 times"> + </span><span class="branchNoCov" title="Branch 27 was not taken"> - </span>]
-<a name="289"><span class="lineNum">     289 </span>                :            : {</a>
-<a name="290"><span class="lineNum">     290 </span>                :            : private:</a>
-<a name="291"><span class="lineNum">     291 </span>                :            :     const T* txTo;</a>
-<a name="292"><span class="lineNum">     292 </span>                :            :     const MissingDataBehavior m_mdb;</a>
-<a name="293"><span class="lineNum">     293 </span>                :            :     unsigned int nIn;</a>
-<a name="294"><span class="lineNum">     294 </span>                :            :     const CAmount amount;</a>
-<a name="295"><span class="lineNum">     295 </span>                :            :     const PrecomputedTransactionData* txdata;</a>
-<a name="296"><span class="lineNum">     296 </span>                :            : </a>
-<a name="297"><span class="lineNum">     297 </span>                :            : protected:</a>
-<a name="298"><span class="lineNum">     298 </span>                :            :     virtual bool VerifyECDSASignature(const std::vector&lt;unsigned char&gt;&amp; vchSig, const CPubKey&amp; vchPubKey, const uint256&amp; sighash) const;</a>
-<a name="299"><span class="lineNum">     299 </span>                :            :     virtual bool VerifySchnorrSignature(Span&lt;const unsigned char&gt; sig, const XOnlyPubKey&amp; pubkey, const uint256&amp; sighash) const;</a>
-<a name="300"><span class="lineNum">     300 </span>                :            : </a>
-<a name="301"><span class="lineNum">     301 </span>                :            : public:</a>
-<a name="302"><span class="lineNum">     302 </span>  [<span class="branchCov" title="Branch 0 was taken 53197 times"> + </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span><span class="branchCov" title="Branch 2 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      72901 :     GenericTransactionSignatureChecker(const T* txToIn, unsigned int nInIn, const CAmount&amp; amountIn, MissingDataBehavior mdb) : txTo(txToIn), m_mdb(mdb), nIn(nInIn), amount(amountIn), txdata(nullptr) {}</span></a>
+<a name="287"><span class="lineNum">     287 </span>                :            : {</a>
+<a name="288"><span class="lineNum">     288 </span>                :            : private:</a>
+<a name="289"><span class="lineNum">     289 </span>                :            :     const T* txTo;</a>
+<a name="290"><span class="lineNum">     290 </span>                :            :     const MissingDataBehavior m_mdb;</a>
+<a name="291"><span class="lineNum">     291 </span>                :            :     unsigned int nIn;</a>
+<a name="292"><span class="lineNum">     292 </span>                :            :     const CAmount amount;</a>
+<a name="293"><span class="lineNum">     293 </span>                :            :     const PrecomputedTransactionData* txdata;</a>
+<a name="294"><span class="lineNum">     294 </span>                :            : </a>
+<a name="295"><span class="lineNum">     295 </span>                :            : protected:</a>
+<a name="296"><span class="lineNum">     296 </span>                :            :     virtual bool VerifyECDSASignature(const std::vector&lt;unsigned char&gt;&amp; vchSig, const CPubKey&amp; vchPubKey, const uint256&amp; sighash) const;</a>
+<a name="297"><span class="lineNum">     297 </span>                :            :     virtual bool VerifySchnorrSignature(Span&lt;const unsigned char&gt; sig, const XOnlyPubKey&amp; pubkey, const uint256&amp; sighash) const;</a>
+<a name="298"><span class="lineNum">     298 </span>                :            : </a>
+<a name="299"><span class="lineNum">     299 </span>                :            : public:</a>
+<a name="300"><span class="lineNum">     300 </span>  [<span class="branchCov" title="Branch 0 was taken 69408 times"> + </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span><span class="branchCov" title="Branch 2 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      89128 :     GenericTransactionSignatureChecker(const T* txToIn, unsigned int nInIn, const CAmount&amp; amountIn, MissingDataBehavior mdb) : txTo(txToIn), m_mdb(mdb), nIn(nInIn), amount(amountIn), txdata(nullptr) {}</span></a>
 <span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 3 times"> + </span> 
 <span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
 <span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 14 times"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 1 time"> + </span> 
 <span class="lineNum">         </span><span class="branchNoCov" title="Branch 19 was not taken"> - </span><span class="branchCov" title="Branch 20 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span><span class="branchCov" title="Branch 22 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 23 was not taken"> - </span> 
-<span class="lineNum">         </span><span class="branchCov" title="Branch 24 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 25 was not taken"> - </span><span class="branchCov" title="Branch 26 was taken 1336 times"> + </span><span class="branchNoCov" title="Branch 27 was not taken"> - </span><span class="branchCov" title="Branch 28 was taken 18324 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 24 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 25 was not taken"> - </span><span class="branchCov" title="Branch 26 was taken 1336 times"> + </span><span class="branchNoCov" title="Branch 27 was not taken"> - </span><span class="branchCov" title="Branch 28 was taken 18340 times"> + </span> 
 <span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 29 was not taken"> - </span>]
-<a name="303"><span class="lineNum">     303 </span>        [<span class="branchCov" title="Branch 0 was taken 441764 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     498460 :     GenericTransactionSignatureChecker(const T* txToIn, unsigned int nInIn, const CAmount&amp; amountIn, const PrecomputedTransactionData&amp; txdataIn, MissingDataBehavior mdb) : txTo(txToIn), m_mdb(mdb), nIn(nInIn), amount(amountIn), txdata(&amp;txdataIn) {}</span></a>
-<a name="304"><span class="lineNum">     304 </span>                :            :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override;</a>
-<a name="305"><span class="lineNum">     305 </span>                :            :     bool CheckSchnorrSignature(Span&lt;const unsigned char&gt; sig, Span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, const ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const override;</a>
-<a name="306"><span class="lineNum">     306 </span>                :            :     bool CheckLockTime(const CScriptNum&amp; nLockTime) const override;</a>
-<a name="307"><span class="lineNum">     307 </span>                :            :     bool CheckSequence(const CScriptNum&amp; nSequence) const override;</a>
-<a name="308"><span class="lineNum">     308 </span>                :            :     bool CheckStandardTemplateHash(const std::vector&lt;unsigned char&gt;&amp; hash) const override;</a>
-<a name="309"><span class="lineNum">     309 </span>                :            : };</a>
-<a name="310"><span class="lineNum">     310 </span>                :            : </a>
-<a name="311"><span class="lineNum">     311 </span>                :            : using TransactionSignatureChecker = GenericTransactionSignatureChecker&lt;CTransaction&gt;;</a>
-<a name="312"><span class="lineNum">     312 </span>                :            : using MutableTransactionSignatureChecker = GenericTransactionSignatureChecker&lt;CMutableTransaction&gt;;</a>
-<a name="313"><span class="lineNum">     313 </span>                :            : </a>
-<a name="314"><span class="lineNum">     314 </span>                :<span class="lineCov">      53119 : class DeferringSignatureChecker : public BaseSignatureChecker</span></a>
-<a name="315"><span class="lineNum">     315 </span>                :            : {</a>
-<a name="316"><span class="lineNum">     316 </span>                :            : protected:</a>
-<a name="317"><span class="lineNum">     317 </span>                :            :     BaseSignatureChecker&amp; m_checker;</a>
-<a name="318"><span class="lineNum">     318 </span>                :            : </a>
-<a name="319"><span class="lineNum">     319 </span>                :            : public:</a>
-<a name="320"><span class="lineNum">     320 </span>        [<span class="branchCov" title="Branch 0 was taken 53119 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      53119 :     DeferringSignatureChecker(BaseSignatureChecker&amp; checker) : m_checker(checker) {}</span></a>
-<a name="321"><span class="lineNum">     321 </span>                :            : </a>
-<a name="322"><span class="lineNum">     322 </span>                :<span class="lineNoCov">          0 :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override</span></a>
-<a name="323"><span class="lineNum">     323 </span>                :            :     {</a>
-<a name="324"><span class="lineNum">     324 </span>                :<span class="lineNoCov">          0 :         return m_checker.CheckECDSASignature(scriptSig, vchPubKey, scriptCode, sigversion);</span></a>
-<a name="325"><span class="lineNum">     325 </span>                :            :     }</a>
-<a name="326"><span class="lineNum">     326 </span>                :            : </a>
-<a name="327"><span class="lineNum">     327 </span>                :<span class="lineCov">        298 :     bool CheckSchnorrSignature(Span&lt;const unsigned char&gt; sig, Span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, const ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const override</span></a>
-<a name="328"><span class="lineNum">     328 </span>                :            :     {</a>
-<a name="329"><span class="lineNum">     329 </span>                :<span class="lineCov">        298 :         return m_checker.CheckSchnorrSignature(sig, pubkey, sigversion, execdata, serror);</span></a>
-<a name="330"><span class="lineNum">     330 </span>                :            :     }</a>
-<a name="331"><span class="lineNum">     331 </span>                :            : </a>
-<a name="332"><span class="lineNum">     332 </span>                :<span class="lineCov">          8 :     bool CheckLockTime(const CScriptNum&amp; nLockTime) const override</span></a>
-<a name="333"><span class="lineNum">     333 </span>                :            :     {</a>
-<a name="334"><span class="lineNum">     334 </span>                :<span class="lineCov">          8 :         return m_checker.CheckLockTime(nLockTime);</span></a>
-<a name="335"><span class="lineNum">     335 </span>                :            :     }</a>
-<a name="336"><span class="lineNum">     336 </span>                :<span class="lineCov">          8 :     bool CheckSequence(const CScriptNum&amp; nSequence) const override</span></a>
-<a name="337"><span class="lineNum">     337 </span>                :            :     {</a>
-<a name="338"><span class="lineNum">     338 </span>                :<span class="lineCov">          8 :         return m_checker.CheckSequence(nSequence);</span></a>
-<a name="339"><span class="lineNum">     339 </span>                :            :     }</a>
-<a name="340"><span class="lineNum">     340 </span>                :            : };</a>
-<a name="341"><span class="lineNum">     341 </span>                :            : </a>
-<a name="342"><span class="lineNum">     342 </span>                :            : /** Compute the BIP341 tapleaf hash from leaf version &amp; script. */</a>
-<a name="343"><span class="lineNum">     343 </span>                :            : uint256 ComputeTapleafHash(uint8_t leaf_version, const CScript&amp; script);</a>
-<a name="344"><span class="lineNum">     344 </span>                :            : /** Compute the BIP341 taproot script tree Merkle root from control block and leaf hash.</a>
-<a name="345"><span class="lineNum">     345 </span>                :            :  *  Requires control block to have valid length (33 + k*32, with k in {0,1,..,128}). */</a>
-<a name="346"><span class="lineNum">     346 </span>                :            : uint256 ComputeTaprootMerkleRoot(Span&lt;const unsigned char&gt; control, const uint256&amp; tapleaf_hash);</a>
-<a name="347"><span class="lineNum">     347 </span>                :            : </a>
-<a name="348"><span class="lineNum">     348 </span>                :            : bool EvalScript(std::vector&lt;std::vector&lt;unsigned char&gt; &gt;&amp; stack, const CScript&amp; script, unsigned int flags, const BaseSignatureChecker&amp; checker, SigVersion sigversion, ScriptExecutionData&amp; execdata, ScriptError* error = nullptr);</a>
-<a name="349"><span class="lineNum">     349 </span>                :            : bool EvalScript(std::vector&lt;std::vector&lt;unsigned char&gt; &gt;&amp; stack, const CScript&amp; script, unsigned int flags, const BaseSignatureChecker&amp; checker, SigVersion sigversion, ScriptError* error = nullptr);</a>
-<a name="350"><span class="lineNum">     350 </span>                :            : bool VerifyScript(const CScript&amp; scriptSig, const CScript&amp; scriptPubKey, const CScriptWitness* witness, unsigned int flags, const BaseSignatureChecker&amp; checker, ScriptError* serror = nullptr);</a>
+<a name="301"><span class="lineNum">     301 </span>        [<span class="branchCov" title="Branch 0 was taken 464540 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     537408 :     GenericTransactionSignatureChecker(const T* txToIn, unsigned int nInIn, const CAmount&amp; amountIn, const PrecomputedTransactionData&amp; txdataIn, MissingDataBehavior mdb) : txTo(txToIn), m_mdb(mdb), nIn(nInIn), amount(amountIn), txdata(&amp;txdataIn) {}</span></a>
+<a name="302"><span class="lineNum">     302 </span>                :            :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override;</a>
+<a name="303"><span class="lineNum">     303 </span>                :            :     bool CheckSchnorrSignature(Span&lt;const unsigned char&gt; sig, Span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, const ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const override;</a>
+<a name="304"><span class="lineNum">     304 </span>                :            :     bool CheckLockTime(const CScriptNum&amp; nLockTime) const override;</a>
+<a name="305"><span class="lineNum">     305 </span>                :            :     bool CheckSequence(const CScriptNum&amp; nSequence) const override;</a>
+<a name="306"><span class="lineNum">     306 </span>                :            :     bool CheckStandardTemplateHash(const std::vector&lt;unsigned char&gt;&amp; hash) const override;</a>
+<a name="307"><span class="lineNum">     307 </span>                :            : };</a>
+<a name="308"><span class="lineNum">     308 </span>                :            : </a>
+<a name="309"><span class="lineNum">     309 </span>                :            : using TransactionSignatureChecker = GenericTransactionSignatureChecker&lt;CTransaction&gt;;</a>
+<a name="310"><span class="lineNum">     310 </span>                :            : using MutableTransactionSignatureChecker = GenericTransactionSignatureChecker&lt;CMutableTransaction&gt;;</a>
+<a name="311"><span class="lineNum">     311 </span>                :            : </a>
+<a name="312"><span class="lineNum">     312 </span>                :<span class="lineCov">      69330 : class DeferringSignatureChecker : public BaseSignatureChecker</span></a>
+<a name="313"><span class="lineNum">     313 </span>                :            : {</a>
+<a name="314"><span class="lineNum">     314 </span>                :            : protected:</a>
+<a name="315"><span class="lineNum">     315 </span>                :            :     BaseSignatureChecker&amp; m_checker;</a>
+<a name="316"><span class="lineNum">     316 </span>                :            : </a>
+<a name="317"><span class="lineNum">     317 </span>                :            : public:</a>
+<a name="318"><span class="lineNum">     318 </span>        [<span class="branchCov" title="Branch 0 was taken 69330 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      69330 :     DeferringSignatureChecker(BaseSignatureChecker&amp; checker) : m_checker(checker) {}</span></a>
+<a name="319"><span class="lineNum">     319 </span>                :            : </a>
+<a name="320"><span class="lineNum">     320 </span>                :<span class="lineNoCov">          0 :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override</span></a>
+<a name="321"><span class="lineNum">     321 </span>                :            :     {</a>
+<a name="322"><span class="lineNum">     322 </span>                :<span class="lineNoCov">          0 :         return m_checker.CheckECDSASignature(scriptSig, vchPubKey, scriptCode, sigversion);</span></a>
+<a name="323"><span class="lineNum">     323 </span>                :            :     }</a>
+<a name="324"><span class="lineNum">     324 </span>                :            : </a>
+<a name="325"><span class="lineNum">     325 </span>                :<span class="lineCov">        444 :     bool CheckSchnorrSignature(Span&lt;const unsigned char&gt; sig, Span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, const ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const override</span></a>
+<a name="326"><span class="lineNum">     326 </span>                :            :     {</a>
+<a name="327"><span class="lineNum">     327 </span>                :<span class="lineCov">        444 :         return m_checker.CheckSchnorrSignature(sig, pubkey, sigversion, execdata, serror);</span></a>
+<a name="328"><span class="lineNum">     328 </span>                :            :     }</a>
+<a name="329"><span class="lineNum">     329 </span>                :            : </a>
+<a name="330"><span class="lineNum">     330 </span>                :<span class="lineCov">          8 :     bool CheckLockTime(const CScriptNum&amp; nLockTime) const override</span></a>
+<a name="331"><span class="lineNum">     331 </span>                :            :     {</a>
+<a name="332"><span class="lineNum">     332 </span>                :<span class="lineCov">          8 :         return m_checker.CheckLockTime(nLockTime);</span></a>
+<a name="333"><span class="lineNum">     333 </span>                :            :     }</a>
+<a name="334"><span class="lineNum">     334 </span>                :<span class="lineCov">          8 :     bool CheckSequence(const CScriptNum&amp; nSequence) const override</span></a>
+<a name="335"><span class="lineNum">     335 </span>                :            :     {</a>
+<a name="336"><span class="lineNum">     336 </span>                :<span class="lineCov">          8 :         return m_checker.CheckSequence(nSequence);</span></a>
+<a name="337"><span class="lineNum">     337 </span>                :            :     }</a>
+<a name="338"><span class="lineNum">     338 </span>                :            : };</a>
+<a name="339"><span class="lineNum">     339 </span>                :            : </a>
+<a name="340"><span class="lineNum">     340 </span>                :            : /** Compute the BIP341 tapleaf hash from leaf version &amp; script. */</a>
+<a name="341"><span class="lineNum">     341 </span>                :            : uint256 ComputeTapleafHash(uint8_t leaf_version, const CScript&amp; script);</a>
+<a name="342"><span class="lineNum">     342 </span>                :            : /** Compute the BIP341 taproot script tree Merkle root from control block and leaf hash.</a>
+<a name="343"><span class="lineNum">     343 </span>                :            :  *  Requires control block to have valid length (33 + k*32, with k in {0,1,..,128}). */</a>
+<a name="344"><span class="lineNum">     344 </span>                :            : uint256 ComputeTaprootMerkleRoot(Span&lt;const unsigned char&gt; control, const uint256&amp; tapleaf_hash);</a>
+<a name="345"><span class="lineNum">     345 </span>                :            : </a>
+<a name="346"><span class="lineNum">     346 </span>                :            : bool EvalScript(std::vector&lt;std::vector&lt;unsigned char&gt; &gt;&amp; stack, const CScript&amp; script, unsigned int flags, const BaseSignatureChecker&amp; checker, SigVersion sigversion, ScriptExecutionData&amp; execdata, ScriptError* error = nullptr);</a>
+<a name="347"><span class="lineNum">     347 </span>                :            : bool EvalScript(std::vector&lt;std::vector&lt;unsigned char&gt; &gt;&amp; stack, const CScript&amp; script, unsigned int flags, const BaseSignatureChecker&amp; checker, SigVersion sigversion, ScriptError* error = nullptr);</a>
+<a name="348"><span class="lineNum">     348 </span>                :            : bool VerifyScript(const CScript&amp; scriptSig, const CScript&amp; scriptPubKey, const CScriptWitness* witness, unsigned int flags, const BaseSignatureChecker&amp; checker, ScriptError* serror = nullptr);</a>
+<a name="349"><span class="lineNum">     349 </span>                :            : </a>
+<a name="350"><span class="lineNum">     350 </span>                :            : size_t CountWitnessSigOps(const CScript&amp; scriptSig, const CScript&amp; scriptPubKey, const CScriptWitness* witness, unsigned int flags);</a>
 <a name="351"><span class="lineNum">     351 </span>                :            : </a>
-<a name="352"><span class="lineNum">     352 </span>                :            : size_t CountWitnessSigOps(const CScript&amp; scriptSig, const CScript&amp; scriptPubKey, const CScriptWitness* witness, unsigned int flags);</a>
+<a name="352"><span class="lineNum">     352 </span>                :            : bool CheckMinimalPush(const std::vector&lt;unsigned char&gt;&amp; data, opcodetype opcode);</a>
 <a name="353"><span class="lineNum">     353 </span>                :            : </a>
-<a name="354"><span class="lineNum">     354 </span>                :            : bool CheckMinimalPush(const std::vector&lt;unsigned char&gt;&amp; data, opcodetype opcode);</a>
+<a name="354"><span class="lineNum">     354 </span>                :            : int FindAndDelete(CScript&amp; script, const CScript&amp; b);</a>
 <a name="355"><span class="lineNum">     355 </span>                :            : </a>
-<a name="356"><span class="lineNum">     356 </span>                :            : int FindAndDelete(CScript&amp; script, const CScript&amp; b);</a>
-<a name="357"><span class="lineNum">     357 </span>                :            : </a>
-<a name="358"><span class="lineNum">     358 </span>                :            : #endif // BITCOIN_SCRIPT_INTERPRETER_H</a>
+<a name="356"><span class="lineNum">     356 </span>                :            : #endif // BITCOIN_SCRIPT_INTERPRETER_H</a>
 </pre>
       </td>
     </tr>

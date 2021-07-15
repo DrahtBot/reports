@@ -104,98 +104,98 @@
 <a name="33"><span class="lineNum">      33 </span>                :            : // Utilities</a>
 <a name="34"><span class="lineNum">      34 </span>                :            : //</a>
 <a name="35"><span class="lineNum">      35 </span>                :            : /** Align up to power of 2 */</a>
-<a name="36"><span class="lineNum">      36 </span>                :<span class="lineCov">    1832624 : static inline size_t align_up(size_t x, size_t align)</span></a>
+<a name="36"><span class="lineNum">      36 </span>                :<span class="lineCov">    1925170 : static inline size_t align_up(size_t x, size_t align)</span></a>
 <a name="37"><span class="lineNum">      37 </span>                :            : {</a>
-<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">    1832624 :     return (x + align - 1) &amp; ~(align - 1);</span></a>
+<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">    1925170 :     return (x + align - 1) &amp; ~(align - 1);</span></a>
 <a name="39"><span class="lineNum">      39 </span>                :            : }</a>
 <a name="40"><span class="lineNum">      40 </span>                :            : </a>
 <a name="41"><span class="lineNum">      41 </span>                :            : /*******************************************************************************/</a>
 <a name="42"><span class="lineNum">      42 </span>                :            : // Implementation: Arena</a>
 <a name="43"><span class="lineNum">      43 </span>                :            : </a>
-<a name="44"><span class="lineNum">      44 </span>                :<span class="lineCov">        914 : Arena::Arena(void *base_in, size_t size_in, size_t alignment_in):</span></a>
-<a name="45"><span class="lineNum">      45 </span>        [<span class="branchCov" title="Branch 0 was taken 914 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        914 :     base(static_cast&lt;char*&gt;(base_in)), end(static_cast&lt;char*&gt;(base_in) + size_in), alignment(alignment_in)</span></a>
+<a name="44"><span class="lineNum">      44 </span>                :<span class="lineCov">        915 : Arena::Arena(void *base_in, size_t size_in, size_t alignment_in):</span></a>
+<a name="45"><span class="lineNum">      45 </span>        [<span class="branchCov" title="Branch 0 was taken 915 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        915 :     base(static_cast&lt;char*&gt;(base_in)), end(static_cast&lt;char*&gt;(base_in) + size_in), alignment(alignment_in)</span></a>
 <a name="46"><span class="lineNum">      46 </span>                :            : {</a>
 <a name="47"><span class="lineNum">      47 </span>                :            :     // Start with one free chunk that covers the entire arena</a>
-<a name="48"><span class="lineNum">      48 </span>        [<span class="branchCov" title="Branch 0 was taken 914 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        914 :     auto it = size_to_free_chunk.emplace(size_in, base);</span></a>
-<a name="49"><span class="lineNum">      49 </span>        [<span class="branchCov" title="Branch 0 was taken 914 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        914 :     chunks_free.emplace(base, it);</span></a>
-<a name="50"><span class="lineNum">      50 </span>        [<span class="branchCov" title="Branch 0 was taken 914 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        914 :     chunks_free_end.emplace(base + size_in, it);</span></a>
-<a name="51"><span class="lineNum">      51 </span>                :<span class="lineCov">        914 : }</span></a>
+<a name="48"><span class="lineNum">      48 </span>        [<span class="branchCov" title="Branch 0 was taken 915 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        915 :     auto it = size_to_free_chunk.emplace(size_in, base);</span></a>
+<a name="49"><span class="lineNum">      49 </span>        [<span class="branchCov" title="Branch 0 was taken 915 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        915 :     chunks_free.emplace(base, it);</span></a>
+<a name="50"><span class="lineNum">      50 </span>        [<span class="branchCov" title="Branch 0 was taken 915 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        915 :     chunks_free_end.emplace(base + size_in, it);</span></a>
+<a name="51"><span class="lineNum">      51 </span>                :<span class="lineCov">        915 : }</span></a>
 <a name="52"><span class="lineNum">      52 </span>                :            : </a>
-<a name="53"><span class="lineNum">      53 </span>                :<span class="lineCov">        914 : Arena::~Arena()</span></a>
+<a name="53"><span class="lineNum">      53 </span>                :<span class="lineCov">        915 : Arena::~Arena()</span></a>
 <a name="54"><span class="lineNum">      54 </span>                :            : {</a>
-<a name="55"><span class="lineNum">      55 </span>                :<span class="lineCov">        914 : }</span></a>
+<a name="55"><span class="lineNum">      55 </span>                :<span class="lineCov">        915 : }</span></a>
 <a name="56"><span class="lineNum">      56 </span>                :            : </a>
-<a name="57"><span class="lineNum">      57 </span>                :<span class="lineCov">    1830804 : void* Arena::alloc(size_t size)</span></a>
+<a name="57"><span class="lineNum">      57 </span>                :<span class="lineCov">    1923348 : void* Arena::alloc(size_t size)</span></a>
 <a name="58"><span class="lineNum">      58 </span>                :            : {</a>
 <a name="59"><span class="lineNum">      59 </span>                :            :     // Round to next multiple of alignment</a>
-<a name="60"><span class="lineNum">      60 </span>                :<span class="lineCov">    1830804 :     size = align_up(size, alignment);</span></a>
+<a name="60"><span class="lineNum">      60 </span>                :<span class="lineCov">    1923348 :     size = align_up(size, alignment);</span></a>
 <a name="61"><span class="lineNum">      61 </span>                :            : </a>
 <a name="62"><span class="lineNum">      62 </span>                :            :     // Don't handle zero-sized chunks</a>
-<a name="63"><span class="lineNum">      63 </span>        [<span class="branchCov" title="Branch 0 was taken 1830802 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">    1830804 :     if (size == 0)</span></a>
+<a name="63"><span class="lineNum">      63 </span>        [<span class="branchCov" title="Branch 0 was taken 1923346 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">    1923348 :     if (size == 0)</span></a>
 <a name="64"><span class="lineNum">      64 </span>                :            :         return nullptr;</a>
 <a name="65"><span class="lineNum">      65 </span>                :            : </a>
 <a name="66"><span class="lineNum">      66 </span>                :            :     // Pick a large enough free-chunk. Returns an iterator pointing to the first element that is not less than key.</a>
 <a name="67"><span class="lineNum">      67 </span>                :            :     // This allocation strategy is best-fit. According to &quot;Dynamic Storage Allocation: A Survey and Critical Review&quot;,</a>
 <a name="68"><span class="lineNum">      68 </span>                :            :     // Wilson et. al. 1995, https://www.scs.stanford.edu/14wi-cs140/sched/readings/wilson.pdf, best-fit and first-fit</a>
 <a name="69"><span class="lineNum">      69 </span>                :            :     // policies seem to work well in practice.</a>
-<a name="70"><span class="lineNum">      70 </span>                :<span class="lineCov">    1830802 :     auto size_ptr_it = size_to_free_chunk.lower_bound(size);</span></a>
-<a name="71"><span class="lineNum">      71 </span>        [<span class="branchCov" title="Branch 0 was taken 1795147 times"> + </span><span class="branchCov" title="Branch 1 was taken 35655 times"> + </span>]:<span class="lineCov">    1830802 :     if (size_ptr_it == size_to_free_chunk.end())</span></a>
+<a name="70"><span class="lineNum">      70 </span>                :<span class="lineCov">    1923346 :     auto size_ptr_it = size_to_free_chunk.lower_bound(size);</span></a>
+<a name="71"><span class="lineNum">      71 </span>        [<span class="branchCov" title="Branch 0 was taken 1887691 times"> + </span><span class="branchCov" title="Branch 1 was taken 35655 times"> + </span>]:<span class="lineCov">    1923346 :     if (size_ptr_it == size_to_free_chunk.end())</span></a>
 <a name="72"><span class="lineNum">      72 </span>                :            :         return nullptr;</a>
 <a name="73"><span class="lineNum">      73 </span>                :            : </a>
 <a name="74"><span class="lineNum">      74 </span>                :            :     // Create the used-chunk, taking its space from the end of the free-chunk</a>
-<a name="75"><span class="lineNum">      75 </span>                :<span class="lineCov">    1795147 :     const size_t size_remaining = size_ptr_it-&gt;first - size;</span></a>
-<a name="76"><span class="lineNum">      76 </span>                :<span class="lineCov">    1795147 :     auto allocated = chunks_used.emplace(size_ptr_it-&gt;second + size_remaining, size).first;</span></a>
-<a name="77"><span class="lineNum">      77 </span>                :<span class="lineCov">    1795147 :     chunks_free_end.erase(size_ptr_it-&gt;second + size_ptr_it-&gt;first);</span></a>
-<a name="78"><span class="lineNum">      78 </span>        [<span class="branchCov" title="Branch 0 was taken 1218249 times"> + </span><span class="branchCov" title="Branch 1 was taken 576898 times"> + </span>]:<span class="lineCov">    1795147 :     if (size_ptr_it-&gt;first == size) {</span></a>
+<a name="75"><span class="lineNum">      75 </span>                :<span class="lineCov">    1887691 :     const size_t size_remaining = size_ptr_it-&gt;first - size;</span></a>
+<a name="76"><span class="lineNum">      76 </span>                :<span class="lineCov">    1887691 :     auto allocated = chunks_used.emplace(size_ptr_it-&gt;second + size_remaining, size).first;</span></a>
+<a name="77"><span class="lineNum">      77 </span>                :<span class="lineCov">    1887691 :     chunks_free_end.erase(size_ptr_it-&gt;second + size_ptr_it-&gt;first);</span></a>
+<a name="78"><span class="lineNum">      78 </span>        [<span class="branchCov" title="Branch 0 was taken 1308196 times"> + </span><span class="branchCov" title="Branch 1 was taken 579495 times"> + </span>]:<span class="lineCov">    1887691 :     if (size_ptr_it-&gt;first == size) {</span></a>
 <a name="79"><span class="lineNum">      79 </span>                :            :         // whole chunk is used up</a>
-<a name="80"><span class="lineNum">      80 </span>                :<span class="lineCov">    1218249 :         chunks_free.erase(size_ptr_it-&gt;second);</span></a>
+<a name="80"><span class="lineNum">      80 </span>                :<span class="lineCov">    1308196 :         chunks_free.erase(size_ptr_it-&gt;second);</span></a>
 <a name="81"><span class="lineNum">      81 </span>                :            :     } else {</a>
 <a name="82"><span class="lineNum">      82 </span>                :            :         // still some memory left in the chunk</a>
-<a name="83"><span class="lineNum">      83 </span>                :<span class="lineCov">     576898 :         auto it_remaining = size_to_free_chunk.emplace(size_remaining, size_ptr_it-&gt;second);</span></a>
-<a name="84"><span class="lineNum">      84 </span>                :<span class="lineCov">     576898 :         chunks_free[size_ptr_it-&gt;second] = it_remaining;</span></a>
-<a name="85"><span class="lineNum">      85 </span>                :<span class="lineCov">     576898 :         chunks_free_end.emplace(size_ptr_it-&gt;second + size_remaining, it_remaining);</span></a>
+<a name="83"><span class="lineNum">      83 </span>                :<span class="lineCov">     579495 :         auto it_remaining = size_to_free_chunk.emplace(size_remaining, size_ptr_it-&gt;second);</span></a>
+<a name="84"><span class="lineNum">      84 </span>                :<span class="lineCov">     579495 :         chunks_free[size_ptr_it-&gt;second] = it_remaining;</span></a>
+<a name="85"><span class="lineNum">      85 </span>                :<span class="lineCov">     579495 :         chunks_free_end.emplace(size_ptr_it-&gt;second + size_remaining, it_remaining);</span></a>
 <a name="86"><span class="lineNum">      86 </span>                :            :     }</a>
-<a name="87"><span class="lineNum">      87 </span>                :<span class="lineCov">    1795147 :     size_to_free_chunk.erase(size_ptr_it);</span></a>
+<a name="87"><span class="lineNum">      87 </span>                :<span class="lineCov">    1887691 :     size_to_free_chunk.erase(size_ptr_it);</span></a>
 <a name="88"><span class="lineNum">      88 </span>                :            : </a>
-<a name="89"><span class="lineNum">      89 </span>                :<span class="lineCov">    1795147 :     return reinterpret_cast&lt;void*&gt;(allocated-&gt;first);</span></a>
+<a name="89"><span class="lineNum">      89 </span>                :<span class="lineCov">    1887691 :     return reinterpret_cast&lt;void*&gt;(allocated-&gt;first);</span></a>
 <a name="90"><span class="lineNum">      90 </span>                :            : }</a>
 <a name="91"><span class="lineNum">      91 </span>                :            : </a>
-<a name="92"><span class="lineNum">      92 </span>                :<span class="lineCov">    1798522 : void Arena::free(void *ptr)</span></a>
+<a name="92"><span class="lineNum">      92 </span>                :<span class="lineCov">    1891066 : void Arena::free(void *ptr)</span></a>
 <a name="93"><span class="lineNum">      93 </span>                :            : {</a>
 <a name="94"><span class="lineNum">      94 </span>                :            :     // Freeing the nullptr pointer is OK.</a>
-<a name="95"><span class="lineNum">      95 </span>        [<span class="branchCov" title="Branch 0 was taken 1795149 times"> + </span><span class="branchCov" title="Branch 1 was taken 3373 times"> + </span>]:<span class="lineCov">    1798522 :     if (ptr == nullptr) {</span></a>
+<a name="95"><span class="lineNum">      95 </span>        [<span class="branchCov" title="Branch 0 was taken 1887693 times"> + </span><span class="branchCov" title="Branch 1 was taken 3373 times"> + </span>]:<span class="lineCov">    1891066 :     if (ptr == nullptr) {</span></a>
 <a name="96"><span class="lineNum">      96 </span>                :            :         return;</a>
 <a name="97"><span class="lineNum">      97 </span>                :            :     }</a>
 <a name="98"><span class="lineNum">      98 </span>                :            : </a>
 <a name="99"><span class="lineNum">      99 </span>                :            :     // Remove chunk from used map</a>
-<a name="100"><span class="lineNum">     100 </span>                :<span class="lineCov">    1795149 :     auto i = chunks_used.find(static_cast&lt;char*&gt;(ptr));</span></a>
-<a name="101"><span class="lineNum">     101 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 1795147 times"> + </span>]:<span class="lineCov">    1795149 :     if (i == chunks_used.end()) {</span></a>
+<a name="100"><span class="lineNum">     100 </span>                :<span class="lineCov">    1887693 :     auto i = chunks_used.find(static_cast&lt;char*&gt;(ptr));</span></a>
+<a name="101"><span class="lineNum">     101 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 1887691 times"> + </span>]:<span class="lineCov">    1887693 :     if (i == chunks_used.end()) {</span></a>
 <a name="102"><span class="lineNum">     102 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         throw std::runtime_error(&quot;Arena: invalid or double free&quot;);</span></a>
 <a name="103"><span class="lineNum">     103 </span>                :            :     }</a>
-<a name="104"><span class="lineNum">     104 </span>                :<span class="lineCov">    1795147 :     std::pair&lt;char*, size_t&gt; freed = *i;</span></a>
-<a name="105"><span class="lineNum">     105 </span>                :<span class="lineCov">    1795147 :     chunks_used.erase(i);</span></a>
+<a name="104"><span class="lineNum">     104 </span>                :<span class="lineCov">    1887691 :     std::pair&lt;char*, size_t&gt; freed = *i;</span></a>
+<a name="105"><span class="lineNum">     105 </span>                :<span class="lineCov">    1887691 :     chunks_used.erase(i);</span></a>
 <a name="106"><span class="lineNum">     106 </span>                :            : </a>
 <a name="107"><span class="lineNum">     107 </span>                :            :     // coalesce freed with previous chunk</a>
-<a name="108"><span class="lineNum">     108 </span>                :<span class="lineCov">    1795147 :     auto prev = chunks_free_end.find(freed.first);</span></a>
-<a name="109"><span class="lineNum">     109 </span>        [<span class="branchCov" title="Branch 0 was taken 537126 times"> + </span><span class="branchCov" title="Branch 1 was taken 1258021 times"> + </span>]:<span class="lineCov">    1795147 :     if (prev != chunks_free_end.end()) {</span></a>
-<a name="110"><span class="lineNum">     110 </span>                :<span class="lineCov">     537126 :         freed.first -= prev-&gt;second-&gt;first;</span></a>
-<a name="111"><span class="lineNum">     111 </span>                :<span class="lineCov">     537126 :         freed.second += prev-&gt;second-&gt;first;</span></a>
-<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">     537126 :         size_to_free_chunk.erase(prev-&gt;second);</span></a>
-<a name="113"><span class="lineNum">     113 </span>                :<span class="lineCov">     537126 :         chunks_free_end.erase(prev);</span></a>
+<a name="108"><span class="lineNum">     108 </span>                :<span class="lineCov">    1887691 :     auto prev = chunks_free_end.find(freed.first);</span></a>
+<a name="109"><span class="lineNum">     109 </span>        [<span class="branchCov" title="Branch 0 was taken 539754 times"> + </span><span class="branchCov" title="Branch 1 was taken 1347937 times"> + </span>]:<span class="lineCov">    1887691 :     if (prev != chunks_free_end.end()) {</span></a>
+<a name="110"><span class="lineNum">     110 </span>                :<span class="lineCov">     539754 :         freed.first -= prev-&gt;second-&gt;first;</span></a>
+<a name="111"><span class="lineNum">     111 </span>                :<span class="lineCov">     539754 :         freed.second += prev-&gt;second-&gt;first;</span></a>
+<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">     539754 :         size_to_free_chunk.erase(prev-&gt;second);</span></a>
+<a name="113"><span class="lineNum">     113 </span>                :<span class="lineCov">     539754 :         chunks_free_end.erase(prev);</span></a>
 <a name="114"><span class="lineNum">     114 </span>                :            :     }</a>
 <a name="115"><span class="lineNum">     115 </span>                :            : </a>
 <a name="116"><span class="lineNum">     116 </span>                :            :     // coalesce freed with chunk after freed</a>
-<a name="117"><span class="lineNum">     117 </span>                :<span class="lineCov">    1795147 :     auto next = chunks_free.find(freed.first + freed.second);</span></a>
-<a name="118"><span class="lineNum">     118 </span>        [<span class="branchCov" title="Branch 0 was taken 39772 times"> + </span><span class="branchCov" title="Branch 1 was taken 1755375 times"> + </span>]:<span class="lineCov">    1795147 :     if (next != chunks_free.end()) {</span></a>
-<a name="119"><span class="lineNum">     119 </span>                :<span class="lineCov">      39772 :         freed.second += next-&gt;second-&gt;first;</span></a>
-<a name="120"><span class="lineNum">     120 </span>                :<span class="lineCov">      39772 :         size_to_free_chunk.erase(next-&gt;second);</span></a>
-<a name="121"><span class="lineNum">     121 </span>                :<span class="lineCov">      39772 :         chunks_free.erase(next);</span></a>
+<a name="117"><span class="lineNum">     117 </span>                :<span class="lineCov">    1887691 :     auto next = chunks_free.find(freed.first + freed.second);</span></a>
+<a name="118"><span class="lineNum">     118 </span>        [<span class="branchCov" title="Branch 0 was taken 39741 times"> + </span><span class="branchCov" title="Branch 1 was taken 1847950 times"> + </span>]:<span class="lineCov">    1887691 :     if (next != chunks_free.end()) {</span></a>
+<a name="119"><span class="lineNum">     119 </span>                :<span class="lineCov">      39741 :         freed.second += next-&gt;second-&gt;first;</span></a>
+<a name="120"><span class="lineNum">     120 </span>                :<span class="lineCov">      39741 :         size_to_free_chunk.erase(next-&gt;second);</span></a>
+<a name="121"><span class="lineNum">     121 </span>                :<span class="lineCov">      39741 :         chunks_free.erase(next);</span></a>
 <a name="122"><span class="lineNum">     122 </span>                :            :     }</a>
 <a name="123"><span class="lineNum">     123 </span>                :            : </a>
 <a name="124"><span class="lineNum">     124 </span>                :            :     // Add/set space with coalesced free chunk</a>
-<a name="125"><span class="lineNum">     125 </span>                :<span class="lineCov">    1795147 :     auto it = size_to_free_chunk.emplace(freed.second, freed.first);</span></a>
-<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">    1795147 :     chunks_free[freed.first] = it;</span></a>
-<a name="127"><span class="lineNum">     127 </span>                :<span class="lineCov">    1795147 :     chunks_free_end[freed.first + freed.second] = it;</span></a>
+<a name="125"><span class="lineNum">     125 </span>                :<span class="lineCov">    1887691 :     auto it = size_to_free_chunk.emplace(freed.second, freed.first);</span></a>
+<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">    1887691 :     chunks_free[freed.first] = it;</span></a>
+<a name="127"><span class="lineNum">     127 </span>                :<span class="lineCov">    1887691 :     chunks_free_end[freed.first + freed.second] = it;</span></a>
 <a name="128"><span class="lineNum">     128 </span>                :            : }</a>
 <a name="129"><span class="lineNum">     129 </span>                :            : </a>
 <a name="130"><span class="lineNum">     130 </span>                :<span class="lineCov">         34 : Arena::Stats Arena::stats() const</span></a>
@@ -296,15 +296,15 @@
 <a name="225"><span class="lineNum">     225 </span>                :            :     size_t page_size;</a>
 <a name="226"><span class="lineNum">     226 </span>                :            : };</a>
 <a name="227"><span class="lineNum">     227 </span>                :            : </a>
-<a name="228"><span class="lineNum">     228 </span>                :<span class="lineCov">        909 : PosixLockedPageAllocator::PosixLockedPageAllocator()</span></a>
+<a name="228"><span class="lineNum">     228 </span>                :<span class="lineCov">        910 : PosixLockedPageAllocator::PosixLockedPageAllocator()</span></a>
 <a name="229"><span class="lineNum">     229 </span>                :            : {</a>
 <a name="230"><span class="lineNum">     230 </span>                :            :     // Determine system page size in bytes</a>
 <a name="231"><span class="lineNum">     231 </span>                :            : #if defined(PAGESIZE) // defined in limits.h</a>
 <a name="232"><span class="lineNum">     232 </span>                :            :     page_size = PAGESIZE;</a>
 <a name="233"><span class="lineNum">     233 </span>                :            : #else                   // assume some POSIX OS</a>
-<a name="234"><span class="lineNum">     234 </span>                :<span class="lineCov">        909 :     page_size = sysconf(_SC_PAGESIZE);</span></a>
+<a name="234"><span class="lineNum">     234 </span>                :<span class="lineCov">        910 :     page_size = sysconf(_SC_PAGESIZE);</span></a>
 <a name="235"><span class="lineNum">     235 </span>                :            : #endif</a>
-<a name="236"><span class="lineNum">     236 </span>                :<span class="lineCov">        909 : }</span></a>
+<a name="236"><span class="lineNum">     236 </span>                :<span class="lineCov">        910 : }</span></a>
 <a name="237"><span class="lineNum">     237 </span>                :            : </a>
 <a name="238"><span class="lineNum">     238 </span>                :            : // Some systems (at least OS X) do not define MAP_ANONYMOUS yet and define</a>
 <a name="239"><span class="lineNum">     239 </span>                :            : // MAP_ANON which is deprecated</a>
@@ -312,38 +312,38 @@
 <a name="241"><span class="lineNum">     241 </span>                :            : #define MAP_ANONYMOUS MAP_ANON</a>
 <a name="242"><span class="lineNum">     242 </span>                :            : #endif</a>
 <a name="243"><span class="lineNum">     243 </span>                :            : </a>
-<a name="244"><span class="lineNum">     244 </span>                :<span class="lineCov">        910 : void *PosixLockedPageAllocator::AllocateLocked(size_t len, bool *lockingSuccess)</span></a>
+<a name="244"><span class="lineNum">     244 </span>                :<span class="lineCov">        911 : void *PosixLockedPageAllocator::AllocateLocked(size_t len, bool *lockingSuccess)</span></a>
 <a name="245"><span class="lineNum">     245 </span>                :            : {</a>
-<a name="246"><span class="lineNum">     246 </span>                :<span class="lineCov">        910 :     void *addr;</span></a>
-<a name="247"><span class="lineNum">     247 </span>                :<span class="lineCov">        910 :     len = align_up(len, page_size);</span></a>
-<a name="248"><span class="lineNum">     248 </span>                :<span class="lineCov">        910 :     addr = mmap(nullptr, len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);</span></a>
-<a name="249"><span class="lineNum">     249 </span>        [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        910 :     if (addr == MAP_FAILED) {</span></a>
+<a name="246"><span class="lineNum">     246 </span>                :<span class="lineCov">        911 :     void *addr;</span></a>
+<a name="247"><span class="lineNum">     247 </span>                :<span class="lineCov">        911 :     len = align_up(len, page_size);</span></a>
+<a name="248"><span class="lineNum">     248 </span>                :<span class="lineCov">        911 :     addr = mmap(nullptr, len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);</span></a>
+<a name="249"><span class="lineNum">     249 </span>        [<span class="branchCov" title="Branch 0 was taken 911 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        911 :     if (addr == MAP_FAILED) {</span></a>
 <a name="250"><span class="lineNum">     250 </span>                :            :         return nullptr;</a>
 <a name="251"><span class="lineNum">     251 </span>                :            :     }</a>
-<a name="252"><span class="lineNum">     252 </span>        [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        910 :     if (addr) {</span></a>
-<a name="253"><span class="lineNum">     253 </span>                :<span class="lineCov">        910 :         *lockingSuccess = mlock(addr, len) == 0;</span></a>
+<a name="252"><span class="lineNum">     252 </span>        [<span class="branchCov" title="Branch 0 was taken 911 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        911 :     if (addr) {</span></a>
+<a name="253"><span class="lineNum">     253 </span>                :<span class="lineCov">        911 :         *lockingSuccess = mlock(addr, len) == 0;</span></a>
 <a name="254"><span class="lineNum">     254 </span>                :            : #if defined(MADV_DONTDUMP) // Linux</a>
-<a name="255"><span class="lineNum">     255 </span>                :<span class="lineCov">        910 :         madvise(addr, len, MADV_DONTDUMP);</span></a>
+<a name="255"><span class="lineNum">     255 </span>                :<span class="lineCov">        911 :         madvise(addr, len, MADV_DONTDUMP);</span></a>
 <a name="256"><span class="lineNum">     256 </span>                :            : #elif defined(MADV_NOCORE) // FreeBSD</a>
 <a name="257"><span class="lineNum">     257 </span>                :            :         madvise(addr, len, MADV_NOCORE);</a>
 <a name="258"><span class="lineNum">     258 </span>                :            : #endif</a>
 <a name="259"><span class="lineNum">     259 </span>                :            :     }</a>
 <a name="260"><span class="lineNum">     260 </span>                :            :     return addr;</a>
 <a name="261"><span class="lineNum">     261 </span>                :            : }</a>
-<a name="262"><span class="lineNum">     262 </span>                :<span class="lineCov">        910 : void PosixLockedPageAllocator::FreeLocked(void* addr, size_t len)</span></a>
+<a name="262"><span class="lineNum">     262 </span>                :<span class="lineCov">        911 : void PosixLockedPageAllocator::FreeLocked(void* addr, size_t len)</span></a>
 <a name="263"><span class="lineNum">     263 </span>                :            : {</a>
-<a name="264"><span class="lineNum">     264 </span>                :<span class="lineCov">        910 :     len = align_up(len, page_size);</span></a>
-<a name="265"><span class="lineNum">     265 </span>                :<span class="lineCov">        910 :     memory_cleanse(addr, len);</span></a>
-<a name="266"><span class="lineNum">     266 </span>                :<span class="lineCov">        910 :     munlock(addr, len);</span></a>
-<a name="267"><span class="lineNum">     267 </span>                :<span class="lineCov">        910 :     munmap(addr, len);</span></a>
-<a name="268"><span class="lineNum">     268 </span>                :<span class="lineCov">        910 : }</span></a>
-<a name="269"><span class="lineNum">     269 </span>                :<span class="lineCov">        909 : size_t PosixLockedPageAllocator::GetLimit()</span></a>
+<a name="264"><span class="lineNum">     264 </span>                :<span class="lineCov">        911 :     len = align_up(len, page_size);</span></a>
+<a name="265"><span class="lineNum">     265 </span>                :<span class="lineCov">        911 :     memory_cleanse(addr, len);</span></a>
+<a name="266"><span class="lineNum">     266 </span>                :<span class="lineCov">        911 :     munlock(addr, len);</span></a>
+<a name="267"><span class="lineNum">     267 </span>                :<span class="lineCov">        911 :     munmap(addr, len);</span></a>
+<a name="268"><span class="lineNum">     268 </span>                :<span class="lineCov">        911 : }</span></a>
+<a name="269"><span class="lineNum">     269 </span>                :<span class="lineCov">        910 : size_t PosixLockedPageAllocator::GetLimit()</span></a>
 <a name="270"><span class="lineNum">     270 </span>                :            : {</a>
 <a name="271"><span class="lineNum">     271 </span>                :            : #ifdef RLIMIT_MEMLOCK</a>
-<a name="272"><span class="lineNum">     272 </span>                :<span class="lineCov">        909 :     struct rlimit rlim;</span></a>
-<a name="273"><span class="lineNum">     273 </span>        [<span class="branchCov" title="Branch 0 was taken 909 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        909 :     if (getrlimit(RLIMIT_MEMLOCK, &amp;rlim) == 0) {</span></a>
-<a name="274"><span class="lineNum">     274 </span>        [<span class="branchCov" title="Branch 0 was taken 909 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        909 :         if (rlim.rlim_cur != RLIM_INFINITY) {</span></a>
-<a name="275"><span class="lineNum">     275 </span>                :<span class="lineCov">        909 :             return rlim.rlim_cur;</span></a>
+<a name="272"><span class="lineNum">     272 </span>                :<span class="lineCov">        910 :     struct rlimit rlim;</span></a>
+<a name="273"><span class="lineNum">     273 </span>        [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        910 :     if (getrlimit(RLIMIT_MEMLOCK, &amp;rlim) == 0) {</span></a>
+<a name="274"><span class="lineNum">     274 </span>        [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        910 :         if (rlim.rlim_cur != RLIM_INFINITY) {</span></a>
+<a name="275"><span class="lineNum">     275 </span>                :<span class="lineCov">        910 :             return rlim.rlim_cur;</span></a>
 <a name="276"><span class="lineNum">     276 </span>                :            :         }</a>
 <a name="277"><span class="lineNum">     277 </span>                :            :     }</a>
 <a name="278"><span class="lineNum">     278 </span>                :            : #endif</a>
@@ -354,45 +354,45 @@
 <a name="283"><span class="lineNum">     283 </span>                :            : /*******************************************************************************/</a>
 <a name="284"><span class="lineNum">     284 </span>                :            : // Implementation: LockedPool</a>
 <a name="285"><span class="lineNum">     285 </span>                :            : </a>
-<a name="286"><span class="lineNum">     286 </span>                :<span class="lineCov">        910 : LockedPool::LockedPool(std::unique_ptr&lt;LockedPageAllocator&gt; allocator_in, LockingFailed_Callback lf_cb_in):</span></a>
-<a name="287"><span class="lineNum">     287 </span>                :<span class="lineCov">        910 :     allocator(std::move(allocator_in)), lf_cb(lf_cb_in), cumulative_bytes_locked(0)</span></a>
+<a name="286"><span class="lineNum">     286 </span>                :<span class="lineCov">        911 : LockedPool::LockedPool(std::unique_ptr&lt;LockedPageAllocator&gt; allocator_in, LockingFailed_Callback lf_cb_in):</span></a>
+<a name="287"><span class="lineNum">     287 </span>                :<span class="lineCov">        911 :     allocator(std::move(allocator_in)), lf_cb(lf_cb_in), cumulative_bytes_locked(0)</span></a>
 <a name="288"><span class="lineNum">     288 </span>                :            : {</a>
-<a name="289"><span class="lineNum">     289 </span>                :<span class="lineCov">        910 : }</span></a>
+<a name="289"><span class="lineNum">     289 </span>                :<span class="lineCov">        911 : }</span></a>
 <a name="290"><span class="lineNum">     290 </span>                :            : </a>
-<a name="291"><span class="lineNum">     291 </span>                :<span class="lineCov">        910 : LockedPool::~LockedPool()</span></a>
+<a name="291"><span class="lineNum">     291 </span>                :<span class="lineCov">        911 : LockedPool::~LockedPool()</span></a>
 <a name="292"><span class="lineNum">     292 </span>                :            : {</a>
-<a name="293"><span class="lineNum">     293 </span>                :<span class="lineCov">        910 : }</span></a>
-<a name="294"><span class="lineNum">     294 </span>                :<span class="lineCov">    1789916 : void* LockedPool::alloc(size_t size)</span></a>
+<a name="293"><span class="lineNum">     293 </span>                :<span class="lineCov">        911 : }</span></a>
+<a name="294"><span class="lineNum">     294 </span>                :<span class="lineCov">    1882460 : void* LockedPool::alloc(size_t size)</span></a>
 <a name="295"><span class="lineNum">     295 </span>                :            : {</a>
-<a name="296"><span class="lineNum">     296 </span>                :<span class="lineCov">    3579832 :     std::lock_guard&lt;std::mutex&gt; lock(mutex);</span></a>
+<a name="296"><span class="lineNum">     296 </span>                :<span class="lineCov">    3764920 :     std::lock_guard&lt;std::mutex&gt; lock(mutex);</span></a>
 <a name="297"><span class="lineNum">     297 </span>                :            : </a>
 <a name="298"><span class="lineNum">     298 </span>                :            :     // Don't handle impossible sizes</a>
-<a name="299"><span class="lineNum">     299 </span>        [<span class="branchCov" title="Branch 0 was taken 1789914 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">    1789916 :     if (size == 0 || size &gt; ARENA_SIZE)</span></a>
+<a name="299"><span class="lineNum">     299 </span>        [<span class="branchCov" title="Branch 0 was taken 1882458 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">    1882460 :     if (size == 0 || size &gt; ARENA_SIZE)</span></a>
 <a name="300"><span class="lineNum">     300 </span>                :            :         return nullptr;</a>
 <a name="301"><span class="lineNum">     301 </span>                :            : </a>
 <a name="302"><span class="lineNum">     302 </span>                :            :     // Try allocating from each current arena</a>
-<a name="303"><span class="lineNum">     303 </span>        [<span class="branchCov" title="Branch 0 was taken 1824046 times"> + </span><span class="branchCov" title="Branch 1 was taken 914 times"> + </span>]:<span class="lineCov">    1824960 :     for (auto &amp;arena: arenas) {</span></a>
-<a name="304"><span class="lineNum">     304 </span>        [<span class="branchCov" title="Branch 0 was taken 1824046 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1824046 :         void *addr = arena.alloc(size);</span></a>
-<a name="305"><span class="lineNum">     305 </span>        [<span class="branchCov" title="Branch 0 was taken 35046 times"> + </span><span class="branchCov" title="Branch 1 was taken 1789000 times"> + </span>]:<span class="lineCov">    1824046 :         if (addr) {</span></a>
+<a name="303"><span class="lineNum">     303 </span>        [<span class="branchCov" title="Branch 0 was taken 1916589 times"> + </span><span class="branchCov" title="Branch 1 was taken 915 times"> + </span>]:<span class="lineCov">    1917504 :     for (auto &amp;arena: arenas) {</span></a>
+<a name="304"><span class="lineNum">     304 </span>        [<span class="branchCov" title="Branch 0 was taken 1916589 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1916589 :         void *addr = arena.alloc(size);</span></a>
+<a name="305"><span class="lineNum">     305 </span>        [<span class="branchCov" title="Branch 0 was taken 35046 times"> + </span><span class="branchCov" title="Branch 1 was taken 1881543 times"> + </span>]:<span class="lineCov">    1916589 :         if (addr) {</span></a>
 <a name="306"><span class="lineNum">     306 </span>                :            :             return addr;</a>
 <a name="307"><span class="lineNum">     307 </span>                :            :         }</a>
 <a name="308"><span class="lineNum">     308 </span>                :            :     }</a>
 <a name="309"><span class="lineNum">     309 </span>                :            :     // If that fails, create a new one</a>
-<a name="310"><span class="lineNum">     310 </span>  [<span class="branchCov" title="Branch 0 was taken 914 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 913 times"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">        914 :     if (new_arena(ARENA_SIZE, ARENA_ALIGN)) {</span></a>
-<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 913 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        913 :         return arenas.back().alloc(size);</span></a>
+<a name="310"><span class="lineNum">     310 </span>  [<span class="branchCov" title="Branch 0 was taken 915 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 914 times"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">        915 :     if (new_arena(ARENA_SIZE, ARENA_ALIGN)) {</span></a>
+<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 914 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        914 :         return arenas.back().alloc(size);</span></a>
 <a name="312"><span class="lineNum">     312 </span>                :            :     }</a>
 <a name="313"><span class="lineNum">     313 </span>                :            :     return nullptr;</a>
 <a name="314"><span class="lineNum">     314 </span>                :            : }</a>
 <a name="315"><span class="lineNum">     315 </span>                :            : </a>
-<a name="316"><span class="lineNum">     316 </span>                :<span class="lineCov">    1789914 : void LockedPool::free(void *ptr)</span></a>
+<a name="316"><span class="lineNum">     316 </span>                :<span class="lineCov">    1882458 : void LockedPool::free(void *ptr)</span></a>
 <a name="317"><span class="lineNum">     317 </span>                :            : {</a>
-<a name="318"><span class="lineNum">     318 </span>                :<span class="lineCov">    1789914 :     std::lock_guard&lt;std::mutex&gt; lock(mutex);</span></a>
+<a name="318"><span class="lineNum">     318 </span>                :<span class="lineCov">    1882458 :     std::lock_guard&lt;std::mutex&gt; lock(mutex);</span></a>
 <a name="319"><span class="lineNum">     319 </span>                :            :     // TODO we can do better than this linear search by keeping a map of arena</a>
 <a name="320"><span class="lineNum">     320 </span>                :            :     // extents to arena, and looking up the address.</a>
-<a name="321"><span class="lineNum">     321 </span>        [<span class="branchCov" title="Branch 0 was taken 1824957 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1824957 :     for (auto &amp;arena: arenas) {</span></a>
-<a name="322"><span class="lineNum">     322 </span>        [<span class="branchCov" title="Branch 0 was taken 1789914 times"> + </span><span class="branchCov" title="Branch 1 was taken 35043 times"> + </span>]:<span class="lineCov">    1824957 :         if (arena.addressInArena(ptr)) {</span></a>
-<a name="323"><span class="lineNum">     323 </span>        [<span class="branchCov" title="Branch 0 was taken 1789913 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    1789914 :             arena.free(ptr);</span></a>
-<a name="324"><span class="lineNum">     324 </span>        [<span class="branchCov" title="Branch 0 was taken 1789913 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    3579826 :             return;</span></a>
+<a name="321"><span class="lineNum">     321 </span>        [<span class="branchCov" title="Branch 0 was taken 1917501 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1917501 :     for (auto &amp;arena: arenas) {</span></a>
+<a name="322"><span class="lineNum">     322 </span>        [<span class="branchCov" title="Branch 0 was taken 1882458 times"> + </span><span class="branchCov" title="Branch 1 was taken 35043 times"> + </span>]:<span class="lineCov">    1917501 :         if (arena.addressInArena(ptr)) {</span></a>
+<a name="323"><span class="lineNum">     323 </span>        [<span class="branchCov" title="Branch 0 was taken 1882457 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    1882458 :             arena.free(ptr);</span></a>
+<a name="324"><span class="lineNum">     324 </span>        [<span class="branchCov" title="Branch 0 was taken 1882457 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    3764914 :             return;</span></a>
 <a name="325"><span class="lineNum">     325 </span>                :            :         }</a>
 <a name="326"><span class="lineNum">     326 </span>                :            :     }</a>
 <a name="327"><span class="lineNum">     327 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     throw std::runtime_error(&quot;LockedPool: invalid address not pointing to any arena&quot;);</span></a>
@@ -413,51 +413,51 @@
 <a name="342"><span class="lineNum">     342 </span>        [<span class="branchCov" title="Branch 0 was taken 14 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         14 :     return r;</span></a>
 <a name="343"><span class="lineNum">     343 </span>                :            : }</a>
 <a name="344"><span class="lineNum">     344 </span>                :            : </a>
-<a name="345"><span class="lineNum">     345 </span>                :<span class="lineCov">        914 : bool LockedPool::new_arena(size_t size, size_t align)</span></a>
+<a name="345"><span class="lineNum">     345 </span>                :<span class="lineCov">        915 : bool LockedPool::new_arena(size_t size, size_t align)</span></a>
 <a name="346"><span class="lineNum">     346 </span>                :            : {</a>
-<a name="347"><span class="lineNum">     347 </span>                :<span class="lineCov">        914 :     bool locked;</span></a>
+<a name="347"><span class="lineNum">     347 </span>                :<span class="lineCov">        915 :     bool locked;</span></a>
 <a name="348"><span class="lineNum">     348 </span>                :            :     // If this is the first arena, handle this specially: Cap the upper size</a>
 <a name="349"><span class="lineNum">     349 </span>                :            :     // by the process limit. This makes sure that the first arena will at least</a>
 <a name="350"><span class="lineNum">     350 </span>                :            :     // be locked. An exception to this is if the process limit is 0:</a>
 <a name="351"><span class="lineNum">     351 </span>                :            :     // in this case no memory can be locked at all so we'll skip past this logic.</a>
-<a name="352"><span class="lineNum">     352 </span>        [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchCov" title="Branch 1 was taken 4 times"> + </span>]:<span class="lineCov">        914 :     if (arenas.empty()) {</span></a>
-<a name="353"><span class="lineNum">     353 </span>                :<span class="lineCov">        910 :         size_t limit = allocator-&gt;GetLimit();</span></a>
-<a name="354"><span class="lineNum">     354 </span>        [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        910 :         if (limit &gt; 0) {</span></a>
-<a name="355"><span class="lineNum">     355 </span>        [<span class="branchCov" title="Branch 0 was taken 909 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">       1819 :             size = std::min(size, limit);</span></a>
+<a name="352"><span class="lineNum">     352 </span>        [<span class="branchCov" title="Branch 0 was taken 911 times"> + </span><span class="branchCov" title="Branch 1 was taken 4 times"> + </span>]:<span class="lineCov">        915 :     if (arenas.empty()) {</span></a>
+<a name="353"><span class="lineNum">     353 </span>                :<span class="lineCov">        911 :         size_t limit = allocator-&gt;GetLimit();</span></a>
+<a name="354"><span class="lineNum">     354 </span>        [<span class="branchCov" title="Branch 0 was taken 911 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        911 :         if (limit &gt; 0) {</span></a>
+<a name="355"><span class="lineNum">     355 </span>        [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">       1821 :             size = std::min(size, limit);</span></a>
 <a name="356"><span class="lineNum">     356 </span>                :            :         }</a>
 <a name="357"><span class="lineNum">     357 </span>                :            :     }</a>
-<a name="358"><span class="lineNum">     358 </span>                :<span class="lineCov">        914 :     void *addr = allocator-&gt;AllocateLocked(size, &amp;locked);</span></a>
-<a name="359"><span class="lineNum">     359 </span>        [<span class="branchCov" title="Branch 0 was taken 913 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">        914 :     if (!addr) {</span></a>
+<a name="358"><span class="lineNum">     358 </span>                :<span class="lineCov">        915 :     void *addr = allocator-&gt;AllocateLocked(size, &amp;locked);</span></a>
+<a name="359"><span class="lineNum">     359 </span>        [<span class="branchCov" title="Branch 0 was taken 914 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">        915 :     if (!addr) {</span></a>
 <a name="360"><span class="lineNum">     360 </span>                :            :         return false;</a>
 <a name="361"><span class="lineNum">     361 </span>                :            :     }</a>
-<a name="362"><span class="lineNum">     362 </span>        [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span>]:<span class="lineCov">        913 :     if (locked) {</span></a>
-<a name="363"><span class="lineNum">     363 </span>                :<span class="lineCov">        910 :         cumulative_bytes_locked += size;</span></a>
+<a name="362"><span class="lineNum">     362 </span>        [<span class="branchCov" title="Branch 0 was taken 911 times"> + </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span>]:<span class="lineCov">        914 :     if (locked) {</span></a>
+<a name="363"><span class="lineNum">     363 </span>                :<span class="lineCov">        911 :         cumulative_bytes_locked += size;</span></a>
 <a name="364"><span class="lineNum">     364 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          3 :     } else if (lf_cb) { // Call the locking-failed callback if locking failed</span></a>
 <a name="365"><span class="lineNum">     365 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :         if (!lf_cb()) { // If the callback returns false, free the memory and fail, otherwise consider the user warned and proceed.</span></a>
 <a name="366"><span class="lineNum">     366 </span>                :<span class="lineNoCov">          0 :             allocator-&gt;FreeLocked(addr, size);</span></a>
 <a name="367"><span class="lineNum">     367 </span>                :<span class="lineNoCov">          0 :             return false;</span></a>
 <a name="368"><span class="lineNum">     368 </span>                :            :         }</a>
 <a name="369"><span class="lineNum">     369 </span>                :            :     }</a>
-<a name="370"><span class="lineNum">     370 </span>                :<span class="lineCov">        913 :     arenas.emplace_back(allocator.get(), addr, size, align);</span></a>
-<a name="371"><span class="lineNum">     371 </span>                :<span class="lineCov">        913 :     return true;</span></a>
+<a name="370"><span class="lineNum">     370 </span>                :<span class="lineCov">        914 :     arenas.emplace_back(allocator.get(), addr, size, align);</span></a>
+<a name="371"><span class="lineNum">     371 </span>                :<span class="lineCov">        914 :     return true;</span></a>
 <a name="372"><span class="lineNum">     372 </span>                :            : }</a>
 <a name="373"><span class="lineNum">     373 </span>                :            : </a>
-<a name="374"><span class="lineNum">     374 </span>                :<span class="lineCov">        913 : LockedPool::LockedPageArena::LockedPageArena(LockedPageAllocator *allocator_in, void *base_in, size_t size_in, size_t align_in):</span></a>
-<a name="375"><span class="lineNum">     375 </span>                :<span class="lineCov">        913 :     Arena(base_in, size_in, align_in), base(base_in), size(size_in), allocator(allocator_in)</span></a>
+<a name="374"><span class="lineNum">     374 </span>                :<span class="lineCov">        914 : LockedPool::LockedPageArena::LockedPageArena(LockedPageAllocator *allocator_in, void *base_in, size_t size_in, size_t align_in):</span></a>
+<a name="375"><span class="lineNum">     375 </span>                :<span class="lineCov">        914 :     Arena(base_in, size_in, align_in), base(base_in), size(size_in), allocator(allocator_in)</span></a>
 <a name="376"><span class="lineNum">     376 </span>                :            : {</a>
-<a name="377"><span class="lineNum">     377 </span>                :<span class="lineCov">        913 : }</span></a>
-<a name="378"><span class="lineNum">     378 </span>                :<span class="lineCov">        913 : LockedPool::LockedPageArena::~LockedPageArena()</span></a>
+<a name="377"><span class="lineNum">     377 </span>                :<span class="lineCov">        914 : }</span></a>
+<a name="378"><span class="lineNum">     378 </span>                :<span class="lineCov">        914 : LockedPool::LockedPageArena::~LockedPageArena()</span></a>
 <a name="379"><span class="lineNum">     379 </span>                :            : {</a>
-<a name="380"><span class="lineNum">     380 </span>                :<span class="lineCov">        913 :     allocator-&gt;FreeLocked(base, size);</span></a>
-<a name="381"><span class="lineNum">     381 </span>                :<span class="lineCov">        913 : }</span></a>
+<a name="380"><span class="lineNum">     380 </span>                :<span class="lineCov">        914 :     allocator-&gt;FreeLocked(base, size);</span></a>
+<a name="381"><span class="lineNum">     381 </span>                :<span class="lineCov">        914 : }</span></a>
 <a name="382"><span class="lineNum">     382 </span>                :            : </a>
 <a name="383"><span class="lineNum">     383 </span>                :            : /*******************************************************************************/</a>
 <a name="384"><span class="lineNum">     384 </span>                :            : // Implementation: LockedPoolManager</a>
 <a name="385"><span class="lineNum">     385 </span>                :            : //</a>
-<a name="386"><span class="lineNum">     386 </span>                :<span class="lineCov">        909 : LockedPoolManager::LockedPoolManager(std::unique_ptr&lt;LockedPageAllocator&gt; allocator_in):</span></a>
-<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">        909 :     LockedPool(std::move(allocator_in), &amp;LockedPoolManager::LockingFailed)</span></a>
+<a name="386"><span class="lineNum">     386 </span>                :<span class="lineCov">        910 : LockedPoolManager::LockedPoolManager(std::unique_ptr&lt;LockedPageAllocator&gt; allocator_in):</span></a>
+<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">        910 :     LockedPool(std::move(allocator_in), &amp;LockedPoolManager::LockingFailed)</span></a>
 <a name="388"><span class="lineNum">     388 </span>                :            : {</a>
-<a name="389"><span class="lineNum">     389 </span>                :<span class="lineCov">        909 : }</span></a>
+<a name="389"><span class="lineNum">     389 </span>                :<span class="lineCov">        910 : }</span></a>
 <a name="390"><span class="lineNum">     390 </span>                :            : </a>
 <a name="391"><span class="lineNum">     391 </span>                :<span class="lineCov">          1 : bool LockedPoolManager::LockingFailed()</span></a>
 <a name="392"><span class="lineNum">     392 </span>                :            : {</a>
@@ -465,7 +465,7 @@
 <a name="394"><span class="lineNum">     394 </span>                :<span class="lineCov">          1 :     return true;</span></a>
 <a name="395"><span class="lineNum">     395 </span>                :            : }</a>
 <a name="396"><span class="lineNum">     396 </span>                :            : </a>
-<a name="397"><span class="lineNum">     397 </span>                :<span class="lineCov">        909 : void LockedPoolManager::CreateInstance()</span></a>
+<a name="397"><span class="lineNum">     397 </span>                :<span class="lineCov">        910 : void LockedPoolManager::CreateInstance()</span></a>
 <a name="398"><span class="lineNum">     398 </span>                :            : {</a>
 <a name="399"><span class="lineNum">     399 </span>                :            :     // Using a local static instance guarantees that the object is initialized</a>
 <a name="400"><span class="lineNum">     400 </span>                :            :     // when it's first needed and also deinitialized after all objects that use</a>
@@ -475,11 +475,11 @@
 <a name="404"><span class="lineNum">     404 </span>                :            : #ifdef WIN32</a>
 <a name="405"><span class="lineNum">     405 </span>                :            :     std::unique_ptr&lt;LockedPageAllocator&gt; allocator(new Win32LockedPageAllocator());</a>
 <a name="406"><span class="lineNum">     406 </span>                :            : #else</a>
-<a name="407"><span class="lineNum">     407 </span>                :<span class="lineCov">        909 :     std::unique_ptr&lt;LockedPageAllocator&gt; allocator(new PosixLockedPageAllocator());</span></a>
+<a name="407"><span class="lineNum">     407 </span>                :<span class="lineCov">        910 :     std::unique_ptr&lt;LockedPageAllocator&gt; allocator(new PosixLockedPageAllocator());</span></a>
 <a name="408"><span class="lineNum">     408 </span>                :            : #endif</a>
-<a name="409"><span class="lineNum">     409 </span>  [<span class="branchCov" title="Branch 0 was taken 909 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 909 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        909 :     static LockedPoolManager instance(std::move(allocator));</span></a>
-<a name="410"><span class="lineNum">     410 </span>                :<span class="lineCov">        909 :     LockedPoolManager::_instance = &amp;instance;</span></a>
-<a name="411"><span class="lineNum">     411 </span>                :<span class="lineCov">        909 : }</span></a>
+<a name="409"><span class="lineNum">     409 </span>  [<span class="branchCov" title="Branch 0 was taken 910 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 910 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        910 :     static LockedPoolManager instance(std::move(allocator));</span></a>
+<a name="410"><span class="lineNum">     410 </span>                :<span class="lineCov">        910 :     LockedPoolManager::_instance = &amp;instance;</span></a>
+<a name="411"><span class="lineNum">     411 </span>                :<span class="lineCov">        910 : }</span></a>
 </pre>
       </td>
     </tr>

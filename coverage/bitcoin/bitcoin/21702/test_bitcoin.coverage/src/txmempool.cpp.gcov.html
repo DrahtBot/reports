@@ -49,9 +49,9 @@
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">352</td>
+            <td class="headerCovTableEntry">353</td>
             <td class="headerCovTableEntry">872</td>
-            <td class="headerCovTableEntryLo">40.4 %</td>
+            <td class="headerCovTableEntryLo">40.5 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -123,9 +123,9 @@
 <a name="51"><span class="lineNum">      51 </span>                :<span class="lineNoCov">          0 :     lockPoints = lp;</span></a>
 <a name="52"><span class="lineNum">      52 </span>                :<span class="lineNoCov">          0 : }</span></a>
 <a name="53"><span class="lineNum">      53 </span>                :            : </a>
-<a name="54"><span class="lineNum">      54 </span>                :<span class="lineCov">   76905859 : size_t CTxMemPoolEntry::GetTxSize() const</span></a>
+<a name="54"><span class="lineNum">      54 </span>                :<span class="lineCov">   78011395 : size_t CTxMemPoolEntry::GetTxSize() const</span></a>
 <a name="55"><span class="lineNum">      55 </span>                :            : {</a>
-<a name="56"><span class="lineNum">      56 </span>                :<span class="lineCov">   76905859 :     return GetVirtualTransactionSize(nTxWeight, sigOpCost);</span></a>
+<a name="56"><span class="lineNum">      56 </span>                :<span class="lineCov">   78011395 :     return GetVirtualTransactionSize(nTxWeight, sigOpCost);</span></a>
 <a name="57"><span class="lineNum">      57 </span>                :            : }</a>
 <a name="58"><span class="lineNum">      58 </span>                :            : </a>
 <a name="59"><span class="lineNum">      59 </span>                :            : // Update the given tx for any in-mempool descendants.</a>
@@ -178,24 +178,24 @@
 <a name="106"><span class="lineNum">     106 </span>                :            : // for each entry, look for descendants that are outside vHashesToUpdate, and</a>
 <a name="107"><span class="lineNum">     107 </span>                :            : // add fee/size information for such descendants to the parent.</a>
 <a name="108"><span class="lineNum">     108 </span>                :            : // for each such descendant, also update the ancestor state to include the parent.</a>
-<a name="109"><span class="lineNum">     109 </span>                :<span class="lineCov">         15 : void CTxMemPool::UpdateTransactionsFromBlock(const std::vector&lt;uint256&gt; &amp;vHashesToUpdate)</span></a>
+<a name="109"><span class="lineNum">     109 </span>                :<span class="lineCov">         17 : void CTxMemPool::UpdateTransactionsFromBlock(const std::vector&lt;uint256&gt; &amp;vHashesToUpdate)</span></a>
 <a name="110"><span class="lineNum">     110 </span>                :            : {</a>
-<a name="111"><span class="lineNum">     111 </span>        [<span class="branchCov" title="Branch 0 was taken 15 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         15 :     AssertLockHeld(cs);</span></a>
+<a name="111"><span class="lineNum">     111 </span>        [<span class="branchCov" title="Branch 0 was taken 17 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         17 :     AssertLockHeld(cs);</span></a>
 <a name="112"><span class="lineNum">     112 </span>                :            :     // For each entry in vHashesToUpdate, store the set of in-mempool, but not</a>
 <a name="113"><span class="lineNum">     113 </span>                :            :     // in-vHashesToUpdate transactions, so that we don't have to recalculate</a>
 <a name="114"><span class="lineNum">     114 </span>                :            :     // descendants when we come across a previously seen entry.</a>
-<a name="115"><span class="lineNum">     115 </span>        [<span class="branchCov" title="Branch 0 was taken 15 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         15 :     cacheMap mapMemPoolDescendantsToUpdate;</span></a>
+<a name="115"><span class="lineNum">     115 </span>        [<span class="branchCov" title="Branch 0 was taken 17 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         17 :     cacheMap mapMemPoolDescendantsToUpdate;</span></a>
 <a name="116"><span class="lineNum">     116 </span>                :            : </a>
 <a name="117"><span class="lineNum">     117 </span>                :            :     // Use a set for lookups into vHashesToUpdate (these entries are already</a>
 <a name="118"><span class="lineNum">     118 </span>                :            :     // accounted for in the state of their ancestors)</a>
-<a name="119"><span class="lineNum">     119 </span>        [<span class="branchCov" title="Branch 0 was taken 15 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         30 :     std::set&lt;uint256&gt; setAlreadyIncluded(vHashesToUpdate.begin(), vHashesToUpdate.end());</span></a>
+<a name="119"><span class="lineNum">     119 </span>        [<span class="branchCov" title="Branch 0 was taken 17 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         34 :     std::set&lt;uint256&gt; setAlreadyIncluded(vHashesToUpdate.begin(), vHashesToUpdate.end());</span></a>
 <a name="120"><span class="lineNum">     120 </span>                :            : </a>
 <a name="121"><span class="lineNum">     121 </span>                :            :     // Iterate in reverse, so that whenever we are looking at a transaction</a>
 <a name="122"><span class="lineNum">     122 </span>                :            :     // we are sure that all in-mempool descendants have already been processed.</a>
 <a name="123"><span class="lineNum">     123 </span>                :            :     // This maximizes the benefit of the descendant cache and guarantees that</a>
 <a name="124"><span class="lineNum">     124 </span>                :            :     // CTxMemPool::m_children will be updated, an assumption made in</a>
 <a name="125"><span class="lineNum">     125 </span>                :            :     // UpdateForDescendants.</a>
-<a name="126"><span class="lineNum">     126 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15 times"> + </span>]:<span class="lineCov">         15 :     for (const uint256 &amp;hash : reverse_iterate(vHashesToUpdate)) {</span></a>
+<a name="126"><span class="lineNum">     126 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 17 times"> + </span>]:<span class="lineCov">         17 :     for (const uint256 &amp;hash : reverse_iterate(vHashesToUpdate)) {</span></a>
 <a name="127"><span class="lineNum">     127 </span>                :            :         // calculate children from mapNextTx</a>
 <a name="128"><span class="lineNum">     128 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         txiter it = mapTx.find(hash);</span></a>
 <a name="129"><span class="lineNum">     129 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (it == mapTx.end()) {</span></a>
@@ -221,7 +221,7 @@
 <a name="149"><span class="lineNum">     149 </span>                :            :         } // release epoch guard for UpdateForDescendants</a>
 <a name="150"><span class="lineNum">     150 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         UpdateForDescendants(it, mapMemPoolDescendantsToUpdate, setAlreadyIncluded);</span></a>
 <a name="151"><span class="lineNum">     151 </span>                :            :     }</a>
-<a name="152"><span class="lineNum">     152 </span>                :<span class="lineCov">         15 : }</span></a>
+<a name="152"><span class="lineNum">     152 </span>                :<span class="lineCov">         17 : }</span></a>
 <a name="153"><span class="lineNum">     153 </span>                :            : </a>
 <a name="154"><span class="lineNum">     154 </span>                :<span class="lineCov">      51630 : bool CTxMemPool::CalculateMemPoolAncestors(const CTxMemPoolEntry &amp;entry, setEntries &amp;setAncestors, uint64_t limitAncestorCount, uint64_t limitAncestorSize, uint64_t limitDescendantCount, uint64_t limitDescendantSize, std::string &amp;errString, bool fSearchForParents /* = true */) const</span></a>
 <a name="155"><span class="lineNum">     155 </span>                :            : {</a>
@@ -325,12 +325,12 @@
 <a name="253"><span class="lineNum">     253 </span>                :            :     }</a>
 <a name="254"><span class="lineNum">     254 </span>                :<span class="lineCov">      24695 : }</span></a>
 <a name="255"><span class="lineNum">     255 </span>                :            : </a>
-<a name="256"><span class="lineNum">     256 </span>                :<span class="lineCov">      25172 : void CTxMemPool::UpdateForRemoveFromMempool(const setEntries &amp;entriesToRemove, bool updateDescendants)</span></a>
+<a name="256"><span class="lineNum">     256 </span>                :<span class="lineCov">      25187 : void CTxMemPool::UpdateForRemoveFromMempool(const setEntries &amp;entriesToRemove, bool updateDescendants)</span></a>
 <a name="257"><span class="lineNum">     257 </span>                :            : {</a>
 <a name="258"><span class="lineNum">     258 </span>                :            :     // For each entry, walk back all ancestors and decrement size associated with this</a>
 <a name="259"><span class="lineNum">     259 </span>                :            :     // transaction</a>
-<a name="260"><span class="lineNum">     260 </span>                :<span class="lineCov">      25172 :     const uint64_t nNoLimit = std::numeric_limits&lt;uint64_t&gt;::max();</span></a>
-<a name="261"><span class="lineNum">     261 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchCov" title="Branch 1 was taken 570 times"> + </span>]:<span class="lineCov">      25172 :     if (updateDescendants) {</span></a>
+<a name="260"><span class="lineNum">     260 </span>                :<span class="lineCov">      25187 :     const uint64_t nNoLimit = std::numeric_limits&lt;uint64_t&gt;::max();</span></a>
+<a name="261"><span class="lineNum">     261 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchCov" title="Branch 1 was taken 585 times"> + </span>]:<span class="lineCov">      25187 :     if (updateDescendants) {</span></a>
 <a name="262"><span class="lineNum">     262 </span>                :            :         // updateDescendants should be true whenever we're not recursively</a>
 <a name="263"><span class="lineNum">     263 </span>                :            :         // removing a tx and all its descendants, eg when a transaction is</a>
 <a name="264"><span class="lineNum">     264 </span>                :            :         // confirmed in a block.</a>
@@ -349,7 +349,7 @@
 <a name="277"><span class="lineNum">     277 </span>                :            :             }</a>
 <a name="278"><span class="lineNum">     278 </span>                :            :         }</a>
 <a name="279"><span class="lineNum">     279 </span>                :            :     }</a>
-<a name="280"><span class="lineNum">     280 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchCov" title="Branch 1 was taken 25172 times"> + </span>]:<span class="lineCov">      49867 :     for (txiter removeIt : entriesToRemove) {</span></a>
+<a name="280"><span class="lineNum">     280 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchCov" title="Branch 1 was taken 25187 times"> + </span>]:<span class="lineCov">      49882 :     for (txiter removeIt : entriesToRemove) {</span></a>
 <a name="281"><span class="lineNum">     281 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      24695 :         setEntries setAncestors;</span></a>
 <a name="282"><span class="lineNum">     282 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      24695 :         const CTxMemPoolEntry &amp;entry = *removeIt;</span></a>
 <a name="283"><span class="lineNum">     283 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      49390 :         std::string dummy;</span></a>
@@ -380,10 +380,10 @@
 <a name="308"><span class="lineNum">     308 </span>                :            :     // After updating all the ancestor sizes, we can now sever the link between each</a>
 <a name="309"><span class="lineNum">     309 </span>                :            :     // transaction being removed and any mempool children (ie, update CTxMemPoolEntry::m_parents</a>
 <a name="310"><span class="lineNum">     310 </span>                :            :     // for each direct child of a transaction being removed).</a>
-<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchCov" title="Branch 1 was taken 25172 times"> + </span>]:<span class="lineCov">      49867 :     for (txiter removeIt : entriesToRemove) {</span></a>
+<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchCov" title="Branch 1 was taken 25187 times"> + </span>]:<span class="lineCov">      49882 :     for (txiter removeIt : entriesToRemove) {</span></a>
 <a name="312"><span class="lineNum">     312 </span>                :<span class="lineCov">      24695 :         UpdateChildrenForRemoval(removeIt);</span></a>
 <a name="313"><span class="lineNum">     313 </span>                :            :     }</a>
-<a name="314"><span class="lineNum">     314 </span>                :<span class="lineCov">      25172 : }</span></a>
+<a name="314"><span class="lineNum">     314 </span>                :<span class="lineCov">      25187 : }</span></a>
 <a name="315"><span class="lineNum">     315 </span>                :            : </a>
 <a name="316"><span class="lineNum">     316 </span>                :<span class="lineCov">    1009239 : void CTxMemPoolEntry::UpdateDescendantState(int64_t modifySize, CAmount modifyFee, int64_t modifyCount)</span></a>
 <a name="317"><span class="lineNum">     317 </span>                :            : {</a>
@@ -422,10 +422,10 @@
 <a name="350"><span class="lineNum">     350 </span>                :<span class="lineNoCov">          0 :     return nTransactionsUpdated;</span></a>
 <a name="351"><span class="lineNum">     351 </span>                :            : }</a>
 <a name="352"><span class="lineNum">     352 </span>                :            : </a>
-<a name="353"><span class="lineNum">     353 </span>                :<span class="lineCov">       4021 : void CTxMemPool::AddTransactionsUpdated(unsigned int n)</span></a>
+<a name="353"><span class="lineNum">     353 </span>                :<span class="lineCov">       4047 : void CTxMemPool::AddTransactionsUpdated(unsigned int n)</span></a>
 <a name="354"><span class="lineNum">     354 </span>                :            : {</a>
-<a name="355"><span class="lineNum">     355 </span>                :<span class="lineCov">       4021 :     nTransactionsUpdated += n;</span></a>
-<a name="356"><span class="lineNum">     356 </span>                :<span class="lineCov">       4021 : }</span></a>
+<a name="355"><span class="lineNum">     355 </span>                :<span class="lineCov">       4047 :     nTransactionsUpdated += n;</span></a>
+<a name="356"><span class="lineNum">     356 </span>                :<span class="lineCov">       4047 : }</span></a>
 <a name="357"><span class="lineNum">     357 </span>                :            : </a>
 <a name="358"><span class="lineNum">     358 </span>                :<span class="lineCov">      26883 : void CTxMemPool::addUnchecked(const CTxMemPoolEntry &amp;entry, setEntries &amp;setAncestors, bool validFeeEstimate)</span></a>
 <a name="359"><span class="lineNum">     359 </span>                :            : {</a>
@@ -547,42 +547,42 @@
 <a name="475"><span class="lineNum">     475 </span>                :            :     }</a>
 <a name="476"><span class="lineNum">     476 </span>                :<span class="lineCov">      26822 : }</span></a>
 <a name="477"><span class="lineNum">     477 </span>                :            : </a>
-<a name="478"><span class="lineNum">     478 </span>                :<span class="lineCov">        396 : void CTxMemPool::removeRecursive(const CTransaction &amp;origTx, MemPoolRemovalReason reason)</span></a>
+<a name="478"><span class="lineNum">     478 </span>                :<span class="lineCov">        407 : void CTxMemPool::removeRecursive(const CTransaction &amp;origTx, MemPoolRemovalReason reason)</span></a>
 <a name="479"><span class="lineNum">     479 </span>                :            : {</a>
 <a name="480"><span class="lineNum">     480 </span>                :            :     // Remove transaction from memory pool</a>
-<a name="481"><span class="lineNum">     481 </span>        [<span class="branchCov" title="Branch 0 was taken 396 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        396 :     AssertLockHeld(cs);</span></a>
-<a name="482"><span class="lineNum">     482 </span>        [<span class="branchCov" title="Branch 0 was taken 396 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        396 :         setEntries txToRemove;</span></a>
-<a name="483"><span class="lineNum">     483 </span>        [<span class="branchCov" title="Branch 0 was taken 396 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        396 :         txiter origit = mapTx.find(origTx.GetHash());</span></a>
-<a name="484"><span class="lineNum">     484 </span>        [<span class="branchCov" title="Branch 0 was taken 8 times"> + </span><span class="branchCov" title="Branch 1 was taken 388 times"> + </span>]:<span class="lineCov">        396 :         if (origit != mapTx.end()) {</span></a>
+<a name="481"><span class="lineNum">     481 </span>        [<span class="branchCov" title="Branch 0 was taken 407 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        407 :     AssertLockHeld(cs);</span></a>
+<a name="482"><span class="lineNum">     482 </span>        [<span class="branchCov" title="Branch 0 was taken 407 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        407 :         setEntries txToRemove;</span></a>
+<a name="483"><span class="lineNum">     483 </span>        [<span class="branchCov" title="Branch 0 was taken 407 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        407 :         txiter origit = mapTx.find(origTx.GetHash());</span></a>
+<a name="484"><span class="lineNum">     484 </span>        [<span class="branchCov" title="Branch 0 was taken 8 times"> + </span><span class="branchCov" title="Branch 1 was taken 399 times"> + </span>]:<span class="lineCov">        407 :         if (origit != mapTx.end()) {</span></a>
 <a name="485"><span class="lineNum">     485 </span>        [<span class="branchCov" title="Branch 0 was taken 8 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          8 :             txToRemove.insert(origit);</span></a>
 <a name="486"><span class="lineNum">     486 </span>                :            :         } else {</a>
 <a name="487"><span class="lineNum">     487 </span>                :            :             // When recursively removing but origTx isn't in the mempool</a>
 <a name="488"><span class="lineNum">     488 </span>                :            :             // be sure to remove any children that are in the pool. This can</a>
 <a name="489"><span class="lineNum">     489 </span>                :            :             // happen during chain re-orgs if origTx isn't re-accepted into</a>
 <a name="490"><span class="lineNum">     490 </span>                :            :             // the mempool for any reason.</a>
-<a name="491"><span class="lineNum">     491 </span>        [<span class="branchCov" title="Branch 0 was taken 1145 times"> + </span><span class="branchCov" title="Branch 1 was taken 388 times"> + </span>]:<span class="lineCov">       1533 :             for (unsigned int i = 0; i &lt; origTx.vout.size(); i++) {</span></a>
-<a name="492"><span class="lineNum">     492 </span>                :<span class="lineCov">       1145 :                 auto it = mapNextTx.find(COutPoint(origTx.GetHash(), i));</span></a>
-<a name="493"><span class="lineNum">     493 </span>        [<span class="branchCov" title="Branch 0 was taken 1076 times"> + </span><span class="branchCov" title="Branch 1 was taken 69 times"> + </span>]:<span class="lineCov">       1145 :                 if (it == mapNextTx.end())</span></a>
-<a name="494"><span class="lineNum">     494 </span>                :<span class="lineCov">       1076 :                     continue;</span></a>
+<a name="491"><span class="lineNum">     491 </span>        [<span class="branchCov" title="Branch 0 was taken 1178 times"> + </span><span class="branchCov" title="Branch 1 was taken 399 times"> + </span>]:<span class="lineCov">       1577 :             for (unsigned int i = 0; i &lt; origTx.vout.size(); i++) {</span></a>
+<a name="492"><span class="lineNum">     492 </span>                :<span class="lineCov">       1178 :                 auto it = mapNextTx.find(COutPoint(origTx.GetHash(), i));</span></a>
+<a name="493"><span class="lineNum">     493 </span>        [<span class="branchCov" title="Branch 0 was taken 1109 times"> + </span><span class="branchCov" title="Branch 1 was taken 69 times"> + </span>]:<span class="lineCov">       1178 :                 if (it == mapNextTx.end())</span></a>
+<a name="494"><span class="lineNum">     494 </span>                :<span class="lineCov">       1109 :                     continue;</span></a>
 <a name="495"><span class="lineNum">     495 </span>        [<span class="branchCov" title="Branch 0 was taken 69 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         69 :                 txiter nextit = mapTx.find(it-&gt;second-&gt;GetHash());</span></a>
 <a name="496"><span class="lineNum">     496 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 69 times"> + </span>]:<span class="lineCov">         69 :                 assert(nextit != mapTx.end());</span></a>
 <a name="497"><span class="lineNum">     497 </span>        [<span class="branchCov" title="Branch 0 was taken 69 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         69 :                 txToRemove.insert(nextit);</span></a>
 <a name="498"><span class="lineNum">     498 </span>                :            :             }</a>
 <a name="499"><span class="lineNum">     499 </span>                :            :         }</a>
-<a name="500"><span class="lineNum">     500 </span>                :<span class="lineCov">        792 :         setEntries setAllRemoves;</span></a>
-<a name="501"><span class="lineNum">     501 </span>        [<span class="branchCov" title="Branch 0 was taken 77 times"> + </span><span class="branchCov" title="Branch 1 was taken 396 times"> + </span>]:<span class="lineCov">        473 :         for (txiter it : txToRemove) {</span></a>
+<a name="500"><span class="lineNum">     500 </span>                :<span class="lineCov">        814 :         setEntries setAllRemoves;</span></a>
+<a name="501"><span class="lineNum">     501 </span>        [<span class="branchCov" title="Branch 0 was taken 77 times"> + </span><span class="branchCov" title="Branch 1 was taken 407 times"> + </span>]:<span class="lineCov">        484 :         for (txiter it : txToRemove) {</span></a>
 <a name="502"><span class="lineNum">     502 </span>        [<span class="branchCov" title="Branch 0 was taken 77 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         77 :             CalculateDescendants(it, setAllRemoves);</span></a>
 <a name="503"><span class="lineNum">     503 </span>                :            :         }</a>
 <a name="504"><span class="lineNum">     504 </span>                :            : </a>
-<a name="505"><span class="lineNum">     505 </span>        [<span class="branchCov" title="Branch 0 was taken 396 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        396 :         RemoveStaged(setAllRemoves, false, reason);</span></a>
-<a name="506"><span class="lineNum">     506 </span>                :<span class="lineCov">        396 : }</span></a>
+<a name="505"><span class="lineNum">     505 </span>        [<span class="branchCov" title="Branch 0 was taken 407 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        407 :         RemoveStaged(setAllRemoves, false, reason);</span></a>
+<a name="506"><span class="lineNum">     506 </span>                :<span class="lineCov">        407 : }</span></a>
 <a name="507"><span class="lineNum">     507 </span>                :            : </a>
-<a name="508"><span class="lineNum">     508 </span>                :<span class="lineCov">         15 : void CTxMemPool::removeForReorg(CChainState&amp; active_chainstate, int flags)</span></a>
+<a name="508"><span class="lineNum">     508 </span>                :<span class="lineCov">         17 : void CTxMemPool::removeForReorg(CChainState&amp; active_chainstate, int flags)</span></a>
 <a name="509"><span class="lineNum">     509 </span>                :            : {</a>
 <a name="510"><span class="lineNum">     510 </span>                :            :     // Remove transactions spending a coinbase which are now immature and no-longer-final transactions</a>
-<a name="511"><span class="lineNum">     511 </span>                :<span class="lineCov">         15 :     AssertLockHeld(cs);</span></a>
-<a name="512"><span class="lineNum">     512 </span>                :<span class="lineCov">         15 :     setEntries txToRemove;</span></a>
-<a name="513"><span class="lineNum">     513 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15 times"> + </span>]:<span class="lineCov">         15 :     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {</span></a>
+<a name="511"><span class="lineNum">     511 </span>                :<span class="lineCov">         17 :     AssertLockHeld(cs);</span></a>
+<a name="512"><span class="lineNum">     512 </span>                :<span class="lineCov">         17 :     setEntries txToRemove;</span></a>
+<a name="513"><span class="lineNum">     513 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 17 times"> + </span>]:<span class="lineCov">         17 :     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {</span></a>
 <a name="514"><span class="lineNum">     514 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         const CTransaction&amp; tx = it-&gt;GetTx();</span></a>
 <a name="515"><span class="lineNum">     515 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         LockPoints lp = it-&gt;GetLockPoints();</span></a>
 <a name="516"><span class="lineNum">     516 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         bool validLP =  TestLockPointValidity(active_chainstate.m_chain, &amp;lp);</span></a>
@@ -612,20 +612,20 @@
 <a name="538"><span class="lineNum">     538 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             mapTx.modify(it, update_lock_points(lp));</span></a>
 <a name="539"><span class="lineNum">     539 </span>                :            :         }</a>
 <a name="540"><span class="lineNum">     540 </span>                :            :     }</a>
-<a name="541"><span class="lineNum">     541 </span>                :<span class="lineCov">         30 :     setEntries setAllRemoves;</span></a>
-<a name="542"><span class="lineNum">     542 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15 times"> + </span>]:<span class="lineCov">         15 :     for (txiter it : txToRemove) {</span></a>
+<a name="541"><span class="lineNum">     541 </span>                :<span class="lineCov">         34 :     setEntries setAllRemoves;</span></a>
+<a name="542"><span class="lineNum">     542 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 17 times"> + </span>]:<span class="lineCov">         17 :     for (txiter it : txToRemove) {</span></a>
 <a name="543"><span class="lineNum">     543 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         CalculateDescendants(it, setAllRemoves);</span></a>
 <a name="544"><span class="lineNum">     544 </span>                :            :     }</a>
-<a name="545"><span class="lineNum">     545 </span>        [<span class="branchCov" title="Branch 0 was taken 15 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         15 :     RemoveStaged(setAllRemoves, false, MemPoolRemovalReason::REORG);</span></a>
-<a name="546"><span class="lineNum">     546 </span>                :<span class="lineCov">         15 : }</span></a>
+<a name="545"><span class="lineNum">     545 </span>        [<span class="branchCov" title="Branch 0 was taken 17 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         17 :     RemoveStaged(setAllRemoves, false, MemPoolRemovalReason::REORG);</span></a>
+<a name="546"><span class="lineNum">     546 </span>                :<span class="lineCov">         17 : }</span></a>
 <a name="547"><span class="lineNum">     547 </span>                :            : </a>
-<a name="548"><span class="lineNum">     548 </span>                :<span class="lineCov">      28244 : void CTxMemPool::removeConflicts(const CTransaction &amp;tx)</span></a>
+<a name="548"><span class="lineNum">     548 </span>                :<span class="lineCov">      28259 : void CTxMemPool::removeConflicts(const CTransaction &amp;tx)</span></a>
 <a name="549"><span class="lineNum">     549 </span>                :            : {</a>
 <a name="550"><span class="lineNum">     550 </span>                :            :     // Remove transactions which depend on inputs of tx, recursively</a>
-<a name="551"><span class="lineNum">     551 </span>                :<span class="lineCov">      28244 :     AssertLockHeld(cs);</span></a>
-<a name="552"><span class="lineNum">     552 </span>        [<span class="branchCov" title="Branch 0 was taken 28243 times"> + </span><span class="branchCov" title="Branch 1 was taken 28244 times"> + </span>]:<span class="lineCov">      56487 :     for (const CTxIn &amp;txin : tx.vin) {</span></a>
-<a name="553"><span class="lineNum">     553 </span>                :<span class="lineCov">      28243 :         auto it = mapNextTx.find(txin.prevout);</span></a>
-<a name="554"><span class="lineNum">     554 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 28243 times"> + </span>]:<span class="lineCov">      28243 :         if (it != mapNextTx.end()) {</span></a>
+<a name="551"><span class="lineNum">     551 </span>                :<span class="lineCov">      28259 :     AssertLockHeld(cs);</span></a>
+<a name="552"><span class="lineNum">     552 </span>        [<span class="branchCov" title="Branch 0 was taken 28258 times"> + </span><span class="branchCov" title="Branch 1 was taken 28259 times"> + </span>]:<span class="lineCov">      56517 :     for (const CTxIn &amp;txin : tx.vin) {</span></a>
+<a name="553"><span class="lineNum">     553 </span>                :<span class="lineCov">      28258 :         auto it = mapNextTx.find(txin.prevout);</span></a>
+<a name="554"><span class="lineNum">     554 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 28258 times"> + </span>]:<span class="lineCov">      28258 :         if (it != mapNextTx.end()) {</span></a>
 <a name="555"><span class="lineNum">     555 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             const CTransaction &amp;txConflict = *it-&gt;second;</span></a>
 <a name="556"><span class="lineNum">     556 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             if (txConflict != tx)</span></a>
 <a name="557"><span class="lineNum">     557 </span>                :            :             {</a>
@@ -634,39 +634,39 @@
 <a name="560"><span class="lineNum">     560 </span>                :            :             }</a>
 <a name="561"><span class="lineNum">     561 </span>                :            :         }</a>
 <a name="562"><span class="lineNum">     562 </span>                :            :     }</a>
-<a name="563"><span class="lineNum">     563 </span>                :<span class="lineCov">      28244 : }</span></a>
+<a name="563"><span class="lineNum">     563 </span>                :<span class="lineCov">      28259 : }</span></a>
 <a name="564"><span class="lineNum">     564 </span>                :            : </a>
 <a name="565"><span class="lineNum">     565 </span>                :            : /**</a>
 <a name="566"><span class="lineNum">     566 </span>                :            :  * Called when a block is connected. Removes from mempool and updates the miner fee estimator.</a>
 <a name="567"><span class="lineNum">     567 </span>                :            :  */</a>
-<a name="568"><span class="lineNum">     568 </span>                :<span class="lineCov">       4305 : void CTxMemPool::removeForBlock(const std::vector&lt;CTransactionRef&gt;&amp; vtx, unsigned int nBlockHeight)</span></a>
+<a name="568"><span class="lineNum">     568 </span>                :<span class="lineCov">       4320 : void CTxMemPool::removeForBlock(const std::vector&lt;CTransactionRef&gt;&amp; vtx, unsigned int nBlockHeight)</span></a>
 <a name="569"><span class="lineNum">     569 </span>                :            : {</a>
-<a name="570"><span class="lineNum">     570 </span>                :<span class="lineCov">       4305 :     AssertLockHeld(cs);</span></a>
-<a name="571"><span class="lineNum">     571 </span>                :<span class="lineCov">       4305 :     std::vector&lt;const CTxMemPoolEntry*&gt; entries;</span></a>
-<a name="572"><span class="lineNum">     572 </span>        [<span class="branchCov" title="Branch 0 was taken 28244 times"> + </span><span class="branchCov" title="Branch 1 was taken 4305 times"> + </span>]:<span class="lineCov">      32549 :     for (const auto&amp; tx : vtx)</span></a>
+<a name="570"><span class="lineNum">     570 </span>                :<span class="lineCov">       4320 :     AssertLockHeld(cs);</span></a>
+<a name="571"><span class="lineNum">     571 </span>                :<span class="lineCov">       4320 :     std::vector&lt;const CTxMemPoolEntry*&gt; entries;</span></a>
+<a name="572"><span class="lineNum">     572 </span>        [<span class="branchCov" title="Branch 0 was taken 28259 times"> + </span><span class="branchCov" title="Branch 1 was taken 4320 times"> + </span>]:<span class="lineCov">      32579 :     for (const auto&amp; tx : vtx)</span></a>
 <a name="573"><span class="lineNum">     573 </span>                :            :     {</a>
-<a name="574"><span class="lineNum">     574 </span>        [<span class="branchCov" title="Branch 0 was taken 28244 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28244 :         uint256 hash = tx-&gt;GetHash();</span></a>
+<a name="574"><span class="lineNum">     574 </span>        [<span class="branchCov" title="Branch 0 was taken 28259 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28259 :         uint256 hash = tx-&gt;GetHash();</span></a>
 <a name="575"><span class="lineNum">     575 </span>                :            : </a>
-<a name="576"><span class="lineNum">     576 </span>        [<span class="branchCov" title="Branch 0 was taken 28244 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28244 :         indexed_transaction_set::iterator i = mapTx.find(hash);</span></a>
-<a name="577"><span class="lineNum">     577 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchCov" title="Branch 1 was taken 3642 times"> + </span>]:<span class="lineCov">      28244 :         if (i != mapTx.end())</span></a>
-<a name="578"><span class="lineNum">     578 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28244 :             entries.push_back(&amp;*i);</span></a>
+<a name="576"><span class="lineNum">     576 </span>        [<span class="branchCov" title="Branch 0 was taken 28259 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28259 :         indexed_transaction_set::iterator i = mapTx.find(hash);</span></a>
+<a name="577"><span class="lineNum">     577 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchCov" title="Branch 1 was taken 3657 times"> + </span>]:<span class="lineCov">      28259 :         if (i != mapTx.end())</span></a>
+<a name="578"><span class="lineNum">     578 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28259 :             entries.push_back(&amp;*i);</span></a>
 <a name="579"><span class="lineNum">     579 </span>                :            :     }</a>
 <a name="580"><span class="lineNum">     580 </span>                :            :     // Before the txs in the new block have been removed from the mempool, update policy estimates</a>
-<a name="581"><span class="lineNum">     581 </span>  [<span class="branchCov" title="Branch 0 was taken 4303 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span><span class="branchCov" title="Branch 2 was taken 4303 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       4305 :     if (minerPolicyEstimator) {minerPolicyEstimator-&gt;processBlock(nBlockHeight, entries);}</span></a>
-<a name="582"><span class="lineNum">     582 </span>        [<span class="branchCov" title="Branch 0 was taken 28244 times"> + </span><span class="branchCov" title="Branch 1 was taken 4305 times"> + </span>]:<span class="lineCov">      32549 :     for (const auto&amp; tx : vtx)</span></a>
+<a name="581"><span class="lineNum">     581 </span>  [<span class="branchCov" title="Branch 0 was taken 4318 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span><span class="branchCov" title="Branch 2 was taken 4318 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       4320 :     if (minerPolicyEstimator) {minerPolicyEstimator-&gt;processBlock(nBlockHeight, entries);}</span></a>
+<a name="582"><span class="lineNum">     582 </span>        [<span class="branchCov" title="Branch 0 was taken 28259 times"> + </span><span class="branchCov" title="Branch 1 was taken 4320 times"> + </span>]:<span class="lineCov">      32579 :     for (const auto&amp; tx : vtx)</span></a>
 <a name="583"><span class="lineNum">     583 </span>                :            :     {</a>
-<a name="584"><span class="lineNum">     584 </span>        [<span class="branchCov" title="Branch 0 was taken 28244 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28244 :         txiter it = mapTx.find(tx-&gt;GetHash());</span></a>
-<a name="585"><span class="lineNum">     585 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchCov" title="Branch 1 was taken 3642 times"> + </span>]:<span class="lineCov">      28244 :         if (it != mapTx.end()) {</span></a>
+<a name="584"><span class="lineNum">     584 </span>        [<span class="branchCov" title="Branch 0 was taken 28259 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28259 :         txiter it = mapTx.find(tx-&gt;GetHash());</span></a>
+<a name="585"><span class="lineNum">     585 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchCov" title="Branch 1 was taken 3657 times"> + </span>]:<span class="lineCov">      28259 :         if (it != mapTx.end()) {</span></a>
 <a name="586"><span class="lineNum">     586 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      24602 :             setEntries stage;</span></a>
 <a name="587"><span class="lineNum">     587 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      24602 :             stage.insert(it);</span></a>
 <a name="588"><span class="lineNum">     588 </span>        [<span class="branchCov" title="Branch 0 was taken 24602 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      24602 :             RemoveStaged(stage, true, MemPoolRemovalReason::BLOCK);</span></a>
 <a name="589"><span class="lineNum">     589 </span>                :            :         }</a>
-<a name="590"><span class="lineNum">     590 </span>        [<span class="branchCov" title="Branch 0 was taken 28244 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28244 :         removeConflicts(*tx);</span></a>
-<a name="591"><span class="lineNum">     591 </span>                :<span class="lineCov">      28244 :         ClearPrioritisation(tx-&gt;GetHash());</span></a>
+<a name="590"><span class="lineNum">     590 </span>        [<span class="branchCov" title="Branch 0 was taken 28259 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      28259 :         removeConflicts(*tx);</span></a>
+<a name="591"><span class="lineNum">     591 </span>                :<span class="lineCov">      28259 :         ClearPrioritisation(tx-&gt;GetHash());</span></a>
 <a name="592"><span class="lineNum">     592 </span>                :            :     }</a>
-<a name="593"><span class="lineNum">     593 </span>        [<span class="branchCov" title="Branch 0 was taken 4305 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       4305 :     lastRollingFeeUpdate = GetTime();</span></a>
-<a name="594"><span class="lineNum">     594 </span>                :<span class="lineCov">       4305 :     blockSinceLastRollingFeeBump = true;</span></a>
-<a name="595"><span class="lineNum">     595 </span>                :<span class="lineCov">       4305 : }</span></a>
+<a name="593"><span class="lineNum">     593 </span>        [<span class="branchCov" title="Branch 0 was taken 4320 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       4320 :     lastRollingFeeUpdate = GetTime();</span></a>
+<a name="594"><span class="lineNum">     594 </span>                :<span class="lineCov">       4320 :     blockSinceLastRollingFeeBump = true;</span></a>
+<a name="595"><span class="lineNum">     595 </span>                :<span class="lineCov">       4320 : }</span></a>
 <a name="596"><span class="lineNum">     596 </span>                :            : </a>
 <a name="597"><span class="lineNum">     597 </span>                :<span class="lineCov">       2872 : void CTxMemPool::_clear()</span></a>
 <a name="598"><span class="lineNum">     598 </span>                :            : {</a>
@@ -697,28 +697,28 @@
 <a name="622"><span class="lineNum">     622 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     UpdateCoins(tx, mempoolDuplicate, std::numeric_limits&lt;int&gt;::max());</span></a>
 <a name="623"><span class="lineNum">     623 </span>                :<span class="lineCov">          2 : }</span></a>
 <a name="624"><span class="lineNum">     624 </span>                :            : </a>
-<a name="625"><span class="lineNum">     625 </span>                :<span class="lineCov">       3265 : void CTxMemPool::check(CChainState&amp; active_chainstate) const</span></a>
+<a name="625"><span class="lineNum">     625 </span>                :<span class="lineCov">       3271 : void CTxMemPool::check(CChainState&amp; active_chainstate) const</span></a>
 <a name="626"><span class="lineNum">     626 </span>                :            : {</a>
-<a name="627"><span class="lineNum">     627 </span>        [<span class="branchCov" title="Branch 0 was taken 3265 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       3265 :     if (m_check_ratio == 0) return;</span></a>
+<a name="627"><span class="lineNum">     627 </span>        [<span class="branchCov" title="Branch 0 was taken 3271 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       3271 :     if (m_check_ratio == 0) return;</span></a>
 <a name="628"><span class="lineNum">     628 </span>                :            : </a>
-<a name="629"><span class="lineNum">     629 </span>        [<span class="branchCov" title="Branch 0 was taken 3265 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       3265 :     if (GetRand(m_check_ratio) &gt;= 1) return;</span></a>
+<a name="629"><span class="lineNum">     629 </span>        [<span class="branchCov" title="Branch 0 was taken 3271 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       3271 :     if (GetRand(m_check_ratio) &gt;= 1) return;</span></a>
 <a name="630"><span class="lineNum">     630 </span>                :            : </a>
-<a name="631"><span class="lineNum">     631 </span>                :<span class="lineCov">       3265 :     AssertLockHeld(::cs_main);</span></a>
-<a name="632"><span class="lineNum">     632 </span>                :<span class="lineCov">       6530 :     LOCK(cs);</span></a>
-<a name="633"><span class="lineNum">     633 </span>  [<span class="branchCov" title="Branch 0 was taken 3265 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3265 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">       9795 :     LogPrint(BCLog::MEMPOOL, &quot;Checking mempool with %u transactions and %u inputs\n&quot;, (unsigned int)mapTx.size(), (unsigned int)mapNextTx.size());</span></a>
-<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 3265 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 3265 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 3265 times"> + </span> 
+<a name="631"><span class="lineNum">     631 </span>                :<span class="lineCov">       3271 :     AssertLockHeld(::cs_main);</span></a>
+<a name="632"><span class="lineNum">     632 </span>                :<span class="lineCov">       6542 :     LOCK(cs);</span></a>
+<a name="633"><span class="lineNum">     633 </span>  [<span class="branchCov" title="Branch 0 was taken 3271 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3271 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">       9813 :     LogPrint(BCLog::MEMPOOL, &quot;Checking mempool with %u transactions and %u inputs\n&quot;, (unsigned int)mapTx.size(), (unsigned int)mapNextTx.size());</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 3271 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 3271 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 3271 times"> + </span> 
 <span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 9 was not taken"> - </span>]
 <a name="634"><span class="lineNum">     634 </span>                :            : </a>
-<a name="635"><span class="lineNum">     635 </span>                :<span class="lineCov">       3265 :     uint64_t checkTotal = 0;</span></a>
-<a name="636"><span class="lineNum">     636 </span>                :<span class="lineCov">       3265 :     CAmount check_total_fee{0};</span></a>
-<a name="637"><span class="lineNum">     637 </span>                :<span class="lineCov">       3265 :     uint64_t innerUsage = 0;</span></a>
+<a name="635"><span class="lineNum">     635 </span>                :<span class="lineCov">       3271 :     uint64_t checkTotal = 0;</span></a>
+<a name="636"><span class="lineNum">     636 </span>                :<span class="lineCov">       3271 :     CAmount check_total_fee{0};</span></a>
+<a name="637"><span class="lineNum">     637 </span>                :<span class="lineCov">       3271 :     uint64_t innerUsage = 0;</span></a>
 <a name="638"><span class="lineNum">     638 </span>                :            : </a>
-<a name="639"><span class="lineNum">     639 </span>                :<span class="lineCov">       3265 :     CCoinsViewCache&amp; active_coins_tip = active_chainstate.CoinsTip();</span></a>
-<a name="640"><span class="lineNum">     640 </span>  [<span class="branchCov" title="Branch 0 was taken 3265 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3265 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       6530 :     CCoinsViewCache mempoolDuplicate(const_cast&lt;CCoinsViewCache*&gt;(&amp;active_coins_tip));</span></a>
-<a name="641"><span class="lineNum">     641 </span>                :<span class="lineCov">       3265 :     const int64_t spendheight = active_chainstate.m_chain.Height() + 1;</span></a>
+<a name="639"><span class="lineNum">     639 </span>                :<span class="lineCov">       3271 :     CCoinsViewCache&amp; active_coins_tip = active_chainstate.CoinsTip();</span></a>
+<a name="640"><span class="lineNum">     640 </span>  [<span class="branchCov" title="Branch 0 was taken 3271 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3271 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       6542 :     CCoinsViewCache mempoolDuplicate(const_cast&lt;CCoinsViewCache*&gt;(&amp;active_coins_tip));</span></a>
+<a name="641"><span class="lineNum">     641 </span>                :<span class="lineCov">       3271 :     const int64_t spendheight = active_chainstate.m_chain.Height() + 1;</span></a>
 <a name="642"><span class="lineNum">     642 </span>                :            : </a>
-<a name="643"><span class="lineNum">     643 </span>                :<span class="lineCov">       6530 :     std::list&lt;const CTxMemPoolEntry*&gt; waitingOnDependants;</span></a>
-<a name="644"><span class="lineNum">     644 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 3265 times"> + </span>]:<span class="lineCov">       3267 :     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {</span></a>
+<a name="643"><span class="lineNum">     643 </span>                :<span class="lineCov">       6542 :     std::list&lt;const CTxMemPoolEntry*&gt; waitingOnDependants;</span></a>
+<a name="644"><span class="lineNum">     644 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 3271 times"> + </span>]:<span class="lineCov">       3273 :     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {</span></a>
 <a name="645"><span class="lineNum">     645 </span>                :<span class="lineCov">          2 :         unsigned int i = 0;</span></a>
 <a name="646"><span class="lineNum">     646 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         checkTotal += it-&gt;GetTxSize();</span></a>
 <a name="647"><span class="lineNum">     647 </span>                :<span class="lineCov">          2 :         check_total_fee += it-&gt;GetFee();</span></a>
@@ -775,7 +775,7 @@
 <a name="698"><span class="lineNum">     698 </span>                :<span class="lineCov">          4 :         CTxMemPoolEntry::Children setChildrenCheck;</span></a>
 <a name="699"><span class="lineNum">     699 </span>                :<span class="lineCov">          2 :         auto iter = mapNextTx.lower_bound(COutPoint(it-&gt;GetTx().GetHash(), 0));</span></a>
 <a name="700"><span class="lineNum">     700 </span>                :<span class="lineCov">          2 :         uint64_t child_sizes = 0;</span></a>
-<a name="701"><span class="lineNum">     701 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          2 :         for (; iter != mapNextTx.end() &amp;&amp; iter-&gt;first-&gt;hash == it-&gt;GetTx().GetHash(); ++iter) {</span></a>
+<a name="701"><span class="lineNum">     701 </span>  [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 2 times"> + </span>]:<span class="lineCov">          2 :         for (; iter != mapNextTx.end() &amp;&amp; iter-&gt;first-&gt;hash == it-&gt;GetTx().GetHash(); ++iter) {</span></a>
 <a name="702"><span class="lineNum">     702 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             txiter childit = mapTx.find(iter-&gt;second-&gt;GetHash());</span></a>
 <a name="703"><span class="lineNum">     703 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             assert(childit != mapTx.end()); // mapNextTx points to in-mempool transactions</span></a>
 <a name="704"><span class="lineNum">     704 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :             if (setChildrenCheck.insert(*childit).second) {</span></a>
@@ -795,7 +795,7 @@
 <a name="718"><span class="lineNum">     718 </span>                :            :         }</a>
 <a name="719"><span class="lineNum">     719 </span>                :            :     }</a>
 <a name="720"><span class="lineNum">     720 </span>                :            :     unsigned int stepsSinceLastRemove = 0;</a>
-<a name="721"><span class="lineNum">     721 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3265 times"> + </span>]:<span class="lineCov">       3265 :     while (!waitingOnDependants.empty()) {</span></a>
+<a name="721"><span class="lineNum">     721 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3271 times"> + </span>]:<span class="lineCov">       3271 :     while (!waitingOnDependants.empty()) {</span></a>
 <a name="722"><span class="lineNum">     722 </span>                :<span class="lineNoCov">          0 :         const CTxMemPoolEntry* entry = waitingOnDependants.front();</span></a>
 <a name="723"><span class="lineNum">     723 </span>                :<span class="lineNoCov">          0 :         waitingOnDependants.pop_front();</span></a>
 <a name="724"><span class="lineNum">     724 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (!mempoolDuplicate.HaveInputs(entry-&gt;GetTx())) {</span></a>
@@ -807,7 +807,7 @@
 <a name="730"><span class="lineNum">     730 </span>                :            :             stepsSinceLastRemove = 0;</a>
 <a name="731"><span class="lineNum">     731 </span>                :            :         }</a>
 <a name="732"><span class="lineNum">     732 </span>                :            :     }</a>
-<a name="733"><span class="lineNum">     733 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 3265 times"> + </span>]:<span class="lineCov">       3267 :     for (auto it = mapNextTx.cbegin(); it != mapNextTx.cend(); it++) {</span></a>
+<a name="733"><span class="lineNum">     733 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 3271 times"> + </span>]:<span class="lineCov">       3273 :     for (auto it = mapNextTx.cbegin(); it != mapNextTx.cend(); it++) {</span></a>
 <a name="734"><span class="lineNum">     734 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         uint256 hash = it-&gt;second-&gt;GetHash();</span></a>
 <a name="735"><span class="lineNum">     735 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         indexed_transaction_set::const_iterator it2 = mapTx.find(hash);</span></a>
 <a name="736"><span class="lineNum">     736 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :         const CTransaction&amp; tx = it2-&gt;GetTx();</span></a>
@@ -815,9 +815,9 @@
 <a name="738"><span class="lineNum">     738 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :         assert(&amp;tx == it-&gt;second);</span></a>
 <a name="739"><span class="lineNum">     739 </span>                :            :     }</a>
 <a name="740"><span class="lineNum">     740 </span>                :            : </a>
-<a name="741"><span class="lineNum">     741 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3265 times"> + </span>]:<span class="lineCov">       3265 :     assert(totalTxSize == checkTotal);</span></a>
-<a name="742"><span class="lineNum">     742 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3265 times"> + </span>]:<span class="lineCov">       3265 :     assert(m_total_fee == check_total_fee);</span></a>
-<a name="743"><span class="lineNum">     743 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3265 times"> + </span>]:<span class="lineCov">       3265 :     assert(innerUsage == cachedInnerUsage);</span></a>
+<a name="741"><span class="lineNum">     741 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3271 times"> + </span>]:<span class="lineCov">       3271 :     assert(totalTxSize == checkTotal);</span></a>
+<a name="742"><span class="lineNum">     742 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3271 times"> + </span>]:<span class="lineCov">       3271 :     assert(m_total_fee == check_total_fee);</span></a>
+<a name="743"><span class="lineNum">     743 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3271 times"> + </span>]:<span class="lineCov">       3271 :     assert(innerUsage == cachedInnerUsage);</span></a>
 <a name="744"><span class="lineNum">     744 </span>                :            : }</a>
 <a name="745"><span class="lineNum">     745 </span>                :            : </a>
 <a name="746"><span class="lineNum">     746 </span>                :<span class="lineNoCov">          0 : bool CTxMemPool::CompareDepthAndScore(const uint256&amp; hasha, const uint256&amp; hashb, bool wtxid)</span></a>
@@ -960,11 +960,11 @@
 <a name="879"><span class="lineNum">     879 </span>                :<span class="lineNoCov">          0 :     nFeeDelta += delta;</span></a>
 <a name="880"><span class="lineNum">     880 </span>                :            : }</a>
 <a name="881"><span class="lineNum">     881 </span>                :            : </a>
-<a name="882"><span class="lineNum">     882 </span>                :<span class="lineCov">      28244 : void CTxMemPool::ClearPrioritisation(const uint256&amp; hash)</span></a>
+<a name="882"><span class="lineNum">     882 </span>                :<span class="lineCov">      28259 : void CTxMemPool::ClearPrioritisation(const uint256&amp; hash)</span></a>
 <a name="883"><span class="lineNum">     883 </span>                :            : {</a>
-<a name="884"><span class="lineNum">     884 </span>                :<span class="lineCov">      28244 :     AssertLockHeld(cs);</span></a>
-<a name="885"><span class="lineNum">     885 </span>                :<span class="lineCov">      28244 :     mapDeltas.erase(hash);</span></a>
-<a name="886"><span class="lineNum">     886 </span>                :<span class="lineCov">      28244 : }</span></a>
+<a name="884"><span class="lineNum">     884 </span>                :<span class="lineCov">      28259 :     AssertLockHeld(cs);</span></a>
+<a name="885"><span class="lineNum">     885 </span>                :<span class="lineCov">      28259 :     mapDeltas.erase(hash);</span></a>
+<a name="886"><span class="lineNum">     886 </span>                :<span class="lineCov">      28259 : }</span></a>
 <a name="887"><span class="lineNum">     887 </span>                :            : </a>
 <a name="888"><span class="lineNum">     888 </span>                :<span class="lineCov">         75 : const CTransaction* CTxMemPool::GetConflictTx(const COutPoint&amp; prevout) const</span></a>
 <a name="889"><span class="lineNum">     889 </span>                :            : {</a>
@@ -1029,10 +1029,10 @@
 <a name="948"><span class="lineNum">     948 </span>                :            :     }</a>
 <a name="949"><span class="lineNum">     949 </span>                :<span class="lineCov">          2 : }</span></a>
 <a name="950"><span class="lineNum">     950 </span>                :            : </a>
-<a name="951"><span class="lineNum">     951 </span>                :<span class="lineCov">      12032 : size_t CTxMemPool::DynamicMemoryUsage() const {</span></a>
-<a name="952"><span class="lineNum">     952 </span>                :<span class="lineCov">      12032 :     LOCK(cs);</span></a>
+<a name="951"><span class="lineNum">     951 </span>                :<span class="lineCov">      12049 : size_t CTxMemPool::DynamicMemoryUsage() const {</span></a>
+<a name="952"><span class="lineNum">     952 </span>                :<span class="lineCov">      12049 :     LOCK(cs);</span></a>
 <a name="953"><span class="lineNum">     953 </span>                :            :     // Estimate the overhead of mapTx to be 15 pointers + an allocation, as no exact formula for boost::multi_index_contained is implemented.</a>
-<a name="954"><span class="lineNum">     954 </span>  [<span class="branchCov" title="Branch 0 was taken 2023 times"> + </span><span class="branchCov" title="Branch 1 was taken 10009 times"> + </span><span class="branchCov" title="Branch 2 was taken 12032 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      14055 :     return memusage::MallocUsage(sizeof(CTxMemPoolEntry) + 15 * sizeof(void*)) * mapTx.size() + memusage::DynamicUsage(mapNextTx) + memusage::DynamicUsage(mapDeltas) + memusage::DynamicUsage(vTxHashes) + cachedInnerUsage;</span></a>
+<a name="954"><span class="lineNum">     954 </span>  [<span class="branchCov" title="Branch 0 was taken 2023 times"> + </span><span class="branchCov" title="Branch 1 was taken 10026 times"> + </span><span class="branchCov" title="Branch 2 was taken 12049 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      14072 :     return memusage::MallocUsage(sizeof(CTxMemPoolEntry) + 15 * sizeof(void*)) * mapTx.size() + memusage::DynamicUsage(mapNextTx) + memusage::DynamicUsage(mapDeltas) + memusage::DynamicUsage(vTxHashes) + cachedInnerUsage;</span></a>
 <a name="955"><span class="lineNum">     955 </span>                :            : }</a>
 <a name="956"><span class="lineNum">     956 </span>                :            : </a>
 <a name="957"><span class="lineNum">     957 </span>                :<span class="lineCov">      24695 : void CTxMemPool::RemoveUnbroadcastTx(const uint256&amp; txid, const bool unchecked) {</span></a>
@@ -1047,29 +1047,29 @@
 <a name="963"><span class="lineNum">     963 </span>                :            :     }</a>
 <a name="964"><span class="lineNum">     964 </span>                :<span class="lineCov">      24695 : }</span></a>
 <a name="965"><span class="lineNum">     965 </span>                :            : </a>
-<a name="966"><span class="lineNum">     966 </span>                :<span class="lineCov">      25172 : void CTxMemPool::RemoveStaged(setEntries &amp;stage, bool updateDescendants, MemPoolRemovalReason reason) {</span></a>
-<a name="967"><span class="lineNum">     967 </span>                :<span class="lineCov">      25172 :     AssertLockHeld(cs);</span></a>
-<a name="968"><span class="lineNum">     968 </span>                :<span class="lineCov">      25172 :     UpdateForRemoveFromMempool(stage, updateDescendants);</span></a>
-<a name="969"><span class="lineNum">     969 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchCov" title="Branch 1 was taken 25172 times"> + </span>]:<span class="lineCov">      49867 :     for (txiter it : stage) {</span></a>
+<a name="966"><span class="lineNum">     966 </span>                :<span class="lineCov">      25187 : void CTxMemPool::RemoveStaged(setEntries &amp;stage, bool updateDescendants, MemPoolRemovalReason reason) {</span></a>
+<a name="967"><span class="lineNum">     967 </span>                :<span class="lineCov">      25187 :     AssertLockHeld(cs);</span></a>
+<a name="968"><span class="lineNum">     968 </span>                :<span class="lineCov">      25187 :     UpdateForRemoveFromMempool(stage, updateDescendants);</span></a>
+<a name="969"><span class="lineNum">     969 </span>        [<span class="branchCov" title="Branch 0 was taken 24695 times"> + </span><span class="branchCov" title="Branch 1 was taken 25187 times"> + </span>]:<span class="lineCov">      49882 :     for (txiter it : stage) {</span></a>
 <a name="970"><span class="lineNum">     970 </span>                :<span class="lineCov">      24695 :         removeUnchecked(it, reason);</span></a>
 <a name="971"><span class="lineNum">     971 </span>                :            :     }</a>
-<a name="972"><span class="lineNum">     972 </span>                :<span class="lineCov">      25172 : }</span></a>
+<a name="972"><span class="lineNum">     972 </span>                :<span class="lineCov">      25187 : }</span></a>
 <a name="973"><span class="lineNum">     973 </span>                :            : </a>
-<a name="974"><span class="lineNum">     974 </span>                :<span class="lineCov">         83 : int CTxMemPool::Expire(std::chrono::seconds time)</span></a>
+<a name="974"><span class="lineNum">     974 </span>                :<span class="lineCov">         85 : int CTxMemPool::Expire(std::chrono::seconds time)</span></a>
 <a name="975"><span class="lineNum">     975 </span>                :            : {</a>
-<a name="976"><span class="lineNum">     976 </span>                :<span class="lineCov">         83 :     AssertLockHeld(cs);</span></a>
-<a name="977"><span class="lineNum">     977 </span>                :<span class="lineCov">         83 :     indexed_transaction_set::index&lt;entry_time&gt;::type::iterator it = mapTx.get&lt;entry_time&gt;().begin();</span></a>
-<a name="978"><span class="lineNum">     978 </span>                :<span class="lineCov">         83 :     setEntries toremove;</span></a>
+<a name="976"><span class="lineNum">     976 </span>                :<span class="lineCov">         85 :     AssertLockHeld(cs);</span></a>
+<a name="977"><span class="lineNum">     977 </span>                :<span class="lineCov">         85 :     indexed_transaction_set::index&lt;entry_time&gt;::type::iterator it = mapTx.get&lt;entry_time&gt;().begin();</span></a>
+<a name="978"><span class="lineNum">     978 </span>                :<span class="lineCov">         85 :     setEntries toremove;</span></a>
 <a name="979"><span class="lineNum">     979 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 68 times"> + </span>]:<span class="lineCov">         68 :     while (it != mapTx.get&lt;entry_time&gt;().end() &amp;&amp; it-&gt;GetTime() &lt; time) {</span></a>
 <a name="980"><span class="lineNum">     980 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         toremove.insert(mapTx.project&lt;0&gt;(it));</span></a>
-<a name="981"><span class="lineNum">     981 </span>        [<span class="branchCov" title="Branch 0 was taken 68 times"> + </span><span class="branchCov" title="Branch 1 was taken 15 times"> + </span>]:<span class="lineCov">         83 :         it++;</span></a>
+<a name="981"><span class="lineNum">     981 </span>        [<span class="branchCov" title="Branch 0 was taken 68 times"> + </span><span class="branchCov" title="Branch 1 was taken 17 times"> + </span>]:<span class="lineCov">         85 :         it++;</span></a>
 <a name="982"><span class="lineNum">     982 </span>                :            :     }</a>
-<a name="983"><span class="lineNum">     983 </span>                :<span class="lineCov">        166 :     setEntries stage;</span></a>
-<a name="984"><span class="lineNum">     984 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 83 times"> + </span>]:<span class="lineCov">         83 :     for (txiter removeit : toremove) {</span></a>
+<a name="983"><span class="lineNum">     983 </span>                :<span class="lineCov">        170 :     setEntries stage;</span></a>
+<a name="984"><span class="lineNum">     984 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 85 times"> + </span>]:<span class="lineCov">         85 :     for (txiter removeit : toremove) {</span></a>
 <a name="985"><span class="lineNum">     985 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         CalculateDescendants(removeit, stage);</span></a>
 <a name="986"><span class="lineNum">     986 </span>                :            :     }</a>
-<a name="987"><span class="lineNum">     987 </span>        [<span class="branchCov" title="Branch 0 was taken 83 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         83 :     RemoveStaged(stage, false, MemPoolRemovalReason::EXPIRY);</span></a>
-<a name="988"><span class="lineNum">     988 </span>                :<span class="lineCov">        166 :     return stage.size();</span></a>
+<a name="987"><span class="lineNum">     987 </span>        [<span class="branchCov" title="Branch 0 was taken 85 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         85 :     RemoveStaged(stage, false, MemPoolRemovalReason::EXPIRY);</span></a>
+<a name="988"><span class="lineNum">     988 </span>                :<span class="lineCov">        170 :     return stage.size();</span></a>
 <a name="989"><span class="lineNum">     989 </span>                :            : }</a>
 <a name="990"><span class="lineNum">     990 </span>                :            : </a>
 <a name="991"><span class="lineNum">     991 </span>                :<span class="lineCov">      26808 : void CTxMemPool::addUnchecked(const CTxMemPoolEntry &amp;entry, bool validFeeEstimate)</span></a>
@@ -1137,11 +1137,11 @@
 <a name="1051"><span class="lineNum">    1051 </span>                :            :     }</a>
 <a name="1052"><span class="lineNum">    1052 </span>                :<span class="lineCov">          5 : }</span></a>
 <a name="1053"><span class="lineNum">    1053 </span>                :            : </a>
-<a name="1054"><span class="lineNum">    1054 </span>                :<span class="lineCov">         89 : void CTxMemPool::TrimToSize(size_t sizelimit, std::vector&lt;COutPoint&gt;* pvNoSpendsRemaining) {</span></a>
-<a name="1055"><span class="lineNum">    1055 </span>                :<span class="lineCov">         89 :     AssertLockHeld(cs);</span></a>
+<a name="1054"><span class="lineNum">    1054 </span>                :<span class="lineCov">         91 : void CTxMemPool::TrimToSize(size_t sizelimit, std::vector&lt;COutPoint&gt;* pvNoSpendsRemaining) {</span></a>
+<a name="1055"><span class="lineNum">    1055 </span>                :<span class="lineCov">         91 :     AssertLockHeld(cs);</span></a>
 <a name="1056"><span class="lineNum">    1056 </span>                :            : </a>
-<a name="1057"><span class="lineNum">    1057 </span>                :<span class="lineCov">         89 :     unsigned nTxnRemoved = 0;</span></a>
-<a name="1058"><span class="lineNum">    1058 </span>                :<span class="lineCov">         89 :     CFeeRate maxFeeRateRemoved(0);</span></a>
+<a name="1057"><span class="lineNum">    1057 </span>                :<span class="lineCov">         91 :     unsigned nTxnRemoved = 0;</span></a>
+<a name="1058"><span class="lineNum">    1058 </span>                :<span class="lineCov">         91 :     CFeeRate maxFeeRateRemoved(0);</span></a>
 <a name="1059"><span class="lineNum">    1059 </span>        [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchCov" title="Branch 1 was taken 73 times"> + </span>]:<span class="lineCov">         78 :     while (!mapTx.empty() &amp;&amp; DynamicMemoryUsage() &gt; sizelimit) {</span></a>
 <a name="1060"><span class="lineNum">    1060 </span>                :<span class="lineCov">          5 :         indexed_transaction_set::index&lt;descendant_score&gt;::type::iterator it = mapTx.get&lt;descendant_score&gt;().begin();</span></a>
 <a name="1061"><span class="lineNum">    1061 </span>                :            : </a>
@@ -1154,7 +1154,7 @@
 <a name="1068"><span class="lineNum">    1068 </span>                :<span class="lineCov">          5 :         trackPackageRemoved(removed);</span></a>
 <a name="1069"><span class="lineNum">    1069 </span>        [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          5 :         maxFeeRateRemoved = std::max(maxFeeRateRemoved, removed);</span></a>
 <a name="1070"><span class="lineNum">    1070 </span>                :            : </a>
-<a name="1071"><span class="lineNum">    1071 </span>  [<span class="branchCov" title="Branch 0 was taken 78 times"> + </span><span class="branchCov" title="Branch 1 was taken 16 times"> + </span><span class="branchCov" title="Branch 2 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">         99 :         setEntries stage;</span></a>
+<a name="1071"><span class="lineNum">    1071 </span>  [<span class="branchCov" title="Branch 0 was taken 78 times"> + </span><span class="branchCov" title="Branch 1 was taken 18 times"> + </span><span class="branchCov" title="Branch 2 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        101 :         setEntries stage;</span></a>
 <a name="1072"><span class="lineNum">    1072 </span>        [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          5 :         CalculateDescendants(mapTx.project&lt;0&gt;(it), stage);</span></a>
 <a name="1073"><span class="lineNum">    1073 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 5 times"> + </span>]:<span class="lineCov">          5 :         nTxnRemoved += stage.size();</span></a>
 <a name="1074"><span class="lineNum">    1074 </span>                :            : </a>
@@ -1175,11 +1175,11 @@
 <a name="1089"><span class="lineNum">    1089 </span>                :            :         }</a>
 <a name="1090"><span class="lineNum">    1090 </span>                :            :     }</a>
 <a name="1091"><span class="lineNum">    1091 </span>                :            : </a>
-<a name="1092"><span class="lineNum">    1092 </span>        [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchCov" title="Branch 1 was taken 84 times"> + </span>]:<span class="lineCov">         89 :     if (maxFeeRateRemoved &gt; CFeeRate(0)) {</span></a>
+<a name="1092"><span class="lineNum">    1092 </span>        [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchCov" title="Branch 1 was taken 86 times"> + </span>]:<span class="lineCov">         91 :     if (maxFeeRateRemoved &gt; CFeeRate(0)) {</span></a>
 <a name="1093"><span class="lineNum">    1093 </span>  [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">         10 :         LogPrint(BCLog::MEMPOOL, &quot;Removed %u txn, rolling minimum fee bumped to %s\n&quot;, nTxnRemoved, maxFeeRateRemoved.ToString());</span></a>
 <span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
 <a name="1094"><span class="lineNum">    1094 </span>                :            :     }</a>
-<a name="1095"><span class="lineNum">    1095 </span>                :<span class="lineCov">         89 : }</span></a>
+<a name="1095"><span class="lineNum">    1095 </span>                :<span class="lineCov">         91 : }</span></a>
 <a name="1096"><span class="lineNum">    1096 </span>                :            : </a>
 <a name="1097"><span class="lineNum">    1097 </span>                :<span class="lineCov">         29 : uint64_t CTxMemPool::CalculateDescendantMaximum(txiter entry) const {</span></a>
 <a name="1098"><span class="lineNum">    1098 </span>                :            :     // find parent with highest descendant count</a>

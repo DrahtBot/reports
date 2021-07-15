@@ -83,9 +83,9 @@
 <a name="12"><span class="lineNum">      12 </span>                :            : </a>
 <a name="13"><span class="lineNum">      13 </span>                :            : namespace sha256_sse4</a>
 <a name="14"><span class="lineNum">      14 </span>                :            : {</a>
-<a name="15"><span class="lineNum">      15 </span>                :<span class="lineCov">   50443165 : void Transform(uint32_t* s, const unsigned char* chunk, size_t blocks)</span></a>
+<a name="15"><span class="lineNum">      15 </span>                :<span class="lineCov">   50008924 : void Transform(uint32_t* s, const unsigned char* chunk, size_t blocks)</span></a>
 <a name="16"><span class="lineNum">      16 </span>                :            : {</a>
-<a name="17"><span class="lineNum">      17 </span>                :<span class="lineCov">   50443165 :     static const uint32_t K256 alignas(16) [] = {</span></a>
+<a name="17"><span class="lineNum">      17 </span>                :<span class="lineCov">   50008924 :     static const uint32_t K256 alignas(16) [] = {</span></a>
 <a name="18"><span class="lineNum">      18 </span>                :            :         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,</a>
 <a name="19"><span class="lineNum">      19 </span>                :            :         0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,</a>
 <a name="20"><span class="lineNum">      20 </span>                :            :         0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,</a>
@@ -103,15 +103,15 @@
 <a name="32"><span class="lineNum">      32 </span>                :            :         0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,</a>
 <a name="33"><span class="lineNum">      33 </span>                :            :         0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,</a>
 <a name="34"><span class="lineNum">      34 </span>                :            :     };</a>
-<a name="35"><span class="lineNum">      35 </span>                :<span class="lineCov">   50443165 :     static const uint32_t FLIP_MASK alignas(16) [] = {0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f};</span></a>
-<a name="36"><span class="lineNum">      36 </span>                :<span class="lineCov">   50443165 :     static const uint32_t SHUF_00BA alignas(16) [] = {0x03020100, 0x0b0a0908, 0xffffffff, 0xffffffff};</span></a>
-<a name="37"><span class="lineNum">      37 </span>                :<span class="lineCov">   50443165 :     static const uint32_t SHUF_DC00 alignas(16) [] = {0xffffffff, 0xffffffff, 0x03020100, 0x0b0a0908};</span></a>
-<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">   50443165 :     uint32_t a, b, c, d, f, g, h, y0, y1, y2;</span></a>
-<a name="39"><span class="lineNum">      39 </span>                :<span class="lineCov">   50443165 :     uint64_t tbl;</span></a>
-<a name="40"><span class="lineNum">      40 </span>                :<span class="lineCov">   50443165 :     uint64_t inp_end, inp;</span></a>
-<a name="41"><span class="lineNum">      41 </span>                :<span class="lineCov">   50443165 :     uint32_t xfer alignas(16) [4];</span></a>
+<a name="35"><span class="lineNum">      35 </span>                :<span class="lineCov">   50008924 :     static const uint32_t FLIP_MASK alignas(16) [] = {0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f};</span></a>
+<a name="36"><span class="lineNum">      36 </span>                :<span class="lineCov">   50008924 :     static const uint32_t SHUF_00BA alignas(16) [] = {0x03020100, 0x0b0a0908, 0xffffffff, 0xffffffff};</span></a>
+<a name="37"><span class="lineNum">      37 </span>                :<span class="lineCov">   50008924 :     static const uint32_t SHUF_DC00 alignas(16) [] = {0xffffffff, 0xffffffff, 0x03020100, 0x0b0a0908};</span></a>
+<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">   50008924 :     uint32_t a, b, c, d, f, g, h, y0, y1, y2;</span></a>
+<a name="39"><span class="lineNum">      39 </span>                :<span class="lineCov">   50008924 :     uint64_t tbl;</span></a>
+<a name="40"><span class="lineNum">      40 </span>                :<span class="lineCov">   50008924 :     uint64_t inp_end, inp;</span></a>
+<a name="41"><span class="lineNum">      41 </span>                :<span class="lineCov">   50008924 :     uint32_t xfer alignas(16) [4];</span></a>
 <a name="42"><span class="lineNum">      42 </span>                :            : </a>
-<a name="43"><span class="lineNum">      43 </span>                :<span class="lineCov">   50443165 :     __asm__ __volatile__(</span></a>
+<a name="43"><span class="lineNum">      43 </span>                :<span class="lineCov">   50008924 :     __asm__ __volatile__(</span></a>
 <a name="44"><span class="lineNum">      44 </span>                :            :         &quot;shl    $0x6,%2;&quot;</a>
 <a name="45"><span class="lineNum">      45 </span>                :            :         &quot;je     Ldone_hash_%=;&quot;</a>
 <a name="46"><span class="lineNum">      46 </span>                :            :         &quot;add    %1,%2;&quot;</a>
@@ -1024,7 +1024,7 @@
 <a name="953"><span class="lineNum">     953 </span>                :            :         : &quot;m&quot;(K256), &quot;m&quot;(FLIP_MASK), &quot;m&quot;(SHUF_00BA), &quot;m&quot;(SHUF_DC00)</a>
 <a name="954"><span class="lineNum">     954 </span>                :            :         : &quot;cc&quot;, &quot;memory&quot;, &quot;xmm0&quot;, &quot;xmm1&quot;, &quot;xmm2&quot;, &quot;xmm3&quot;, &quot;xmm4&quot;, &quot;xmm5&quot;, &quot;xmm6&quot;, &quot;xmm7&quot;, &quot;xmm8&quot;, &quot;xmm9&quot;, &quot;xmm10&quot;, &quot;xmm11&quot;, &quot;xmm12&quot;</a>
 <a name="955"><span class="lineNum">     955 </span>                :            :    );</a>
-<a name="956"><span class="lineNum">     956 </span>                :<span class="lineCov">   50442903 : }</span></a>
+<a name="956"><span class="lineNum">     956 </span>                :<span class="lineCov">   50011537 : }</span></a>
 <a name="957"><span class="lineNum">     957 </span>                :            : }</a>
 <a name="958"><span class="lineNum">     958 </span>                :            : </a>
 <a name="959"><span class="lineNum">     959 </span>                :            : /*</a>

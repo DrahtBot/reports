@@ -132,7 +132,7 @@
 <a name="61"><span class="lineNum">      61 </span>                :            :     /**</a>
 <a name="62"><span class="lineNum">      62 </span>                :            :      * @param[in] _parent   CDBWrapper that this batch is to be submitted to</a>
 <a name="63"><span class="lineNum">      63 </span>                :            :      */</a>
-<a name="64"><span class="lineNum">      64 </span>                :<span class="lineCov">       1121 :     explicit CDBBatch(const CDBWrapper &amp;_parent) : parent(_parent), ssKey(SER_DISK, CLIENT_VERSION), ssValue(SER_DISK, CLIENT_VERSION), size_estimate(0) { };</span></a>
+<a name="64"><span class="lineNum">      64 </span>                :<span class="lineCov">       1111 :     explicit CDBBatch(const CDBWrapper &amp;_parent) : parent(_parent), ssKey(SER_DISK, CLIENT_VERSION), ssValue(SER_DISK, CLIENT_VERSION), size_estimate(0) { };</span></a>
 <a name="65"><span class="lineNum">      65 </span>                :            : </a>
 <a name="66"><span class="lineNum">      66 </span>                :<span class="lineNoCov">          0 :     void Clear()</span></a>
 <a name="67"><span class="lineNum">      67 </span>                :            :     {</a>
@@ -141,18 +141,18 @@
 <a name="70"><span class="lineNum">      70 </span>                :            :     }</a>
 <a name="71"><span class="lineNum">      71 </span>                :            : </a>
 <a name="72"><span class="lineNum">      72 </span>                :            :     template &lt;typename K, typename V&gt;</a>
-<a name="73"><span class="lineNum">      73 </span>                :<span class="lineCov">      23881 :     void Write(const K&amp; key, const V&amp; value)</span></a>
+<a name="73"><span class="lineNum">      73 </span>                :<span class="lineCov">      23307 :     void Write(const K&amp; key, const V&amp; value)</span></a>
 <a name="74"><span class="lineNum">      74 </span>                :            :     {</a>
-<a name="75"><span class="lineNum">      75 </span>                :<span class="lineCov">      23881 :         ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></a>
-<a name="76"><span class="lineNum">      76 </span>                :<span class="lineCov">      23881 :         ssKey &lt;&lt; key;</span></a>
-<a name="77"><span class="lineNum">      77 </span>                :<span class="lineCov">      23881 :         leveldb::Slice slKey((const char*)ssKey.data(), ssKey.size());</span></a>
+<a name="75"><span class="lineNum">      75 </span>                :<span class="lineCov">      23307 :         ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></a>
+<a name="76"><span class="lineNum">      76 </span>                :<span class="lineCov">      23307 :         ssKey &lt;&lt; key;</span></a>
+<a name="77"><span class="lineNum">      77 </span>                :<span class="lineCov">      23307 :         leveldb::Slice slKey((const char*)ssKey.data(), ssKey.size());</span></a>
 <a name="78"><span class="lineNum">      78 </span>                :            : </a>
-<a name="79"><span class="lineNum">      79 </span>                :<span class="lineCov">      23881 :         ssValue.reserve(DBWRAPPER_PREALLOC_VALUE_SIZE);</span></a>
-<a name="80"><span class="lineNum">      80 </span>                :<span class="lineCov">      23881 :         ssValue &lt;&lt; value;</span></a>
-<a name="81"><span class="lineNum">      81 </span>                :<span class="lineCov">      23881 :         ssValue.Xor(dbwrapper_private::GetObfuscateKey(parent));</span></a>
-<a name="82"><span class="lineNum">      82 </span>                :<span class="lineCov">      23881 :         leveldb::Slice slValue((const char*)ssValue.data(), ssValue.size());</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :<span class="lineCov">      23307 :         ssValue.reserve(DBWRAPPER_PREALLOC_VALUE_SIZE);</span></a>
+<a name="80"><span class="lineNum">      80 </span>                :<span class="lineCov">      23307 :         ssValue &lt;&lt; value;</span></a>
+<a name="81"><span class="lineNum">      81 </span>                :<span class="lineCov">      23307 :         ssValue.Xor(dbwrapper_private::GetObfuscateKey(parent));</span></a>
+<a name="82"><span class="lineNum">      82 </span>                :<span class="lineCov">      23307 :         leveldb::Slice slValue((const char*)ssValue.data(), ssValue.size());</span></a>
 <a name="83"><span class="lineNum">      83 </span>                :            : </a>
-<a name="84"><span class="lineNum">      84 </span>        [<span class="branchCov" title="Branch 0 was taken 23851 times"> + </span><span class="branchCov" title="Branch 1 was taken 30 times"> + </span>]:<span class="lineCov">      23881 :         batch.Put(slKey, slValue);</span></a>
+<a name="84"><span class="lineNum">      84 </span>        [<span class="branchCov" title="Branch 0 was taken 23277 times"> + </span><span class="branchCov" title="Branch 1 was taken 30 times"> + </span>]:<span class="lineCov">      23307 :         batch.Put(slKey, slValue);</span></a>
 <a name="85"><span class="lineNum">      85 </span>                :            :         // LevelDB serializes writes as:</a>
 <a name="86"><span class="lineNum">      86 </span>                :            :         // - byte: header</a>
 <a name="87"><span class="lineNum">      87 </span>                :            :         // - varint: key length (1 byte up to 127B, 2 bytes up to 16383B, ...)</a>
@@ -160,30 +160,30 @@
 <a name="89"><span class="lineNum">      89 </span>                :            :         // - varint: value length</a>
 <a name="90"><span class="lineNum">      90 </span>                :            :         // - byte[]: value</a>
 <a name="91"><span class="lineNum">      91 </span>                :            :         // The formula below assumes the key and value are both less than 16k.</a>
-<a name="92"><span class="lineNum">      92 </span>        [<span class="branchCov" title="Branch 0 was taken 23851 times"> + </span><span class="branchCov" title="Branch 1 was taken 30 times"> + </span>]:<span class="lineCov">      23881 :         size_estimate += 3 + (slKey.size() &gt; 127) + slKey.size() + (slValue.size() &gt; 127) + slValue.size();</span></a>
-<a name="93"><span class="lineNum">      93 </span>        [<span class="branchCov" title="Branch 0 was taken 23881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      23881 :         ssKey.clear();</span></a>
-<a name="94"><span class="lineNum">      94 </span>        [<span class="branchCov" title="Branch 0 was taken 23881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      23881 :         ssValue.clear();</span></a>
-<a name="95"><span class="lineNum">      95 </span>                :<span class="lineCov">      23881 :     }</span></a>
+<a name="92"><span class="lineNum">      92 </span>        [<span class="branchCov" title="Branch 0 was taken 23277 times"> + </span><span class="branchCov" title="Branch 1 was taken 30 times"> + </span>]:<span class="lineCov">      23307 :         size_estimate += 3 + (slKey.size() &gt; 127) + slKey.size() + (slValue.size() &gt; 127) + slValue.size();</span></a>
+<a name="93"><span class="lineNum">      93 </span>        [<span class="branchCov" title="Branch 0 was taken 23307 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      23307 :         ssKey.clear();</span></a>
+<a name="94"><span class="lineNum">      94 </span>        [<span class="branchCov" title="Branch 0 was taken 23307 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      23307 :         ssValue.clear();</span></a>
+<a name="95"><span class="lineNum">      95 </span>                :<span class="lineCov">      23307 :     }</span></a>
 <a name="96"><span class="lineNum">      96 </span>                :            : </a>
 <a name="97"><span class="lineNum">      97 </span>                :            :     template &lt;typename K&gt;</a>
-<a name="98"><span class="lineNum">      98 </span>                :<span class="lineCov">      15008 :     void Erase(const K&amp; key)</span></a>
+<a name="98"><span class="lineNum">      98 </span>                :<span class="lineCov">      14713 :     void Erase(const K&amp; key)</span></a>
 <a name="99"><span class="lineNum">      99 </span>                :            :     {</a>
-<a name="100"><span class="lineNum">     100 </span>                :<span class="lineCov">      15008 :         ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></a>
-<a name="101"><span class="lineNum">     101 </span>                :<span class="lineCov">      15008 :         ssKey &lt;&lt; key;</span></a>
-<a name="102"><span class="lineNum">     102 </span>                :<span class="lineCov">      15008 :         leveldb::Slice slKey((const char*)ssKey.data(), ssKey.size());</span></a>
+<a name="100"><span class="lineNum">     100 </span>                :<span class="lineCov">      14713 :         ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></a>
+<a name="101"><span class="lineNum">     101 </span>                :<span class="lineCov">      14713 :         ssKey &lt;&lt; key;</span></a>
+<a name="102"><span class="lineNum">     102 </span>                :<span class="lineCov">      14713 :         leveldb::Slice slKey((const char*)ssKey.data(), ssKey.size());</span></a>
 <a name="103"><span class="lineNum">     103 </span>                :            : </a>
-<a name="104"><span class="lineNum">     104 </span>        [<span class="branchCov" title="Branch 0 was taken 15008 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      15008 :         batch.Delete(slKey);</span></a>
+<a name="104"><span class="lineNum">     104 </span>        [<span class="branchCov" title="Branch 0 was taken 14713 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      14713 :         batch.Delete(slKey);</span></a>
 <a name="105"><span class="lineNum">     105 </span>                :            :         // LevelDB serializes erases as:</a>
 <a name="106"><span class="lineNum">     106 </span>                :            :         // - byte: header</a>
 <a name="107"><span class="lineNum">     107 </span>                :            :         // - varint: key length</a>
 <a name="108"><span class="lineNum">     108 </span>                :            :         // - byte[]: key</a>
 <a name="109"><span class="lineNum">     109 </span>                :            :         // The formula below assumes the key is less than 16kB.</a>
-<a name="110"><span class="lineNum">     110 </span>        [<span class="branchCov" title="Branch 0 was taken 15008 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      15008 :         size_estimate += 2 + (slKey.size() &gt; 127) + slKey.size();</span></a>
-<a name="111"><span class="lineNum">     111 </span>        [<span class="branchCov" title="Branch 0 was taken 15008 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      15008 :         ssKey.clear();</span></a>
-<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">      15008 :     }</span></a>
+<a name="110"><span class="lineNum">     110 </span>        [<span class="branchCov" title="Branch 0 was taken 14713 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      14713 :         size_estimate += 2 + (slKey.size() &gt; 127) + slKey.size();</span></a>
+<a name="111"><span class="lineNum">     111 </span>        [<span class="branchCov" title="Branch 0 was taken 14713 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      14713 :         ssKey.clear();</span></a>
+<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">      14713 :     }</span></a>
 <a name="113"><span class="lineNum">     113 </span>                :            : </a>
-<a name="114"><span class="lineNum">     114 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 114067 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     114245 :     size_t SizeEstimate() const { return size_estimate; }</span></a>
-<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 178 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="114"><span class="lineNum">     114 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 118441 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     118609 :     size_t SizeEstimate() const { return size_estimate; }</span></a>
+<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 168 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
 <a name="115"><span class="lineNum">     115 </span>                :            : };</a>
 <a name="116"><span class="lineNum">     116 </span>                :            : </a>
 <a name="117"><span class="lineNum">     117 </span>                :            : class CDBIterator</a>
@@ -300,30 +300,30 @@
 <a name="228"><span class="lineNum">     228 </span>                :            :     CDBWrapper&amp; operator=(const CDBWrapper&amp;) = delete;</a>
 <a name="229"><span class="lineNum">     229 </span>                :            : </a>
 <a name="230"><span class="lineNum">     230 </span>                :            :     template &lt;typename K, typename V&gt;</a>
-<a name="231"><span class="lineNum">     231 </span>        [<span class="branchCov" title="Branch 0 was taken 4071830 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4071830 :     bool Read(const K&amp; key, V&amp; value) const</span></a>
+<a name="231"><span class="lineNum">     231 </span>        [<span class="branchCov" title="Branch 0 was taken 4869796 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4869796 :     bool Read(const K&amp; key, V&amp; value) const</span></a>
 <a name="232"><span class="lineNum">     232 </span>                :            :     {</a>
-<a name="233"><span class="lineNum">     233 </span>        [<span class="branchCov" title="Branch 0 was taken 4071830 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    8143660 :         CDataStream ssKey(SER_DISK, CLIENT_VERSION);</span></a>
-<a name="234"><span class="lineNum">     234 </span>        [<span class="branchCov" title="Branch 0 was taken 4071830 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4071830 :         ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></a>
-<a name="235"><span class="lineNum">     235 </span>        [<span class="branchCov" title="Branch 0 was taken 4071830 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4071830 :         ssKey &lt;&lt; key;</span></a>
-<a name="236"><span class="lineNum">     236 </span>        [<span class="branchCov" title="Branch 0 was taken 4071830 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4071830 :         leveldb::Slice slKey((const char*)ssKey.data(), ssKey.size());</span></a>
+<a name="233"><span class="lineNum">     233 </span>        [<span class="branchCov" title="Branch 0 was taken 4869796 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9739592 :         CDataStream ssKey(SER_DISK, CLIENT_VERSION);</span></a>
+<a name="234"><span class="lineNum">     234 </span>        [<span class="branchCov" title="Branch 0 was taken 4869796 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4869796 :         ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></a>
+<a name="235"><span class="lineNum">     235 </span>        [<span class="branchCov" title="Branch 0 was taken 4869796 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4869796 :         ssKey &lt;&lt; key;</span></a>
+<a name="236"><span class="lineNum">     236 </span>        [<span class="branchCov" title="Branch 0 was taken 4869796 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4869796 :         leveldb::Slice slKey((const char*)ssKey.data(), ssKey.size());</span></a>
 <a name="237"><span class="lineNum">     237 </span>                :            : </a>
-<a name="238"><span class="lineNum">     238 </span>                :<span class="lineCov">    4071830 :         std::string strValue;</span></a>
-<a name="239"><span class="lineNum">     239 </span>        [<span class="branchCov" title="Branch 0 was taken 4071830 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    8143660 :         leveldb::Status status = pdb-&gt;Get(readoptions, slKey, &amp;strValue);</span></a>
-<a name="240"><span class="lineNum">     240 </span>        [<span class="branchCov" title="Branch 0 was taken 3980623 times"> + </span><span class="branchCov" title="Branch 1 was taken 91207 times"> + </span>]:<span class="lineCov">    4071830 :         if (!status.ok()) {</span></a>
-<a name="241"><span class="lineNum">     241 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3980623 times"> + </span>]:<span class="lineCov">    3980623 :             if (status.IsNotFound())</span></a>
+<a name="238"><span class="lineNum">     238 </span>                :<span class="lineCov">    4869796 :         std::string strValue;</span></a>
+<a name="239"><span class="lineNum">     239 </span>        [<span class="branchCov" title="Branch 0 was taken 4869796 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9739592 :         leveldb::Status status = pdb-&gt;Get(readoptions, slKey, &amp;strValue);</span></a>
+<a name="240"><span class="lineNum">     240 </span>        [<span class="branchCov" title="Branch 0 was taken 4776351 times"> + </span><span class="branchCov" title="Branch 1 was taken 93445 times"> + </span>]:<span class="lineCov">    4869796 :         if (!status.ok()) {</span></a>
+<a name="241"><span class="lineNum">     241 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 4776351 times"> + </span>]:<span class="lineCov">    4776351 :             if (status.IsNotFound())</span></a>
 <a name="242"><span class="lineNum">     242 </span>                :            :                 return false;</a>
 <a name="243"><span class="lineNum">     243 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :             LogPrintf(&quot;LevelDB read failure: %s\n&quot;, status.ToString());</span></a>
 <span class="lineNum">         </span>   <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span><span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span>]
 <a name="244"><span class="lineNum">     244 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             dbwrapper_private::HandleError(status);</span></a>
 <a name="245"><span class="lineNum">     245 </span>                :            :         }</a>
 <a name="246"><span class="lineNum">     246 </span>                :            :         try {</a>
-<a name="247"><span class="lineNum">     247 </span>        [<span class="branchCov" title="Branch 0 was taken 91207 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      91207 :             CDataStream ssValue(MakeUCharSpan(strValue), SER_DISK, CLIENT_VERSION);</span></a>
-<a name="248"><span class="lineNum">     248 </span>        [<span class="branchCov" title="Branch 0 was taken 91207 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      91207 :             ssValue.Xor(obfuscate_key);</span></a>
-<a name="249"><span class="lineNum">     249 </span>                :<span class="lineCov">      91207 :             ssValue &gt;&gt; value;</span></a>
+<a name="247"><span class="lineNum">     247 </span>        [<span class="branchCov" title="Branch 0 was taken 93445 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      93445 :             CDataStream ssValue(MakeUCharSpan(strValue), SER_DISK, CLIENT_VERSION);</span></a>
+<a name="248"><span class="lineNum">     248 </span>        [<span class="branchCov" title="Branch 0 was taken 93445 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      93445 :             ssValue.Xor(obfuscate_key);</span></a>
+<a name="249"><span class="lineNum">     249 </span>                :<span class="lineCov">      93445 :             ssValue &gt;&gt; value;</span></a>
 <a name="250"><span class="lineNum">     250 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineNoCov">          0 :         } catch (const std::exception&amp;) {</span></a>
 <a name="251"><span class="lineNum">     251 </span>                :            :             return false;</a>
 <a name="252"><span class="lineNum">     252 </span>                :            :         }</a>
-<a name="253"><span class="lineNum">     253 </span>                :<span class="lineCov">      91207 :         return true;</span></a>
+<a name="253"><span class="lineNum">     253 </span>                :<span class="lineCov">      93445 :         return true;</span></a>
 <a name="254"><span class="lineNum">     254 </span>                :            :     }</a>
 <a name="255"><span class="lineNum">     255 </span>                :            : </a>
 <a name="256"><span class="lineNum">     256 </span>                :            :     template &lt;typename K, typename V&gt;</a>

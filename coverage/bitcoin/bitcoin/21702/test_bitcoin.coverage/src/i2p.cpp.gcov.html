@@ -31,9 +31,9 @@
             <td class="headerValue">test_bitcoin_coverage.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">53</td>
-            <td class="headerCovTableEntry">202</td>
-            <td class="headerCovTableEntryLo">26.2 %</td>
+            <td class="headerCovTableEntry">54</td>
+            <td class="headerCovTableEntry">205</td>
+            <td class="headerCovTableEntryLo">26.3 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
@@ -49,9 +49,9 @@
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">42</td>
+            <td class="headerCovTableEntry">43</td>
             <td class="headerCovTableEntry">347</td>
-            <td class="headerCovTableEntryLo">12.1 %</td>
+            <td class="headerCovTableEntryLo">12.4 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -232,8 +232,7 @@
 <a name="159"><span class="lineNum">     159 </span>                :<span class="lineNoCov">          0 :             const std::string&amp; peer_dest =</span></a>
 <a name="160"><span class="lineNum">     160 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :                 conn.sock-&gt;RecvUntilTerminator('\n', MAX_WAIT_FOR_IO, *m_interrupt, MAX_MSG_SIZE);</span></a>
 <a name="161"><span class="lineNum">     161 </span>                :            : </a>
-<a name="162"><span class="lineNum">     162 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :             conn.peer = CService(DestB64ToAddr(peer_dest), Params().GetDefaultPort());</span></a>
-<span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
+<a name="162"><span class="lineNum">     162 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :             conn.peer = CService(DestB64ToAddr(peer_dest), I2P_SAM31_PORT);</span></a>
 <a name="163"><span class="lineNum">     163 </span>                :            : </a>
 <a name="164"><span class="lineNum">     164 </span>                :<span class="lineNoCov">          0 :             return true;</span></a>
 <a name="165"><span class="lineNum">     165 </span>                :            :         }</a>
@@ -247,259 +246,266 @@
 <a name="172"><span class="lineNum">     172 </span>                :            : </a>
 <a name="173"><span class="lineNum">     173 </span>                :<span class="lineCov">          1 : bool Session::Connect(const CService&amp; to, Connection&amp; conn, bool&amp; proxy_error)</span></a>
 <a name="174"><span class="lineNum">     174 </span>                :            : {</a>
-<a name="175"><span class="lineNum">     175 </span>                :<span class="lineCov">          1 :     proxy_error = true;</span></a>
-<a name="176"><span class="lineNum">     176 </span>                :            : </a>
-<a name="177"><span class="lineNum">     177 </span>                :<span class="lineCov">          2 :     std::string session_id;</span></a>
-<a name="178"><span class="lineNum">     178 </span>                :<span class="lineCov">          1 :     std::unique_ptr&lt;Sock&gt; sock;</span></a>
-<a name="179"><span class="lineNum">     179 </span>                :<span class="lineCov">          1 :     conn.peer = to;</span></a>
-<a name="180"><span class="lineNum">     180 </span>                :            : </a>
-<a name="181"><span class="lineNum">     181 </span>                :<span class="lineCov">          1 :     try {</span></a>
-<a name="182"><span class="lineNum">     182 </span>                :<span class="lineCov">          1 :         {</span></a>
-<a name="183"><span class="lineNum">     183 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :             LOCK(m_mutex);</span></a>
-<a name="184"><span class="lineNum">     184 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :             CreateIfNotCreatedAlready();</span></a>
-<a name="185"><span class="lineNum">     185 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             session_id = m_session_id;</span></a>
-<a name="186"><span class="lineNum">     186 </span>                :<span class="lineNoCov">          0 :             conn.me = m_my_addr;</span></a>
-<a name="187"><span class="lineNum">     187 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :             sock = Hello();</span></a>
-<a name="188"><span class="lineNum">     188 </span>                :            :         }</a>
-<a name="189"><span class="lineNum">     189 </span>                :            : </a>
-<a name="190"><span class="lineNum">     190 </span>                :<span class="lineNoCov">          0 :         const Reply&amp; lookup_reply =</span></a>
-<a name="191"><span class="lineNum">     191 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :             SendRequestAndGetReply(*sock, strprintf(&quot;NAMING LOOKUP NAME=%s&quot;, to.ToStringIP()));</span></a>
+<a name="175"><span class="lineNum">     175 </span>                :            :     // Refuse connecting to arbitrary ports. We don't specify any destination port to the SAM proxy</a>
+<a name="176"><span class="lineNum">     176 </span>                :            :     // when connecting (SAM 3.1 does not use ports) and it forces/defaults it to I2P_SAM31_PORT.</a>
+<a name="177"><span class="lineNum">     177 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (to.GetPort() != I2P_SAM31_PORT) {</span></a>
+<a name="178"><span class="lineNum">     178 </span>                :<span class="lineNoCov">          0 :         proxy_error = false;</span></a>
+<a name="179"><span class="lineNum">     179 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
+<a name="180"><span class="lineNum">     180 </span>                :            :     }</a>
+<a name="181"><span class="lineNum">     181 </span>                :            : </a>
+<a name="182"><span class="lineNum">     182 </span>                :<span class="lineCov">          1 :     proxy_error = true;</span></a>
+<a name="183"><span class="lineNum">     183 </span>                :            : </a>
+<a name="184"><span class="lineNum">     184 </span>                :<span class="lineCov">          2 :     std::string session_id;</span></a>
+<a name="185"><span class="lineNum">     185 </span>                :<span class="lineCov">          1 :     std::unique_ptr&lt;Sock&gt; sock;</span></a>
+<a name="186"><span class="lineNum">     186 </span>                :<span class="lineCov">          1 :     conn.peer = to;</span></a>
+<a name="187"><span class="lineNum">     187 </span>                :            : </a>
+<a name="188"><span class="lineNum">     188 </span>                :<span class="lineCov">          1 :     try {</span></a>
+<a name="189"><span class="lineNum">     189 </span>                :<span class="lineCov">          1 :         {</span></a>
+<a name="190"><span class="lineNum">     190 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :             LOCK(m_mutex);</span></a>
+<a name="191"><span class="lineNum">     191 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :             CreateIfNotCreatedAlready();</span></a>
+<a name="192"><span class="lineNum">     192 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             session_id = m_session_id;</span></a>
+<a name="193"><span class="lineNum">     193 </span>                :<span class="lineNoCov">          0 :             conn.me = m_my_addr;</span></a>
+<a name="194"><span class="lineNum">     194 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :             sock = Hello();</span></a>
+<a name="195"><span class="lineNum">     195 </span>                :            :         }</a>
+<a name="196"><span class="lineNum">     196 </span>                :            : </a>
+<a name="197"><span class="lineNum">     197 </span>                :<span class="lineNoCov">          0 :         const Reply&amp; lookup_reply =</span></a>
+<a name="198"><span class="lineNum">     198 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :             SendRequestAndGetReply(*sock, strprintf(&quot;NAMING LOOKUP NAME=%s&quot;, to.ToStringIP()));</span></a>
 <span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
-<a name="192"><span class="lineNum">     192 </span>                :            : </a>
-<a name="193"><span class="lineNum">     193 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         const std::string&amp; dest = lookup_reply.Get(&quot;VALUE&quot;);</span></a>
+<a name="199"><span class="lineNum">     199 </span>                :            : </a>
+<a name="200"><span class="lineNum">     200 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         const std::string&amp; dest = lookup_reply.Get(&quot;VALUE&quot;);</span></a>
 <span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
-<a name="194"><span class="lineNum">     194 </span>                :            : </a>
-<a name="195"><span class="lineNum">     195 </span>                :<span class="lineNoCov">          0 :         const Reply&amp; connect_reply = SendRequestAndGetReply(</span></a>
-<a name="196"><span class="lineNum">     196 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             *sock, strprintf(&quot;STREAM CONNECT ID=%s DESTINATION=%s SILENT=false&quot;, session_id, dest),</span></a>
-<a name="197"><span class="lineNum">     197 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             false);</span></a>
-<a name="198"><span class="lineNum">     198 </span>                :            : </a>
-<a name="199"><span class="lineNum">     199 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         const std::string&amp; result = connect_reply.Get(&quot;RESULT&quot;);</span></a>
-<a name="200"><span class="lineNum">     200 </span>                :            : </a>
-<a name="201"><span class="lineNum">     201 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (result == &quot;OK&quot;) {</span></a>
-<a name="202"><span class="lineNum">     202 </span>                :<span class="lineNoCov">          0 :             conn.sock = std::move(sock);</span></a>
-<a name="203"><span class="lineNum">     203 </span>                :<span class="lineNoCov">          0 :             return true;</span></a>
-<a name="204"><span class="lineNum">     204 </span>                :            :         }</a>
+<a name="201"><span class="lineNum">     201 </span>                :            : </a>
+<a name="202"><span class="lineNum">     202 </span>                :<span class="lineNoCov">          0 :         const Reply&amp; connect_reply = SendRequestAndGetReply(</span></a>
+<a name="203"><span class="lineNum">     203 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             *sock, strprintf(&quot;STREAM CONNECT ID=%s DESTINATION=%s SILENT=false&quot;, session_id, dest),</span></a>
+<a name="204"><span class="lineNum">     204 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             false);</span></a>
 <a name="205"><span class="lineNum">     205 </span>                :            : </a>
-<a name="206"><span class="lineNum">     206 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (result == &quot;INVALID_ID&quot;) {</span></a>
-<a name="207"><span class="lineNum">     207 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             LOCK(m_mutex);</span></a>
-<a name="208"><span class="lineNum">     208 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             Disconnect();</span></a>
-<a name="209"><span class="lineNum">     209 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             throw std::runtime_error(&quot;Invalid session id&quot;);</span></a>
-<a name="210"><span class="lineNum">     210 </span>                :            :         }</a>
-<a name="211"><span class="lineNum">     211 </span>                :            : </a>
-<a name="212"><span class="lineNum">     212 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (result == &quot;CANT_REACH_PEER&quot; || result == &quot;TIMEOUT&quot;) {</span></a>
-<a name="213"><span class="lineNum">     213 </span>                :<span class="lineNoCov">          0 :             proxy_error = false;</span></a>
-<a name="214"><span class="lineNum">     214 </span>                :            :         }</a>
-<a name="215"><span class="lineNum">     215 </span>                :            : </a>
-<a name="216"><span class="lineNum">     216 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(strprintf(&quot;\&quot;%s\&quot;&quot;, connect_reply.full));</span></a>
-<a name="217"><span class="lineNum">     217 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     } catch (const std::runtime_error&amp; e) {</span></a>
-<a name="218"><span class="lineNum">     218 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          2 :         Log(&quot;Error connecting to %s: %s&quot;, to.ToString(), e.what());</span></a>
+<a name="206"><span class="lineNum">     206 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         const std::string&amp; result = connect_reply.Get(&quot;RESULT&quot;);</span></a>
+<a name="207"><span class="lineNum">     207 </span>                :            : </a>
+<a name="208"><span class="lineNum">     208 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (result == &quot;OK&quot;) {</span></a>
+<a name="209"><span class="lineNum">     209 </span>                :<span class="lineNoCov">          0 :             conn.sock = std::move(sock);</span></a>
+<a name="210"><span class="lineNum">     210 </span>                :<span class="lineNoCov">          0 :             return true;</span></a>
+<a name="211"><span class="lineNum">     211 </span>                :            :         }</a>
+<a name="212"><span class="lineNum">     212 </span>                :            : </a>
+<a name="213"><span class="lineNum">     213 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (result == &quot;INVALID_ID&quot;) {</span></a>
+<a name="214"><span class="lineNum">     214 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             LOCK(m_mutex);</span></a>
+<a name="215"><span class="lineNum">     215 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             Disconnect();</span></a>
+<a name="216"><span class="lineNum">     216 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             throw std::runtime_error(&quot;Invalid session id&quot;);</span></a>
+<a name="217"><span class="lineNum">     217 </span>                :            :         }</a>
+<a name="218"><span class="lineNum">     218 </span>                :            : </a>
+<a name="219"><span class="lineNum">     219 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (result == &quot;CANT_REACH_PEER&quot; || result == &quot;TIMEOUT&quot;) {</span></a>
+<a name="220"><span class="lineNum">     220 </span>                :<span class="lineNoCov">          0 :             proxy_error = false;</span></a>
+<a name="221"><span class="lineNum">     221 </span>                :            :         }</a>
+<a name="222"><span class="lineNum">     222 </span>                :            : </a>
+<a name="223"><span class="lineNum">     223 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(strprintf(&quot;\&quot;%s\&quot;&quot;, connect_reply.full));</span></a>
+<a name="224"><span class="lineNum">     224 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     } catch (const std::runtime_error&amp; e) {</span></a>
+<a name="225"><span class="lineNum">     225 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          2 :         Log(&quot;Error connecting to %s: %s&quot;, to.ToString(), e.what());</span></a>
 <span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
-<a name="219"><span class="lineNum">     219 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :         CheckControlSock();</span></a>
-<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">          1 :         return false;</span></a>
-<a name="221"><span class="lineNum">     221 </span>                :            :     }</a>
-<a name="222"><span class="lineNum">     222 </span>                :            : }</a>
-<a name="223"><span class="lineNum">     223 </span>                :            : </a>
-<a name="224"><span class="lineNum">     224 </span>                :            : // Private methods</a>
-<a name="225"><span class="lineNum">     225 </span>                :            : </a>
-<a name="226"><span class="lineNum">     226 </span>                :<span class="lineNoCov">          0 : std::string Session::Reply::Get(const std::string&amp; key) const</span></a>
-<a name="227"><span class="lineNum">     227 </span>                :            : {</a>
-<a name="228"><span class="lineNum">     228 </span>                :<span class="lineNoCov">          0 :     const auto&amp; pos = keys.find(key);</span></a>
-<a name="229"><span class="lineNum">     229 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (pos == keys.end() || !pos-&gt;second.has_value()) {</span></a>
-<a name="230"><span class="lineNum">     230 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(</span></a>
-<a name="231"><span class="lineNum">     231 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             strprintf(&quot;Missing %s= in the reply to \&quot;%s\&quot;: \&quot;%s\&quot;&quot;, key, request, full));</span></a>
-<a name="232"><span class="lineNum">     232 </span>                :            :     }</a>
-<a name="233"><span class="lineNum">     233 </span>                :<span class="lineNoCov">          0 :     return pos-&gt;second.value();</span></a>
-<a name="234"><span class="lineNum">     234 </span>                :            : }</a>
-<a name="235"><span class="lineNum">     235 </span>                :            : </a>
-<a name="236"><span class="lineNum">     236 </span>                :            : template &lt;typename... Args&gt;</a>
-<a name="237"><span class="lineNum">     237 </span>                :<span class="lineCov">          3 : void Session::Log(const std::string&amp; fmt, const Args&amp;... args) const</span></a>
-<a name="238"><span class="lineNum">     238 </span>                :            : {</a>
-<a name="239"><span class="lineNum">     239 </span>  [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          6 :     LogPrint(BCLog::I2P, &quot;I2P: %s\n&quot;, tfm::format(fmt, args...));</span></a>
-<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
-<a name="240"><span class="lineNum">     240 </span>                :<span class="lineCov">          3 : }</span></a>
-<a name="241"><span class="lineNum">     241 </span>                :            : </a>
-<a name="242"><span class="lineNum">     242 </span>                :<span class="lineCov">          1 : Session::Reply Session::SendRequestAndGetReply(const Sock&amp; sock,</span></a>
-<a name="243"><span class="lineNum">     243 </span>                :            :                                                const std::string&amp; request,</a>
-<a name="244"><span class="lineNum">     244 </span>                :            :                                                bool check_result_ok) const</a>
+<a name="226"><span class="lineNum">     226 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :         CheckControlSock();</span></a>
+<a name="227"><span class="lineNum">     227 </span>                :<span class="lineCov">          1 :         return false;</span></a>
+<a name="228"><span class="lineNum">     228 </span>                :            :     }</a>
+<a name="229"><span class="lineNum">     229 </span>                :            : }</a>
+<a name="230"><span class="lineNum">     230 </span>                :            : </a>
+<a name="231"><span class="lineNum">     231 </span>                :            : // Private methods</a>
+<a name="232"><span class="lineNum">     232 </span>                :            : </a>
+<a name="233"><span class="lineNum">     233 </span>                :<span class="lineNoCov">          0 : std::string Session::Reply::Get(const std::string&amp; key) const</span></a>
+<a name="234"><span class="lineNum">     234 </span>                :            : {</a>
+<a name="235"><span class="lineNum">     235 </span>                :<span class="lineNoCov">          0 :     const auto&amp; pos = keys.find(key);</span></a>
+<a name="236"><span class="lineNum">     236 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (pos == keys.end() || !pos-&gt;second.has_value()) {</span></a>
+<a name="237"><span class="lineNum">     237 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(</span></a>
+<a name="238"><span class="lineNum">     238 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             strprintf(&quot;Missing %s= in the reply to \&quot;%s\&quot;: \&quot;%s\&quot;&quot;, key, request, full));</span></a>
+<a name="239"><span class="lineNum">     239 </span>                :            :     }</a>
+<a name="240"><span class="lineNum">     240 </span>                :<span class="lineNoCov">          0 :     return pos-&gt;second.value();</span></a>
+<a name="241"><span class="lineNum">     241 </span>                :            : }</a>
+<a name="242"><span class="lineNum">     242 </span>                :            : </a>
+<a name="243"><span class="lineNum">     243 </span>                :            : template &lt;typename... Args&gt;</a>
+<a name="244"><span class="lineNum">     244 </span>                :<span class="lineCov">          3 : void Session::Log(const std::string&amp; fmt, const Args&amp;... args) const</span></a>
 <a name="245"><span class="lineNum">     245 </span>                :            : {</a>
-<a name="246"><span class="lineNum">     246 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :     sock.SendComplete(request + &quot;\n&quot;, MAX_WAIT_FOR_IO, *m_interrupt);</span></a>
-<a name="247"><span class="lineNum">     247 </span>                :            : </a>
-<a name="248"><span class="lineNum">     248 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :     Reply reply;</span></a>
-<a name="249"><span class="lineNum">     249 </span>                :            : </a>
-<a name="250"><span class="lineNum">     250 </span>                :            :     // Don't log the full &quot;SESSION CREATE ...&quot; because it contains our private key.</a>
-<a name="251"><span class="lineNum">     251 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">          3 :     reply.request = request.substr(0, 14) == &quot;SESSION CREATE&quot; ? &quot;SESSION CREATE ...&quot; : request;</span></a>
+<a name="246"><span class="lineNum">     246 </span>  [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          6 :     LogPrint(BCLog::I2P, &quot;I2P: %s\n&quot;, tfm::format(fmt, args...));</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="247"><span class="lineNum">     247 </span>                :<span class="lineCov">          3 : }</span></a>
+<a name="248"><span class="lineNum">     248 </span>                :            : </a>
+<a name="249"><span class="lineNum">     249 </span>                :<span class="lineCov">          1 : Session::Reply Session::SendRequestAndGetReply(const Sock&amp; sock,</span></a>
+<a name="250"><span class="lineNum">     250 </span>                :            :                                                const std::string&amp; request,</a>
+<a name="251"><span class="lineNum">     251 </span>                :            :                                                bool check_result_ok) const</a>
+<a name="252"><span class="lineNum">     252 </span>                :            : {</a>
+<a name="253"><span class="lineNum">     253 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :     sock.SendComplete(request + &quot;\n&quot;, MAX_WAIT_FOR_IO, *m_interrupt);</span></a>
+<a name="254"><span class="lineNum">     254 </span>                :            : </a>
+<a name="255"><span class="lineNum">     255 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :     Reply reply;</span></a>
+<a name="256"><span class="lineNum">     256 </span>                :            : </a>
+<a name="257"><span class="lineNum">     257 </span>                :            :     // Don't log the full &quot;SESSION CREATE ...&quot; because it contains our private key.</a>
+<a name="258"><span class="lineNum">     258 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">          3 :     reply.request = request.substr(0, 14) == &quot;SESSION CREATE&quot; ? &quot;SESSION CREATE ...&quot; : request;</span></a>
 <span class="lineNum">         </span><span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
 <span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 9 was not taken"> - </span>]
-<a name="252"><span class="lineNum">     252 </span>                :            : </a>
-<a name="253"><span class="lineNum">     253 </span>                :            :     // It could take a few minutes for the I2P router to reply as it is querying the I2P network</a>
-<a name="254"><span class="lineNum">     254 </span>                :            :     // (when doing name lookup, for example). Notice: `RecvUntilTerminator()` is checking</a>
-<a name="255"><span class="lineNum">     255 </span>                :            :     // `m_interrupt` more often, so we would not be stuck here for long if `m_interrupt` is</a>
-<a name="256"><span class="lineNum">     256 </span>                :            :     // signaled.</a>
-<a name="257"><span class="lineNum">     257 </span>                :<span class="lineCov">          1 :     static constexpr auto recv_timeout = 3min;</span></a>
-<a name="258"><span class="lineNum">     258 </span>                :            : </a>
-<a name="259"><span class="lineNum">     259 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     reply.full = sock.RecvUntilTerminator('\n', recv_timeout, *m_interrupt, MAX_MSG_SIZE);</span></a>
-<a name="260"><span class="lineNum">     260 </span>                :            : </a>
-<a name="261"><span class="lineNum">     261 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     for (const auto&amp; kv : spanparsing::Split(reply.full, ' ')) {</span></a>
-<a name="262"><span class="lineNum">     262 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         const auto&amp; pos = std::find(kv.begin(), kv.end(), '=');</span></a>
-<a name="263"><span class="lineNum">     263 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (pos != kv.end()) {</span></a>
-<a name="264"><span class="lineNum">     264 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :             reply.keys.emplace(std::string{kv.begin(), pos}, std::string{pos + 1, kv.end()});</span></a>
+<a name="259"><span class="lineNum">     259 </span>                :            : </a>
+<a name="260"><span class="lineNum">     260 </span>                :            :     // It could take a few minutes for the I2P router to reply as it is querying the I2P network</a>
+<a name="261"><span class="lineNum">     261 </span>                :            :     // (when doing name lookup, for example). Notice: `RecvUntilTerminator()` is checking</a>
+<a name="262"><span class="lineNum">     262 </span>                :            :     // `m_interrupt` more often, so we would not be stuck here for long if `m_interrupt` is</a>
+<a name="263"><span class="lineNum">     263 </span>                :            :     // signaled.</a>
+<a name="264"><span class="lineNum">     264 </span>                :<span class="lineCov">          1 :     static constexpr auto recv_timeout = 3min;</span></a>
+<a name="265"><span class="lineNum">     265 </span>                :            : </a>
+<a name="266"><span class="lineNum">     266 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     reply.full = sock.RecvUntilTerminator('\n', recv_timeout, *m_interrupt, MAX_MSG_SIZE);</span></a>
+<a name="267"><span class="lineNum">     267 </span>                :            : </a>
+<a name="268"><span class="lineNum">     268 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     for (const auto&amp; kv : spanparsing::Split(reply.full, ' ')) {</span></a>
+<a name="269"><span class="lineNum">     269 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         const auto&amp; pos = std::find(kv.begin(), kv.end(), '=');</span></a>
+<a name="270"><span class="lineNum">     270 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (pos != kv.end()) {</span></a>
+<a name="271"><span class="lineNum">     271 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :             reply.keys.emplace(std::string{kv.begin(), pos}, std::string{pos + 1, kv.end()});</span></a>
 <span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
-<a name="265"><span class="lineNum">     265 </span>                :            :         } else {</a>
-<a name="266"><span class="lineNum">     266 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             reply.keys.emplace(std::string{kv.begin(), kv.end()}, std::nullopt);</span></a>
-<a name="267"><span class="lineNum">     267 </span>                :            :         }</a>
-<a name="268"><span class="lineNum">     268 </span>                :            :     }</a>
-<a name="269"><span class="lineNum">     269 </span>                :            : </a>
-<a name="270"><span class="lineNum">     270 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :     if (check_result_ok &amp;&amp; reply.Get(&quot;RESULT&quot;) != &quot;OK&quot;) {</span></a>
+<a name="272"><span class="lineNum">     272 </span>                :            :         } else {</a>
+<a name="273"><span class="lineNum">     273 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :             reply.keys.emplace(std::string{kv.begin(), kv.end()}, std::nullopt);</span></a>
+<a name="274"><span class="lineNum">     274 </span>                :            :         }</a>
+<a name="275"><span class="lineNum">     275 </span>                :            :     }</a>
+<a name="276"><span class="lineNum">     276 </span>                :            : </a>
+<a name="277"><span class="lineNum">     277 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :     if (check_result_ok &amp;&amp; reply.Get(&quot;RESULT&quot;) != &quot;OK&quot;) {</span></a>
 <span class="lineNum">         </span><span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span><span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
 <span class="lineNum">         </span><span class="branchNoExec" title="Branch 9 was not executed"> # </span><span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span><span class="branchNoExec" title="Branch 12 was not executed"> # </span><span class="branchNoExec" title="Branch 13 was not executed"> # </span> 
 <span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 14 was not executed"> # </span><span class="branchNoExec" title="Branch 15 was not executed"> # </span>]
-<a name="271"><span class="lineNum">     271 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(</span></a>
-<a name="272"><span class="lineNum">     272 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             strprintf(&quot;Unexpected reply to \&quot;%s\&quot;: \&quot;%s\&quot;&quot;, request, reply.full));</span></a>
-<a name="273"><span class="lineNum">     273 </span>                :            :     }</a>
-<a name="274"><span class="lineNum">     274 </span>                :            : </a>
-<a name="275"><span class="lineNum">     275 </span>                :<span class="lineNoCov">          0 :     return reply;</span></a>
-<a name="276"><span class="lineNum">     276 </span>                :            : }</a>
-<a name="277"><span class="lineNum">     277 </span>                :            : </a>
-<a name="278"><span class="lineNum">     278 </span>                :<span class="lineCov">          1 : std::unique_ptr&lt;Sock&gt; Session::Hello() const</span></a>
-<a name="279"><span class="lineNum">     279 </span>                :            : {</a>
-<a name="280"><span class="lineNum">     280 </span>                :<span class="lineCov">          1 :     auto sock = CreateSock(m_control_host);</span></a>
+<a name="278"><span class="lineNum">     278 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(</span></a>
+<a name="279"><span class="lineNum">     279 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             strprintf(&quot;Unexpected reply to \&quot;%s\&quot;: \&quot;%s\&quot;&quot;, request, reply.full));</span></a>
+<a name="280"><span class="lineNum">     280 </span>                :            :     }</a>
 <a name="281"><span class="lineNum">     281 </span>                :            : </a>
-<a name="282"><span class="lineNum">     282 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (!sock) {</span></a>
-<a name="283"><span class="lineNum">     283 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(&quot;Cannot create socket&quot;);</span></a>
-<a name="284"><span class="lineNum">     284 </span>                :            :     }</a>
-<a name="285"><span class="lineNum">     285 </span>                :            : </a>
-<a name="286"><span class="lineNum">     286 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (!ConnectSocketDirectly(m_control_host, *sock, nConnectTimeout, true)) {</span></a>
-<a name="287"><span class="lineNum">     287 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         throw std::runtime_error(strprintf(&quot;Cannot connect to %s&quot;, m_control_host.ToString()));</span></a>
+<a name="282"><span class="lineNum">     282 </span>                :<span class="lineNoCov">          0 :     return reply;</span></a>
+<a name="283"><span class="lineNum">     283 </span>                :            : }</a>
+<a name="284"><span class="lineNum">     284 </span>                :            : </a>
+<a name="285"><span class="lineNum">     285 </span>                :<span class="lineCov">          1 : std::unique_ptr&lt;Sock&gt; Session::Hello() const</span></a>
+<a name="286"><span class="lineNum">     286 </span>                :            : {</a>
+<a name="287"><span class="lineNum">     287 </span>                :<span class="lineCov">          1 :     auto sock = CreateSock(m_control_host);</span></a>
+<a name="288"><span class="lineNum">     288 </span>                :            : </a>
+<a name="289"><span class="lineNum">     289 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (!sock) {</span></a>
+<a name="290"><span class="lineNum">     290 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(&quot;Cannot create socket&quot;);</span></a>
+<a name="291"><span class="lineNum">     291 </span>                :            :     }</a>
+<a name="292"><span class="lineNum">     292 </span>                :            : </a>
+<a name="293"><span class="lineNum">     293 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (!ConnectSocketDirectly(m_control_host, *sock, nConnectTimeout, true)) {</span></a>
+<a name="294"><span class="lineNum">     294 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         throw std::runtime_error(strprintf(&quot;Cannot connect to %s&quot;, m_control_host.ToString()));</span></a>
 <span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
-<a name="288"><span class="lineNum">     288 </span>                :            :     }</a>
-<a name="289"><span class="lineNum">     289 </span>                :            : </a>
-<a name="290"><span class="lineNum">     290 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          2 :     SendRequestAndGetReply(*sock, &quot;HELLO VERSION MIN=3.1 MAX=3.1&quot;);</span></a>
-<a name="291"><span class="lineNum">     291 </span>                :            : </a>
-<a name="292"><span class="lineNum">     292 </span>                :<span class="lineNoCov">          0 :     return sock;</span></a>
-<a name="293"><span class="lineNum">     293 </span>                :            : }</a>
-<a name="294"><span class="lineNum">     294 </span>                :            : </a>
-<a name="295"><span class="lineNum">     295 </span>                :<span class="lineCov">          1 : void Session::CheckControlSock()</span></a>
-<a name="296"><span class="lineNum">     296 </span>                :            : {</a>
-<a name="297"><span class="lineNum">     297 </span>                :<span class="lineCov">          1 :     LOCK(m_mutex);</span></a>
+<a name="295"><span class="lineNum">     295 </span>                :            :     }</a>
+<a name="296"><span class="lineNum">     296 </span>                :            : </a>
+<a name="297"><span class="lineNum">     297 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          2 :     SendRequestAndGetReply(*sock, &quot;HELLO VERSION MIN=3.1 MAX=3.1&quot;);</span></a>
 <a name="298"><span class="lineNum">     298 </span>                :            : </a>
-<a name="299"><span class="lineNum">     299 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          2 :     std::string errmsg;</span></a>
-<a name="300"><span class="lineNum">     300 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          1 :     if (!m_control_sock-&gt;IsConnected(errmsg)) {</span></a>
-<a name="301"><span class="lineNum">     301 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          2 :         Log(&quot;Control socket error: %s&quot;, errmsg);</span></a>
-<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
-<a name="302"><span class="lineNum">     302 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :         Disconnect();</span></a>
-<a name="303"><span class="lineNum">     303 </span>                :            :     }</a>
-<a name="304"><span class="lineNum">     304 </span>                :<span class="lineCov">          1 : }</span></a>
+<a name="299"><span class="lineNum">     299 </span>                :<span class="lineNoCov">          0 :     return sock;</span></a>
+<a name="300"><span class="lineNum">     300 </span>                :            : }</a>
+<a name="301"><span class="lineNum">     301 </span>                :            : </a>
+<a name="302"><span class="lineNum">     302 </span>                :<span class="lineCov">          1 : void Session::CheckControlSock()</span></a>
+<a name="303"><span class="lineNum">     303 </span>                :            : {</a>
+<a name="304"><span class="lineNum">     304 </span>                :<span class="lineCov">          1 :     LOCK(m_mutex);</span></a>
 <a name="305"><span class="lineNum">     305 </span>                :            : </a>
-<a name="306"><span class="lineNum">     306 </span>                :<span class="lineNoCov">          0 : void Session::DestGenerate(const Sock&amp; sock)</span></a>
-<a name="307"><span class="lineNum">     307 </span>                :            : {</a>
-<a name="308"><span class="lineNum">     308 </span>                :            :     // https://geti2p.net/spec/common-structures#key-certificates</a>
-<a name="309"><span class="lineNum">     309 </span>                :            :     // &quot;7&quot; or &quot;EdDSA_SHA512_Ed25519&quot; - &quot;Recent Router Identities and Destinations&quot;.</a>
-<a name="310"><span class="lineNum">     310 </span>                :            :     // Use &quot;7&quot; because i2pd &lt;2.24.0 does not recognize the textual form.</a>
-<a name="311"><span class="lineNum">     311 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const Reply&amp; reply = SendRequestAndGetReply(sock, &quot;DEST GENERATE SIGNATURE_TYPE=7&quot;, false);</span></a>
-<a name="312"><span class="lineNum">     312 </span>                :            : </a>
-<a name="313"><span class="lineNum">     313 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :     m_private_key = DecodeI2PBase64(reply.Get(&quot;PRIV&quot;));</span></a>
-<span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
-<a name="314"><span class="lineNum">     314 </span>                :<span class="lineNoCov">          0 : }</span></a>
-<a name="315"><span class="lineNum">     315 </span>                :            : </a>
-<a name="316"><span class="lineNum">     316 </span>                :<span class="lineNoCov">          0 : void Session::GenerateAndSavePrivateKey(const Sock&amp; sock)</span></a>
-<a name="317"><span class="lineNum">     317 </span>                :            : {</a>
-<a name="318"><span class="lineNum">     318 </span>                :<span class="lineNoCov">          0 :     DestGenerate(sock);</span></a>
-<a name="319"><span class="lineNum">     319 </span>                :            : </a>
-<a name="320"><span class="lineNum">     320 </span>                :            :     // umask is set to 077 in init.cpp, which is ok (unless -sysperms is given)</a>
-<a name="321"><span class="lineNum">     321 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (!WriteBinaryFile(m_private_key_file,</span></a>
-<a name="322"><span class="lineNum">     322 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :                          std::string(m_private_key.begin(), m_private_key.end()))) {</span></a>
-<a name="323"><span class="lineNum">     323 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(</span></a>
-<a name="324"><span class="lineNum">     324 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             strprintf(&quot;Cannot save I2P private key to %s&quot;, m_private_key_file));</span></a>
-<a name="325"><span class="lineNum">     325 </span>                :            :     }</a>
-<a name="326"><span class="lineNum">     326 </span>                :<span class="lineNoCov">          0 : }</span></a>
-<a name="327"><span class="lineNum">     327 </span>                :            : </a>
-<a name="328"><span class="lineNum">     328 </span>                :<span class="lineNoCov">          0 : Binary Session::MyDestination() const</span></a>
-<a name="329"><span class="lineNum">     329 </span>                :            : {</a>
-<a name="330"><span class="lineNum">     330 </span>                :            :     // From https://geti2p.net/spec/common-structures#destination:</a>
-<a name="331"><span class="lineNum">     331 </span>                :            :     // &quot;They are 387 bytes plus the certificate length specified at bytes 385-386, which may be</a>
-<a name="332"><span class="lineNum">     332 </span>                :            :     // non-zero&quot;</a>
-<a name="333"><span class="lineNum">     333 </span>                :<span class="lineNoCov">          0 :     static constexpr size_t DEST_LEN_BASE = 387;</span></a>
-<a name="334"><span class="lineNum">     334 </span>                :<span class="lineNoCov">          0 :     static constexpr size_t CERT_LEN_POS = 385;</span></a>
-<a name="335"><span class="lineNum">     335 </span>                :            : </a>
-<a name="336"><span class="lineNum">     336 </span>                :<span class="lineNoCov">          0 :     uint16_t cert_len;</span></a>
-<a name="337"><span class="lineNum">     337 </span>                :<span class="lineNoCov">          0 :     memcpy(&amp;cert_len, &amp;m_private_key.at(CERT_LEN_POS), sizeof(cert_len));</span></a>
-<a name="338"><span class="lineNum">     338 </span>                :<span class="lineNoCov">          0 :     cert_len = be16toh(cert_len);</span></a>
-<a name="339"><span class="lineNum">     339 </span>                :            : </a>
-<a name="340"><span class="lineNum">     340 </span>                :<span class="lineNoCov">          0 :     const size_t dest_len = DEST_LEN_BASE + cert_len;</span></a>
-<a name="341"><span class="lineNum">     341 </span>                :            : </a>
-<a name="342"><span class="lineNum">     342 </span>                :<span class="lineNoCov">          0 :     return Binary{m_private_key.begin(), m_private_key.begin() + dest_len};</span></a>
-<a name="343"><span class="lineNum">     343 </span>                :            : }</a>
-<a name="344"><span class="lineNum">     344 </span>                :            : </a>
-<a name="345"><span class="lineNum">     345 </span>                :<span class="lineCov">          1 : void Session::CreateIfNotCreatedAlready()</span></a>
-<a name="346"><span class="lineNum">     346 </span>                :            : {</a>
-<a name="347"><span class="lineNum">     347 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :     std::string errmsg;</span></a>
-<a name="348"><span class="lineNum">     348 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (m_control_sock-&gt;IsConnected(errmsg)) {</span></a>
-<a name="349"><span class="lineNum">     349 </span>                :<span class="lineNoCov">          0 :         return;</span></a>
-<a name="350"><span class="lineNum">     350 </span>                :            :     }</a>
-<a name="351"><span class="lineNum">     351 </span>                :            : </a>
-<a name="352"><span class="lineNum">     352 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          2 :     Log(&quot;Creating SAM session with %s&quot;, m_control_host.ToString());</span></a>
+<a name="306"><span class="lineNum">     306 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          2 :     std::string errmsg;</span></a>
+<a name="307"><span class="lineNum">     307 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          1 :     if (!m_control_sock-&gt;IsConnected(errmsg)) {</span></a>
+<a name="308"><span class="lineNum">     308 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          2 :         Log(&quot;Control socket error: %s&quot;, errmsg);</span></a>
 <span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
-<a name="353"><span class="lineNum">     353 </span>                :            : </a>
-<a name="354"><span class="lineNum">     354 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     auto sock = Hello();</span></a>
-<a name="355"><span class="lineNum">     355 </span>                :            : </a>
-<a name="356"><span class="lineNum">     356 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const auto&amp; [read_ok, data] = ReadBinaryFile(m_private_key_file);</span></a>
-<a name="357"><span class="lineNum">     357 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (read_ok) {</span></a>
-<a name="358"><span class="lineNum">     358 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         m_private_key.assign(data.begin(), data.end());</span></a>
-<a name="359"><span class="lineNum">     359 </span>                :            :     } else {</a>
-<a name="360"><span class="lineNum">     360 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         GenerateAndSavePrivateKey(*sock);</span></a>
-<a name="361"><span class="lineNum">     361 </span>                :            :     }</a>
+<a name="309"><span class="lineNum">     309 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :         Disconnect();</span></a>
+<a name="310"><span class="lineNum">     310 </span>                :            :     }</a>
+<a name="311"><span class="lineNum">     311 </span>                :<span class="lineCov">          1 : }</span></a>
+<a name="312"><span class="lineNum">     312 </span>                :            : </a>
+<a name="313"><span class="lineNum">     313 </span>                :<span class="lineNoCov">          0 : void Session::DestGenerate(const Sock&amp; sock)</span></a>
+<a name="314"><span class="lineNum">     314 </span>                :            : {</a>
+<a name="315"><span class="lineNum">     315 </span>                :            :     // https://geti2p.net/spec/common-structures#key-certificates</a>
+<a name="316"><span class="lineNum">     316 </span>                :            :     // &quot;7&quot; or &quot;EdDSA_SHA512_Ed25519&quot; - &quot;Recent Router Identities and Destinations&quot;.</a>
+<a name="317"><span class="lineNum">     317 </span>                :            :     // Use &quot;7&quot; because i2pd &lt;2.24.0 does not recognize the textual form.</a>
+<a name="318"><span class="lineNum">     318 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const Reply&amp; reply = SendRequestAndGetReply(sock, &quot;DEST GENERATE SIGNATURE_TYPE=7&quot;, false);</span></a>
+<a name="319"><span class="lineNum">     319 </span>                :            : </a>
+<a name="320"><span class="lineNum">     320 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :     m_private_key = DecodeI2PBase64(reply.Get(&quot;PRIV&quot;));</span></a>
+<span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
+<a name="321"><span class="lineNum">     321 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="322"><span class="lineNum">     322 </span>                :            : </a>
+<a name="323"><span class="lineNum">     323 </span>                :<span class="lineNoCov">          0 : void Session::GenerateAndSavePrivateKey(const Sock&amp; sock)</span></a>
+<a name="324"><span class="lineNum">     324 </span>                :            : {</a>
+<a name="325"><span class="lineNum">     325 </span>                :<span class="lineNoCov">          0 :     DestGenerate(sock);</span></a>
+<a name="326"><span class="lineNum">     326 </span>                :            : </a>
+<a name="327"><span class="lineNum">     327 </span>                :            :     // umask is set to 077 in init.cpp, which is ok (unless -sysperms is given)</a>
+<a name="328"><span class="lineNum">     328 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (!WriteBinaryFile(m_private_key_file,</span></a>
+<a name="329"><span class="lineNum">     329 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :                          std::string(m_private_key.begin(), m_private_key.end()))) {</span></a>
+<a name="330"><span class="lineNum">     330 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(</span></a>
+<a name="331"><span class="lineNum">     331 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             strprintf(&quot;Cannot save I2P private key to %s&quot;, m_private_key_file));</span></a>
+<a name="332"><span class="lineNum">     332 </span>                :            :     }</a>
+<a name="333"><span class="lineNum">     333 </span>                :<span class="lineNoCov">          0 : }</span></a>
+<a name="334"><span class="lineNum">     334 </span>                :            : </a>
+<a name="335"><span class="lineNum">     335 </span>                :<span class="lineNoCov">          0 : Binary Session::MyDestination() const</span></a>
+<a name="336"><span class="lineNum">     336 </span>                :            : {</a>
+<a name="337"><span class="lineNum">     337 </span>                :            :     // From https://geti2p.net/spec/common-structures#destination:</a>
+<a name="338"><span class="lineNum">     338 </span>                :            :     // &quot;They are 387 bytes plus the certificate length specified at bytes 385-386, which may be</a>
+<a name="339"><span class="lineNum">     339 </span>                :            :     // non-zero&quot;</a>
+<a name="340"><span class="lineNum">     340 </span>                :<span class="lineNoCov">          0 :     static constexpr size_t DEST_LEN_BASE = 387;</span></a>
+<a name="341"><span class="lineNum">     341 </span>                :<span class="lineNoCov">          0 :     static constexpr size_t CERT_LEN_POS = 385;</span></a>
+<a name="342"><span class="lineNum">     342 </span>                :            : </a>
+<a name="343"><span class="lineNum">     343 </span>                :<span class="lineNoCov">          0 :     uint16_t cert_len;</span></a>
+<a name="344"><span class="lineNum">     344 </span>                :<span class="lineNoCov">          0 :     memcpy(&amp;cert_len, &amp;m_private_key.at(CERT_LEN_POS), sizeof(cert_len));</span></a>
+<a name="345"><span class="lineNum">     345 </span>                :<span class="lineNoCov">          0 :     cert_len = be16toh(cert_len);</span></a>
+<a name="346"><span class="lineNum">     346 </span>                :            : </a>
+<a name="347"><span class="lineNum">     347 </span>                :<span class="lineNoCov">          0 :     const size_t dest_len = DEST_LEN_BASE + cert_len;</span></a>
+<a name="348"><span class="lineNum">     348 </span>                :            : </a>
+<a name="349"><span class="lineNum">     349 </span>                :<span class="lineNoCov">          0 :     return Binary{m_private_key.begin(), m_private_key.begin() + dest_len};</span></a>
+<a name="350"><span class="lineNum">     350 </span>                :            : }</a>
+<a name="351"><span class="lineNum">     351 </span>                :            : </a>
+<a name="352"><span class="lineNum">     352 </span>                :<span class="lineCov">          1 : void Session::CreateIfNotCreatedAlready()</span></a>
+<a name="353"><span class="lineNum">     353 </span>                :            : {</a>
+<a name="354"><span class="lineNum">     354 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :     std::string errmsg;</span></a>
+<a name="355"><span class="lineNum">     355 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     if (m_control_sock-&gt;IsConnected(errmsg)) {</span></a>
+<a name="356"><span class="lineNum">     356 </span>                :<span class="lineNoCov">          0 :         return;</span></a>
+<a name="357"><span class="lineNum">     357 </span>                :            :     }</a>
+<a name="358"><span class="lineNum">     358 </span>                :            : </a>
+<a name="359"><span class="lineNum">     359 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">          2 :     Log(&quot;Creating SAM session with %s&quot;, m_control_host.ToString());</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="360"><span class="lineNum">     360 </span>                :            : </a>
+<a name="361"><span class="lineNum">     361 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     auto sock = Hello();</span></a>
 <a name="362"><span class="lineNum">     362 </span>                :            : </a>
-<a name="363"><span class="lineNum">     363 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const std::string&amp; session_id = GetRandHash().GetHex().substr(0, 10); // full is an overkill, too verbose in the logs</span></a>
-<a name="364"><span class="lineNum">     364 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const std::string&amp; private_key_b64 = SwapBase64(EncodeBase64(m_private_key));</span></a>
-<a name="365"><span class="lineNum">     365 </span>                :            : </a>
-<a name="366"><span class="lineNum">     366 </span>                :<span class="lineNoCov">          0 :     SendRequestAndGetReply(*sock, strprintf(&quot;SESSION CREATE STYLE=STREAM ID=%s DESTINATION=%s&quot;,</span></a>
-<a name="367"><span class="lineNum">     367 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :                                             session_id, private_key_b64));</span></a>
-<a name="368"><span class="lineNum">     368 </span>                :            : </a>
-<a name="369"><span class="lineNum">     369 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :     m_my_addr = CService(DestBinToAddr(MyDestination()), Params().GetDefaultPort());</span></a>
-<span class="lineNum">         </span>   <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span><span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span>]
-<a name="370"><span class="lineNum">     370 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     m_session_id = session_id;</span></a>
-<a name="371"><span class="lineNum">     371 </span>                :<span class="lineNoCov">          0 :     m_control_sock = std::move(sock);</span></a>
+<a name="363"><span class="lineNum">     363 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const auto&amp; [read_ok, data] = ReadBinaryFile(m_private_key_file);</span></a>
+<a name="364"><span class="lineNum">     364 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (read_ok) {</span></a>
+<a name="365"><span class="lineNum">     365 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         m_private_key.assign(data.begin(), data.end());</span></a>
+<a name="366"><span class="lineNum">     366 </span>                :            :     } else {</a>
+<a name="367"><span class="lineNum">     367 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         GenerateAndSavePrivateKey(*sock);</span></a>
+<a name="368"><span class="lineNum">     368 </span>                :            :     }</a>
+<a name="369"><span class="lineNum">     369 </span>                :            : </a>
+<a name="370"><span class="lineNum">     370 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const std::string&amp; session_id = GetRandHash().GetHex().substr(0, 10); // full is an overkill, too verbose in the logs</span></a>
+<a name="371"><span class="lineNum">     371 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const std::string&amp; private_key_b64 = SwapBase64(EncodeBase64(m_private_key));</span></a>
 <a name="372"><span class="lineNum">     372 </span>                :            : </a>
-<a name="373"><span class="lineNum">     373 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :     LogPrintf(&quot;I2P: SAM session created: session id=%s, my address=%s\n&quot;, m_session_id,</span></a>
+<a name="373"><span class="lineNum">     373 </span>                :<span class="lineNoCov">          0 :     SendRequestAndGetReply(*sock, strprintf(&quot;SESSION CREATE STYLE=STREAM ID=%s DESTINATION=%s&quot;,</span></a>
+<a name="374"><span class="lineNum">     374 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :                                             session_id, private_key_b64));</span></a>
+<a name="375"><span class="lineNum">     375 </span>                :            : </a>
+<a name="376"><span class="lineNum">     376 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :     m_my_addr = CService(DestBinToAddr(MyDestination()), I2P_SAM31_PORT);</span></a>
+<span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
+<a name="377"><span class="lineNum">     377 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     m_session_id = session_id;</span></a>
+<a name="378"><span class="lineNum">     378 </span>                :<span class="lineNoCov">          0 :     m_control_sock = std::move(sock);</span></a>
+<a name="379"><span class="lineNum">     379 </span>                :            : </a>
+<a name="380"><span class="lineNum">     380 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :     LogPrintf(&quot;I2P: SAM session created: session id=%s, my address=%s\n&quot;, m_session_id,</span></a>
 <span class="lineNum">         </span>   <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span><span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span>]
-<a name="374"><span class="lineNum">     374 </span>                :            :               m_my_addr.ToString());</a>
-<a name="375"><span class="lineNum">     375 </span>                :            : }</a>
-<a name="376"><span class="lineNum">     376 </span>                :            : </a>
-<a name="377"><span class="lineNum">     377 </span>                :<span class="lineNoCov">          0 : std::unique_ptr&lt;Sock&gt; Session::StreamAccept()</span></a>
-<a name="378"><span class="lineNum">     378 </span>                :            : {</a>
-<a name="379"><span class="lineNum">     379 </span>                :<span class="lineNoCov">          0 :     auto sock = Hello();</span></a>
-<a name="380"><span class="lineNum">     380 </span>                :            : </a>
-<a name="381"><span class="lineNum">     381 </span>                :<span class="lineNoCov">          0 :     const Reply&amp; reply = SendRequestAndGetReply(</span></a>
-<a name="382"><span class="lineNum">     382 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         *sock, strprintf(&quot;STREAM ACCEPT ID=%s SILENT=false&quot;, m_session_id), false);</span></a>
+<a name="381"><span class="lineNum">     381 </span>                :            :               m_my_addr.ToString());</a>
+<a name="382"><span class="lineNum">     382 </span>                :            : }</a>
 <a name="383"><span class="lineNum">     383 </span>                :            : </a>
-<a name="384"><span class="lineNum">     384 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const std::string&amp; result = reply.Get(&quot;RESULT&quot;);</span></a>
-<a name="385"><span class="lineNum">     385 </span>                :            : </a>
-<a name="386"><span class="lineNum">     386 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (result == &quot;OK&quot;) {</span></a>
-<a name="387"><span class="lineNum">     387 </span>                :<span class="lineNoCov">          0 :         return sock;</span></a>
-<a name="388"><span class="lineNum">     388 </span>                :            :     }</a>
-<a name="389"><span class="lineNum">     389 </span>                :            : </a>
-<a name="390"><span class="lineNum">     390 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (result == &quot;INVALID_ID&quot;) {</span></a>
-<a name="391"><span class="lineNum">     391 </span>                :            :         // If our session id is invalid, then force session re-creation on next usage.</a>
-<a name="392"><span class="lineNum">     392 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         Disconnect();</span></a>
-<a name="393"><span class="lineNum">     393 </span>                :            :     }</a>
-<a name="394"><span class="lineNum">     394 </span>                :            : </a>
-<a name="395"><span class="lineNum">     395 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     throw std::runtime_error(strprintf(&quot;\&quot;%s\&quot;&quot;, reply.full));</span></a>
-<a name="396"><span class="lineNum">     396 </span>                :            : }</a>
-<a name="397"><span class="lineNum">     397 </span>                :            : </a>
-<a name="398"><span class="lineNum">     398 </span>                :<span class="lineCov">          2 : void Session::Disconnect()</span></a>
-<a name="399"><span class="lineNum">     399 </span>                :            : {</a>
-<a name="400"><span class="lineNum">     400 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     if (m_control_sock-&gt;Get() != INVALID_SOCKET) {</span></a>
-<a name="401"><span class="lineNum">     401 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (m_session_id.empty()) {</span></a>
-<a name="402"><span class="lineNum">     402 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             Log(&quot;Destroying incomplete session&quot;);</span></a>
-<a name="403"><span class="lineNum">     403 </span>                :            :         } else {</a>
-<a name="404"><span class="lineNum">     404 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :             Log(&quot;Destroying session %s&quot;, m_session_id);</span></a>
-<a name="405"><span class="lineNum">     405 </span>                :            :         }</a>
-<a name="406"><span class="lineNum">     406 </span>                :            :     }</a>
-<a name="407"><span class="lineNum">     407 </span>                :<span class="lineCov">          2 :     m_control_sock-&gt;Reset();</span></a>
-<a name="408"><span class="lineNum">     408 </span>                :<span class="lineCov">          2 :     m_session_id.clear();</span></a>
-<a name="409"><span class="lineNum">     409 </span>                :<span class="lineCov">          2 : }</span></a>
-<a name="410"><span class="lineNum">     410 </span>                :            : } // namespace sam</a>
-<a name="411"><span class="lineNum">     411 </span>                :            : } // namespace i2p</a>
+<a name="384"><span class="lineNum">     384 </span>                :<span class="lineNoCov">          0 : std::unique_ptr&lt;Sock&gt; Session::StreamAccept()</span></a>
+<a name="385"><span class="lineNum">     385 </span>                :            : {</a>
+<a name="386"><span class="lineNum">     386 </span>                :<span class="lineNoCov">          0 :     auto sock = Hello();</span></a>
+<a name="387"><span class="lineNum">     387 </span>                :            : </a>
+<a name="388"><span class="lineNum">     388 </span>                :<span class="lineNoCov">          0 :     const Reply&amp; reply = SendRequestAndGetReply(</span></a>
+<a name="389"><span class="lineNum">     389 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         *sock, strprintf(&quot;STREAM ACCEPT ID=%s SILENT=false&quot;, m_session_id), false);</span></a>
+<a name="390"><span class="lineNum">     390 </span>                :            : </a>
+<a name="391"><span class="lineNum">     391 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     const std::string&amp; result = reply.Get(&quot;RESULT&quot;);</span></a>
+<a name="392"><span class="lineNum">     392 </span>                :            : </a>
+<a name="393"><span class="lineNum">     393 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (result == &quot;OK&quot;) {</span></a>
+<a name="394"><span class="lineNum">     394 </span>                :<span class="lineNoCov">          0 :         return sock;</span></a>
+<a name="395"><span class="lineNum">     395 </span>                :            :     }</a>
+<a name="396"><span class="lineNum">     396 </span>                :            : </a>
+<a name="397"><span class="lineNum">     397 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     if (result == &quot;INVALID_ID&quot;) {</span></a>
+<a name="398"><span class="lineNum">     398 </span>                :            :         // If our session id is invalid, then force session re-creation on next usage.</a>
+<a name="399"><span class="lineNum">     399 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         Disconnect();</span></a>
+<a name="400"><span class="lineNum">     400 </span>                :            :     }</a>
+<a name="401"><span class="lineNum">     401 </span>                :            : </a>
+<a name="402"><span class="lineNum">     402 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     throw std::runtime_error(strprintf(&quot;\&quot;%s\&quot;&quot;, reply.full));</span></a>
+<a name="403"><span class="lineNum">     403 </span>                :            : }</a>
+<a name="404"><span class="lineNum">     404 </span>                :            : </a>
+<a name="405"><span class="lineNum">     405 </span>                :<span class="lineCov">          2 : void Session::Disconnect()</span></a>
+<a name="406"><span class="lineNum">     406 </span>                :            : {</a>
+<a name="407"><span class="lineNum">     407 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :     if (m_control_sock-&gt;Get() != INVALID_SOCKET) {</span></a>
+<a name="408"><span class="lineNum">     408 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (m_session_id.empty()) {</span></a>
+<a name="409"><span class="lineNum">     409 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             Log(&quot;Destroying incomplete session&quot;);</span></a>
+<a name="410"><span class="lineNum">     410 </span>                :            :         } else {</a>
+<a name="411"><span class="lineNum">     411 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :             Log(&quot;Destroying session %s&quot;, m_session_id);</span></a>
+<a name="412"><span class="lineNum">     412 </span>                :            :         }</a>
+<a name="413"><span class="lineNum">     413 </span>                :            :     }</a>
+<a name="414"><span class="lineNum">     414 </span>                :<span class="lineCov">          2 :     m_control_sock-&gt;Reset();</span></a>
+<a name="415"><span class="lineNum">     415 </span>                :<span class="lineCov">          2 :     m_session_id.clear();</span></a>
+<a name="416"><span class="lineNum">     416 </span>                :<span class="lineCov">          2 : }</span></a>
+<a name="417"><span class="lineNum">     417 </span>                :            : } // namespace sam</a>
+<a name="418"><span class="lineNum">     418 </span>                :            : } // namespace i2p</a>
 </pre>
       </td>
     </tr>

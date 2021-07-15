@@ -49,9 +49,9 @@
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">360</td>
+            <td class="headerCovTableEntry">361</td>
             <td class="headerCovTableEntry">4907</td>
-            <td class="headerCovTableEntryLo">7.3 %</td>
+            <td class="headerCovTableEntryLo">7.4 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -4762,19 +4762,19 @@
 <a name="4332"><span class="lineNum">    4332 </span>                :<span class="lineNoCov">          0 :             pto.m_tx_relay-&gt;m_next_send_feefilter = 0us;</span></a>
 <a name="4333"><span class="lineNum">    4333 </span>                :            :         }</a>
 <a name="4334"><span class="lineNum">    4334 </span>                :            :     }</a>
-<a name="4335"><span class="lineNum">    4335 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          4 :     if (current_time &gt; pto.m_tx_relay-&gt;m_next_send_feefilter) {</span></a>
-<a name="4336"><span class="lineNum">    4336 </span>                :<span class="lineCov">          2 :         CAmount filterToSend = g_filter_rounder.round(currentFilter);</span></a>
+<a name="4335"><span class="lineNum">    4335 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     if (current_time &gt; pto.m_tx_relay-&gt;m_next_send_feefilter) {</span></a>
+<a name="4336"><span class="lineNum">    4336 </span>                :<span class="lineCov">          3 :         CAmount filterToSend = g_filter_rounder.round(currentFilter);</span></a>
 <a name="4337"><span class="lineNum">    4337 </span>                :            :         // We always have a fee filter of at least minRelayTxFee</a>
-<a name="4338"><span class="lineNum">    4338 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 :         filterToSend = std::max(filterToSend, ::minRelayTxFee.GetFeePerK());</span></a>
-<a name="4339"><span class="lineNum">    4339 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :         if (filterToSend != pto.m_tx_relay-&gt;lastSentFeeFilter) {</span></a>
+<a name="4338"><span class="lineNum">    4338 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span>]:<span class="lineCov">          3 :         filterToSend = std::max(filterToSend, ::minRelayTxFee.GetFeePerK());</span></a>
+<a name="4339"><span class="lineNum">    4339 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          3 :         if (filterToSend != pto.m_tx_relay-&gt;lastSentFeeFilter) {</span></a>
 <a name="4340"><span class="lineNum">    4340 </span>  [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          4 :             m_connman.PushMessage(&amp;pto, CNetMsgMaker(pto.GetCommonVersion()).Make(NetMsgType::FEEFILTER, filterToSend));</span></a>
 <a name="4341"><span class="lineNum">    4341 </span>                :<span class="lineCov">          2 :             pto.m_tx_relay-&gt;lastSentFeeFilter = filterToSend;</span></a>
 <a name="4342"><span class="lineNum">    4342 </span>                :            :         }</a>
-<a name="4343"><span class="lineNum">    4343 </span>                :<span class="lineCov">          2 :         pto.m_tx_relay-&gt;m_next_send_feefilter = PoissonNextSend(current_time, AVG_FEEFILTER_BROADCAST_INTERVAL);</span></a>
+<a name="4343"><span class="lineNum">    4343 </span>                :<span class="lineCov">          3 :         pto.m_tx_relay-&gt;m_next_send_feefilter = PoissonNextSend(current_time, AVG_FEEFILTER_BROADCAST_INTERVAL);</span></a>
 <a name="4344"><span class="lineNum">    4344 </span>                :            :     }</a>
 <a name="4345"><span class="lineNum">    4345 </span>                :            :     // If the fee filter has changed substantially and it's still more than MAX_FEEFILTER_CHANGE_DELAY</a>
 <a name="4346"><span class="lineNum">    4346 </span>                :            :     // until scheduled broadcast, then move the broadcast to within MAX_FEEFILTER_CHANGE_DELAY.</a>
-<a name="4347"><span class="lineNum">    4347 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          2 :     else if (current_time + MAX_FEEFILTER_CHANGE_DELAY &lt; pto.m_tx_relay-&gt;m_next_send_feefilter &amp;&amp;</span></a>
+<a name="4347"><span class="lineNum">    4347 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          1 :     else if (current_time + MAX_FEEFILTER_CHANGE_DELAY &lt; pto.m_tx_relay-&gt;m_next_send_feefilter &amp;&amp;</span></a>
 <a name="4348"><span class="lineNum">    4348 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :                 (currentFilter &lt; 3 * pto.m_tx_relay-&gt;lastSentFeeFilter / 4 || currentFilter &gt; 4 * pto.m_tx_relay-&gt;lastSentFeeFilter / 3)) {</span></a>
 <a name="4349"><span class="lineNum">    4349 </span>                :<span class="lineNoCov">          0 :         pto.m_tx_relay-&gt;m_next_send_feefilter = current_time + GetRandomDuration&lt;std::chrono::microseconds&gt;(MAX_FEEFILTER_CHANGE_DELAY);</span></a>
 <a name="4350"><span class="lineNum">    4350 </span>                :            :     }</a>

@@ -270,16 +270,16 @@
 <a name="198"><span class="lineNum">     198 </span>                :            : }</a>
 <a name="199"><span class="lineNum">     199 </span>                :            : </a>
 <a name="200"><span class="lineNum">     200 </span>                :            : // Check that the sig has a low R value and will be less than 71 bytes</a>
-<a name="201"><span class="lineNum">     201 </span>                :<span class="lineCov">      30507 : bool SigHasLowR(const secp256k1_ecdsa_signature* sig)</span></a>
+<a name="201"><span class="lineNum">     201 </span>                :<span class="lineCov">      30312 : bool SigHasLowR(const secp256k1_ecdsa_signature* sig)</span></a>
 <a name="202"><span class="lineNum">     202 </span>                :            : {</a>
-<a name="203"><span class="lineNum">     203 </span>                :<span class="lineCov">      30507 :     unsigned char compact_sig[64];</span></a>
-<a name="204"><span class="lineNum">     204 </span>                :<span class="lineCov">      30507 :     secp256k1_ecdsa_signature_serialize_compact(secp256k1_context_sign, compact_sig, sig);</span></a>
+<a name="203"><span class="lineNum">     203 </span>                :<span class="lineCov">      30312 :     unsigned char compact_sig[64];</span></a>
+<a name="204"><span class="lineNum">     204 </span>                :<span class="lineCov">      30312 :     secp256k1_ecdsa_signature_serialize_compact(secp256k1_context_sign, compact_sig, sig);</span></a>
 <a name="205"><span class="lineNum">     205 </span>                :            : </a>
 <a name="206"><span class="lineNum">     206 </span>                :            :     // In DER serialization, all values are interpreted as big-endian, signed integers. The highest bit in the integer indicates</a>
 <a name="207"><span class="lineNum">     207 </span>                :            :     // its signed-ness; 0 is positive, 1 is negative. When the value is interpreted as a negative integer, it must be converted</a>
 <a name="208"><span class="lineNum">     208 </span>                :            :     // to a positive value by prepending a 0x00 byte so that the highest bit is 0. We can avoid this prepending by ensuring that</a>
 <a name="209"><span class="lineNum">     209 </span>                :            :     // our highest bit is always 0, and thus we must check that the first byte is less than 0x80.</a>
-<a name="210"><span class="lineNum">     210 </span>                :<span class="lineCov">      30507 :     return compact_sig[0] &lt; 0x80;</span></a>
+<a name="210"><span class="lineNum">     210 </span>                :<span class="lineCov">      30312 :     return compact_sig[0] &lt; 0x80;</span></a>
 <a name="211"><span class="lineNum">     211 </span>                :            : }</a>
 <a name="212"><span class="lineNum">     212 </span>                :            : </a>
 <a name="213"><span class="lineNum">     213 </span>                :<span class="lineCov">      15915 : bool CKey::Sign(const uint256 &amp;hash, std::vector&lt;unsigned char&gt;&amp; vchSig, bool grind, uint32_t test_case) const {</span></a>
@@ -294,10 +294,10 @@
 <a name="222"><span class="lineNum">     222 </span>        [<span class="branchCov" title="Branch 0 was taken 14716 times"> + </span><span class="branchCov" title="Branch 1 was taken 1199 times"> + </span>]:<span class="lineCov">      30631 :     int ret = secp256k1_ecdsa_sign(secp256k1_context_sign, &amp;sig, hash.begin(), begin(), secp256k1_nonce_function_rfc6979, (!grind &amp;&amp; test_case) ? extra_entropy : nullptr);</span></a>
 <a name="223"><span class="lineNum">     223 </span>                :            : </a>
 <a name="224"><span class="lineNum">     224 </span>                :            :     // Grind for low R</a>
-<a name="225"><span class="lineNum">     225 </span>  [<span class="branchCov" title="Branch 0 was taken 30507 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 15333 times"> + </span><span class="branchCov" title="Branch 3 was taken 15174 times"> + </span> :<span class="lineCov">      30507 :     while (ret &amp;&amp; !SigHasLowR(&amp;sig) &amp;&amp; grind) {</span></a>
-<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 14592 times"> + </span><span class="branchCov" title="Branch 5 was taken 741 times"> + </span>]
-<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">      14592 :         WriteLE32(extra_entropy, ++counter);</span></a>
-<a name="227"><span class="lineNum">     227 </span>                :<span class="lineCov">      14592 :         ret = secp256k1_ecdsa_sign(secp256k1_context_sign, &amp;sig, hash.begin(), begin(), secp256k1_nonce_function_rfc6979, extra_entropy);</span></a>
+<a name="225"><span class="lineNum">     225 </span>  [<span class="branchCov" title="Branch 0 was taken 30312 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 15138 times"> + </span><span class="branchCov" title="Branch 3 was taken 15174 times"> + </span> :<span class="lineCov">      30312 :     while (ret &amp;&amp; !SigHasLowR(&amp;sig) &amp;&amp; grind) {</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 14397 times"> + </span><span class="branchCov" title="Branch 5 was taken 741 times"> + </span>]
+<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">      14397 :         WriteLE32(extra_entropy, ++counter);</span></a>
+<a name="227"><span class="lineNum">     227 </span>                :<span class="lineCov">      14397 :         ret = secp256k1_ecdsa_sign(secp256k1_context_sign, &amp;sig, hash.begin(), begin(), secp256k1_nonce_function_rfc6979, extra_entropy);</span></a>
 <a name="228"><span class="lineNum">     228 </span>                :            :     }</a>
 <a name="229"><span class="lineNum">     229 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15915 times"> + </span>]:<span class="lineCov">      15915 :     assert(ret);</span></a>
 <a name="230"><span class="lineNum">     230 </span>                :<span class="lineCov">      15915 :     secp256k1_ecdsa_signature_serialize_der(secp256k1_context_sign, vchSig.data(), &amp;nSigLen, &amp;sig);</span></a>
@@ -441,31 +441,31 @@
 <a name="366"><span class="lineNum">     366 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :     return key.VerifyPubKey(pubkey);</span></a>
 <a name="367"><span class="lineNum">     367 </span>                :            : }</a>
 <a name="368"><span class="lineNum">     368 </span>                :            : </a>
-<a name="369"><span class="lineNum">     369 </span>                :<span class="lineCov">        475 : void ECC_Start() {</span></a>
-<a name="370"><span class="lineNum">     370 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 475 times"> + </span>]:<span class="lineCov">        475 :     assert(secp256k1_context_sign == nullptr);</span></a>
+<a name="369"><span class="lineNum">     369 </span>                :<span class="lineCov">        476 : void ECC_Start() {</span></a>
+<a name="370"><span class="lineNum">     370 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 476 times"> + </span>]:<span class="lineCov">        476 :     assert(secp256k1_context_sign == nullptr);</span></a>
 <a name="371"><span class="lineNum">     371 </span>                :            : </a>
-<a name="372"><span class="lineNum">     372 </span>                :<span class="lineCov">        475 :     secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);</span></a>
-<a name="373"><span class="lineNum">     373 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 475 times"> + </span>]:<span class="lineCov">        475 :     assert(ctx != nullptr);</span></a>
+<a name="372"><span class="lineNum">     372 </span>                :<span class="lineCov">        476 :     secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);</span></a>
+<a name="373"><span class="lineNum">     373 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 476 times"> + </span>]:<span class="lineCov">        476 :     assert(ctx != nullptr);</span></a>
 <a name="374"><span class="lineNum">     374 </span>                :            : </a>
-<a name="375"><span class="lineNum">     375 </span>                :<span class="lineCov">        475 :     {</span></a>
+<a name="375"><span class="lineNum">     375 </span>                :<span class="lineCov">        476 :     {</span></a>
 <a name="376"><span class="lineNum">     376 </span>                :            :         // Pass in a random blinding seed to the secp256k1 context.</a>
-<a name="377"><span class="lineNum">     377 </span>                :<span class="lineCov">        475 :         std::vector&lt;unsigned char, secure_allocator&lt;unsigned char&gt;&gt; vseed(32);</span></a>
-<a name="378"><span class="lineNum">     378 </span>                :<span class="lineCov">        475 :         GetRandBytes(vseed.data(), 32);</span></a>
-<a name="379"><span class="lineNum">     379 </span>        [<span class="branchCov" title="Branch 0 was taken 475 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        475 :         bool ret = secp256k1_context_randomize(ctx, vseed.data());</span></a>
-<a name="380"><span class="lineNum">     380 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 475 times"> + </span>]:<span class="lineCov">        475 :         assert(ret);</span></a>
+<a name="377"><span class="lineNum">     377 </span>                :<span class="lineCov">        476 :         std::vector&lt;unsigned char, secure_allocator&lt;unsigned char&gt;&gt; vseed(32);</span></a>
+<a name="378"><span class="lineNum">     378 </span>                :<span class="lineCov">        476 :         GetRandBytes(vseed.data(), 32);</span></a>
+<a name="379"><span class="lineNum">     379 </span>        [<span class="branchCov" title="Branch 0 was taken 476 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        476 :         bool ret = secp256k1_context_randomize(ctx, vseed.data());</span></a>
+<a name="380"><span class="lineNum">     380 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 476 times"> + </span>]:<span class="lineCov">        476 :         assert(ret);</span></a>
 <a name="381"><span class="lineNum">     381 </span>                :            :     }</a>
 <a name="382"><span class="lineNum">     382 </span>                :            : </a>
-<a name="383"><span class="lineNum">     383 </span>                :<span class="lineCov">        475 :     secp256k1_context_sign = ctx;</span></a>
-<a name="384"><span class="lineNum">     384 </span>                :<span class="lineCov">        475 : }</span></a>
+<a name="383"><span class="lineNum">     383 </span>                :<span class="lineCov">        476 :     secp256k1_context_sign = ctx;</span></a>
+<a name="384"><span class="lineNum">     384 </span>                :<span class="lineCov">        476 : }</span></a>
 <a name="385"><span class="lineNum">     385 </span>                :            : </a>
-<a name="386"><span class="lineNum">     386 </span>                :<span class="lineCov">        474 : void ECC_Stop() {</span></a>
-<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">        474 :     secp256k1_context *ctx = secp256k1_context_sign;</span></a>
-<a name="388"><span class="lineNum">     388 </span>                :<span class="lineCov">        474 :     secp256k1_context_sign = nullptr;</span></a>
+<a name="386"><span class="lineNum">     386 </span>                :<span class="lineCov">        475 : void ECC_Stop() {</span></a>
+<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">        475 :     secp256k1_context *ctx = secp256k1_context_sign;</span></a>
+<a name="388"><span class="lineNum">     388 </span>                :<span class="lineCov">        475 :     secp256k1_context_sign = nullptr;</span></a>
 <a name="389"><span class="lineNum">     389 </span>                :            : </a>
-<a name="390"><span class="lineNum">     390 </span>        [<span class="branchCov" title="Branch 0 was taken 474 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        474 :     if (ctx) {</span></a>
-<a name="391"><span class="lineNum">     391 </span>                :<span class="lineCov">        474 :         secp256k1_context_destroy(ctx);</span></a>
+<a name="390"><span class="lineNum">     390 </span>        [<span class="branchCov" title="Branch 0 was taken 475 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        475 :     if (ctx) {</span></a>
+<a name="391"><span class="lineNum">     391 </span>                :<span class="lineCov">        475 :         secp256k1_context_destroy(ctx);</span></a>
 <a name="392"><span class="lineNum">     392 </span>                :            :     }</a>
-<a name="393"><span class="lineNum">     393 </span>                :<span class="lineCov">        474 : }</span></a>
+<a name="393"><span class="lineNum">     393 </span>                :<span class="lineCov">        475 : }</span></a>
 </pre>
       </td>
     </tr>

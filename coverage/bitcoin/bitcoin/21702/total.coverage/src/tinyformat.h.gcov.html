@@ -49,9 +49,9 @@
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">62</td>
+            <td class="headerCovTableEntry">63</td>
             <td class="headerCovTableEntry">242</td>
-            <td class="headerCovTableEntryLo">25.6 %</td>
+            <td class="headerCovTableEntryLo">26.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -408,7 +408,7 @@
 <a name="326"><span class="lineNum">     326 </span>                :            : /// operator&lt;&lt; to format the type T, with special cases for the %c and %p</a>
 <a name="327"><span class="lineNum">     327 </span>                :            : /// conversions.</a>
 <a name="328"><span class="lineNum">     328 </span>                :            : template&lt;typename T&gt;</a>
-<a name="329"><span class="lineNum">     329 </span>                :<span class="lineCov">   36409700 : inline void formatValue(std::ostream&amp; out, const char* /*fmtBegin*/,</span></a>
+<a name="329"><span class="lineNum">     329 </span>                :<span class="lineCov">   36518608 : inline void formatValue(std::ostream&amp; out, const char* /*fmtBegin*/,</span></a>
 <a name="330"><span class="lineNum">     330 </span>                :            :                         const char* fmtEnd, int ntrunc, const T&amp; value)</a>
 <a name="331"><span class="lineNum">     331 </span>                :            : {</a>
 <a name="332"><span class="lineNum">     332 </span>                :            : #ifndef TINYFORMAT_ALLOW_WCHAR_STRINGS</a>
@@ -422,23 +422,23 @@
 <a name="340"><span class="lineNum">     340 </span>                :            :     // void* respectively and format that instead of the value itself.  For the</a>
 <a name="341"><span class="lineNum">     341 </span>                :            :     // %p conversion it's important to avoid dereferencing the pointer, which</a>
 <a name="342"><span class="lineNum">     342 </span>                :            :     // could otherwise lead to a crash when printing a dangling (const char*).</a>
-<a name="343"><span class="lineNum">     343 </span>                :<span class="lineCov">   36409700 :     const bool canConvertToChar = detail::is_convertible&lt;T,char&gt;::value;</span></a>
-<a name="344"><span class="lineNum">     344 </span>                :<span class="lineCov">   36409700 :     const bool canConvertToVoidPtr = detail::is_convertible&lt;T, const void*&gt;::value;</span></a>
-<a name="345"><span class="lineNum">     345 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 31451988 times"> + </span>]:<span class="lineCov">   31451988 :     if (canConvertToChar &amp;&amp; *(fmtEnd-1) == 'c')</span></a>
-<a name="346"><span class="lineNum">     346 </span>                :<span class="lineCov">   26999726 :         detail::formatValueAsType&lt;T, char&gt;::invoke(out, value);</span></a>
-<a name="347"><span class="lineNum">     347 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1697173 times"> + </span>]:<span class="lineCov">    1697173 :     else if (canConvertToVoidPtr &amp;&amp; *(fmtEnd-1) == 'p')</span></a>
-<a name="348"><span class="lineNum">     348 </span>                :<span class="lineCov">    1697216 :         detail::formatValueAsType&lt;T, const void*&gt;::invoke(out, value);</span></a>
+<a name="343"><span class="lineNum">     343 </span>                :<span class="lineCov">   36518608 :     const bool canConvertToChar = detail::is_convertible&lt;T,char&gt;::value;</span></a>
+<a name="344"><span class="lineNum">     344 </span>                :<span class="lineCov">   36518608 :     const bool canConvertToVoidPtr = detail::is_convertible&lt;T, const void*&gt;::value;</span></a>
+<a name="345"><span class="lineNum">     345 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 31536441 times"> + </span>]:<span class="lineCov">   31536441 :     if (canConvertToChar &amp;&amp; *(fmtEnd-1) == 'c')</span></a>
+<a name="346"><span class="lineNum">     346 </span>                :<span class="lineCov">   27075476 :         detail::formatValueAsType&lt;T, char&gt;::invoke(out, value);</span></a>
+<a name="347"><span class="lineNum">     347 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1704156 times"> + </span>]:<span class="lineCov">    1704156 :     else if (canConvertToVoidPtr &amp;&amp; *(fmtEnd-1) == 'p')</span></a>
+<a name="348"><span class="lineNum">     348 </span>                :<span class="lineCov">    1704218 :         detail::formatValueAsType&lt;T, const void*&gt;::invoke(out, value);</span></a>
 <a name="349"><span class="lineNum">     349 </span>                :            : #ifdef TINYFORMAT_OLD_LIBSTDCPLUSPLUS_WORKAROUND</a>
 <a name="350"><span class="lineNum">     350 </span>                :            :     else if (detail::formatZeroIntegerWorkaround&lt;T&gt;::invoke(out, value)) /**/;</a>
 <a name="351"><span class="lineNum">     351 </span>                :            : #endif</a>
-<a name="352"><span class="lineNum">     352 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 36409700 times"> + </span>]:<span class="lineCov">   36409700 :     else if (ntrunc &gt;= 0) {</span></a>
+<a name="352"><span class="lineNum">     352 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 36518608 times"> + </span>]:<span class="lineCov">   36518608 :     else if (ntrunc &gt;= 0) {</span></a>
 <a name="353"><span class="lineNum">     353 </span>                :            :         // Take care not to overread C strings in truncating conversions like</a>
 <a name="354"><span class="lineNum">     354 </span>                :            :         // &quot;%.4s&quot; where at most 4 characters may be read.</a>
 <a name="355"><span class="lineNum">     355 </span>                :<span class="lineNoCov">          0 :         detail::formatTruncated(out, value, ntrunc);</span></a>
 <a name="356"><span class="lineNum">     356 </span>                :            :     }</a>
 <a name="357"><span class="lineNum">     357 </span>                :            :     else</a>
-<a name="358"><span class="lineNum">     358 </span>                :<span class="lineCov">   36409750 :         out &lt;&lt; value;</span></a>
-<a name="359"><span class="lineNum">     359 </span>                :<span class="lineCov">   36409807 : }</span></a>
+<a name="358"><span class="lineNum">     358 </span>                :<span class="lineCov">   36518683 :         out &lt;&lt; value;</span></a>
+<a name="359"><span class="lineNum">     359 </span>                :<span class="lineCov">   36518747 : }</span></a>
 <a name="360"><span class="lineNum">     360 </span>                :            : </a>
 <a name="361"><span class="lineNum">     361 </span>                :            : </a>
 <a name="362"><span class="lineNum">     362 </span>                :            : // Overloaded version for char types to support printing as an integer</a>
@@ -456,7 +456,7 @@
 <a name="374"><span class="lineNum">     374 </span>                :            : // per 3.9.1: char, signed char and unsigned char are all distinct types</a>
 <a name="375"><span class="lineNum">     375 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          2 : TINYFORMAT_DEFINE_FORMATVALUE_CHAR(char)</span></a>
 <a name="376"><span class="lineNum">     376 </span>                :<span class="lineNoCov">          0 : TINYFORMAT_DEFINE_FORMATVALUE_CHAR(signed char)</span></a>
-<a name="377"><span class="lineNum">     377 </span>        [<span class="branchCov" title="Branch 0 was taken 1315651 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1315651 : TINYFORMAT_DEFINE_FORMATVALUE_CHAR(unsigned char)</span></a>
+<a name="377"><span class="lineNum">     377 </span>        [<span class="branchCov" title="Branch 0 was taken 1316385 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1316385 : TINYFORMAT_DEFINE_FORMATVALUE_CHAR(unsigned char)</span></a>
 <a name="378"><span class="lineNum">     378 </span>                :            : #undef TINYFORMAT_DEFINE_FORMATVALUE_CHAR</a>
 <a name="379"><span class="lineNum">     379 </span>                :            : </a>
 <a name="380"><span class="lineNum">     380 </span>                :            : </a>
@@ -596,19 +596,19 @@
 <a name="514"><span class="lineNum">     514 </span>                :            :         { }</a>
 <a name="515"><span class="lineNum">     515 </span>                :            : </a>
 <a name="516"><span class="lineNum">     516 </span>                :            :         template&lt;typename T&gt;</a>
-<a name="517"><span class="lineNum">     517 </span>                :<span class="lineCov">   11856715 :         explicit FormatArg(const T&amp; value)</span></a>
+<a name="517"><span class="lineNum">     517 </span>                :<span class="lineCov">   11897128 :         explicit FormatArg(const T&amp; value)</span></a>
 <a name="518"><span class="lineNum">     518 </span>                :            :             : m_value(static_cast&lt;const void*&gt;(&amp;value)),</a>
 <a name="519"><span class="lineNum">     519 </span>                :            :             m_formatImpl(&amp;formatImpl&lt;T&gt;),</a>
-<a name="520"><span class="lineNum">     520 </span>                :<span class="lineCov">   11856715 :             m_toIntImpl(&amp;toIntImpl&lt;T&gt;)</span></a>
+<a name="520"><span class="lineNum">     520 </span>                :<span class="lineCov">   11897128 :             m_toIntImpl(&amp;toIntImpl&lt;T&gt;)</span></a>
 <a name="521"><span class="lineNum">     521 </span>                :            :         { }</a>
 <a name="522"><span class="lineNum">     522 </span>                :            : </a>
-<a name="523"><span class="lineNum">     523 </span>                :<span class="lineCov">   37722746 :         void format(std::ostream&amp; out, const char* fmtBegin,</span></a>
+<a name="523"><span class="lineNum">     523 </span>                :<span class="lineCov">   37831874 :         void format(std::ostream&amp; out, const char* fmtBegin,</span></a>
 <a name="524"><span class="lineNum">     524 </span>                :            :                     const char* fmtEnd, int ntrunc) const</a>
 <a name="525"><span class="lineNum">     525 </span>                :            :         {</a>
-<a name="526"><span class="lineNum">     526 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37722746 times"> + </span>]:<span class="lineCov">   37722746 :             TINYFORMAT_ASSERT(m_value);</span></a>
-<a name="527"><span class="lineNum">     527 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37722746 times"> + </span>]:<span class="lineCov">   37722746 :             TINYFORMAT_ASSERT(m_formatImpl);</span></a>
-<a name="528"><span class="lineNum">     528 </span>                :<span class="lineCov">   37722746 :             m_formatImpl(out, fmtBegin, fmtEnd, ntrunc, m_value);</span></a>
-<a name="529"><span class="lineNum">     529 </span>                :<span class="lineCov">   37723412 :         }</span></a>
+<a name="526"><span class="lineNum">     526 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37831874 times"> + </span>]:<span class="lineCov">   37831874 :             TINYFORMAT_ASSERT(m_value);</span></a>
+<a name="527"><span class="lineNum">     527 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37831874 times"> + </span>]:<span class="lineCov">   37831874 :             TINYFORMAT_ASSERT(m_formatImpl);</span></a>
+<a name="528"><span class="lineNum">     528 </span>                :<span class="lineCov">   37831874 :             m_formatImpl(out, fmtBegin, fmtEnd, ntrunc, m_value);</span></a>
+<a name="529"><span class="lineNum">     529 </span>                :<span class="lineCov">   37832840 :         }</span></a>
 <a name="530"><span class="lineNum">     530 </span>                :            : </a>
 <a name="531"><span class="lineNum">     531 </span>                :<span class="lineNoCov">          0 :         int toInt() const</span></a>
 <a name="532"><span class="lineNum">     532 </span>                :            :         {</a>
@@ -619,11 +619,11 @@
 <a name="537"><span class="lineNum">     537 </span>                :            : </a>
 <a name="538"><span class="lineNum">     538 </span>                :            :     private:</a>
 <a name="539"><span class="lineNum">     539 </span>                :            :         template&lt;typename T&gt;</a>
-<a name="540"><span class="lineNum">     540 </span>                :<span class="lineCov">   37725362 :         TINYFORMAT_HIDDEN static void formatImpl(std::ostream&amp; out, const char* fmtBegin,</span></a>
+<a name="540"><span class="lineNum">     540 </span>                :<span class="lineCov">   37834993 :         TINYFORMAT_HIDDEN static void formatImpl(std::ostream&amp; out, const char* fmtBegin,</span></a>
 <a name="541"><span class="lineNum">     541 </span>                :            :                         const char* fmtEnd, int ntrunc, const void* value)</a>
 <a name="542"><span class="lineNum">     542 </span>                :            :         {</a>
-<a name="543"><span class="lineNum">     543 </span>                :<span class="lineCov">   37725362 :             formatValue(out, fmtBegin, fmtEnd, ntrunc, *static_cast&lt;const T*&gt;(value));</span></a>
-<a name="544"><span class="lineNum">     544 </span>                :<span class="lineCov">   37725464 :         }</span></a>
+<a name="543"><span class="lineNum">     543 </span>                :<span class="lineCov">   37834993 :             formatValue(out, fmtBegin, fmtEnd, ntrunc, *static_cast&lt;const T*&gt;(value));</span></a>
+<a name="544"><span class="lineNum">     544 </span>                :<span class="lineCov">   37835139 :         }</span></a>
 <a name="545"><span class="lineNum">     545 </span>                :            : </a>
 <a name="546"><span class="lineNum">     546 </span>                :            :         template&lt;typename T&gt;</a>
 <a name="547"><span class="lineNum">     547 </span>                :<span class="lineNoCov">          0 :         TINYFORMAT_HIDDEN static int toIntImpl(const void* value)</span></a>
@@ -643,9 +643,9 @@
 <a name="561"><span class="lineNum">     561 </span>                :            : inline int parseIntAndAdvance(const char*&amp; c)</a>
 <a name="562"><span class="lineNum">     562 </span>                :            : {</a>
 <a name="563"><span class="lineNum">     563 </span>                :            :     int i = 0;</a>
-<a name="564"><span class="lineNum">     564 </span>                :<span class="lineCov">  123903630 :     for (;*c &gt;= '0' &amp;&amp; *c &lt;= '9'; ++c)</span></a>
-<a name="565"><span class="lineNum">     565 </span>                :<span class="lineCov">   48792406 :         i = 10*i + (*c - '0');</span></a>
-<a name="566"><span class="lineNum">     566 </span>                :<span class="lineCov">   26318818 :     return i;</span></a>
+<a name="564"><span class="lineNum">     564 </span>                :<span class="lineCov">  124182690 :     for (;*c &gt;= '0' &amp;&amp; *c &lt;= '9'; ++c)</span></a>
+<a name="565"><span class="lineNum">     565 </span>                :<span class="lineCov">   48903434 :         i = 10*i + (*c - '0');</span></a>
+<a name="566"><span class="lineNum">     566 </span>                :<span class="lineCov">   26375822 :     return i;</span></a>
 <a name="567"><span class="lineNum">     567 </span>                :            : }</a>
 <a name="568"><span class="lineNum">     568 </span>                :            : </a>
 <a name="569"><span class="lineNum">     569 </span>                :            : // Parse width or precision `n` from format string pointer `c`, and advance it</a>
@@ -653,14 +653,14 @@
 <a name="571"><span class="lineNum">     571 </span>                :            : // is read from `args[argIndex]` and `argIndex` is incremented (or read</a>
 <a name="572"><span class="lineNum">     572 </span>                :            : // from `args[n]` in positional mode). Returns true if one or more</a>
 <a name="573"><span class="lineNum">     573 </span>                :            : // characters were read.</a>
-<a name="574"><span class="lineNum">     574 </span>                :<span class="lineCov">   19113888 : inline bool parseWidthOrPrecision(int&amp; n, const char*&amp; c, bool positionalMode,</span></a>
+<a name="574"><span class="lineNum">     574 </span>                :<span class="lineCov">   19171942 : inline bool parseWidthOrPrecision(int&amp; n, const char*&amp; c, bool positionalMode,</span></a>
 <a name="575"><span class="lineNum">     575 </span>                :            :                                   const detail::FormatArg* args,</a>
 <a name="576"><span class="lineNum">     576 </span>                :            :                                   int&amp; argIndex, int numArgs)</a>
 <a name="577"><span class="lineNum">     577 </span>                :            : {</a>
-<a name="578"><span class="lineNum">     578 </span>        [<span class="branchCov" title="Branch 0 was taken 3854351 times"> + </span><span class="branchCov" title="Branch 1 was taken 15259537 times"> + </span>]:<span class="lineCov">   19113888 :     if (*c &gt;= '0' &amp;&amp; *c &lt;= '9') {</span></a>
-<a name="579"><span class="lineNum">     579 </span>        [<span class="branchCov" title="Branch 0 was taken 3854351 times"> + </span><span class="branchCov" title="Branch 1 was taken 3854351 times"> + </span>]:<span class="lineCov">    7708702 :         n = parseIntAndAdvance(c);</span></a>
+<a name="578"><span class="lineNum">     578 </span>        [<span class="branchCov" title="Branch 0 was taken 3857161 times"> + </span><span class="branchCov" title="Branch 1 was taken 15314781 times"> + </span>]:<span class="lineCov">   19171942 :     if (*c &gt;= '0' &amp;&amp; *c &lt;= '9') {</span></a>
+<a name="579"><span class="lineNum">     579 </span>        [<span class="branchCov" title="Branch 0 was taken 3857161 times"> + </span><span class="branchCov" title="Branch 1 was taken 3857161 times"> + </span>]:<span class="lineCov">    7714322 :         n = parseIntAndAdvance(c);</span></a>
 <a name="580"><span class="lineNum">     580 </span>                :            :     }</a>
-<a name="581"><span class="lineNum">     581 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15259537 times"> + </span>]:<span class="lineCov">   15259537 :     else if (*c == '*') {</span></a>
+<a name="581"><span class="lineNum">     581 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15314781 times"> + </span>]:<span class="lineCov">   15314781 :     else if (*c == '*') {</span></a>
 <a name="582"><span class="lineNum">     582 </span>                :<span class="lineNoCov">          0 :         ++c;</span></a>
 <a name="583"><span class="lineNum">     583 </span>                :<span class="lineNoCov">          0 :         n = 0;</span></a>
 <a name="584"><span class="lineNum">     584 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (positionalMode) {</span></a>
@@ -691,20 +691,20 @@
 <a name="609"><span class="lineNum">     609 </span>                :            : // Skips over any occurrences of '%%', printing a literal '%' to the output.</a>
 <a name="610"><span class="lineNum">     610 </span>                :            : // The position of the first % character of the next nontrivial format spec is</a>
 <a name="611"><span class="lineNum">     611 </span>                :            : // returned, or the end of string.</a>
-<a name="612"><span class="lineNum">     612 </span>                :<span class="lineCov">   49602761 : inline const char* printFormatStringLiteral(std::ostream&amp; out, const char* fmt)</span></a>
+<a name="612"><span class="lineNum">     612 </span>                :<span class="lineCov">   49752145 : inline const char* printFormatStringLiteral(std::ostream&amp; out, const char* fmt)</span></a>
 <a name="613"><span class="lineNum">     613 </span>                :            : {</a>
-<a name="614"><span class="lineNum">     614 </span>                :<span class="lineCov">   49602761 :     const char* c = fmt;</span></a>
-<a name="615"><span class="lineNum">     615 </span>                :<span class="lineCov">  163576331 :     for (;; ++c) {</span></a>
-<a name="616"><span class="lineNum">     616 </span>        [<span class="branchCov" title="Branch 0 was taken 11881316 times"> + </span><span class="branchCov" title="Branch 1 was taken 201297776 times"> + </span>]:<span class="lineCov">  213179092 :         if (*c == '\0') {</span></a>
-<a name="617"><span class="lineNum">     617 </span>                :<span class="lineCov">   11881316 :             out.write(fmt, c - fmt);</span></a>
-<a name="618"><span class="lineNum">     618 </span>                :<span class="lineCov">   11881316 :             return c;</span></a>
+<a name="614"><span class="lineNum">     614 </span>                :<span class="lineCov">   49752145 :     const char* c = fmt;</span></a>
+<a name="615"><span class="lineNum">     615 </span>                :<span class="lineCov">  164236645 :     for (;; ++c) {</span></a>
+<a name="616"><span class="lineNum">     616 </span>        [<span class="branchCov" title="Branch 0 was taken 11921811 times"> + </span><span class="branchCov" title="Branch 1 was taken 202066979 times"> + </span>]:<span class="lineCov">  213988790 :         if (*c == '\0') {</span></a>
+<a name="617"><span class="lineNum">     617 </span>                :<span class="lineCov">   11921811 :             out.write(fmt, c - fmt);</span></a>
+<a name="618"><span class="lineNum">     618 </span>                :<span class="lineCov">   11921811 :             return c;</span></a>
 <a name="619"><span class="lineNum">     619 </span>                :            :         }</a>
-<a name="620"><span class="lineNum">     620 </span>        [<span class="branchCov" title="Branch 0 was taken 37908074 times"> + </span><span class="branchCov" title="Branch 1 was taken 163389702 times"> + </span>]:<span class="lineCov">  201297776 :         else if (*c == '%') {</span></a>
-<a name="621"><span class="lineNum">     621 </span>                :<span class="lineCov">   37908074 :             out.write(fmt, c - fmt);</span></a>
-<a name="622"><span class="lineNum">     622 </span>        [<span class="branchCov" title="Branch 0 was taken 186629 times"> + </span><span class="branchCov" title="Branch 1 was taken 37723410 times"> + </span>]:<span class="lineCov">   37910039 :             if (*(c+1) != '%')</span></a>
+<a name="620"><span class="lineNum">     620 </span>        [<span class="branchCov" title="Branch 0 was taken 38019531 times"> + </span><span class="branchCov" title="Branch 1 was taken 164047448 times"> + </span>]:<span class="lineCov">  202066979 :         else if (*c == '%') {</span></a>
+<a name="621"><span class="lineNum">     621 </span>                :<span class="lineCov">   38019531 :             out.write(fmt, c - fmt);</span></a>
+<a name="622"><span class="lineNum">     622 </span>        [<span class="branchCov" title="Branch 0 was taken 189197 times"> + </span><span class="branchCov" title="Branch 1 was taken 37832825 times"> + </span>]:<span class="lineCov">   38022022 :             if (*(c+1) != '%')</span></a>
 <a name="623"><span class="lineNum">     623 </span>                :            :                 return c;</a>
 <a name="624"><span class="lineNum">     624 </span>                :            :             // for &quot;%%&quot;, tack trailing % onto next literal section.</a>
-<a name="625"><span class="lineNum">     625 </span>                :<span class="lineCov">     186629 :             fmt = ++c;</span></a>
+<a name="625"><span class="lineNum">     625 </span>                :<span class="lineCov">     189197 :             fmt = ++c;</span></a>
 <a name="626"><span class="lineNum">     626 </span>                :            :         }</a>
 <a name="627"><span class="lineNum">     627 </span>                :            :     }</a>
 <a name="628"><span class="lineNum">     628 </span>                :            : }</a>
@@ -743,32 +743,32 @@
 <a name="661"><span class="lineNum">     661 </span>                :            : // and ntrunc (for truncating conversions).  argIndex is incremented if</a>
 <a name="662"><span class="lineNum">     662 </span>                :            : // necessary to pull out variable width and precision.  The function returns a</a>
 <a name="663"><span class="lineNum">     663 </span>                :            : // pointer to the character after the end of the current format spec.</a>
-<a name="664"><span class="lineNum">     664 </span>                :<span class="lineCov">   37723181 : inline const char* streamStateFromFormat(std::ostream&amp; out, bool&amp; positionalMode,</span></a>
+<a name="664"><span class="lineNum">     664 </span>                :<span class="lineCov">   37832553 : inline const char* streamStateFromFormat(std::ostream&amp; out, bool&amp; positionalMode,</span></a>
 <a name="665"><span class="lineNum">     665 </span>                :            :                                          bool&amp; spacePadPositive,</a>
 <a name="666"><span class="lineNum">     666 </span>                :            :                                          int&amp; ntrunc, const char* fmtStart,</a>
 <a name="667"><span class="lineNum">     667 </span>                :            :                                          const detail::FormatArg* args,</a>
 <a name="668"><span class="lineNum">     668 </span>                :            :                                          int&amp; argIndex, int numArgs)</a>
 <a name="669"><span class="lineNum">     669 </span>                :            : {</a>
-<a name="670"><span class="lineNum">     670 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37723181 times"> + </span>]:<span class="lineCov">   37723181 :     TINYFORMAT_ASSERT(*fmtStart == '%');</span></a>
+<a name="670"><span class="lineNum">     670 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37832553 times"> + </span>]:<span class="lineCov">   37832553 :     TINYFORMAT_ASSERT(*fmtStart == '%');</span></a>
 <a name="671"><span class="lineNum">     671 </span>                :            :     // Reset stream state to defaults.</a>
-<a name="672"><span class="lineNum">     672 </span>                :<span class="lineCov">   37723181 :     out.width(0);</span></a>
-<a name="673"><span class="lineNum">     673 </span>                :<span class="lineCov">   37723181 :     out.precision(6);</span></a>
-<a name="674"><span class="lineNum">     674 </span>                :<span class="lineCov">   37723181 :     out.fill(' ');</span></a>
+<a name="672"><span class="lineNum">     672 </span>                :<span class="lineCov">   37832553 :     out.width(0);</span></a>
+<a name="673"><span class="lineNum">     673 </span>                :<span class="lineCov">   37832553 :     out.precision(6);</span></a>
+<a name="674"><span class="lineNum">     674 </span>                :<span class="lineCov">   37832553 :     out.fill(' ');</span></a>
 <a name="675"><span class="lineNum">     675 </span>                :            :     // Reset most flags; ignore irrelevant unitbuf &amp; skipws.</a>
-<a name="676"><span class="lineNum">     676 </span>        [<span class="branchCov" title="Branch 0 was taken 22464467 times"> + </span><span class="branchCov" title="Branch 1 was taken 15259819 times"> + </span>]:<span class="lineCov">   37724286 :     out.unsetf(std::ios::adjustfield | std::ios::basefield |</span></a>
+<a name="676"><span class="lineNum">     676 </span>        [<span class="branchCov" title="Branch 0 was taken 22518661 times"> + </span><span class="branchCov" title="Branch 1 was taken 15315082 times"> + </span>]:<span class="lineCov">   37833743 :     out.unsetf(std::ios::adjustfield | std::ios::basefield |</span></a>
 <a name="677"><span class="lineNum">     677 </span>                :            :                std::ios::floatfield | std::ios::showbase | std::ios::boolalpha |</a>
 <a name="678"><span class="lineNum">     678 </span>                :            :                std::ios::showpoint | std::ios::showpos | std::ios::uppercase);</a>
-<a name="679"><span class="lineNum">     679 </span>                :<span class="lineCov">   37724286 :     bool precisionSet = false;</span></a>
-<a name="680"><span class="lineNum">     680 </span>                :<span class="lineCov">   37724286 :     bool widthSet = false;</span></a>
-<a name="681"><span class="lineNum">     681 </span>                :<span class="lineCov">   37724286 :     int widthExtra = 0;</span></a>
-<a name="682"><span class="lineNum">     682 </span>                :<span class="lineCov">   37724286 :     const char* c = fmtStart + 1;</span></a>
+<a name="679"><span class="lineNum">     679 </span>                :<span class="lineCov">   37833743 :     bool precisionSet = false;</span></a>
+<a name="680"><span class="lineNum">     680 </span>                :<span class="lineCov">   37833743 :     bool widthSet = false;</span></a>
+<a name="681"><span class="lineNum">     681 </span>                :<span class="lineCov">   37833743 :     int widthExtra = 0;</span></a>
+<a name="682"><span class="lineNum">     682 </span>                :<span class="lineCov">   37833743 :     const char* c = fmtStart + 1;</span></a>
 <a name="683"><span class="lineNum">     683 </span>                :            : </a>
 <a name="684"><span class="lineNum">     684 </span>                :            :     // 1) Parse an argument index (if followed by '$') or a width possibly</a>
 <a name="685"><span class="lineNum">     685 </span>                :            :     // preceded with '0' flag.</a>
-<a name="686"><span class="lineNum">     686 </span>        [<span class="branchCov" title="Branch 0 was taken 22464467 times"> + </span><span class="branchCov" title="Branch 1 was taken 15259819 times"> + </span>]:<span class="lineCov">   37724286 :     if (*c &gt;= '0' &amp;&amp; *c &lt;= '9') {</span></a>
-<a name="687"><span class="lineNum">     687 </span>                :<span class="lineCov">   67402522 :         const char tmpc = *c;</span></a>
-<a name="688"><span class="lineNum">     688 </span>        [<span class="branchCov" title="Branch 0 was taken 44938055 times"> + </span><span class="branchCov" title="Branch 1 was taken 22464467 times"> + </span>]:<span class="lineCov">   67402522 :         int value = parseIntAndAdvance(c);</span></a>
-<a name="689"><span class="lineNum">     689 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 22464467 times"> + </span>]:<span class="lineCov">   22464467 :         if (*c == '$') {</span></a>
+<a name="686"><span class="lineNum">     686 </span>        [<span class="branchCov" title="Branch 0 was taken 22518661 times"> + </span><span class="branchCov" title="Branch 1 was taken 15315082 times"> + </span>]:<span class="lineCov">   37833743 :     if (*c &gt;= '0' &amp;&amp; *c &lt;= '9') {</span></a>
+<a name="687"><span class="lineNum">     687 </span>                :<span class="lineCov">   67564934 :         const char tmpc = *c;</span></a>
+<a name="688"><span class="lineNum">     688 </span>        [<span class="branchCov" title="Branch 0 was taken 45046273 times"> + </span><span class="branchCov" title="Branch 1 was taken 22518661 times"> + </span>]:<span class="lineCov">   67564934 :         int value = parseIntAndAdvance(c);</span></a>
+<a name="689"><span class="lineNum">     689 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 22518661 times"> + </span>]:<span class="lineCov">   22518661 :         if (*c == '$') {</span></a>
 <a name="690"><span class="lineNum">     690 </span>                :            :             // value is an argument index</a>
 <a name="691"><span class="lineNum">     691 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             if (value &gt; 0 &amp;&amp; value &lt;= numArgs)</span></a>
 <a name="692"><span class="lineNum">     692 </span>                :<span class="lineNoCov">          0 :                 argIndex = value - 1;</span></a>
@@ -777,32 +777,32 @@
 <a name="695"><span class="lineNum">     695 </span>                :<span class="lineNoCov">          0 :             ++c;</span></a>
 <a name="696"><span class="lineNum">     696 </span>                :<span class="lineNoCov">          0 :             positionalMode = true;</span></a>
 <a name="697"><span class="lineNum">     697 </span>                :            :         }</a>
-<a name="698"><span class="lineNum">     698 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 22464467 times"> + </span>]:<span class="lineCov">   22464467 :         else if (positionalMode) {</span></a>
+<a name="698"><span class="lineNum">     698 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 22518661 times"> + </span>]:<span class="lineCov">   22518661 :         else if (positionalMode) {</span></a>
 <a name="699"><span class="lineNum">     699 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             TINYFORMAT_ERROR(&quot;tinyformat: Non-positional argument used after a positional one&quot;);</span></a>
 <a name="700"><span class="lineNum">     700 </span>                :            :         }</a>
 <a name="701"><span class="lineNum">     701 </span>                :            :         else {</a>
-<a name="702"><span class="lineNum">     702 </span>        [<span class="branchCov" title="Branch 0 was taken 22461390 times"> + </span><span class="branchCov" title="Branch 1 was taken 3077 times"> + </span>]:<span class="lineCov">   22464467 :             if (tmpc == '0') {</span></a>
+<a name="702"><span class="lineNum">     702 </span>        [<span class="branchCov" title="Branch 0 was taken 22515583 times"> + </span><span class="branchCov" title="Branch 1 was taken 3078 times"> + </span>]:<span class="lineCov">   22518661 :             if (tmpc == '0') {</span></a>
 <a name="703"><span class="lineNum">     703 </span>                :            :                 // Use internal padding so that numeric values are</a>
 <a name="704"><span class="lineNum">     704 </span>                :            :                 // formatted correctly, eg -00010 rather than 000-10</a>
-<a name="705"><span class="lineNum">     705 </span>                :<span class="lineCov">   22461390 :                 out.fill('0');</span></a>
-<a name="706"><span class="lineNum">     706 </span>                :<span class="lineCov">   22461397 :                 out.setf(std::ios::internal, std::ios::adjustfield);</span></a>
+<a name="705"><span class="lineNum">     705 </span>                :<span class="lineCov">   22515583 :                 out.fill('0');</span></a>
+<a name="706"><span class="lineNum">     706 </span>                :<span class="lineCov">   22515584 :                 out.setf(std::ios::internal, std::ios::adjustfield);</span></a>
 <a name="707"><span class="lineNum">     707 </span>                :            :             }</a>
-<a name="708"><span class="lineNum">     708 </span>        [<span class="branchCov" title="Branch 0 was taken 22464474 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   22464474 :             if (value != 0) {</span></a>
+<a name="708"><span class="lineNum">     708 </span>        [<span class="branchCov" title="Branch 0 was taken 22518657 times"> + </span><span class="branchCov" title="Branch 1 was taken 5 times"> + </span>]:<span class="lineCov">   22518662 :             if (value != 0) {</span></a>
 <a name="709"><span class="lineNum">     709 </span>                :            :                 // Nonzero value means that we parsed width.</a>
-<a name="710"><span class="lineNum">     710 </span>                :<span class="lineCov">   22464474 :                 widthSet = true;</span></a>
-<a name="711"><span class="lineNum">     711 </span>                :<span class="lineCov">   22464474 :                 out.width(value);</span></a>
+<a name="710"><span class="lineNum">     710 </span>                :<span class="lineCov">   22518657 :                 widthSet = true;</span></a>
+<a name="711"><span class="lineNum">     711 </span>                :<span class="lineCov">   22518657 :                 out.width(value);</span></a>
 <a name="712"><span class="lineNum">     712 </span>                :            :             }</a>
 <a name="713"><span class="lineNum">     713 </span>                :            :         }</a>
 <a name="714"><span class="lineNum">     714 </span>                :            :     }</a>
-<a name="715"><span class="lineNum">     715 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15259819 times"> + </span>]:<span class="lineCov">   15259819 :     else if (positionalMode) {</span></a>
+<a name="715"><span class="lineNum">     715 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15315082 times"> + </span>]:<span class="lineCov">   15315082 :     else if (positionalMode) {</span></a>
 <a name="716"><span class="lineNum">     716 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         TINYFORMAT_ERROR(&quot;tinyformat: Non-positional argument used after a positional one&quot;);</span></a>
 <a name="717"><span class="lineNum">     717 </span>                :            :     }</a>
 <a name="718"><span class="lineNum">     718 </span>                :            :     // 2) Parse flags and width if we did not do it in previous step.</a>
-<a name="719"><span class="lineNum">     719 </span>                :<span class="lineCov">   22464474 :     if (!widthSet) {</span></a>
+<a name="719"><span class="lineNum">     719 </span>                :<span class="lineCov">   22518657 :     if (!widthSet) {</span></a>
 <a name="720"><span class="lineNum">     720 </span>                :            :         // Parse flags</a>
-<a name="721"><span class="lineNum">     721 </span>                :<span class="lineCov">      11064 :         for (;; ++c) {</span></a>
-<a name="722"><span class="lineNum">     722 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">   15270883 :             switch (*c) {</span></a>
-<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 11392 times"> + </span><span class="branchCov" title="Branch 5 was taken 15259491 times"> + </span>]
+<a name="721"><span class="lineNum">     721 </span>                :<span class="lineCov">      11071 :         for (;; ++c) {</span></a>
+<a name="722"><span class="lineNum">     722 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">   15326158 :             switch (*c) {</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 11392 times"> + </span><span class="branchCov" title="Branch 5 was taken 15314766 times"> + </span>]
 <a name="723"><span class="lineNum">     723 </span>                :<span class="lineNoCov">          0 :                 case '#':</span></a>
 <a name="724"><span class="lineNum">     724 </span>                :<span class="lineNoCov">          0 :                     out.setf(std::ios::showpoint | std::ios::showbase);</span></a>
 <a name="725"><span class="lineNum">     725 </span>                :<span class="lineNoCov">          0 :                     continue;</span></a>
@@ -829,16 +829,16 @@
 <a name="746"><span class="lineNum">     746 </span>                :<span class="lineCov">      11392 :                     spacePadPositive = false;</span></a>
 <a name="747"><span class="lineNum">     747 </span>                :<span class="lineCov">      11392 :                     widthExtra = 1;</span></a>
 <a name="748"><span class="lineNum">     748 </span>                :<span class="lineCov">      11392 :                     continue;</span></a>
-<a name="749"><span class="lineNum">     749 </span>                :<span class="lineCov">   15259491 :                 default:</span></a>
-<a name="750"><span class="lineNum">     750 </span>                :<span class="lineCov">   15259491 :                     break;</span></a>
+<a name="749"><span class="lineNum">     749 </span>                :<span class="lineCov">   15314766 :                 default:</span></a>
+<a name="750"><span class="lineNum">     750 </span>                :<span class="lineCov">   15314766 :                     break;</span></a>
 <a name="751"><span class="lineNum">     751 </span>                :            :             }</a>
-<a name="752"><span class="lineNum">     752 </span>                :<span class="lineCov">   15259491 :             break;</span></a>
+<a name="752"><span class="lineNum">     752 </span>                :<span class="lineCov">   15314766 :             break;</span></a>
 <a name="753"><span class="lineNum">     753 </span>                :            :         }</a>
 <a name="754"><span class="lineNum">     754 </span>                :            :         // Parse width</a>
-<a name="755"><span class="lineNum">     755 </span>                :<span class="lineCov">   15259491 :         int width = 0;</span></a>
-<a name="756"><span class="lineNum">     756 </span>                :<span class="lineCov">   15259491 :         widthSet = parseWidthOrPrecision(width, c, positionalMode,</span></a>
+<a name="755"><span class="lineNum">     755 </span>                :<span class="lineCov">   15314766 :         int width = 0;</span></a>
+<a name="756"><span class="lineNum">     756 </span>                :<span class="lineCov">   15314766 :         widthSet = parseWidthOrPrecision(width, c, positionalMode,</span></a>
 <a name="757"><span class="lineNum">     757 </span>                :            :                                          args, argIndex, numArgs);</a>
-<a name="758"><span class="lineNum">     758 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15260203 times"> + </span>]:<span class="lineCov">   15260203 :         if (widthSet) {</span></a>
+<a name="758"><span class="lineNum">     758 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 15315458 times"> + </span>]:<span class="lineCov">   15315458 :         if (widthSet) {</span></a>
 <a name="759"><span class="lineNum">     759 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             if (width &lt; 0) {</span></a>
 <a name="760"><span class="lineNum">     760 </span>                :            :                 // negative widths correspond to '-' flag set</a>
 <a name="761"><span class="lineNum">     761 </span>                :<span class="lineNoCov">          0 :                 out.fill(' ');</span></a>
@@ -849,35 +849,35 @@
 <a name="766"><span class="lineNum">     766 </span>                :            :         }</a>
 <a name="767"><span class="lineNum">     767 </span>                :            :     }</a>
 <a name="768"><span class="lineNum">     768 </span>                :            :     // 3) Parse precision</a>
-<a name="769"><span class="lineNum">     769 </span>        [<span class="branchCov" title="Branch 0 was taken 3854351 times"> + </span><span class="branchCov" title="Branch 1 was taken 33870326 times"> + </span>]:<span class="lineCov">   37724677 :     if (*c == '.') {</span></a>
-<a name="770"><span class="lineNum">     770 </span>                :<span class="lineCov">    3854351 :         ++c;</span></a>
-<a name="771"><span class="lineNum">     771 </span>                :<span class="lineCov">    3854351 :         int precision = 0;</span></a>
-<a name="772"><span class="lineNum">     772 </span>                :<span class="lineCov">    3854351 :         parseWidthOrPrecision(precision, c, positionalMode,</span></a>
+<a name="769"><span class="lineNum">     769 </span>        [<span class="branchCov" title="Branch 0 was taken 3857161 times"> + </span><span class="branchCov" title="Branch 1 was taken 33976954 times"> + </span>]:<span class="lineCov">   37834115 :     if (*c == '.') {</span></a>
+<a name="770"><span class="lineNum">     770 </span>                :<span class="lineCov">    3857161 :         ++c;</span></a>
+<a name="771"><span class="lineNum">     771 </span>                :<span class="lineCov">    3857161 :         int precision = 0;</span></a>
+<a name="772"><span class="lineNum">     772 </span>                :<span class="lineCov">    3857161 :         parseWidthOrPrecision(precision, c, positionalMode,</span></a>
 <a name="773"><span class="lineNum">     773 </span>                :            :                               args, argIndex, numArgs);</a>
 <a name="774"><span class="lineNum">     774 </span>                :            :         // Presence of `.` indicates precision set, unless the inferred value</a>
 <a name="775"><span class="lineNum">     775 </span>                :            :         // was negative in which case the default is used.</a>
-<a name="776"><span class="lineNum">     776 </span>                :<span class="lineCov">    3854351 :         precisionSet = precision &gt;= 0;</span></a>
-<a name="777"><span class="lineNum">     777 </span>        [<span class="branchCov" title="Branch 0 was taken 3854351 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    3854351 :         if (precisionSet)</span></a>
-<a name="778"><span class="lineNum">     778 </span>                :<span class="lineCov">   37724677 :             out.precision(precision);</span></a>
+<a name="776"><span class="lineNum">     776 </span>                :<span class="lineCov">    3857161 :         precisionSet = precision &gt;= 0;</span></a>
+<a name="777"><span class="lineNum">     777 </span>        [<span class="branchCov" title="Branch 0 was taken 3857161 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    3857161 :         if (precisionSet)</span></a>
+<a name="778"><span class="lineNum">     778 </span>                :<span class="lineCov">   37834115 :             out.precision(precision);</span></a>
 <a name="779"><span class="lineNum">     779 </span>                :            :     }</a>
 <a name="780"><span class="lineNum">     780 </span>                :            :     // 4) Ignore any C99 length modifier</a>
-<a name="781"><span class="lineNum">     781 </span>  [<span class="branchCov" title="Branch 0 was taken 37729673 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 37729673 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">   37729673 :     while (*c == 'l' || *c == 'h' || *c == 'L' ||</span></a>
-<a name="782"><span class="lineNum">     782 </span>  [<span class="branchCov" title="Branch 0 was taken 37729673 times"> + </span><span class="branchCov" title="Branch 1 was taken 208956 times"> + </span><span class="branchCov" title="Branch 2 was taken 37722776 times"> + </span><span class="branchCov" title="Branch 3 was taken 6897 times"> + </span> :<span class="lineCov">   75668302 :            *c == 'j' || *c == 'z' || *c == 't') {</span></a>
-<span class="lineNum">         </span>         <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 37724677 times"> + </span>]
-<a name="783"><span class="lineNum">     783 </span>                :<span class="lineCov">     213952 :         ++c;</span></a>
+<a name="781"><span class="lineNum">     781 </span>  [<span class="branchCov" title="Branch 0 was taken 37838538 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 37838538 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">   37838538 :     while (*c == 'l' || *c == 'h' || *c == 'L' ||</span></a>
+<a name="782"><span class="lineNum">     782 </span>  [<span class="branchCov" title="Branch 0 was taken 37838538 times"> + </span><span class="branchCov" title="Branch 1 was taken 206751 times"> + </span><span class="branchCov" title="Branch 2 was taken 37831629 times"> + </span><span class="branchCov" title="Branch 3 was taken 6909 times"> + </span> :<span class="lineCov">   75883827 :            *c == 'j' || *c == 'z' || *c == 't') {</span></a>
+<span class="lineNum">         </span>         <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 37834115 times"> + </span>]
+<a name="783"><span class="lineNum">     783 </span>                :<span class="lineCov">     211174 :         ++c;</span></a>
 <a name="784"><span class="lineNum">     784 </span>                :            :     }</a>
 <a name="785"><span class="lineNum">     785 </span>                :            :     // 5) We're up to the conversion specifier character.</a>
 <a name="786"><span class="lineNum">     786 </span>                :            :     // Set stream flags based on conversion specifier (thanks to the</a>
 <a name="787"><span class="lineNum">     787 </span>                :            :     // boost::format class for forging the way here).</a>
-<a name="788"><span class="lineNum">     788 </span>                :<span class="lineCov">   37724677 :     bool intConversion = false;</span></a>
-<a name="789"><span class="lineNum">     789 </span>  [<span class="branchCov" title="Branch 0 was taken 28202970 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 118983 times"> + </span> :<span class="lineCov">   37724677 :     switch (*c) {</span></a>
-<span class="lineNum">         </span><span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchNoCov" title="Branch 6 was not taken"> - </span><span class="branchCov" title="Branch 7 was taken 4012273 times"> + </span><span class="branchNoCov" title="Branch 8 was not taken"> - </span> 
-<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchNoCov" title="Branch 10 was not taken"> - </span><span class="branchCov" title="Branch 11 was taken 312005 times"> + </span><span class="branchCov" title="Branch 12 was taken 5078444 times"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<a name="788"><span class="lineNum">     788 </span>                :<span class="lineCov">   37834115 :     bool intConversion = false;</span></a>
+<a name="789"><span class="lineNum">     789 </span>  [<span class="branchCov" title="Branch 0 was taken 28281302 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 118748 times"> + </span> :<span class="lineCov">   37834115 :     switch (*c) {</span></a>
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchNoCov" title="Branch 6 was not taken"> - </span><span class="branchCov" title="Branch 7 was taken 4014812 times"> + </span><span class="branchNoCov" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchNoCov" title="Branch 10 was not taken"> - </span><span class="branchCov" title="Branch 11 was taken 316364 times"> + </span><span class="branchCov" title="Branch 12 was taken 5102887 times"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
 <span class="lineNum">         </span>         <span class="branchNoCov" title="Branch 14 was not taken"> - </span><span class="branchCov" title="Branch 15 was taken 2 times"> + </span>]
-<a name="790"><span class="lineNum">     790 </span>                :<span class="lineCov">   28202970 :         case 'u': case 'd': case 'i':</span></a>
-<a name="791"><span class="lineNum">     791 </span>                :<span class="lineCov">   28202970 :             out.setf(std::ios::dec, std::ios::basefield);</span></a>
-<a name="792"><span class="lineNum">     792 </span>                :<span class="lineCov">   28202970 :             intConversion = true;</span></a>
-<a name="793"><span class="lineNum">     793 </span>                :<span class="lineCov">   28202970 :             break;</span></a>
+<a name="790"><span class="lineNum">     790 </span>                :<span class="lineCov">   28281302 :         case 'u': case 'd': case 'i':</span></a>
+<a name="791"><span class="lineNum">     791 </span>                :<span class="lineCov">   28281302 :             out.setf(std::ios::dec, std::ios::basefield);</span></a>
+<a name="792"><span class="lineNum">     792 </span>                :<span class="lineCov">   28281302 :             intConversion = true;</span></a>
+<a name="793"><span class="lineNum">     793 </span>                :<span class="lineCov">   28281302 :             break;</span></a>
 <a name="794"><span class="lineNum">     794 </span>                :<span class="lineNoCov">          0 :         case 'o':</span></a>
 <a name="795"><span class="lineNum">     795 </span>                :<span class="lineNoCov">          0 :             out.setf(std::ios::oct, std::ios::basefield);</span></a>
 <a name="796"><span class="lineNum">     796 </span>                :<span class="lineNoCov">          0 :             intConversion = true;</span></a>
@@ -885,10 +885,10 @@
 <a name="798"><span class="lineNum">     798 </span>                :<span class="lineNoCov">          0 :         case 'X':</span></a>
 <a name="799"><span class="lineNum">     799 </span>                :<span class="lineNoCov">          0 :             out.setf(std::ios::uppercase);</span></a>
 <a name="800"><span class="lineNum">     800 </span>                :            :             // Falls through</a>
-<a name="801"><span class="lineNum">     801 </span>                :<span class="lineCov">     118983 :         case 'x': case 'p':</span></a>
-<a name="802"><span class="lineNum">     802 </span>                :<span class="lineCov">     118983 :             out.setf(std::ios::hex, std::ios::basefield);</span></a>
-<a name="803"><span class="lineNum">     803 </span>                :<span class="lineCov">     118983 :             intConversion = true;</span></a>
-<a name="804"><span class="lineNum">     804 </span>                :<span class="lineCov">     118983 :             break;</span></a>
+<a name="801"><span class="lineNum">     801 </span>                :<span class="lineCov">     118748 :         case 'x': case 'p':</span></a>
+<a name="802"><span class="lineNum">     802 </span>                :<span class="lineCov">     118748 :             out.setf(std::ios::hex, std::ios::basefield);</span></a>
+<a name="803"><span class="lineNum">     803 </span>                :<span class="lineCov">     118748 :             intConversion = true;</span></a>
+<a name="804"><span class="lineNum">     804 </span>                :<span class="lineCov">     118748 :             break;</span></a>
 <a name="805"><span class="lineNum">     805 </span>                :<span class="lineNoCov">          0 :         case 'E':</span></a>
 <a name="806"><span class="lineNum">     806 </span>                :<span class="lineNoCov">          0 :             out.setf(std::ios::uppercase);</span></a>
 <a name="807"><span class="lineNum">     807 </span>                :            :             // Falls through</a>
@@ -899,8 +899,8 @@
 <a name="812"><span class="lineNum">     812 </span>                :<span class="lineNoCov">          0 :         case 'F':</span></a>
 <a name="813"><span class="lineNum">     813 </span>                :<span class="lineNoCov">          0 :             out.setf(std::ios::uppercase);</span></a>
 <a name="814"><span class="lineNum">     814 </span>                :            :             // Falls through</a>
-<a name="815"><span class="lineNum">     815 </span>                :<span class="lineCov">    4012273 :         case 'f':</span></a>
-<a name="816"><span class="lineNum">     816 </span>                :<span class="lineCov">    4012273 :             out.setf(std::ios::fixed, std::ios::floatfield);</span></a>
+<a name="815"><span class="lineNum">     815 </span>                :<span class="lineCov">    4014812 :         case 'f':</span></a>
+<a name="816"><span class="lineNum">     816 </span>                :<span class="lineCov">    4014812 :             out.setf(std::ios::fixed, std::ios::floatfield);</span></a>
 <a name="817"><span class="lineNum">     817 </span>                :            :             break;</a>
 <a name="818"><span class="lineNum">     818 </span>                :<span class="lineNoCov">          0 :         case 'A':</span></a>
 <a name="819"><span class="lineNum">     819 </span>                :<span class="lineNoCov">          0 :             out.setf(std::ios::uppercase);</span></a>
@@ -917,19 +917,19 @@
 <a name="830"><span class="lineNum">     830 </span>                :<span class="lineNoCov">          0 :         case 'G':</span></a>
 <a name="831"><span class="lineNum">     831 </span>                :<span class="lineNoCov">          0 :             out.setf(std::ios::uppercase);</span></a>
 <a name="832"><span class="lineNum">     832 </span>                :            :             // Falls through</a>
-<a name="833"><span class="lineNum">     833 </span>                :<span class="lineCov">     312005 :         case 'g':</span></a>
-<a name="834"><span class="lineNum">     834 </span>                :<span class="lineCov">     312005 :             out.setf(std::ios::dec, std::ios::basefield);</span></a>
+<a name="833"><span class="lineNum">     833 </span>                :<span class="lineCov">     316364 :         case 'g':</span></a>
+<a name="834"><span class="lineNum">     834 </span>                :<span class="lineCov">     316364 :             out.setf(std::ios::dec, std::ios::basefield);</span></a>
 <a name="835"><span class="lineNum">     835 </span>                :            :             // As in boost::format, let stream decide float format.</a>
-<a name="836"><span class="lineNum">     836 </span>                :<span class="lineCov">     312005 :             out.flags(out.flags() &amp; ~std::ios::floatfield);</span></a>
+<a name="836"><span class="lineNum">     836 </span>                :<span class="lineCov">     316364 :             out.flags(out.flags() &amp; ~std::ios::floatfield);</span></a>
 <a name="837"><span class="lineNum">     837 </span>                :            :             break;</a>
 <a name="838"><span class="lineNum">     838 </span>                :            :         case 'c':</a>
 <a name="839"><span class="lineNum">     839 </span>                :            :             // Handled as special case inside formatValue()</a>
 <a name="840"><span class="lineNum">     840 </span>                :            :             break;</a>
-<a name="841"><span class="lineNum">     841 </span>                :<span class="lineCov">    5078444 :         case 's':</span></a>
-<a name="842"><span class="lineNum">     842 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 5078444 times"> + </span>]:<span class="lineCov">    5078444 :             if (precisionSet)</span></a>
+<a name="841"><span class="lineNum">     841 </span>                :<span class="lineCov">    5102887 :         case 's':</span></a>
+<a name="842"><span class="lineNum">     842 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 5102887 times"> + </span>]:<span class="lineCov">    5102887 :             if (precisionSet)</span></a>
 <a name="843"><span class="lineNum">     843 </span>                :<span class="lineNoCov">          0 :                 ntrunc = static_cast&lt;int&gt;(out.precision());</span></a>
 <a name="844"><span class="lineNum">     844 </span>                :            :             // Make %s print Booleans as &quot;true&quot; and &quot;false&quot;</a>
-<a name="845"><span class="lineNum">     845 </span>                :<span class="lineCov">    5078444 :             out.setf(std::ios::boolalpha);</span></a>
+<a name="845"><span class="lineNum">     845 </span>                :<span class="lineCov">    5102887 :             out.setf(std::ios::boolalpha);</span></a>
 <a name="846"><span class="lineNum">     846 </span>                :            :             break;</a>
 <a name="847"><span class="lineNum">     847 </span>                :<span class="lineNoCov">          0 :         case 'n':</span></a>
 <a name="848"><span class="lineNum">     848 </span>                :            :             // Not supported - will cause problems!</a>
@@ -942,7 +942,7 @@
 <a name="855"><span class="lineNum">     855 </span>                :            :         default:</a>
 <a name="856"><span class="lineNum">     856 </span>                :            :             break;</a>
 <a name="857"><span class="lineNum">     857 </span>                :            :     }</a>
-<a name="858"><span class="lineNum">     858 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37724677 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">   37724677 :     if (intConversion &amp;&amp; precisionSet &amp;&amp; !widthSet) {</span></a>
+<a name="858"><span class="lineNum">     858 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37834115 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">   37834115 :     if (intConversion &amp;&amp; precisionSet &amp;&amp; !widthSet) {</span></a>
 <a name="859"><span class="lineNum">     859 </span>                :            :         // &quot;precision&quot; for integers gives the minimum number of digits (to be</a>
 <a name="860"><span class="lineNum">     860 </span>                :            :         // padded with zeros on the left).  This isn't really supported by the</a>
 <a name="861"><span class="lineNum">     861 </span>                :            :         // iostreams, but we can approximately simulate it with the width if</a>
@@ -951,47 +951,47 @@
 <a name="864"><span class="lineNum">     864 </span>                :<span class="lineNoCov">          0 :         out.setf(std::ios::internal, std::ios::adjustfield);</span></a>
 <a name="865"><span class="lineNum">     865 </span>                :<span class="lineNoCov">          0 :         out.fill('0');</span></a>
 <a name="866"><span class="lineNum">     866 </span>                :            :     }</a>
-<a name="867"><span class="lineNum">     867 </span>                :<span class="lineCov">   37724677 :     return c+1;</span></a>
+<a name="867"><span class="lineNum">     867 </span>                :<span class="lineCov">   37834115 :     return c+1;</span></a>
 <a name="868"><span class="lineNum">     868 </span>                :            : }</a>
 <a name="869"><span class="lineNum">     869 </span>                :            : </a>
 <a name="870"><span class="lineNum">     870 </span>                :            : </a>
 <a name="871"><span class="lineNum">     871 </span>                :            : //------------------------------------------------------------------------------</a>
-<a name="872"><span class="lineNum">     872 </span>                :<span class="lineCov">   11881174 : inline void formatImpl(std::ostream&amp; out, const char* fmt,</span></a>
+<a name="872"><span class="lineNum">     872 </span>                :<span class="lineCov">   11921630 : inline void formatImpl(std::ostream&amp; out, const char* fmt,</span></a>
 <a name="873"><span class="lineNum">     873 </span>                :            :                        const detail::FormatArg* args,</a>
 <a name="874"><span class="lineNum">     874 </span>                :            :                        int numArgs)</a>
 <a name="875"><span class="lineNum">     875 </span>                :            : {</a>
 <a name="876"><span class="lineNum">     876 </span>                :            :     // Saved stream state</a>
-<a name="877"><span class="lineNum">     877 </span>                :<span class="lineCov">   11881174 :     std::streamsize origWidth = out.width();</span></a>
-<a name="878"><span class="lineNum">     878 </span>                :<span class="lineCov">   11881174 :     std::streamsize origPrecision = out.precision();</span></a>
-<a name="879"><span class="lineNum">     879 </span>                :<span class="lineCov">   11881174 :     std::ios::fmtflags origFlags = out.flags();</span></a>
-<a name="880"><span class="lineNum">     880 </span>                :<span class="lineCov">   11881174 :     char origFill = out.fill();</span></a>
+<a name="877"><span class="lineNum">     877 </span>                :<span class="lineCov">   11921630 :     std::streamsize origWidth = out.width();</span></a>
+<a name="878"><span class="lineNum">     878 </span>                :<span class="lineCov">   11921630 :     std::streamsize origPrecision = out.precision();</span></a>
+<a name="879"><span class="lineNum">     879 </span>                :<span class="lineCov">   11921630 :     std::ios::fmtflags origFlags = out.flags();</span></a>
+<a name="880"><span class="lineNum">     880 </span>                :<span class="lineCov">   11921630 :     char origFill = out.fill();</span></a>
 <a name="881"><span class="lineNum">     881 </span>                :            : </a>
 <a name="882"><span class="lineNum">     882 </span>                :            :     // &quot;Positional mode&quot; means all format specs should be of the form &quot;%n$...&quot;</a>
 <a name="883"><span class="lineNum">     883 </span>                :            :     // with `n` an integer. We detect this in `streamStateFromFormat`.</a>
-<a name="884"><span class="lineNum">     884 </span>                :<span class="lineCov">   11881142 :     bool positionalMode = false;</span></a>
-<a name="885"><span class="lineNum">     885 </span>                :<span class="lineCov">   11881142 :     int argIndex = 0;</span></a>
-<a name="886"><span class="lineNum">     886 </span>                :<span class="lineCov">   49604671 :     while (true) {</span></a>
-<a name="887"><span class="lineNum">     887 </span>                :<span class="lineCov">   49604671 :         fmt = printFormatStringLiteral(out, fmt);</span></a>
-<a name="888"><span class="lineNum">     888 </span>        [<span class="branchCov" title="Branch 0 was taken 11881357 times"> + </span><span class="branchCov" title="Branch 1 was taken 37723432 times"> + </span>]:<span class="lineCov">   49604789 :         if (*fmt == '\0') {</span></a>
-<a name="889"><span class="lineNum">     889 </span>  [<span class="branchCov" title="Branch 0 was taken 11881357 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 11881357 times"> + </span>]:<span class="lineCov">   11881357 :             if (!positionalMode &amp;&amp; argIndex &lt; numArgs) {</span></a>
+<a name="884"><span class="lineNum">     884 </span>                :<span class="lineCov">   11921508 :     bool positionalMode = false;</span></a>
+<a name="885"><span class="lineNum">     885 </span>                :<span class="lineCov">   11921508 :     int argIndex = 0;</span></a>
+<a name="886"><span class="lineNum">     886 </span>                :<span class="lineCov">   49754425 :     while (true) {</span></a>
+<a name="887"><span class="lineNum">     887 </span>                :<span class="lineCov">   49754425 :         fmt = printFormatStringLiteral(out, fmt);</span></a>
+<a name="888"><span class="lineNum">     888 </span>        [<span class="branchCov" title="Branch 0 was taken 11921856 times"> + </span><span class="branchCov" title="Branch 1 was taken 37832869 times"> + </span>]:<span class="lineCov">   49754725 :         if (*fmt == '\0') {</span></a>
+<a name="889"><span class="lineNum">     889 </span>  [<span class="branchCov" title="Branch 0 was taken 11921856 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 11921856 times"> + </span>]:<span class="lineCov">   11921856 :             if (!positionalMode &amp;&amp; argIndex &lt; numArgs) {</span></a>
 <a name="890"><span class="lineNum">     890 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :                 TINYFORMAT_ERROR(&quot;tinyformat: Not enough conversion specifiers in format string&quot;);</span></a>
 <a name="891"><span class="lineNum">     891 </span>                :            :             }</a>
-<a name="892"><span class="lineNum">     892 </span>                :<span class="lineCov">   11881357 :             break;</span></a>
+<a name="892"><span class="lineNum">     892 </span>                :<span class="lineCov">   11921856 :             break;</span></a>
 <a name="893"><span class="lineNum">     893 </span>                :            :         }</a>
-<a name="894"><span class="lineNum">     894 </span>                :<span class="lineCov">   37723432 :         bool spacePadPositive = false;</span></a>
-<a name="895"><span class="lineNum">     895 </span>                :<span class="lineCov">   37723432 :         int ntrunc = -1;</span></a>
-<a name="896"><span class="lineNum">     896 </span>                :<span class="lineCov">   37723432 :         const char* fmtEnd = streamStateFromFormat(out, positionalMode, spacePadPositive, ntrunc, fmt,</span></a>
+<a name="894"><span class="lineNum">     894 </span>                :<span class="lineCov">   37832869 :         bool spacePadPositive = false;</span></a>
+<a name="895"><span class="lineNum">     895 </span>                :<span class="lineCov">   37832869 :         int ntrunc = -1;</span></a>
+<a name="896"><span class="lineNum">     896 </span>                :<span class="lineCov">   37832869 :         const char* fmtEnd = streamStateFromFormat(out, positionalMode, spacePadPositive, ntrunc, fmt,</span></a>
 <a name="897"><span class="lineNum">     897 </span>                :            :                                                    args, argIndex, numArgs);</a>
 <a name="898"><span class="lineNum">     898 </span>                :            :         // NB: argIndex may be incremented by reading variable width/precision</a>
 <a name="899"><span class="lineNum">     899 </span>                :            :         // in `streamStateFromFormat`, so do the bounds check here.</a>
-<a name="900"><span class="lineNum">     900 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37722687 times"> + </span>]:<span class="lineCov">   37722687 :         if (argIndex &gt;= numArgs) {</span></a>
+<a name="900"><span class="lineNum">     900 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37831754 times"> + </span>]:<span class="lineCov">   37831754 :         if (argIndex &gt;= numArgs) {</span></a>
 <a name="901"><span class="lineNum">     901 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             TINYFORMAT_ERROR(&quot;tinyformat: Too many conversion specifiers in format string&quot;);</span></a>
 <a name="902"><span class="lineNum">     902 </span>                :            :             return;</a>
 <a name="903"><span class="lineNum">     903 </span>                :            :         }</a>
-<a name="904"><span class="lineNum">     904 </span>                :<span class="lineCov">   37722687 :         const FormatArg&amp; arg = args[argIndex];</span></a>
+<a name="904"><span class="lineNum">     904 </span>                :<span class="lineCov">   37831754 :         const FormatArg&amp; arg = args[argIndex];</span></a>
 <a name="905"><span class="lineNum">     905 </span>                :            :         // Format the arg into the stream.</a>
-<a name="906"><span class="lineNum">     906 </span>        [<span class="branchCov" title="Branch 0 was taken 37722687 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   37722687 :         if (!spacePadPositive) {</span></a>
-<a name="907"><span class="lineNum">     907 </span>                :<span class="lineCov">   37722687 :             arg.format(out, fmt, fmtEnd, ntrunc);</span></a>
+<a name="906"><span class="lineNum">     906 </span>        [<span class="branchCov" title="Branch 0 was taken 37831754 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   37831754 :         if (!spacePadPositive) {</span></a>
+<a name="907"><span class="lineNum">     907 </span>                :<span class="lineCov">   37831754 :             arg.format(out, fmt, fmtEnd, ntrunc);</span></a>
 <a name="908"><span class="lineNum">     908 </span>                :            :         }</a>
 <a name="909"><span class="lineNum">     909 </span>                :            :         else {</a>
 <a name="910"><span class="lineNum">     910 </span>                :            :             // The following is a special case with no direct correspondence</a>
@@ -1009,16 +1009,16 @@
 <a name="922"><span class="lineNum">     922 </span>                :            :             }</a>
 <a name="923"><span class="lineNum">     923 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             out &lt;&lt; result;</span></a>
 <a name="924"><span class="lineNum">     924 </span>                :            :         }</a>
-<a name="925"><span class="lineNum">     925 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37723631 times"> + </span>]:<span class="lineCov">   37723529 :         if (!positionalMode)</span></a>
-<a name="926"><span class="lineNum">     926 </span>                :<span class="lineCov">   37723631 :             ++argIndex;</span></a>
+<a name="925"><span class="lineNum">     925 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 37833017 times"> + </span>]:<span class="lineCov">   37832917 :         if (!positionalMode)</span></a>
+<a name="926"><span class="lineNum">     926 </span>                :<span class="lineCov">   37833017 :             ++argIndex;</span></a>
 <a name="927"><span class="lineNum">     927 </span>                :            :         fmt = fmtEnd;</a>
 <a name="928"><span class="lineNum">     928 </span>                :            :     }</a>
 <a name="929"><span class="lineNum">     929 </span>                :            : </a>
 <a name="930"><span class="lineNum">     930 </span>                :            :     // Restore stream state</a>
-<a name="931"><span class="lineNum">     931 </span>                :<span class="lineCov">   11881357 :     out.width(origWidth);</span></a>
-<a name="932"><span class="lineNum">     932 </span>                :<span class="lineCov">   11881357 :     out.precision(origPrecision);</span></a>
-<a name="933"><span class="lineNum">     933 </span>                :<span class="lineCov">   11881357 :     out.flags(origFlags);</span></a>
-<a name="934"><span class="lineNum">     934 </span>                :<span class="lineCov">   11881357 :     out.fill(origFill);</span></a>
+<a name="931"><span class="lineNum">     931 </span>                :<span class="lineCov">   11921856 :     out.width(origWidth);</span></a>
+<a name="932"><span class="lineNum">     932 </span>                :<span class="lineCov">   11921856 :     out.precision(origPrecision);</span></a>
+<a name="933"><span class="lineNum">     933 </span>                :<span class="lineCov">   11921856 :     out.flags(origFlags);</span></a>
+<a name="934"><span class="lineNum">     934 </span>                :<span class="lineCov">   11921856 :     out.fill(origFill);</span></a>
 <a name="935"><span class="lineNum">     935 </span>                :            : }</a>
 <a name="936"><span class="lineNum">     936 </span>                :            : </a>
 <a name="937"><span class="lineNum">     937 </span>                :            : } // namespace detail</a>
@@ -1033,8 +1033,8 @@
 <a name="946"><span class="lineNum">     946 </span>                :            : class FormatList</a>
 <a name="947"><span class="lineNum">     947 </span>                :            : {</a>
 <a name="948"><span class="lineNum">     948 </span>                :            :     public:</a>
-<a name="949"><span class="lineNum">     949 </span>                :<span class="lineCov">   11881505 :         FormatList(detail::FormatArg* args, int N)</span></a>
-<a name="950"><span class="lineNum">     950 </span>                :<span class="lineCov">   11881505 :             : m_args(args), m_N(N) { }</span></a>
+<a name="949"><span class="lineNum">     949 </span>                :<span class="lineCov">   11922015 :         FormatList(detail::FormatArg* args, int N)</span></a>
+<a name="950"><span class="lineNum">     950 </span>                :<span class="lineCov">   11922015 :             : m_args(args), m_N(N) { }</span></a>
 <a name="951"><span class="lineNum">     951 </span>                :            : </a>
 <a name="952"><span class="lineNum">     952 </span>                :            :         friend void vformat(std::ostream&amp; out, const char* fmt,</a>
 <a name="953"><span class="lineNum">     953 </span>                :            :                             const FormatList&amp; list);</a>
@@ -1057,10 +1057,10 @@
 <a name="970"><span class="lineNum">     970 </span>                :            :     public:</a>
 <a name="971"><span class="lineNum">     971 </span>                :            : #ifdef TINYFORMAT_USE_VARIADIC_TEMPLATES</a>
 <a name="972"><span class="lineNum">     972 </span>                :            :         template&lt;typename... Args&gt;</a>
-<a name="973"><span class="lineNum">     973 </span>                :<span class="lineCov">   11856715 :         explicit FormatListN(const Args&amp;... args)</span></a>
+<a name="973"><span class="lineNum">     973 </span>                :<span class="lineCov">   11897128 :         explicit FormatListN(const Args&amp;... args)</span></a>
 <a name="974"><span class="lineNum">     974 </span>                :            :             : FormatList(&amp;m_formatterStore[0], N),</a>
-<a name="975"><span class="lineNum">     975 </span>                :<span class="lineCov">   11856715 :             m_formatterStore { FormatArg(args)... }</span></a>
-<a name="976"><span class="lineNum">     976 </span>                :<span class="lineCov">      63029 :         { static_assert(sizeof...(args) == N, &quot;Number of args must be N&quot;); }</span></a>
+<a name="975"><span class="lineNum">     975 </span>                :<span class="lineCov">   11897128 :             m_formatterStore { FormatArg(args)... }</span></a>
+<a name="976"><span class="lineNum">     976 </span>                :<span class="lineCov">      63923 :         { static_assert(sizeof...(args) == N, &quot;Number of args must be N&quot;); }</span></a>
 <a name="977"><span class="lineNum">     977 </span>                :            : #else // C++98 version</a>
 <a name="978"><span class="lineNum">     978 </span>                :            :         void init(int) {}</a>
 <a name="979"><span class="lineNum">     979 </span>                :            : #       define TINYFORMAT_MAKE_FORMATLIST_CONSTRUCTOR(n)                \</a>
@@ -1092,7 +1092,7 @@
 <a name="1005"><span class="lineNum">    1005 </span>                :            : // Special 0-arg version - MSVC says zero-sized C array in struct is nonstandard</a>
 <a name="1006"><span class="lineNum">    1006 </span>                :            : template&lt;&gt; class FormatListN&lt;0&gt; : public FormatList</a>
 <a name="1007"><span class="lineNum">    1007 </span>                :            : {</a>
-<a name="1008"><span class="lineNum">    1008 </span>                :<span class="lineCov">      24790 :     public: FormatListN() : FormatList(0, 0) {}</span></a>
+<a name="1008"><span class="lineNum">    1008 </span>                :<span class="lineCov">      24887 :     public: FormatListN() : FormatList(0, 0) {}</span></a>
 <a name="1009"><span class="lineNum">    1009 </span>                :            : };</a>
 <a name="1010"><span class="lineNum">    1010 </span>                :            : </a>
 <a name="1011"><span class="lineNum">    1011 </span>                :            : } // namespace detail</a>
@@ -1110,9 +1110,9 @@
 <a name="1023"><span class="lineNum">    1023 </span>                :            : ///</a>
 <a name="1024"><span class="lineNum">    1024 </span>                :            : ///   FormatListRef formatList = makeFormatList( /*...*/ );</a>
 <a name="1025"><span class="lineNum">    1025 </span>                :            : template&lt;typename... Args&gt;</a>
-<a name="1026"><span class="lineNum">    1026 </span>                :<span class="lineCov">   11881505 : detail::FormatListN&lt;sizeof...(Args)&gt; makeFormatList(const Args&amp;... args)</span></a>
+<a name="1026"><span class="lineNum">    1026 </span>                :<span class="lineCov">   11922015 : detail::FormatListN&lt;sizeof...(Args)&gt; makeFormatList(const Args&amp;... args)</span></a>
 <a name="1027"><span class="lineNum">    1027 </span>                :            : {</a>
-<a name="1028"><span class="lineNum">    1028 </span>                :<span class="lineCov">   11881505 :     return detail::FormatListN&lt;sizeof...(args)&gt;(args...);</span></a>
+<a name="1028"><span class="lineNum">    1028 </span>                :<span class="lineCov">   11922015 :     return detail::FormatListN&lt;sizeof...(args)&gt;(args...);</span></a>
 <a name="1029"><span class="lineNum">    1029 </span>                :            : }</a>
 <a name="1030"><span class="lineNum">    1030 </span>                :            : </a>
 <a name="1031"><span class="lineNum">    1031 </span>                :            : #else // C++98 version</a>
@@ -1136,9 +1136,9 @@
 <a name="1049"><span class="lineNum">    1049 </span>                :            : ///</a>
 <a name="1050"><span class="lineNum">    1050 </span>                :            : /// The name vformat() is chosen for the semantic similarity to vprintf(): the</a>
 <a name="1051"><span class="lineNum">    1051 </span>                :            : /// list of format arguments is held in a single function argument.</a>
-<a name="1052"><span class="lineNum">    1052 </span>                :<span class="lineCov">   11881507 : inline void vformat(std::ostream&amp; out, const char* fmt, FormatListRef list)</span></a>
+<a name="1052"><span class="lineNum">    1052 </span>                :<span class="lineCov">   11922018 : inline void vformat(std::ostream&amp; out, const char* fmt, FormatListRef list)</span></a>
 <a name="1053"><span class="lineNum">    1053 </span>                :            : {</a>
-<a name="1054"><span class="lineNum">    1054 </span>                :<span class="lineCov">   11881507 :     detail::formatImpl(out, fmt, list.m_args, list.m_N);</span></a>
+<a name="1054"><span class="lineNum">    1054 </span>                :<span class="lineCov">   11922018 :     detail::formatImpl(out, fmt, list.m_args, list.m_N);</span></a>
 <a name="1055"><span class="lineNum">    1055 </span>                :            : }</a>
 <a name="1056"><span class="lineNum">    1056 </span>                :            : </a>
 <a name="1057"><span class="lineNum">    1057 </span>                :            : </a>
@@ -1146,19 +1146,19 @@
 <a name="1059"><span class="lineNum">    1059 </span>                :            : </a>
 <a name="1060"><span class="lineNum">    1060 </span>                :            : /// Format list of arguments to the stream according to given format string.</a>
 <a name="1061"><span class="lineNum">    1061 </span>                :            : template&lt;typename... Args&gt;</a>
-<a name="1062"><span class="lineNum">    1062 </span>                :<span class="lineCov">   11881505 : void format(std::ostream&amp; out, const char* fmt, const Args&amp;... args)</span></a>
+<a name="1062"><span class="lineNum">    1062 </span>                :<span class="lineCov">   11922026 : void format(std::ostream&amp; out, const char* fmt, const Args&amp;... args)</span></a>
 <a name="1063"><span class="lineNum">    1063 </span>                :            : {</a>
-<a name="1064"><span class="lineNum">    1064 </span>                :<span class="lineCov">   11881505 :     vformat(out, fmt, makeFormatList(args...));</span></a>
-<a name="1065"><span class="lineNum">    1065 </span>                :<span class="lineCov">   11881525 : }</span></a>
+<a name="1064"><span class="lineNum">    1064 </span>                :<span class="lineCov">   11922026 :     vformat(out, fmt, makeFormatList(args...));</span></a>
+<a name="1065"><span class="lineNum">    1065 </span>                :<span class="lineCov">   11922041 : }</span></a>
 <a name="1066"><span class="lineNum">    1066 </span>                :            : </a>
 <a name="1067"><span class="lineNum">    1067 </span>                :            : /// Format list of arguments according to the given format string and return</a>
 <a name="1068"><span class="lineNum">    1068 </span>                :            : /// the result as a string.</a>
 <a name="1069"><span class="lineNum">    1069 </span>                :            : template&lt;typename... Args&gt;</a>
-<a name="1070"><span class="lineNum">    1070 </span>                :<span class="lineCov">   11787347 : std::string format(const char* fmt, const Args&amp;... args)</span></a>
+<a name="1070"><span class="lineNum">    1070 </span>                :<span class="lineCov">   11827467 : std::string format(const char* fmt, const Args&amp;... args)</span></a>
 <a name="1071"><span class="lineNum">    1071 </span>                :            : {</a>
-<a name="1072"><span class="lineNum">    1072 </span>                :<span class="lineCov">   11787347 :     std::ostringstream oss;</span></a>
-<a name="1073"><span class="lineNum">    1073 </span>        [<span class="branchCov" title="Branch 0 was taken 11787350 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   11787351 :     format(oss, fmt, args...);</span></a>
-<a name="1074"><span class="lineNum">    1074 </span>                :<span class="lineCov">   11787340 :     return oss.str();</span></a>
+<a name="1072"><span class="lineNum">    1072 </span>                :<span class="lineCov">   11827467 :     std::ostringstream oss;</span></a>
+<a name="1073"><span class="lineNum">    1073 </span>        [<span class="branchCov" title="Branch 0 was taken 11827456 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   11827463 :     format(oss, fmt, args...);</span></a>
+<a name="1074"><span class="lineNum">    1074 </span>                :<span class="lineCov">   11827455 :     return oss.str();</span></a>
 <a name="1075"><span class="lineNum">    1075 </span>                :            : }</a>
 <a name="1076"><span class="lineNum">    1076 </span>                :            : </a>
 <a name="1077"><span class="lineNum">    1077 </span>                :            : /// Format list of arguments to std::cout, according to the given format string</a>
@@ -1237,11 +1237,11 @@
 <a name="1150"><span class="lineNum">    1150 </span>                :            : </a>
 <a name="1151"><span class="lineNum">    1151 </span>                :            : // Added for Bitcoin Core</a>
 <a name="1152"><span class="lineNum">    1152 </span>                :            : template&lt;typename... Args&gt;</a>
-<a name="1153"><span class="lineNum">    1153 </span>                :<span class="lineCov">      92440 : std::string format(const std::string &amp;fmt, const Args&amp;... args)</span></a>
+<a name="1153"><span class="lineNum">    1153 </span>                :<span class="lineCov">      92505 : std::string format(const std::string &amp;fmt, const Args&amp;... args)</span></a>
 <a name="1154"><span class="lineNum">    1154 </span>                :            : {</a>
-<a name="1155"><span class="lineNum">    1155 </span>        [<span class="branchCov" title="Branch 0 was taken 92440 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      92440 :     std::ostringstream oss;</span></a>
-<a name="1156"><span class="lineNum">    1156 </span>        [<span class="branchCov" title="Branch 0 was taken 92440 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      92440 :     format(oss, fmt.c_str(), args...);</span></a>
-<a name="1157"><span class="lineNum">    1157 </span>                :<span class="lineCov">      92440 :     return oss.str();</span></a>
+<a name="1155"><span class="lineNum">    1155 </span>        [<span class="branchCov" title="Branch 0 was taken 92505 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      92505 :     std::ostringstream oss;</span></a>
+<a name="1156"><span class="lineNum">    1156 </span>        [<span class="branchCov" title="Branch 0 was taken 92505 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      92505 :     format(oss, fmt.c_str(), args...);</span></a>
+<a name="1157"><span class="lineNum">    1157 </span>                :<span class="lineCov">      92505 :     return oss.str();</span></a>
 <a name="1158"><span class="lineNum">    1158 </span>                :            : }</a>
 <a name="1159"><span class="lineNum">    1159 </span>                :            : </a>
 <a name="1160"><span class="lineNum">    1160 </span>                :            : } // namespace tinyformat</a>

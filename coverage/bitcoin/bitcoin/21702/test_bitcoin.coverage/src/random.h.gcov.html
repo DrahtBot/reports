@@ -201,20 +201,20 @@
 <a name="130"><span class="lineNum">     130 </span>                :            : </a>
 <a name="131"><span class="lineNum">     131 </span>                :            :     void RandomSeed();</a>
 <a name="132"><span class="lineNum">     132 </span>                :            : </a>
-<a name="133"><span class="lineNum">     133 </span>                :<span class="lineCov">    3114291 :     void FillByteBuffer()</span></a>
+<a name="133"><span class="lineNum">     133 </span>                :<span class="lineCov">    3117037 :     void FillByteBuffer()</span></a>
 <a name="134"><span class="lineNum">     134 </span>                :            :     {</a>
-<a name="135"><span class="lineNum">     135 </span>        [<span class="branchCov" title="Branch 0 was taken 565474 times"> + </span><span class="branchCov" title="Branch 1 was taken 2548817 times"> + </span>]:<span class="lineCov">    3114291 :         if (requires_seed) {</span></a>
-<a name="136"><span class="lineNum">     136 </span>                :<span class="lineCov">     565474 :             RandomSeed();</span></a>
+<a name="135"><span class="lineNum">     135 </span>        [<span class="branchCov" title="Branch 0 was taken 565581 times"> + </span><span class="branchCov" title="Branch 1 was taken 2551456 times"> + </span>]:<span class="lineCov">    3117037 :         if (requires_seed) {</span></a>
+<a name="136"><span class="lineNum">     136 </span>                :<span class="lineCov">     565581 :             RandomSeed();</span></a>
 <a name="137"><span class="lineNum">     137 </span>                :            :         }</a>
-<a name="138"><span class="lineNum">     138 </span>                :<span class="lineCov">    3114291 :         rng.Keystream(bytebuf, sizeof(bytebuf));</span></a>
-<a name="139"><span class="lineNum">     139 </span>                :<span class="lineCov">    3114291 :         bytebuf_size = sizeof(bytebuf);</span></a>
-<a name="140"><span class="lineNum">     140 </span>                :<span class="lineCov">    3114291 :     }</span></a>
+<a name="138"><span class="lineNum">     138 </span>                :<span class="lineCov">    3117037 :         rng.Keystream(bytebuf, sizeof(bytebuf));</span></a>
+<a name="139"><span class="lineNum">     139 </span>                :<span class="lineCov">    3117037 :         bytebuf_size = sizeof(bytebuf);</span></a>
+<a name="140"><span class="lineNum">     140 </span>                :<span class="lineCov">    3117037 :     }</span></a>
 <a name="141"><span class="lineNum">     141 </span>                :            : </a>
-<a name="142"><span class="lineNum">     142 </span>                :<span class="lineCov">   15243801 :     void FillBitBuffer()</span></a>
+<a name="142"><span class="lineNum">     142 </span>                :<span class="lineCov">   15251664 :     void FillBitBuffer()</span></a>
 <a name="143"><span class="lineNum">     143 </span>                :            :     {</a>
-<a name="144"><span class="lineNum">     144 </span>                :<span class="lineCov">   30487602 :         bitbuf = rand64();</span></a>
-<a name="145"><span class="lineNum">     145 </span>                :<span class="lineCov">   15243801 :         bitbuf_size = 64;</span></a>
-<a name="146"><span class="lineNum">     146 </span>                :<span class="lineCov">   15243801 :     }</span></a>
+<a name="144"><span class="lineNum">     144 </span>                :<span class="lineCov">   30503328 :         bitbuf = rand64();</span></a>
+<a name="145"><span class="lineNum">     145 </span>                :<span class="lineCov">   15251664 :         bitbuf_size = 64;</span></a>
+<a name="146"><span class="lineNum">     146 </span>                :<span class="lineCov">   15251664 :     }</span></a>
 <a name="147"><span class="lineNum">     147 </span>                :            : </a>
 <a name="148"><span class="lineNum">     148 </span>                :            : public:</a>
 <a name="149"><span class="lineNum">     149 </span>                :            :     explicit FastRandomContext(bool fDeterministic = false) noexcept;</a>
@@ -231,41 +231,41 @@
 <a name="160"><span class="lineNum">     160 </span>                :            :     FastRandomContext&amp; operator=(FastRandomContext&amp;&amp; from) noexcept;</a>
 <a name="161"><span class="lineNum">     161 </span>                :            : </a>
 <a name="162"><span class="lineNum">     162 </span>                :            :     /** Generate a random 64-bit integer. */</a>
-<a name="163"><span class="lineNum">     163 </span>                :<span class="lineCov">   16423890 :     uint64_t rand64() noexcept</span></a>
+<a name="163"><span class="lineNum">     163 </span>                :<span class="lineCov">   16432105 :     uint64_t rand64() noexcept</span></a>
 <a name="164"><span class="lineNum">     164 </span>                :            :     {</a>
-<a name="165"><span class="lineNum">     165 </span>        [<span class="branchCov" title="Branch 0 was taken 2542904 times"> + </span><span class="branchCov" title="Branch 1 was taken 13880986 times"> + </span>]:<span class="lineCov">   16423890 :         if (bytebuf_size &lt; 8) FillByteBuffer();</span></a>
-<a name="166"><span class="lineNum">     166 </span>                :<span class="lineCov">   16423890 :         uint64_t ret = ReadLE64(bytebuf + 64 - bytebuf_size);</span></a>
-<a name="167"><span class="lineNum">     167 </span>                :<span class="lineCov">   16423890 :         bytebuf_size -= 8;</span></a>
-<a name="168"><span class="lineNum">     168 </span>                :<span class="lineCov">   16423890 :         return ret;</span></a>
+<a name="165"><span class="lineNum">     165 </span>        [<span class="branchCov" title="Branch 0 was taken 2543860 times"> + </span><span class="branchCov" title="Branch 1 was taken 13888245 times"> + </span>]:<span class="lineCov">   16432105 :         if (bytebuf_size &lt; 8) FillByteBuffer();</span></a>
+<a name="166"><span class="lineNum">     166 </span>                :<span class="lineCov">   16432105 :         uint64_t ret = ReadLE64(bytebuf + 64 - bytebuf_size);</span></a>
+<a name="167"><span class="lineNum">     167 </span>                :<span class="lineCov">   16432105 :         bytebuf_size -= 8;</span></a>
+<a name="168"><span class="lineNum">     168 </span>                :<span class="lineCov">   16432105 :         return ret;</span></a>
 <a name="169"><span class="lineNum">     169 </span>                :            :     }</a>
 <a name="170"><span class="lineNum">     170 </span>                :            : </a>
 <a name="171"><span class="lineNum">     171 </span>                :            :     /** Generate a random (bits)-bit integer. */</a>
-<a name="172"><span class="lineNum">     172 </span>                :<span class="lineCov">  377792374 :     uint64_t randbits(int bits) noexcept</span></a>
+<a name="172"><span class="lineNum">     172 </span>                :<span class="lineCov">  377815756 :     uint64_t randbits(int bits) noexcept</span></a>
 <a name="173"><span class="lineNum">     173 </span>                :            :     {</a>
-<a name="174"><span class="lineNum">     174 </span>        [<span class="branchCov" title="Branch 0 was taken 377709853 times"> + </span><span class="branchCov" title="Branch 1 was taken 82521 times"> + </span>]:<span class="lineCov">  377792374 :         if (bits == 0) {</span></a>
+<a name="174"><span class="lineNum">     174 </span>        [<span class="branchCov" title="Branch 0 was taken 377730597 times"> + </span><span class="branchCov" title="Branch 1 was taken 85159 times"> + </span>]:<span class="lineCov">  377815756 :         if (bits == 0) {</span></a>
 <a name="175"><span class="lineNum">     175 </span>                :            :             return 0;</a>
-<a name="176"><span class="lineNum">     176 </span>        [<span class="branchCov" title="Branch 0 was taken 1179453 times"> + </span><span class="branchCov" title="Branch 1 was taken 376530400 times"> + </span>]:<span class="lineCov">  377709853 :         } else if (bits &gt; 32) {</span></a>
-<a name="177"><span class="lineNum">     177 </span>                :<span class="lineCov">    1179453 :             return rand64() &gt;&gt; (64 - bits);</span></a>
+<a name="176"><span class="lineNum">     176 </span>        [<span class="branchCov" title="Branch 0 was taken 1179805 times"> + </span><span class="branchCov" title="Branch 1 was taken 376550792 times"> + </span>]:<span class="lineCov">  377730597 :         } else if (bits &gt; 32) {</span></a>
+<a name="177"><span class="lineNum">     177 </span>                :<span class="lineCov">    1179805 :             return rand64() &gt;&gt; (64 - bits);</span></a>
 <a name="178"><span class="lineNum">     178 </span>                :            :         } else {</a>
-<a name="179"><span class="lineNum">     179 </span>        [<span class="branchCov" title="Branch 0 was taken 15243801 times"> + </span><span class="branchCov" title="Branch 1 was taken 361286599 times"> + </span>]:<span class="lineCov">  376530400 :             if (bitbuf_size &lt; bits) FillBitBuffer();</span></a>
-<a name="180"><span class="lineNum">     180 </span>                :<span class="lineCov">  376530400 :             uint64_t ret = bitbuf &amp; (~(uint64_t)0 &gt;&gt; (64 - bits));</span></a>
-<a name="181"><span class="lineNum">     181 </span>                :<span class="lineCov">  376530400 :             bitbuf &gt;&gt;= bits;</span></a>
-<a name="182"><span class="lineNum">     182 </span>                :<span class="lineCov">  376530400 :             bitbuf_size -= bits;</span></a>
-<a name="183"><span class="lineNum">     183 </span>                :<span class="lineCov">  376530400 :             return ret;</span></a>
+<a name="179"><span class="lineNum">     179 </span>        [<span class="branchCov" title="Branch 0 was taken 15251664 times"> + </span><span class="branchCov" title="Branch 1 was taken 361299128 times"> + </span>]:<span class="lineCov">  376550792 :             if (bitbuf_size &lt; bits) FillBitBuffer();</span></a>
+<a name="180"><span class="lineNum">     180 </span>                :<span class="lineCov">  376550792 :             uint64_t ret = bitbuf &amp; (~(uint64_t)0 &gt;&gt; (64 - bits));</span></a>
+<a name="181"><span class="lineNum">     181 </span>                :<span class="lineCov">  376550792 :             bitbuf &gt;&gt;= bits;</span></a>
+<a name="182"><span class="lineNum">     182 </span>                :<span class="lineCov">  376550792 :             bitbuf_size -= bits;</span></a>
+<a name="183"><span class="lineNum">     183 </span>                :<span class="lineCov">  376550792 :             return ret;</span></a>
 <a name="184"><span class="lineNum">     184 </span>                :            :         }</a>
 <a name="185"><span class="lineNum">     185 </span>                :            :     }</a>
 <a name="186"><span class="lineNum">     186 </span>                :            : </a>
 <a name="187"><span class="lineNum">     187 </span>                :            :     /** Generate a random integer in the range [0..range).</a>
 <a name="188"><span class="lineNum">     188 </span>                :            :      * Precondition: range &gt; 0.</a>
 <a name="189"><span class="lineNum">     189 </span>                :            :      */</a>
-<a name="190"><span class="lineNum">     190 </span>                :<span class="lineCov">    8042441 :     uint64_t randrange(uint64_t range) noexcept</span></a>
+<a name="190"><span class="lineNum">     190 </span>                :<span class="lineCov">    8039268 :     uint64_t randrange(uint64_t range) noexcept</span></a>
 <a name="191"><span class="lineNum">     191 </span>                :            :     {</a>
-<a name="192"><span class="lineNum">     192 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 8042441 times"> + </span>]:<span class="lineCov">    8042441 :         assert(range);</span></a>
-<a name="193"><span class="lineNum">     193 </span>                :<span class="lineCov">    8042441 :         --range;</span></a>
-<a name="194"><span class="lineNum">     194 </span>        [<span class="branchCov" title="Branch 0 was taken 7974256 times"> + </span><span class="branchCov" title="Branch 1 was taken 68185 times"> + </span>]:<span class="lineCov">   16016697 :         int bits = CountBits(range);</span></a>
-<a name="195"><span class="lineNum">     195 </span>                :<span class="lineCov">   11841834 :         while (true) {</span></a>
-<a name="196"><span class="lineNum">     196 </span>                :<span class="lineCov">   11841834 :             uint64_t ret = randbits(bits);</span></a>
-<a name="197"><span class="lineNum">     197 </span>        [<span class="branchCov" title="Branch 0 was taken 3799393 times"> + </span><span class="branchCov" title="Branch 1 was taken 8042441 times"> + </span>]:<span class="lineCov">   11841834 :             if (ret &lt;= range) return ret;</span></a>
+<a name="192"><span class="lineNum">     192 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 8039268 times"> + </span>]:<span class="lineCov">    8039268 :         assert(range);</span></a>
+<a name="193"><span class="lineNum">     193 </span>                :<span class="lineCov">    8039268 :         --range;</span></a>
+<a name="194"><span class="lineNum">     194 </span>        [<span class="branchCov" title="Branch 0 was taken 7968445 times"> + </span><span class="branchCov" title="Branch 1 was taken 70823 times"> + </span>]:<span class="lineCov">   16007713 :         int bits = CountBits(range);</span></a>
+<a name="195"><span class="lineNum">     195 </span>                :<span class="lineCov">   11831953 :         while (true) {</span></a>
+<a name="196"><span class="lineNum">     196 </span>                :<span class="lineCov">   11831953 :             uint64_t ret = randbits(bits);</span></a>
+<a name="197"><span class="lineNum">     197 </span>        [<span class="branchCov" title="Branch 0 was taken 3792685 times"> + </span><span class="branchCov" title="Branch 1 was taken 8039268 times"> + </span>]:<span class="lineCov">   11831953 :             if (ret &lt;= range) return ret;</span></a>
 <a name="198"><span class="lineNum">     198 </span>                :            :         }</a>
 <a name="199"><span class="lineNum">     199 </span>                :            :     }</a>
 <a name="200"><span class="lineNum">     200 </span>                :            : </a>
@@ -273,14 +273,14 @@
 <a name="202"><span class="lineNum">     202 </span>                :            :     std::vector&lt;unsigned char&gt; randbytes(size_t len);</a>
 <a name="203"><span class="lineNum">     203 </span>                :            : </a>
 <a name="204"><span class="lineNum">     204 </span>                :            :     /** Generate a random 32-bit integer. */</a>
-<a name="205"><span class="lineNum">     205 </span>  [<span class="branchCov" title="Branch 0 was taken 93731 times"> + </span><span class="branchCov" title="Branch 1 was taken 181946 times"> + </span><span class="branchCov" title="Branch 2 was taken 1193 times"> + </span><span class="branchCov" title="Branch 3 was taken 1240 times"> + </span> :<span class="lineCov">   16590637 :     uint32_t rand32() noexcept { return randbits(32); }</span></a>
+<a name="205"><span class="lineNum">     205 </span>  [<span class="branchCov" title="Branch 0 was taken 93731 times"> + </span><span class="branchCov" title="Branch 1 was taken 181948 times"> + </span><span class="branchCov" title="Branch 2 was taken 1250 times"> + </span><span class="branchCov" title="Branch 3 was taken 1249 times"> + </span> :<span class="lineCov">   16607095 :     uint32_t rand32() noexcept { return randbits(32); }</span></a>
 <span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
 <a name="206"><span class="lineNum">     206 </span>                :            : </a>
 <a name="207"><span class="lineNum">     207 </span>                :            :     /** generate a random uint256. */</a>
 <a name="208"><span class="lineNum">     208 </span>                :            :     uint256 rand256() noexcept;</a>
 <a name="209"><span class="lineNum">     209 </span>                :            : </a>
 <a name="210"><span class="lineNum">     210 </span>                :            :     /** Generate a random boolean. */</a>
-<a name="211"><span class="lineNum">     211 </span>  [<span class="branchCov" title="Branch 0 was taken 12098 times"> + </span><span class="branchCov" title="Branch 1 was taken 4864 times"> + </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">  343013638 :     bool randbool() noexcept { return randbits(1); }</span></a>
+<a name="211"><span class="lineNum">     211 </span>  [<span class="branchCov" title="Branch 0 was taken 9794 times"> + </span><span class="branchCov" title="Branch 1 was taken 6144 times"> + </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">  343030780 :     bool randbool() noexcept { return randbits(1); }</span></a>
 <a name="212"><span class="lineNum">     212 </span>                :            : </a>
 <a name="213"><span class="lineNum">     213 </span>                :            :     // Compatibility with the C++11 UniformRandomBitGenerator concept</a>
 <a name="214"><span class="lineNum">     214 </span>                :            :     typedef uint64_t result_type;</a>
@@ -304,9 +304,9 @@
 <a name="232"><span class="lineNum">     232 </span>                :            : {</a>
 <a name="233"><span class="lineNum">     233 </span>        [<span class="branchCov" title="Branch 0 was taken 60000 times"> + </span><span class="branchCov" title="Branch 1 was taken 12000 times"> + </span>]:<span class="lineCov">     792766 :     while (first != last) {</span></a>
 <a name="234"><span class="lineNum">     234 </span>                :<span class="lineCov">     774613 :         size_t j = rng.randrange(last - first);</span></a>
-<a name="235"><span class="lineNum">     235 </span>        [<span class="branchCov" title="Branch 0 was taken 721033 times"> + </span><span class="branchCov" title="Branch 1 was taken 53580 times"> + </span>]:<span class="lineCov">     774613 :         if (j) {</span></a>
+<a name="235"><span class="lineNum">     235 </span>        [<span class="branchCov" title="Branch 0 was taken 721344 times"> + </span><span class="branchCov" title="Branch 1 was taken 53269 times"> + </span>]:<span class="lineCov">     774613 :         if (j) {</span></a>
 <a name="236"><span class="lineNum">     236 </span>                :            :             using std::swap;</a>
-<a name="237"><span class="lineNum">     237 </span>                :<span class="lineCov">     722020 :             swap(*first, *(first + j));</span></a>
+<a name="237"><span class="lineNum">     237 </span>                :<span class="lineCov">     722297 :             swap(*first, *(first + j));</span></a>
 <a name="238"><span class="lineNum">     238 </span>                :            :         }</a>
 <a name="239"><span class="lineNum">     239 </span>        [<span class="branchCov" title="Branch 0 was taken 714613 times"> + </span><span class="branchCov" title="Branch 1 was taken 6153 times"> + </span>]:<span class="lineCov">     780766 :         ++first;</span></a>
 <a name="240"><span class="lineNum">     240 </span>                :            :     }</a>

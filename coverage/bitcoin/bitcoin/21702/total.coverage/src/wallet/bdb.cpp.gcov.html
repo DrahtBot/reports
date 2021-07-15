@@ -49,9 +49,9 @@
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">450</td>
+            <td class="headerCovTableEntry">449</td>
             <td class="headerCovTableEntry">858</td>
-            <td class="headerCovTableEntryLo">52.4 %</td>
+            <td class="headerCovTableEntryLo">52.3 %</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -97,17 +97,17 @@
 <a name="26"><span class="lineNum">      26 </span>                :            : //! (https://docs.oracle.com/cd/E17275_01/html/programmer_reference/program_copy.html),</a>
 <a name="27"><span class="lineNum">      27 </span>                :            : //! so bitcoin should never create different databases with the same fileid, but</a>
 <a name="28"><span class="lineNum">      28 </span>                :            : //! this error can be triggered if users manually copy database files.</a>
-<a name="29"><span class="lineNum">      29 </span>                :<span class="lineCov">       1170 : void CheckUniqueFileid(const BerkeleyEnvironment&amp; env, const std::string&amp; filename, Db&amp; db, WalletDatabaseFileId&amp; fileid)</span></a>
+<a name="29"><span class="lineNum">      29 </span>                :<span class="lineCov">       1117 : void CheckUniqueFileid(const BerkeleyEnvironment&amp; env, const std::string&amp; filename, Db&amp; db, WalletDatabaseFileId&amp; fileid)</span></a>
 <a name="30"><span class="lineNum">      30 </span>                :            : {</a>
-<a name="31"><span class="lineNum">      31 </span>        [<span class="branchCov" title="Branch 0 was taken 1159 times"> + </span><span class="branchCov" title="Branch 1 was taken 11 times"> + </span>]:<span class="lineCov">       1170 :     if (env.IsMock()) return;</span></a>
+<a name="31"><span class="lineNum">      31 </span>        [<span class="branchCov" title="Branch 0 was taken 1106 times"> + </span><span class="branchCov" title="Branch 1 was taken 11 times"> + </span>]:<span class="lineCov">       1117 :     if (env.IsMock()) return;</span></a>
 <a name="32"><span class="lineNum">      32 </span>                :            : </a>
-<a name="33"><span class="lineNum">      33 </span>                :<span class="lineCov">       1159 :     int ret = db.get_mpf()-&gt;get_fileid(fileid.value);</span></a>
-<a name="34"><span class="lineNum">      34 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1159 times"> + </span>]:<span class="lineCov">       1159 :     if (ret != 0) {</span></a>
+<a name="33"><span class="lineNum">      33 </span>                :<span class="lineCov">       1106 :     int ret = db.get_mpf()-&gt;get_fileid(fileid.value);</span></a>
+<a name="34"><span class="lineNum">      34 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1106 times"> + </span>]:<span class="lineCov">       1106 :     if (ret != 0) {</span></a>
 <a name="35"><span class="lineNum">      35 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         throw std::runtime_error(strprintf(&quot;BerkeleyDatabase: Can't open database %s (get_fileid failed with %d)&quot;, filename, ret));</span></a>
 <a name="36"><span class="lineNum">      36 </span>                :            :     }</a>
 <a name="37"><span class="lineNum">      37 </span>                :            : </a>
-<a name="38"><span class="lineNum">      38 </span>        [<span class="branchCov" title="Branch 0 was taken 1195 times"> + </span><span class="branchCov" title="Branch 1 was taken 1153 times"> + </span>]:<span class="lineCov">       2348 :     for (const auto&amp; item : env.m_fileids) {</span></a>
-<a name="39"><span class="lineNum">      39 </span>  [<span class="branchCov" title="Branch 0 was taken 1165 times"> + </span><span class="branchCov" title="Branch 1 was taken 30 times"> + </span><span class="branchCov" title="Branch 2 was taken 6 times"> + </span><span class="branchCov" title="Branch 3 was taken 1159 times"> + </span>]:<span class="lineCov">       1195 :         if (fileid == item.second &amp;&amp; &amp;fileid != &amp;item.second) {</span></a>
+<a name="38"><span class="lineNum">      38 </span>        [<span class="branchCov" title="Branch 0 was taken 1142 times"> + </span><span class="branchCov" title="Branch 1 was taken 1100 times"> + </span>]:<span class="lineCov">       2242 :     for (const auto&amp; item : env.m_fileids) {</span></a>
+<a name="39"><span class="lineNum">      39 </span>  [<span class="branchCov" title="Branch 0 was taken 1112 times"> + </span><span class="branchCov" title="Branch 1 was taken 30 times"> + </span><span class="branchCov" title="Branch 2 was taken 6 times"> + </span><span class="branchCov" title="Branch 3 was taken 1106 times"> + </span>]:<span class="lineCov">       1142 :         if (fileid == item.second &amp;&amp; &amp;fileid != &amp;item.second) {</span></a>
 <a name="40"><span class="lineNum">      40 </span>        [<span class="branchCov" title="Branch 0 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         12 :             throw std::runtime_error(strprintf(&quot;BerkeleyDatabase: Can't open database %s (duplicates fileid %s from %s)&quot;, filename,</span></a>
 <a name="41"><span class="lineNum">      41 </span>  [<span class="branchCov" title="Branch 0 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">         12 :                 HexStr(item.second.value), item.first));</span></a>
 <a name="42"><span class="lineNum">      42 </span>                :            :         }</a>
@@ -118,9 +118,9 @@
 <a name="47"><span class="lineNum">      47 </span>                :            : std::map&lt;std::string, std::weak_ptr&lt;BerkeleyEnvironment&gt;&gt; g_dbenvs GUARDED_BY(cs_db); //!&lt; Map from directory name to db environment.</a>
 <a name="48"><span class="lineNum">      48 </span>                :            : } // namespace</a>
 <a name="49"><span class="lineNum">      49 </span>                :            : </a>
-<a name="50"><span class="lineNum">      50 </span>                :<span class="lineCov">       1195 : bool WalletDatabaseFileId::operator==(const WalletDatabaseFileId&amp; rhs) const</span></a>
+<a name="50"><span class="lineNum">      50 </span>                :<span class="lineCov">       1142 : bool WalletDatabaseFileId::operator==(const WalletDatabaseFileId&amp; rhs) const</span></a>
 <a name="51"><span class="lineNum">      51 </span>                :            : {</a>
-<a name="52"><span class="lineNum">      52 </span>                :<span class="lineCov">       1195 :     return memcmp(value, &amp;rhs.value, sizeof(value)) == 0;</span></a>
+<a name="52"><span class="lineNum">      52 </span>                :<span class="lineCov">       1142 :     return memcmp(value, &amp;rhs.value, sizeof(value)) == 0;</span></a>
 <a name="53"><span class="lineNum">      53 </span>                :            : }</a>
 <a name="54"><span class="lineNum">      54 </span>                :            : </a>
 <a name="55"><span class="lineNum">      55 </span>                :            : /**</a>
@@ -195,13 +195,13 @@
 <a name="123"><span class="lineNum">     123 </span>        [<span class="branchCov" title="Branch 0 was taken 622 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        622 :     Close();</span></a>
 <a name="124"><span class="lineNum">     124 </span>                :<span class="lineCov">        622 : }</span></a>
 <a name="125"><span class="lineNum">     125 </span>                :            : </a>
-<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">     122123 : bool BerkeleyEnvironment::Open(bilingual_str&amp; err)</span></a>
+<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">     122612 : bool BerkeleyEnvironment::Open(bilingual_str&amp; err)</span></a>
 <a name="127"><span class="lineNum">     127 </span>                :            : {</a>
-<a name="128"><span class="lineNum">     128 </span>        [<span class="branchCov" title="Branch 0 was taken 619 times"> + </span><span class="branchCov" title="Branch 1 was taken 121504 times"> + </span>]:<span class="lineCov">     122123 :     if (fDbEnvInit) {</span></a>
+<a name="128"><span class="lineNum">     128 </span>        [<span class="branchCov" title="Branch 0 was taken 619 times"> + </span><span class="branchCov" title="Branch 1 was taken 121993 times"> + </span>]:<span class="lineCov">     122612 :     if (fDbEnvInit) {</span></a>
 <a name="129"><span class="lineNum">     129 </span>                :            :         return true;</a>
 <a name="130"><span class="lineNum">     130 </span>                :            :     }</a>
 <a name="131"><span class="lineNum">     131 </span>                :            : </a>
-<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">     122740 :     fs::path pathIn = strPath;</span></a>
+<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">     123229 :     fs::path pathIn = strPath;</span></a>
 <a name="133"><span class="lineNum">     133 </span>        [<span class="branchCov" title="Branch 0 was taken 617 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">        619 :     TryCreateDirectories(pathIn);</span></a>
 <a name="134"><span class="lineNum">     134 </span>  [<span class="branchCov" title="Branch 0 was taken 617 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 617 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">        617 :     if (!LockDirectory(pathIn, &quot;.walletlock&quot;)) {</span></a>
 <span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 6 times"> + </span><span class="branchCov" title="Branch 5 was taken 611 times"> + </span>]
@@ -301,43 +301,43 @@
 <a name="216"><span class="lineNum">     216 </span>                :<span class="lineCov">         11 :     fMockDb = true;</span></a>
 <a name="217"><span class="lineNum">     217 </span>                :<span class="lineCov">         11 : }</span></a>
 <a name="218"><span class="lineNum">     218 </span>                :            : </a>
-<a name="219"><span class="lineNum">     219 </span>                :<span class="lineCov">     126256 : BerkeleyBatch::SafeDbt::SafeDbt()</span></a>
+<a name="219"><span class="lineNum">     219 </span>                :<span class="lineCov">     126412 : BerkeleyBatch::SafeDbt::SafeDbt()</span></a>
 <a name="220"><span class="lineNum">     220 </span>                :            : {</a>
-<a name="221"><span class="lineNum">     221 </span>                :<span class="lineCov">     126256 :     m_dbt.set_flags(DB_DBT_MALLOC);</span></a>
-<a name="222"><span class="lineNum">     222 </span>                :<span class="lineCov">     126256 : }</span></a>
+<a name="221"><span class="lineNum">     221 </span>                :<span class="lineCov">     126412 :     m_dbt.set_flags(DB_DBT_MALLOC);</span></a>
+<a name="222"><span class="lineNum">     222 </span>                :<span class="lineCov">     126412 : }</span></a>
 <a name="223"><span class="lineNum">     223 </span>                :            : </a>
-<a name="224"><span class="lineNum">     224 </span>                :<span class="lineCov">     579694 : BerkeleyBatch::SafeDbt::SafeDbt(void* data, size_t size)</span></a>
-<a name="225"><span class="lineNum">     225 </span>                :<span class="lineCov">     579694 :     : m_dbt(data, size)</span></a>
+<a name="224"><span class="lineNum">     224 </span>                :<span class="lineCov">     581887 : BerkeleyBatch::SafeDbt::SafeDbt(void* data, size_t size)</span></a>
+<a name="225"><span class="lineNum">     225 </span>                :<span class="lineCov">     581887 :     : m_dbt(data, size)</span></a>
 <a name="226"><span class="lineNum">     226 </span>                :            : {</a>
-<a name="227"><span class="lineNum">     227 </span>                :<span class="lineCov">     579694 : }</span></a>
+<a name="227"><span class="lineNum">     227 </span>                :<span class="lineCov">     581887 : }</span></a>
 <a name="228"><span class="lineNum">     228 </span>                :            : </a>
-<a name="229"><span class="lineNum">     229 </span>                :<span class="lineCov">     705950 : BerkeleyBatch::SafeDbt::~SafeDbt()</span></a>
+<a name="229"><span class="lineNum">     229 </span>                :<span class="lineCov">     708299 : BerkeleyBatch::SafeDbt::~SafeDbt()</span></a>
 <a name="230"><span class="lineNum">     230 </span>                :            : {</a>
-<a name="231"><span class="lineNum">     231 </span>        [<span class="branchCov" title="Branch 0 was taken 704296 times"> + </span><span class="branchCov" title="Branch 1 was taken 1654 times"> + </span>]:<span class="lineCov">     705950 :     if (m_dbt.get_data() != nullptr) {</span></a>
+<a name="231"><span class="lineNum">     231 </span>        [<span class="branchCov" title="Branch 0 was taken 706645 times"> + </span><span class="branchCov" title="Branch 1 was taken 1654 times"> + </span>]:<span class="lineCov">     708299 :     if (m_dbt.get_data() != nullptr) {</span></a>
 <a name="232"><span class="lineNum">     232 </span>                :            :         // Clear memory, e.g. in case it was a private key</a>
-<a name="233"><span class="lineNum">     233 </span>                :<span class="lineCov">     704296 :         memory_cleanse(m_dbt.get_data(), m_dbt.get_size());</span></a>
+<a name="233"><span class="lineNum">     233 </span>                :<span class="lineCov">     706645 :         memory_cleanse(m_dbt.get_data(), m_dbt.get_size());</span></a>
 <a name="234"><span class="lineNum">     234 </span>                :            :         // under DB_DBT_MALLOC, data is malloced by the Dbt, but must be</a>
 <a name="235"><span class="lineNum">     235 </span>                :            :         // freed by the caller.</a>
 <a name="236"><span class="lineNum">     236 </span>                :            :         // https://docs.oracle.com/cd/E17275_01/html/api_reference/C/dbt.html</a>
-<a name="237"><span class="lineNum">     237 </span>        [<span class="branchCov" title="Branch 0 was taken 124602 times"> + </span><span class="branchCov" title="Branch 1 was taken 579694 times"> + </span>]:<span class="lineCov">     704296 :         if (m_dbt.get_flags() &amp; DB_DBT_MALLOC) {</span></a>
-<a name="238"><span class="lineNum">     238 </span>                :<span class="lineCov">     124602 :             free(m_dbt.get_data());</span></a>
+<a name="237"><span class="lineNum">     237 </span>        [<span class="branchCov" title="Branch 0 was taken 124758 times"> + </span><span class="branchCov" title="Branch 1 was taken 581887 times"> + </span>]:<span class="lineCov">     706645 :         if (m_dbt.get_flags() &amp; DB_DBT_MALLOC) {</span></a>
+<a name="238"><span class="lineNum">     238 </span>                :<span class="lineCov">     124758 :             free(m_dbt.get_data());</span></a>
 <a name="239"><span class="lineNum">     239 </span>                :            :         }</a>
 <a name="240"><span class="lineNum">     240 </span>                :            :     }</a>
-<a name="241"><span class="lineNum">     241 </span>                :<span class="lineCov">     705950 : }</span></a>
+<a name="241"><span class="lineNum">     241 </span>                :<span class="lineCov">     708299 : }</span></a>
 <a name="242"><span class="lineNum">     242 </span>                :            : </a>
-<a name="243"><span class="lineNum">     243 </span>                :<span class="lineCov">     233666 : const void* BerkeleyBatch::SafeDbt::get_data() const</span></a>
+<a name="243"><span class="lineNum">     243 </span>                :<span class="lineCov">     233870 : const void* BerkeleyBatch::SafeDbt::get_data() const</span></a>
 <a name="244"><span class="lineNum">     244 </span>                :            : {</a>
-<a name="245"><span class="lineNum">     245 </span>                :<span class="lineCov">     233666 :     return m_dbt.get_data();</span></a>
+<a name="245"><span class="lineNum">     245 </span>                :<span class="lineCov">     233870 :     return m_dbt.get_data();</span></a>
 <a name="246"><span class="lineNum">     246 </span>                :            : }</a>
 <a name="247"><span class="lineNum">     247 </span>                :            : </a>
-<a name="248"><span class="lineNum">     248 </span>                :<span class="lineCov">     124602 : u_int32_t BerkeleyBatch::SafeDbt::get_size() const</span></a>
+<a name="248"><span class="lineNum">     248 </span>                :<span class="lineCov">     124758 : u_int32_t BerkeleyBatch::SafeDbt::get_size() const</span></a>
 <a name="249"><span class="lineNum">     249 </span>                :            : {</a>
-<a name="250"><span class="lineNum">     250 </span>                :<span class="lineCov">     124602 :     return m_dbt.get_size();</span></a>
+<a name="250"><span class="lineNum">     250 </span>                :<span class="lineCov">     124758 :     return m_dbt.get_size();</span></a>
 <a name="251"><span class="lineNum">     251 </span>                :            : }</a>
 <a name="252"><span class="lineNum">     252 </span>                :            : </a>
-<a name="253"><span class="lineNum">     253 </span>                :<span class="lineCov">     705950 : BerkeleyBatch::SafeDbt::operator Dbt*()</span></a>
+<a name="253"><span class="lineNum">     253 </span>                :<span class="lineCov">     708299 : BerkeleyBatch::SafeDbt::operator Dbt*()</span></a>
 <a name="254"><span class="lineNum">     254 </span>                :            : {</a>
-<a name="255"><span class="lineNum">     255 </span>                :<span class="lineCov">     705950 :     return &amp;m_dbt;</span></a>
+<a name="255"><span class="lineNum">     255 </span>                :<span class="lineCov">     708299 :     return &amp;m_dbt;</span></a>
 <a name="256"><span class="lineNum">     256 </span>                :            : }</a>
 <a name="257"><span class="lineNum">     257 </span>                :            : </a>
 <a name="258"><span class="lineNum">     258 </span>                :<span class="lineCov">        525 : bool BerkeleyDatabase::Verify(bilingual_str&amp; errorStr)</span></a>
@@ -369,12 +369,12 @@
 <a name="282"><span class="lineNum">     282 </span>                :            :     return true;</a>
 <a name="283"><span class="lineNum">     283 </span>                :            : }</a>
 <a name="284"><span class="lineNum">     284 </span>                :            : </a>
-<a name="285"><span class="lineNum">     285 </span>                :<span class="lineCov">        327 : void BerkeleyEnvironment::CheckpointLSN(const std::string&amp; strFile)</span></a>
+<a name="285"><span class="lineNum">     285 </span>                :<span class="lineCov">        270 : void BerkeleyEnvironment::CheckpointLSN(const std::string&amp; strFile)</span></a>
 <a name="286"><span class="lineNum">     286 </span>                :            : {</a>
-<a name="287"><span class="lineNum">     287 </span>                :<span class="lineCov">        327 :     dbenv-&gt;txn_checkpoint(0, 0, 0);</span></a>
-<a name="288"><span class="lineNum">     288 </span>        [<span class="branchCov" title="Branch 0 was taken 327 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        327 :     if (fMockDb)</span></a>
+<a name="287"><span class="lineNum">     287 </span>                :<span class="lineCov">        270 :     dbenv-&gt;txn_checkpoint(0, 0, 0);</span></a>
+<a name="288"><span class="lineNum">     288 </span>        [<span class="branchCov" title="Branch 0 was taken 270 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        270 :     if (fMockDb)</span></a>
 <a name="289"><span class="lineNum">     289 </span>                :            :         return;</a>
-<a name="290"><span class="lineNum">     290 </span>                :<span class="lineCov">        327 :     dbenv-&gt;lsn_reset(strFile.c_str(), 0);</span></a>
+<a name="290"><span class="lineNum">     290 </span>                :<span class="lineCov">        270 :     dbenv-&gt;lsn_reset(strFile.c_str(), 0);</span></a>
 <a name="291"><span class="lineNum">     291 </span>                :            : }</a>
 <a name="292"><span class="lineNum">     292 </span>                :            : </a>
 <a name="293"><span class="lineNum">     293 </span>        [<span class="branchCov" title="Branch 0 was taken 637 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1274 : BerkeleyDatabase::~BerkeleyDatabase()</span></a>
@@ -389,40 +389,40 @@
 <a name="302"><span class="lineNum">     302 </span>                :            :     }</a>
 <a name="303"><span class="lineNum">     303 </span>                :<span class="lineCov">       1274 : }</span></a>
 <a name="304"><span class="lineNum">     304 </span>                :            : </a>
-<a name="305"><span class="lineNum">     305 </span>        [<span class="branchCov" title="Branch 0 was taken 121581 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121587 : BerkeleyBatch::BerkeleyBatch(BerkeleyDatabase&amp; database, const bool read_only, bool fFlushOnCloseIn) : pdb(nullptr), activeTxn(nullptr), m_cursor(nullptr), m_database(database)</span></a>
+<a name="305"><span class="lineNum">     305 </span>        [<span class="branchCov" title="Branch 0 was taken 122070 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122076 : BerkeleyBatch::BerkeleyBatch(BerkeleyDatabase&amp; database, const bool read_only, bool fFlushOnCloseIn) : pdb(nullptr), activeTxn(nullptr), m_cursor(nullptr), m_database(database)</span></a>
 <a name="306"><span class="lineNum">     306 </span>                :            : {</a>
-<a name="307"><span class="lineNum">     307 </span>        [<span class="branchCov" title="Branch 0 was taken 121581 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121581 :     database.AddRef();</span></a>
-<a name="308"><span class="lineNum">     308 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchCov" title="Branch 1 was taken 6 times"> + </span>]:<span class="lineCov">     121581 :     database.Open();</span></a>
-<a name="309"><span class="lineNum">     309 </span>                :<span class="lineCov">     121575 :     fReadOnly = read_only;</span></a>
-<a name="310"><span class="lineNum">     310 </span>                :<span class="lineCov">     121575 :     fFlushOnClose = fFlushOnCloseIn;</span></a>
-<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121575 :     env = database.env.get();</span></a>
-<a name="312"><span class="lineNum">     312 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121575 :     pdb = database.m_db.get();</span></a>
-<a name="313"><span class="lineNum">     313 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121575 :     strFile = database.strFile;</span></a>
-<a name="314"><span class="lineNum">     314 </span>  [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     121575 :     if (!Exists(std::string(&quot;version&quot;))) {</span></a>
-<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 285 times"> + </span><span class="branchCov" title="Branch 5 was taken 121290 times"> + </span>]
+<a name="307"><span class="lineNum">     307 </span>        [<span class="branchCov" title="Branch 0 was taken 122070 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122070 :     database.AddRef();</span></a>
+<a name="308"><span class="lineNum">     308 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchCov" title="Branch 1 was taken 6 times"> + </span>]:<span class="lineCov">     122070 :     database.Open();</span></a>
+<a name="309"><span class="lineNum">     309 </span>                :<span class="lineCov">     122064 :     fReadOnly = read_only;</span></a>
+<a name="310"><span class="lineNum">     310 </span>                :<span class="lineCov">     122064 :     fFlushOnClose = fFlushOnCloseIn;</span></a>
+<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122064 :     env = database.env.get();</span></a>
+<a name="312"><span class="lineNum">     312 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122064 :     pdb = database.m_db.get();</span></a>
+<a name="313"><span class="lineNum">     313 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122064 :     strFile = database.strFile;</span></a>
+<a name="314"><span class="lineNum">     314 </span>  [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">     122064 :     if (!Exists(std::string(&quot;version&quot;))) {</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 285 times"> + </span><span class="branchCov" title="Branch 5 was taken 121779 times"> + </span>]
 <a name="315"><span class="lineNum">     315 </span>                :<span class="lineCov">        285 :         bool fTmp = fReadOnly;</span></a>
 <a name="316"><span class="lineNum">     316 </span>                :<span class="lineCov">        285 :         fReadOnly = false;</span></a>
 <a name="317"><span class="lineNum">     317 </span>  [<span class="branchCov" title="Branch 0 was taken 285 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 285 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        570 :         Write(std::string(&quot;version&quot;), CLIENT_VERSION);</span></a>
 <a name="318"><span class="lineNum">     318 </span>                :<span class="lineCov">        285 :         fReadOnly = fTmp;</span></a>
 <a name="319"><span class="lineNum">     319 </span>                :            :     }</a>
-<a name="320"><span class="lineNum">     320 </span>                :<span class="lineCov">     121575 : }</span></a>
+<a name="320"><span class="lineNum">     320 </span>                :<span class="lineCov">     122064 : }</span></a>
 <a name="321"><span class="lineNum">     321 </span>                :            : </a>
-<a name="322"><span class="lineNum">     322 </span>                :<span class="lineCov">     121581 : void BerkeleyDatabase::Open()</span></a>
+<a name="322"><span class="lineNum">     322 </span>                :<span class="lineCov">     122070 : void BerkeleyDatabase::Open()</span></a>
 <a name="323"><span class="lineNum">     323 </span>                :            : {</a>
-<a name="324"><span class="lineNum">     324 </span>                :<span class="lineCov">     121581 :     unsigned int nFlags = DB_THREAD | DB_CREATE;</span></a>
+<a name="324"><span class="lineNum">     324 </span>                :<span class="lineCov">     122070 :     unsigned int nFlags = DB_THREAD | DB_CREATE;</span></a>
 <a name="325"><span class="lineNum">     325 </span>                :            : </a>
-<a name="326"><span class="lineNum">     326 </span>                :<span class="lineCov">     121581 :     {</span></a>
-<a name="327"><span class="lineNum">     327 </span>                :<span class="lineCov">     121581 :         LOCK(cs_db);</span></a>
-<a name="328"><span class="lineNum">     328 </span>  [<span class="branchCov" title="Branch 0 was taken 121581 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     243162 :         bilingual_str open_err;</span></a>
-<a name="329"><span class="lineNum">     329 </span>  [<span class="branchCov" title="Branch 0 was taken 121581 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 121581 times"> + </span>]:<span class="lineCov">     121581 :         if (!env-&gt;Open(open_err))</span></a>
+<a name="326"><span class="lineNum">     326 </span>                :<span class="lineCov">     122070 :     {</span></a>
+<a name="327"><span class="lineNum">     327 </span>                :<span class="lineCov">     122070 :         LOCK(cs_db);</span></a>
+<a name="328"><span class="lineNum">     328 </span>  [<span class="branchCov" title="Branch 0 was taken 122070 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     244140 :         bilingual_str open_err;</span></a>
+<a name="329"><span class="lineNum">     329 </span>  [<span class="branchCov" title="Branch 0 was taken 122070 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 122070 times"> + </span>]:<span class="lineCov">     122070 :         if (!env-&gt;Open(open_err))</span></a>
 <a name="330"><span class="lineNum">     330 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             throw std::runtime_error(&quot;BerkeleyDatabase: Failed to open database environment.&quot;);</span></a>
 <a name="331"><span class="lineNum">     331 </span>                :            : </a>
-<a name="332"><span class="lineNum">     332 </span>        [<span class="branchCov" title="Branch 0 was taken 1170 times"> + </span><span class="branchCov" title="Branch 1 was taken 120411 times"> + </span>]:<span class="lineCov">     121581 :         if (m_db == nullptr) {</span></a>
-<a name="333"><span class="lineNum">     333 </span>                :<span class="lineCov">       1170 :             int ret;</span></a>
-<a name="334"><span class="lineNum">     334 </span>        [<span class="branchCov" title="Branch 0 was taken 1170 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1176 :             std::unique_ptr&lt;Db&gt; pdb_temp = std::make_unique&lt;Db&gt;(env-&gt;dbenv.get(), 0);</span></a>
+<a name="332"><span class="lineNum">     332 </span>        [<span class="branchCov" title="Branch 0 was taken 1117 times"> + </span><span class="branchCov" title="Branch 1 was taken 120953 times"> + </span>]:<span class="lineCov">     122070 :         if (m_db == nullptr) {</span></a>
+<a name="333"><span class="lineNum">     333 </span>                :<span class="lineCov">       1117 :             int ret;</span></a>
+<a name="334"><span class="lineNum">     334 </span>        [<span class="branchCov" title="Branch 0 was taken 1117 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1123 :             std::unique_ptr&lt;Db&gt; pdb_temp = std::make_unique&lt;Db&gt;(env-&gt;dbenv.get(), 0);</span></a>
 <a name="335"><span class="lineNum">     335 </span>                :            : </a>
-<a name="336"><span class="lineNum">     336 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 1159 times"> + </span>]:<span class="lineCov">       1170 :             bool fMockDb = env-&gt;IsMock();</span></a>
-<a name="337"><span class="lineNum">     337 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 1159 times"> + </span>]:<span class="lineCov">       1170 :             if (fMockDb) {</span></a>
+<a name="336"><span class="lineNum">     336 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 1106 times"> + </span>]:<span class="lineCov">       1117 :             bool fMockDb = env-&gt;IsMock();</span></a>
+<a name="337"><span class="lineNum">     337 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 1106 times"> + </span>]:<span class="lineCov">       1117 :             if (fMockDb) {</span></a>
 <a name="338"><span class="lineNum">     338 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         11 :                 DbMpoolFile* mpf = pdb_temp-&gt;get_mpf();</span></a>
 <a name="339"><span class="lineNum">     339 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         11 :                 ret = mpf-&gt;set_flags(DB_MPOOL_NOFILE, 1);</span></a>
 <a name="340"><span class="lineNum">     340 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 11 times"> + </span>]:<span class="lineCov">         11 :                 if (ret != 0) {</span></a>
@@ -430,85 +430,85 @@
 <a name="342"><span class="lineNum">     342 </span>                :            :                 }</a>
 <a name="343"><span class="lineNum">     343 </span>                :            :             }</a>
 <a name="344"><span class="lineNum">     344 </span>                :            : </a>
-<a name="345"><span class="lineNum">     345 </span>  [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 1159 times"> + </span><span class="branchCov" title="Branch 2 was taken 1159 times"> + </span><span class="branchCov" title="Branch 3 was taken 11 times"> + </span> :<span class="lineCov">       2340 :             ret = pdb_temp-&gt;open(nullptr,                             // Txn pointer</span></a>
-<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1170 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
-<a name="346"><span class="lineNum">     346 </span>                :<span class="lineCov">       1159 :                             fMockDb ? nullptr : strFile.c_str(),      // Filename</span></a>
+<a name="345"><span class="lineNum">     345 </span>  [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 1106 times"> + </span><span class="branchCov" title="Branch 2 was taken 1106 times"> + </span><span class="branchCov" title="Branch 3 was taken 11 times"> + </span> :<span class="lineCov">       2234 :             ret = pdb_temp-&gt;open(nullptr,                             // Txn pointer</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1117 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="346"><span class="lineNum">     346 </span>                :<span class="lineCov">       1106 :                             fMockDb ? nullptr : strFile.c_str(),      // Filename</span></a>
 <a name="347"><span class="lineNum">     347 </span>                :<span class="lineCov">         11 :                             fMockDb ? strFile.c_str() : &quot;main&quot;,       // Logical db name</span></a>
 <a name="348"><span class="lineNum">     348 </span>                :            :                             DB_BTREE,                                 // Database type</a>
 <a name="349"><span class="lineNum">     349 </span>                :            :                             nFlags,                                   // Flags</a>
-<a name="350"><span class="lineNum">     350 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 1159 times"> + </span>]:<span class="lineCov">       1170 :                             0);</span></a>
+<a name="350"><span class="lineNum">     350 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 1106 times"> + </span>]:<span class="lineCov">       1117 :                             0);</span></a>
 <a name="351"><span class="lineNum">     351 </span>                :            : </a>
-<a name="352"><span class="lineNum">     352 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1170 times"> + </span>]:<span class="lineCov">       1170 :             if (ret != 0) {</span></a>
+<a name="352"><span class="lineNum">     352 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1117 times"> + </span>]:<span class="lineCov">       1117 :             if (ret != 0) {</span></a>
 <a name="353"><span class="lineNum">     353 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :                 throw std::runtime_error(strprintf(&quot;BerkeleyDatabase: Error %d, can't open database %s&quot;, ret, strFile));</span></a>
 <a name="354"><span class="lineNum">     354 </span>                :            :             }</a>
 <a name="355"><span class="lineNum">     355 </span>                :            : </a>
 <a name="356"><span class="lineNum">     356 </span>                :            :             // Call CheckUniqueFileid on the containing BDB environment to</a>
 <a name="357"><span class="lineNum">     357 </span>                :            :             // avoid BDB data consistency bugs that happen when different data</a>
 <a name="358"><span class="lineNum">     358 </span>                :            :             // files in the same environment have the same fileid.</a>
-<a name="359"><span class="lineNum">     359 </span>  [<span class="branchCov" title="Branch 0 was taken 1170 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1164 times"> + </span><span class="branchCov" title="Branch 3 was taken 6 times"> + </span>]:<span class="lineCov">       1170 :             CheckUniqueFileid(*env, strFile, *pdb_temp, this-&gt;env-&gt;m_fileids[strFile]);</span></a>
+<a name="359"><span class="lineNum">     359 </span>  [<span class="branchCov" title="Branch 0 was taken 1117 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1111 times"> + </span><span class="branchCov" title="Branch 3 was taken 6 times"> + </span>]:<span class="lineCov">       1117 :             CheckUniqueFileid(*env, strFile, *pdb_temp, this-&gt;env-&gt;m_fileids[strFile]);</span></a>
 <a name="360"><span class="lineNum">     360 </span>                :            : </a>
-<a name="361"><span class="lineNum">     361 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1164 times"> + </span>]:<span class="lineCov">       1164 :             m_db.reset(pdb_temp.release());</span></a>
+<a name="361"><span class="lineNum">     361 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1111 times"> + </span>]:<span class="lineCov">       1111 :             m_db.reset(pdb_temp.release());</span></a>
 <a name="362"><span class="lineNum">     362 </span>                :            : </a>
 <a name="363"><span class="lineNum">     363 </span>                :            :         }</a>
 <a name="364"><span class="lineNum">     364 </span>                :            :     }</a>
-<a name="365"><span class="lineNum">     365 </span>                :<span class="lineCov">     121575 : }</span></a>
+<a name="365"><span class="lineNum">     365 </span>                :<span class="lineCov">     122064 : }</span></a>
 <a name="366"><span class="lineNum">     366 </span>                :            : </a>
-<a name="367"><span class="lineNum">     367 </span>                :<span class="lineCov">      78716 : void BerkeleyBatch::Flush()</span></a>
+<a name="367"><span class="lineNum">     367 </span>                :<span class="lineCov">      79206 : void BerkeleyBatch::Flush()</span></a>
 <a name="368"><span class="lineNum">     368 </span>                :            : {</a>
-<a name="369"><span class="lineNum">     369 </span>        [<span class="branchCov" title="Branch 0 was taken 78715 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">      78716 :     if (activeTxn)</span></a>
+<a name="369"><span class="lineNum">     369 </span>        [<span class="branchCov" title="Branch 0 was taken 79205 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">      79206 :     if (activeTxn)</span></a>
 <a name="370"><span class="lineNum">     370 </span>                :            :         return;</a>
 <a name="371"><span class="lineNum">     371 </span>                :            : </a>
 <a name="372"><span class="lineNum">     372 </span>                :            :     // Flush database activity from memory pool to disk log</a>
-<a name="373"><span class="lineNum">     373 </span>                :<span class="lineCov">      78715 :     unsigned int nMinutes = 0;</span></a>
-<a name="374"><span class="lineNum">     374 </span>        [<span class="branchCov" title="Branch 0 was taken 16 times"> + </span><span class="branchCov" title="Branch 1 was taken 78699 times"> + </span>]:<span class="lineCov">      78715 :     if (fReadOnly)</span></a>
+<a name="373"><span class="lineNum">     373 </span>                :<span class="lineCov">      79205 :     unsigned int nMinutes = 0;</span></a>
+<a name="374"><span class="lineNum">     374 </span>        [<span class="branchCov" title="Branch 0 was taken 16 times"> + </span><span class="branchCov" title="Branch 1 was taken 79189 times"> + </span>]:<span class="lineCov">      79205 :     if (fReadOnly)</span></a>
 <a name="375"><span class="lineNum">     375 </span>                :<span class="lineCov">         16 :         nMinutes = 1;</span></a>
 <a name="376"><span class="lineNum">     376 </span>                :            : </a>
-<a name="377"><span class="lineNum">     377 </span>        [<span class="branchCov" title="Branch 0 was taken 78715 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      78715 :     if (env) { // env is nullptr for dummy databases (i.e. in tests). Don't actually flush if env is nullptr so we don't segfault</span></a>
-<a name="378"><span class="lineNum">     378 </span>  [<span class="branchCov" title="Branch 0 was taken 16 times"> + </span><span class="branchCov" title="Branch 1 was taken 78699 times"> + </span><span class="branchCov" title="Branch 2 was taken 16 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      78732 :         env-&gt;dbenv-&gt;txn_checkpoint(nMinutes ? gArgs.GetArg(&quot;-dblogsize&quot;, DEFAULT_WALLET_DBLOGSIZE) * 1024 : 0, nMinutes, 0);</span></a>
-<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 16 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 78715 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 16 times"> + </span> 
-<span class="lineNum">         </span>      <span class="branchCov" title="Branch 9 was taken 78699 times"> + </span><span class="branchNoCov" title="Branch 10 was not taken"> - </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<a name="377"><span class="lineNum">     377 </span>        [<span class="branchCov" title="Branch 0 was taken 79205 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      79205 :     if (env) { // env is nullptr for dummy databases (i.e. in tests). Don't actually flush if env is nullptr so we don't segfault</span></a>
+<a name="378"><span class="lineNum">     378 </span>  [<span class="branchCov" title="Branch 0 was taken 16 times"> + </span><span class="branchCov" title="Branch 1 was taken 79189 times"> + </span><span class="branchCov" title="Branch 2 was taken 16 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      79222 :         env-&gt;dbenv-&gt;txn_checkpoint(nMinutes ? gArgs.GetArg(&quot;-dblogsize&quot;, DEFAULT_WALLET_DBLOGSIZE) * 1024 : 0, nMinutes, 0);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 16 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 79205 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 16 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchCov" title="Branch 9 was taken 79189 times"> + </span><span class="branchNoCov" title="Branch 10 was not taken"> - </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
 <a name="379"><span class="lineNum">     379 </span>                :            :     }</a>
 <a name="380"><span class="lineNum">     380 </span>                :            : }</a>
 <a name="381"><span class="lineNum">     381 </span>                :            : </a>
-<a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">     218344 : void BerkeleyDatabase::IncrementUpdateCounter()</span></a>
+<a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">     219181 : void BerkeleyDatabase::IncrementUpdateCounter()</span></a>
 <a name="383"><span class="lineNum">     383 </span>                :            : {</a>
-<a name="384"><span class="lineNum">     384 </span>                :<span class="lineCov">     218344 :     ++nUpdateCounter;</span></a>
-<a name="385"><span class="lineNum">     385 </span>                :<span class="lineCov">     218344 : }</span></a>
+<a name="384"><span class="lineNum">     384 </span>                :<span class="lineCov">     219181 :     ++nUpdateCounter;</span></a>
+<a name="385"><span class="lineNum">     385 </span>                :<span class="lineCov">     219181 : }</span></a>
 <a name="386"><span class="lineNum">     386 </span>                :            : </a>
-<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">     243134 : BerkeleyBatch::~BerkeleyBatch()</span></a>
+<a name="387"><span class="lineNum">     387 </span>                :<span class="lineCov">     244112 : BerkeleyBatch::~BerkeleyBatch()</span></a>
 <a name="388"><span class="lineNum">     388 </span>                :            : {</a>
-<a name="389"><span class="lineNum">     389 </span>                :<span class="lineCov">     121575 :     Close();</span></a>
-<a name="390"><span class="lineNum">     390 </span>                :<span class="lineCov">     121575 :     m_database.RemoveRef();</span></a>
-<a name="391"><span class="lineNum">     391 </span>                :<span class="lineCov">     243134 : }</span></a>
+<a name="389"><span class="lineNum">     389 </span>                :<span class="lineCov">     122064 :     Close();</span></a>
+<a name="390"><span class="lineNum">     390 </span>                :<span class="lineCov">     122064 :     m_database.RemoveRef();</span></a>
+<a name="391"><span class="lineNum">     391 </span>                :<span class="lineCov">     244112 : }</span></a>
 <a name="392"><span class="lineNum">     392 </span>                :            : </a>
-<a name="393"><span class="lineNum">     393 </span>                :<span class="lineCov">     121591 : void BerkeleyBatch::Close()</span></a>
+<a name="393"><span class="lineNum">     393 </span>                :<span class="lineCov">     122080 : void BerkeleyBatch::Close()</span></a>
 <a name="394"><span class="lineNum">     394 </span>                :            : {</a>
-<a name="395"><span class="lineNum">     395 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchCov" title="Branch 1 was taken 16 times"> + </span>]:<span class="lineCov">     121591 :     if (!pdb)</span></a>
+<a name="395"><span class="lineNum">     395 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchCov" title="Branch 1 was taken 16 times"> + </span>]:<span class="lineCov">     122080 :     if (!pdb)</span></a>
 <a name="396"><span class="lineNum">     396 </span>                :            :         return;</a>
-<a name="397"><span class="lineNum">     397 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 121575 times"> + </span>]:<span class="lineCov">     121575 :     if (activeTxn)</span></a>
+<a name="397"><span class="lineNum">     397 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 122064 times"> + </span>]:<span class="lineCov">     122064 :     if (activeTxn)</span></a>
 <a name="398"><span class="lineNum">     398 </span>                :<span class="lineNoCov">          0 :         activeTxn-&gt;abort();</span></a>
-<a name="399"><span class="lineNum">     399 </span>                :<span class="lineCov">     121575 :     activeTxn = nullptr;</span></a>
-<a name="400"><span class="lineNum">     400 </span>                :<span class="lineCov">     121575 :     pdb = nullptr;</span></a>
-<a name="401"><span class="lineNum">     401 </span>                :<span class="lineCov">     121575 :     CloseCursor();</span></a>
+<a name="399"><span class="lineNum">     399 </span>                :<span class="lineCov">     122064 :     activeTxn = nullptr;</span></a>
+<a name="400"><span class="lineNum">     400 </span>                :<span class="lineCov">     122064 :     pdb = nullptr;</span></a>
+<a name="401"><span class="lineNum">     401 </span>                :<span class="lineCov">     122064 :     CloseCursor();</span></a>
 <a name="402"><span class="lineNum">     402 </span>                :            : </a>
-<a name="403"><span class="lineNum">     403 </span>        [<span class="branchCov" title="Branch 0 was taken 78560 times"> + </span><span class="branchCov" title="Branch 1 was taken 43015 times"> + </span>]:<span class="lineCov">     121575 :     if (fFlushOnClose)</span></a>
-<a name="404"><span class="lineNum">     404 </span>                :<span class="lineCov">      78560 :         Flush();</span></a>
+<a name="403"><span class="lineNum">     403 </span>        [<span class="branchCov" title="Branch 0 was taken 79049 times"> + </span><span class="branchCov" title="Branch 1 was taken 43015 times"> + </span>]:<span class="lineCov">     122064 :     if (fFlushOnClose)</span></a>
+<a name="404"><span class="lineNum">     404 </span>                :<span class="lineCov">      79049 :         Flush();</span></a>
 <a name="405"><span class="lineNum">     405 </span>                :            : }</a>
 <a name="406"><span class="lineNum">     406 </span>                :            : </a>
-<a name="407"><span class="lineNum">     407 </span>                :<span class="lineCov">       1877 : void BerkeleyEnvironment::CloseDb(const std::string&amp; strFile)</span></a>
+<a name="407"><span class="lineNum">     407 </span>                :<span class="lineCov">       1823 : void BerkeleyEnvironment::CloseDb(const std::string&amp; strFile)</span></a>
 <a name="408"><span class="lineNum">     408 </span>                :            : {</a>
-<a name="409"><span class="lineNum">     409 </span>                :<span class="lineCov">       1877 :     {</span></a>
-<a name="410"><span class="lineNum">     410 </span>                :<span class="lineCov">       1877 :         LOCK(cs_db);</span></a>
-<a name="411"><span class="lineNum">     411 </span>                :<span class="lineCov">       1877 :         auto it = m_databases.find(strFile);</span></a>
-<a name="412"><span class="lineNum">     412 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1877 times"> + </span>]:<span class="lineCov">       1877 :         assert(it != m_databases.end());</span></a>
-<a name="413"><span class="lineNum">     413 </span>        [<span class="branchCov" title="Branch 0 was taken 1164 times"> + </span><span class="branchCov" title="Branch 1 was taken 713 times"> + </span>]:<span class="lineCov">       1877 :         BerkeleyDatabase&amp; database = it-&gt;second.get();</span></a>
-<a name="414"><span class="lineNum">     414 </span>        [<span class="branchCov" title="Branch 0 was taken 1164 times"> + </span><span class="branchCov" title="Branch 1 was taken 713 times"> + </span>]:<span class="lineCov">       1877 :         if (database.m_db) {</span></a>
+<a name="409"><span class="lineNum">     409 </span>                :<span class="lineCov">       1823 :     {</span></a>
+<a name="410"><span class="lineNum">     410 </span>                :<span class="lineCov">       1823 :         LOCK(cs_db);</span></a>
+<a name="411"><span class="lineNum">     411 </span>                :<span class="lineCov">       1823 :         auto it = m_databases.find(strFile);</span></a>
+<a name="412"><span class="lineNum">     412 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1823 times"> + </span>]:<span class="lineCov">       1823 :         assert(it != m_databases.end());</span></a>
+<a name="413"><span class="lineNum">     413 </span>        [<span class="branchCov" title="Branch 0 was taken 1111 times"> + </span><span class="branchCov" title="Branch 1 was taken 712 times"> + </span>]:<span class="lineCov">       1823 :         BerkeleyDatabase&amp; database = it-&gt;second.get();</span></a>
+<a name="414"><span class="lineNum">     414 </span>        [<span class="branchCov" title="Branch 0 was taken 1111 times"> + </span><span class="branchCov" title="Branch 1 was taken 712 times"> + </span>]:<span class="lineCov">       1823 :         if (database.m_db) {</span></a>
 <a name="415"><span class="lineNum">     415 </span>                :            :             // Close the database handle</a>
-<a name="416"><span class="lineNum">     416 </span>        [<span class="branchCov" title="Branch 0 was taken 1164 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1164 :             database.m_db-&gt;close(0);</span></a>
-<a name="417"><span class="lineNum">     417 </span>  [<span class="branchCov" title="Branch 0 was taken 1164 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1877 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       3041 :             database.m_db.reset();</span></a>
+<a name="416"><span class="lineNum">     416 </span>        [<span class="branchCov" title="Branch 0 was taken 1111 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1111 :             database.m_db-&gt;close(0);</span></a>
+<a name="417"><span class="lineNum">     417 </span>  [<span class="branchCov" title="Branch 0 was taken 1111 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1823 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       2934 :             database.m_db.reset();</span></a>
 <a name="418"><span class="lineNum">     418 </span>                :            :         }</a>
 <a name="419"><span class="lineNum">     419 </span>                :            :     }</a>
-<a name="420"><span class="lineNum">     420 </span>                :<span class="lineCov">       1877 : }</span></a>
+<a name="420"><span class="lineNum">     420 </span>                :<span class="lineCov">       1823 : }</span></a>
 <a name="421"><span class="lineNum">     421 </span>                :            : </a>
 <a name="422"><span class="lineNum">     422 </span>                :<span class="lineCov">         16 : void BerkeleyEnvironment::ReloadDbEnv()</span></a>
 <a name="423"><span class="lineNum">     423 </span>                :            : {</a>
@@ -638,27 +638,27 @@
 <a name="542"><span class="lineNum">     542 </span>                :<span class="lineCov">        909 :         bool no_dbs_accessed = true;</span></a>
 <a name="543"><span class="lineNum">     543 </span>        [<span class="branchCov" title="Branch 0 was taken 947 times"> + </span><span class="branchCov" title="Branch 1 was taken 909 times"> + </span>]:<span class="lineCov">       1856 :         for (auto&amp; db_it : m_databases) {</span></a>
 <a name="544"><span class="lineNum">     544 </span>        [<span class="branchCov" title="Branch 0 was taken 947 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        947 :             std::string strFile = db_it.first;</span></a>
-<a name="545"><span class="lineNum">     545 </span>        [<span class="branchCov" title="Branch 0 was taken 57 times"> + </span><span class="branchCov" title="Branch 1 was taken 890 times"> + </span>]:<span class="lineCov">        947 :             int nRefCount = db_it.second.get().m_refcount;</span></a>
-<a name="546"><span class="lineNum">     546 </span>        [<span class="branchCov" title="Branch 0 was taken 57 times"> + </span><span class="branchCov" title="Branch 1 was taken 890 times"> + </span>]:<span class="lineCov">       1894 :             if (nRefCount &lt; 0) continue;</span></a>
-<a name="547"><span class="lineNum">     547 </span>  [<span class="branchCov" title="Branch 0 was taken 890 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 875 times"> + </span><span class="branchCov" title="Branch 3 was taken 15 times"> + </span> :<span class="lineCov">       2640 :             LogPrint(BCLog::WALLETDB, &quot;BerkeleyEnvironment::Flush: Flushing %s (refcount = %d)...\n&quot;, strFile, nRefCount);</span></a>
-<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 875 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 875 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 875 times"> + </span> 
-<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 881 times"> + </span><span class="branchCov" title="Branch 11 was taken 9 times"> + </span>]
-<a name="548"><span class="lineNum">     548 </span>        [<span class="branchCov" title="Branch 0 was taken 881 times"> + </span><span class="branchCov" title="Branch 1 was taken 9 times"> + </span>]:<span class="lineCov">        890 :             if (nRefCount == 0) {</span></a>
+<a name="545"><span class="lineNum">     545 </span>        [<span class="branchCov" title="Branch 0 was taken 55 times"> + </span><span class="branchCov" title="Branch 1 was taken 892 times"> + </span>]:<span class="lineCov">        947 :             int nRefCount = db_it.second.get().m_refcount;</span></a>
+<a name="546"><span class="lineNum">     546 </span>        [<span class="branchCov" title="Branch 0 was taken 55 times"> + </span><span class="branchCov" title="Branch 1 was taken 892 times"> + </span>]:<span class="lineCov">       1894 :             if (nRefCount &lt; 0) continue;</span></a>
+<a name="547"><span class="lineNum">     547 </span>  [<span class="branchCov" title="Branch 0 was taken 892 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 877 times"> + </span><span class="branchCov" title="Branch 3 was taken 15 times"> + </span> :<span class="lineCov">       2646 :             LogPrint(BCLog::WALLETDB, &quot;BerkeleyEnvironment::Flush: Flushing %s (refcount = %d)...\n&quot;, strFile, nRefCount);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 877 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 877 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 877 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 884 times"> + </span><span class="branchCov" title="Branch 11 was taken 8 times"> + </span>]
+<a name="548"><span class="lineNum">     548 </span>        [<span class="branchCov" title="Branch 0 was taken 884 times"> + </span><span class="branchCov" title="Branch 1 was taken 8 times"> + </span>]:<span class="lineCov">        892 :             if (nRefCount == 0) {</span></a>
 <a name="549"><span class="lineNum">     549 </span>                :            :                 // Move log data to the dat file</a>
-<a name="550"><span class="lineNum">     550 </span>        [<span class="branchCov" title="Branch 0 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        881 :                 CloseDb(strFile);</span></a>
-<a name="551"><span class="lineNum">     551 </span>  [<span class="branchCov" title="Branch 0 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 866 times"> + </span><span class="branchCov" title="Branch 3 was taken 15 times"> + </span> :<span class="lineCov">       2613 :                 LogPrint(BCLog::WALLETDB, &quot;BerkeleyEnvironment::Flush: %s checkpoint\n&quot;, strFile);</span></a>
-<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 866 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 866 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 866 times"> + </span> 
-<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
-<a name="552"><span class="lineNum">     552 </span>        [<span class="branchCov" title="Branch 0 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        881 :                 dbenv-&gt;txn_checkpoint(0, 0, 0);</span></a>
-<a name="553"><span class="lineNum">     553 </span>  [<span class="branchCov" title="Branch 0 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 866 times"> + </span><span class="branchCov" title="Branch 3 was taken 15 times"> + </span> :<span class="lineCov">       2613 :                 LogPrint(BCLog::WALLETDB, &quot;BerkeleyEnvironment::Flush: %s detach\n&quot;, strFile);</span></a>
-<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 866 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 866 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 866 times"> + </span> 
-<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
-<a name="554"><span class="lineNum">     554 </span>        [<span class="branchCov" title="Branch 0 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        881 :                 if (!fMockDb)</span></a>
-<a name="555"><span class="lineNum">     555 </span>        [<span class="branchCov" title="Branch 0 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        881 :                     dbenv-&gt;lsn_reset(strFile.c_str(), 0);</span></a>
-<a name="556"><span class="lineNum">     556 </span>  [<span class="branchCov" title="Branch 0 was taken 881 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 866 times"> + </span><span class="branchCov" title="Branch 3 was taken 15 times"> + </span> :<span class="lineCov">       2613 :                 LogPrint(BCLog::WALLETDB, &quot;BerkeleyEnvironment::Flush: %s closed\n&quot;, strFile);</span></a>
-<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 866 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 866 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 866 times"> + </span> 
+<a name="550"><span class="lineNum">     550 </span>        [<span class="branchCov" title="Branch 0 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        884 :                 CloseDb(strFile);</span></a>
+<a name="551"><span class="lineNum">     551 </span>  [<span class="branchCov" title="Branch 0 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 869 times"> + </span><span class="branchCov" title="Branch 3 was taken 15 times"> + </span> :<span class="lineCov">       2622 :                 LogPrint(BCLog::WALLETDB, &quot;BerkeleyEnvironment::Flush: %s checkpoint\n&quot;, strFile);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 869 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 869 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 869 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<a name="552"><span class="lineNum">     552 </span>        [<span class="branchCov" title="Branch 0 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        884 :                 dbenv-&gt;txn_checkpoint(0, 0, 0);</span></a>
+<a name="553"><span class="lineNum">     553 </span>  [<span class="branchCov" title="Branch 0 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 869 times"> + </span><span class="branchCov" title="Branch 3 was taken 15 times"> + </span> :<span class="lineCov">       2622 :                 LogPrint(BCLog::WALLETDB, &quot;BerkeleyEnvironment::Flush: %s detach\n&quot;, strFile);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 869 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 869 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 869 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<a name="554"><span class="lineNum">     554 </span>        [<span class="branchCov" title="Branch 0 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        884 :                 if (!fMockDb)</span></a>
+<a name="555"><span class="lineNum">     555 </span>        [<span class="branchCov" title="Branch 0 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        884 :                     dbenv-&gt;lsn_reset(strFile.c_str(), 0);</span></a>
+<a name="556"><span class="lineNum">     556 </span>  [<span class="branchCov" title="Branch 0 was taken 884 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 869 times"> + </span><span class="branchCov" title="Branch 3 was taken 15 times"> + </span> :<span class="lineCov">       2622 :                 LogPrint(BCLog::WALLETDB, &quot;BerkeleyEnvironment::Flush: %s closed\n&quot;, strFile);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 869 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 869 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 869 times"> + </span> 
 <span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 9 was not taken"> - </span>]
-<a name="557"><span class="lineNum">     557 </span>                :<span class="lineCov">        881 :                 nRefCount = -1;</span></a>
+<a name="557"><span class="lineNum">     557 </span>                :<span class="lineCov">        884 :                 nRefCount = -1;</span></a>
 <a name="558"><span class="lineNum">     558 </span>                :            :             } else {</a>
 <a name="559"><span class="lineNum">     559 </span>                :            :                 no_dbs_accessed = false;</a>
 <a name="560"><span class="lineNum">     560 </span>                :            :             }</a>
@@ -681,34 +681,34 @@
 <a name="573"><span class="lineNum">     573 </span>                :            :     }</a>
 <a name="574"><span class="lineNum">     574 </span>                :            : }</a>
 <a name="575"><span class="lineNum">     575 </span>                :            : </a>
-<a name="576"><span class="lineNum">     576 </span>                :<span class="lineCov">        285 : bool BerkeleyDatabase::PeriodicFlush()</span></a>
+<a name="576"><span class="lineNum">     576 </span>                :<span class="lineCov">        228 : bool BerkeleyDatabase::PeriodicFlush()</span></a>
 <a name="577"><span class="lineNum">     577 </span>                :            : {</a>
 <a name="578"><span class="lineNum">     578 </span>                :            :     // Don't flush if we can't acquire the lock.</a>
-<a name="579"><span class="lineNum">     579 </span>                :<span class="lineCov">        570 :     TRY_LOCK(cs_db, lockDb);</span></a>
-<a name="580"><span class="lineNum">     580 </span>        [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">        285 :     if (!lockDb) return false;</span></a>
+<a name="579"><span class="lineNum">     579 </span>                :<span class="lineCov">        456 :     TRY_LOCK(cs_db, lockDb);</span></a>
+<a name="580"><span class="lineNum">     580 </span>        [<span class="branchCov" title="Branch 0 was taken 228 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        228 :     if (!lockDb) return false;</span></a>
 <a name="581"><span class="lineNum">     581 </span>                :            : </a>
 <a name="582"><span class="lineNum">     582 </span>                :            :     // Don't flush if any databases are in use</a>
-<a name="583"><span class="lineNum">     583 </span>        [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchCov" title="Branch 1 was taken 284 times"> + </span>]:<span class="lineCov">        568 :     for (auto&amp; it : env-&gt;m_databases) {</span></a>
-<a name="584"><span class="lineNum">     584 </span>        [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        284 :         if (it.second.get().m_refcount &gt; 0) return false;</span></a>
+<a name="583"><span class="lineNum">     583 </span>        [<span class="branchCov" title="Branch 0 was taken 228 times"> + </span><span class="branchCov" title="Branch 1 was taken 227 times"> + </span>]:<span class="lineCov">        455 :     for (auto&amp; it : env-&gt;m_databases) {</span></a>
+<a name="584"><span class="lineNum">     584 </span>        [<span class="branchCov" title="Branch 0 was taken 227 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">        228 :         if (it.second.get().m_refcount &gt; 0) return false;</span></a>
 <a name="585"><span class="lineNum">     585 </span>                :            :     }</a>
 <a name="586"><span class="lineNum">     586 </span>                :            : </a>
 <a name="587"><span class="lineNum">     587 </span>                :            :     // Don't flush if there haven't been any batch writes for this database.</a>
-<a name="588"><span class="lineNum">     588 </span>        [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        284 :     if (m_refcount &lt; 0) return false;</span></a>
+<a name="588"><span class="lineNum">     588 </span>        [<span class="branchCov" title="Branch 0 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        227 :     if (m_refcount &lt; 0) return false;</span></a>
 <a name="589"><span class="lineNum">     589 </span>                :            : </a>
-<a name="590"><span class="lineNum">     590 </span>  [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">        852 :     LogPrint(BCLog::WALLETDB, &quot;Flushing %s\n&quot;, strFile);</span></a>
-<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 284 times"> + </span> 
-<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
-<a name="591"><span class="lineNum">     591 </span>        [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        284 :     int64_t nStart = GetTimeMillis();</span></a>
+<a name="590"><span class="lineNum">     590 </span>  [<span class="branchCov" title="Branch 0 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">        681 :     LogPrint(BCLog::WALLETDB, &quot;Flushing %s\n&quot;, strFile);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 227 times"> + </span> 
+<span class="lineNum">         </span>      <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<a name="591"><span class="lineNum">     591 </span>        [<span class="branchCov" title="Branch 0 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        227 :     int64_t nStart = GetTimeMillis();</span></a>
 <a name="592"><span class="lineNum">     592 </span>                :            : </a>
 <a name="593"><span class="lineNum">     593 </span>                :            :     // Flush wallet file so it's self contained</a>
-<a name="594"><span class="lineNum">     594 </span>        [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        284 :     env-&gt;CloseDb(strFile);</span></a>
-<a name="595"><span class="lineNum">     595 </span>        [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        284 :     env-&gt;CheckpointLSN(strFile);</span></a>
-<a name="596"><span class="lineNum">     596 </span>        [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        284 :     m_refcount = -1;</span></a>
+<a name="594"><span class="lineNum">     594 </span>        [<span class="branchCov" title="Branch 0 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        227 :     env-&gt;CloseDb(strFile);</span></a>
+<a name="595"><span class="lineNum">     595 </span>        [<span class="branchCov" title="Branch 0 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        227 :     env-&gt;CheckpointLSN(strFile);</span></a>
+<a name="596"><span class="lineNum">     596 </span>        [<span class="branchCov" title="Branch 0 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        227 :     m_refcount = -1;</span></a>
 <a name="597"><span class="lineNum">     597 </span>                :            : </a>
-<a name="598"><span class="lineNum">     598 </span>  [<span class="branchCov" title="Branch 0 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">        853 :     LogPrint(BCLog::WALLETDB, &quot;Flushed %s %dms\n&quot;, strFile, GetTimeMillis() - nStart);</span></a>
-<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 284 times"> + </span> 
-<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 284 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 284 times"> + </span> 
-<span class="lineNum">         </span>            <span class="branchCov" title="Branch 13 was taken 1 time"> + </span>]
+<a name="598"><span class="lineNum">     598 </span>  [<span class="branchCov" title="Branch 0 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">        682 :     LogPrint(BCLog::WALLETDB, &quot;Flushed %s %dms\n&quot;, strFile, GetTimeMillis() - nStart);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 227 times"> + </span> 
+<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 227 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 228 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 13 was not taken"> - </span>]
 <a name="599"><span class="lineNum">     599 </span>                :            : </a>
 <a name="600"><span class="lineNum">     600 </span>                :            :     return true;</a>
 <a name="601"><span class="lineNum">     601 </span>                :            : }</a>
@@ -778,35 +778,35 @@
 <a name="661"><span class="lineNum">     661 </span>                :<span class="lineCov">        541 :     return ret == 0;</span></a>
 <a name="662"><span class="lineNum">     662 </span>                :            : }</a>
 <a name="663"><span class="lineNum">     663 </span>                :            : </a>
-<a name="664"><span class="lineNum">     664 </span>                :<span class="lineCov">      55073 : bool BerkeleyBatch::ReadAtCursor(CDataStream&amp; ssKey, CDataStream&amp; ssValue, bool&amp; complete)</span></a>
+<a name="664"><span class="lineNum">     664 </span>                :<span class="lineCov">      55097 : bool BerkeleyBatch::ReadAtCursor(CDataStream&amp; ssKey, CDataStream&amp; ssValue, bool&amp; complete)</span></a>
 <a name="665"><span class="lineNum">     665 </span>                :            : {</a>
-<a name="666"><span class="lineNum">     666 </span>                :<span class="lineCov">      55073 :     complete = false;</span></a>
-<a name="667"><span class="lineNum">     667 </span>        [<span class="branchCov" title="Branch 0 was taken 55073 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      55073 :     if (m_cursor == nullptr) return false;</span></a>
+<a name="666"><span class="lineNum">     666 </span>                :<span class="lineCov">      55097 :     complete = false;</span></a>
+<a name="667"><span class="lineNum">     667 </span>        [<span class="branchCov" title="Branch 0 was taken 55097 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      55097 :     if (m_cursor == nullptr) return false;</span></a>
 <a name="668"><span class="lineNum">     668 </span>                :            :     // Read at cursor</a>
-<a name="669"><span class="lineNum">     669 </span>                :<span class="lineCov">     110146 :     SafeDbt datKey;</span></a>
-<a name="670"><span class="lineNum">     670 </span>        [<span class="branchCov" title="Branch 0 was taken 55073 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     110146 :     SafeDbt datValue;</span></a>
-<a name="671"><span class="lineNum">     671 </span>        [<span class="branchCov" title="Branch 0 was taken 55073 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      55073 :     int ret = m_cursor-&gt;get(datKey, datValue, DB_NEXT);</span></a>
-<a name="672"><span class="lineNum">     672 </span>        [<span class="branchCov" title="Branch 0 was taken 541 times"> + </span><span class="branchCov" title="Branch 1 was taken 54532 times"> + </span>]:<span class="lineCov">      55073 :     if (ret == DB_NOTFOUND) {</span></a>
+<a name="669"><span class="lineNum">     669 </span>                :<span class="lineCov">     110194 :     SafeDbt datKey;</span></a>
+<a name="670"><span class="lineNum">     670 </span>        [<span class="branchCov" title="Branch 0 was taken 55097 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     110194 :     SafeDbt datValue;</span></a>
+<a name="671"><span class="lineNum">     671 </span>        [<span class="branchCov" title="Branch 0 was taken 55097 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      55097 :     int ret = m_cursor-&gt;get(datKey, datValue, DB_NEXT);</span></a>
+<a name="672"><span class="lineNum">     672 </span>        [<span class="branchCov" title="Branch 0 was taken 541 times"> + </span><span class="branchCov" title="Branch 1 was taken 54556 times"> + </span>]:<span class="lineCov">      55097 :     if (ret == DB_NOTFOUND) {</span></a>
 <a name="673"><span class="lineNum">     673 </span>                :<span class="lineCov">        541 :         complete = true;</span></a>
 <a name="674"><span class="lineNum">     674 </span>                :            :     }</a>
-<a name="675"><span class="lineNum">     675 </span>        [<span class="branchCov" title="Branch 0 was taken 54532 times"> + </span><span class="branchCov" title="Branch 1 was taken 541 times"> + </span>]:<span class="lineCov">      55073 :     if (ret != 0)</span></a>
+<a name="675"><span class="lineNum">     675 </span>        [<span class="branchCov" title="Branch 0 was taken 54556 times"> + </span><span class="branchCov" title="Branch 1 was taken 541 times"> + </span>]:<span class="lineCov">      55097 :     if (ret != 0)</span></a>
 <a name="676"><span class="lineNum">     676 </span>                :            :         return false;</a>
-<a name="677"><span class="lineNum">     677 </span>  [<span class="branchCov" title="Branch 0 was taken 54532 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 54532 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      54532 :     else if (datKey.get_data() == nullptr || datValue.get_data() == nullptr)</span></a>
+<a name="677"><span class="lineNum">     677 </span>  [<span class="branchCov" title="Branch 0 was taken 54556 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 54556 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      54556 :     else if (datKey.get_data() == nullptr || datValue.get_data() == nullptr)</span></a>
 <a name="678"><span class="lineNum">     678 </span>                :            :         return false;</a>
 <a name="679"><span class="lineNum">     679 </span>                :            : </a>
 <a name="680"><span class="lineNum">     680 </span>                :            :     // Convert to streams</a>
-<a name="681"><span class="lineNum">     681 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 54532 times"> + </span>]:<span class="lineCov">      54532 :     ssKey.SetType(SER_DISK);</span></a>
-<a name="682"><span class="lineNum">     682 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 54532 times"> + </span>]:<span class="lineCov">      54532 :     ssKey.clear();</span></a>
-<a name="683"><span class="lineNum">     683 </span>        [<span class="branchCov" title="Branch 0 was taken 54532 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      54532 :     ssKey.write((char*)datKey.get_data(), datKey.get_size());</span></a>
-<a name="684"><span class="lineNum">     684 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 54532 times"> + </span>]:<span class="lineCov">      54532 :     ssValue.SetType(SER_DISK);</span></a>
-<a name="685"><span class="lineNum">     685 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 54532 times"> + </span>]:<span class="lineCov">      54532 :     ssValue.clear();</span></a>
-<a name="686"><span class="lineNum">     686 </span>        [<span class="branchCov" title="Branch 0 was taken 54532 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      54532 :     ssValue.write((char*)datValue.get_data(), datValue.get_size());</span></a>
+<a name="681"><span class="lineNum">     681 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 54556 times"> + </span>]:<span class="lineCov">      54556 :     ssKey.SetType(SER_DISK);</span></a>
+<a name="682"><span class="lineNum">     682 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 54556 times"> + </span>]:<span class="lineCov">      54556 :     ssKey.clear();</span></a>
+<a name="683"><span class="lineNum">     683 </span>        [<span class="branchCov" title="Branch 0 was taken 54556 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      54556 :     ssKey.write((char*)datKey.get_data(), datKey.get_size());</span></a>
+<a name="684"><span class="lineNum">     684 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 54556 times"> + </span>]:<span class="lineCov">      54556 :     ssValue.SetType(SER_DISK);</span></a>
+<a name="685"><span class="lineNum">     685 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 54556 times"> + </span>]:<span class="lineCov">      54556 :     ssValue.clear();</span></a>
+<a name="686"><span class="lineNum">     686 </span>        [<span class="branchCov" title="Branch 0 was taken 54556 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      54556 :     ssValue.write((char*)datValue.get_data(), datValue.get_size());</span></a>
 <a name="687"><span class="lineNum">     687 </span>                :            :     return true;</a>
 <a name="688"><span class="lineNum">     688 </span>                :            : }</a>
 <a name="689"><span class="lineNum">     689 </span>                :            : </a>
-<a name="690"><span class="lineNum">     690 </span>                :<span class="lineCov">     122116 : void BerkeleyBatch::CloseCursor()</span></a>
+<a name="690"><span class="lineNum">     690 </span>                :<span class="lineCov">     122605 : void BerkeleyBatch::CloseCursor()</span></a>
 <a name="691"><span class="lineNum">     691 </span>                :            : {</a>
-<a name="692"><span class="lineNum">     692 </span>        [<span class="branchCov" title="Branch 0 was taken 541 times"> + </span><span class="branchCov" title="Branch 1 was taken 121575 times"> + </span>]:<span class="lineCov">     122116 :     if (!m_cursor) return;</span></a>
+<a name="692"><span class="lineNum">     692 </span>        [<span class="branchCov" title="Branch 0 was taken 541 times"> + </span><span class="branchCov" title="Branch 1 was taken 122064 times"> + </span>]:<span class="lineCov">     122605 :     if (!m_cursor) return;</span></a>
 <a name="693"><span class="lineNum">     693 </span>                :<span class="lineCov">        541 :     m_cursor-&gt;close();</span></a>
 <a name="694"><span class="lineNum">     694 </span>                :<span class="lineCov">        541 :     m_cursor = nullptr;</span></a>
 <a name="695"><span class="lineNum">     695 </span>                :            : }</a>
@@ -840,15 +840,15 @@
 <a name="723"><span class="lineNum">     723 </span>                :<span class="lineCov">          3 :     return (ret == 0);</span></a>
 <a name="724"><span class="lineNum">     724 </span>                :            : }</a>
 <a name="725"><span class="lineNum">     725 </span>                :            : </a>
-<a name="726"><span class="lineNum">     726 </span>                :<span class="lineCov">       1152 : bool BerkeleyDatabaseSanityCheck()</span></a>
+<a name="726"><span class="lineNum">     726 </span>                :<span class="lineCov">       1154 : bool BerkeleyDatabaseSanityCheck()</span></a>
 <a name="727"><span class="lineNum">     727 </span>                :            : {</a>
-<a name="728"><span class="lineNum">     728 </span>                :<span class="lineCov">       1152 :     int major, minor;</span></a>
-<a name="729"><span class="lineNum">     729 </span>                :<span class="lineCov">       1152 :     DbEnv::version(&amp;major, &amp;minor, nullptr);</span></a>
+<a name="728"><span class="lineNum">     728 </span>                :<span class="lineCov">       1154 :     int major, minor;</span></a>
+<a name="729"><span class="lineNum">     729 </span>                :<span class="lineCov">       1154 :     DbEnv::version(&amp;major, &amp;minor, nullptr);</span></a>
 <a name="730"><span class="lineNum">     730 </span>                :            : </a>
 <a name="731"><span class="lineNum">     731 </span>                :            :     /* If the major version differs, or the minor version of library is *older*</a>
 <a name="732"><span class="lineNum">     732 </span>                :            :      * than the header that was compiled against, flag an error.</a>
 <a name="733"><span class="lineNum">     733 </span>                :            :      */</a>
-<a name="734"><span class="lineNum">     734 </span>  [<span class="branchCov" title="Branch 0 was taken 1152 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1152 times"> + </span>]:<span class="lineCov">       1152 :     if (major != DB_VERSION_MAJOR || minor &lt; DB_VERSION_MINOR) {</span></a>
+<a name="734"><span class="lineNum">     734 </span>  [<span class="branchCov" title="Branch 0 was taken 1154 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 1154 times"> + </span>]:<span class="lineCov">       1154 :     if (major != DB_VERSION_MAJOR || minor &lt; DB_VERSION_MINOR) {</span></a>
 <a name="735"><span class="lineNum">     735 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         LogPrintf(&quot;BerkeleyDB database version conflict: header version is %d.%d, library version is %d.%d\n&quot;,</span></a>
 <a name="736"><span class="lineNum">     736 </span>                :            :             DB_VERSION_MAJOR, DB_VERSION_MINOR, major, minor);</a>
 <a name="737"><span class="lineNum">     737 </span>                :<span class="lineNoCov">          0 :         return false;</span></a>
@@ -862,81 +862,81 @@
 <a name="745"><span class="lineNum">     745 </span>                :<span class="lineCov">        525 :     return DbEnv::version(nullptr, nullptr, nullptr);</span></a>
 <a name="746"><span class="lineNum">     746 </span>                :            : }</a>
 <a name="747"><span class="lineNum">     747 </span>                :            : </a>
-<a name="748"><span class="lineNum">     748 </span>                :<span class="lineCov">      16110 : bool BerkeleyBatch::ReadKey(CDataStream&amp;&amp; key, CDataStream&amp; value)</span></a>
+<a name="748"><span class="lineNum">     748 </span>                :<span class="lineCov">      16218 : bool BerkeleyBatch::ReadKey(CDataStream&amp;&amp; key, CDataStream&amp; value)</span></a>
 <a name="749"><span class="lineNum">     749 </span>                :            : {</a>
-<a name="750"><span class="lineNum">     750 </span>        [<span class="branchCov" title="Branch 0 was taken 16110 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      16110 :     if (!pdb)</span></a>
+<a name="750"><span class="lineNum">     750 </span>        [<span class="branchCov" title="Branch 0 was taken 16218 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      16218 :     if (!pdb)</span></a>
 <a name="751"><span class="lineNum">     751 </span>                :            :         return false;</a>
 <a name="752"><span class="lineNum">     752 </span>                :            : </a>
-<a name="753"><span class="lineNum">     753 </span>                :<span class="lineCov">      32220 :     SafeDbt datKey(key.data(), key.size());</span></a>
+<a name="753"><span class="lineNum">     753 </span>                :<span class="lineCov">      32436 :     SafeDbt datKey(key.data(), key.size());</span></a>
 <a name="754"><span class="lineNum">     754 </span>                :            : </a>
-<a name="755"><span class="lineNum">     755 </span>        [<span class="branchCov" title="Branch 0 was taken 16110 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      32220 :     SafeDbt datValue;</span></a>
-<a name="756"><span class="lineNum">     756 </span>        [<span class="branchCov" title="Branch 0 was taken 16110 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      16110 :     int ret = pdb-&gt;get(activeTxn, datKey, datValue, 0);</span></a>
-<a name="757"><span class="lineNum">     757 </span>  [<span class="branchCov" title="Branch 0 was taken 15538 times"> + </span><span class="branchCov" title="Branch 1 was taken 572 times"> + </span><span class="branchCov" title="Branch 2 was taken 15538 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      16110 :     if (ret == 0 &amp;&amp; datValue.get_data() != nullptr) {</span></a>
-<a name="758"><span class="lineNum">     758 </span>        [<span class="branchCov" title="Branch 0 was taken 15538 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      15538 :         value.write((char*)datValue.get_data(), datValue.get_size());</span></a>
+<a name="755"><span class="lineNum">     755 </span>        [<span class="branchCov" title="Branch 0 was taken 16218 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      32436 :     SafeDbt datValue;</span></a>
+<a name="756"><span class="lineNum">     756 </span>        [<span class="branchCov" title="Branch 0 was taken 16218 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      16218 :     int ret = pdb-&gt;get(activeTxn, datKey, datValue, 0);</span></a>
+<a name="757"><span class="lineNum">     757 </span>  [<span class="branchCov" title="Branch 0 was taken 15646 times"> + </span><span class="branchCov" title="Branch 1 was taken 572 times"> + </span><span class="branchCov" title="Branch 2 was taken 15646 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      16218 :     if (ret == 0 &amp;&amp; datValue.get_data() != nullptr) {</span></a>
+<a name="758"><span class="lineNum">     758 </span>        [<span class="branchCov" title="Branch 0 was taken 15646 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      15646 :         value.write((char*)datValue.get_data(), datValue.get_size());</span></a>
 <a name="759"><span class="lineNum">     759 </span>                :            :         return true;</a>
 <a name="760"><span class="lineNum">     760 </span>                :            :     }</a>
 <a name="761"><span class="lineNum">     761 </span>                :            :     return false;</a>
 <a name="762"><span class="lineNum">     762 </span>                :            : }</a>
 <a name="763"><span class="lineNum">     763 </span>                :            : </a>
-<a name="764"><span class="lineNum">     764 </span>                :<span class="lineCov">     214196 : bool BerkeleyBatch::WriteKey(CDataStream&amp;&amp; key, CDataStream&amp;&amp; value, bool overwrite)</span></a>
+<a name="764"><span class="lineNum">     764 </span>                :<span class="lineCov">     214940 : bool BerkeleyBatch::WriteKey(CDataStream&amp;&amp; key, CDataStream&amp;&amp; value, bool overwrite)</span></a>
 <a name="765"><span class="lineNum">     765 </span>                :            : {</a>
-<a name="766"><span class="lineNum">     766 </span>        [<span class="branchCov" title="Branch 0 was taken 214196 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     214196 :     if (!pdb)</span></a>
+<a name="766"><span class="lineNum">     766 </span>        [<span class="branchCov" title="Branch 0 was taken 214940 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     214940 :     if (!pdb)</span></a>
 <a name="767"><span class="lineNum">     767 </span>                :            :         return false;</a>
-<a name="768"><span class="lineNum">     768 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 214196 times"> + </span>]:<span class="lineCov">     214196 :     if (fReadOnly)</span></a>
+<a name="768"><span class="lineNum">     768 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 214940 times"> + </span>]:<span class="lineCov">     214940 :     if (fReadOnly)</span></a>
 <a name="769"><span class="lineNum">     769 </span>                :<span class="lineNoCov">          0 :         assert(!&quot;Write called on database in read-only mode&quot;);</span></a>
 <a name="770"><span class="lineNum">     770 </span>                :            : </a>
-<a name="771"><span class="lineNum">     771 </span>                :<span class="lineCov">     428392 :     SafeDbt datKey(key.data(), key.size());</span></a>
+<a name="771"><span class="lineNum">     771 </span>                :<span class="lineCov">     429880 :     SafeDbt datKey(key.data(), key.size());</span></a>
 <a name="772"><span class="lineNum">     772 </span>                :            : </a>
-<a name="773"><span class="lineNum">     773 </span>        [<span class="branchCov" title="Branch 0 was taken 214196 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     214196 :     SafeDbt datValue(value.data(), value.size());</span></a>
+<a name="773"><span class="lineNum">     773 </span>        [<span class="branchCov" title="Branch 0 was taken 214940 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     214940 :     SafeDbt datValue(value.data(), value.size());</span></a>
 <a name="774"><span class="lineNum">     774 </span>                :            : </a>
-<a name="775"><span class="lineNum">     775 </span>  [<span class="branchCov" title="Branch 0 was taken 77631 times"> + </span><span class="branchCov" title="Branch 1 was taken 136565 times"> + </span><span class="branchCov" title="Branch 2 was taken 214196 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     291827 :     int ret = pdb-&gt;put(activeTxn, datKey, datValue, (overwrite ? 0 : DB_NOOVERWRITE));</span></a>
-<a name="776"><span class="lineNum">     776 </span>                :<span class="lineCov">     214196 :     return (ret == 0);</span></a>
+<a name="775"><span class="lineNum">     775 </span>  [<span class="branchCov" title="Branch 0 was taken 77997 times"> + </span><span class="branchCov" title="Branch 1 was taken 136943 times"> + </span><span class="branchCov" title="Branch 2 was taken 214940 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     292937 :     int ret = pdb-&gt;put(activeTxn, datKey, datValue, (overwrite ? 0 : DB_NOOVERWRITE));</span></a>
+<a name="776"><span class="lineNum">     776 </span>                :<span class="lineCov">     214940 :     return (ret == 0);</span></a>
 <a name="777"><span class="lineNum">     777 </span>                :            : }</a>
 <a name="778"><span class="lineNum">     778 </span>                :            : </a>
-<a name="779"><span class="lineNum">     779 </span>                :<span class="lineCov">      13617 : bool BerkeleyBatch::EraseKey(CDataStream&amp;&amp; key)</span></a>
+<a name="779"><span class="lineNum">     779 </span>                :<span class="lineCov">      13725 : bool BerkeleyBatch::EraseKey(CDataStream&amp;&amp; key)</span></a>
 <a name="780"><span class="lineNum">     780 </span>                :            : {</a>
-<a name="781"><span class="lineNum">     781 </span>        [<span class="branchCov" title="Branch 0 was taken 13617 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      13617 :     if (!pdb)</span></a>
+<a name="781"><span class="lineNum">     781 </span>        [<span class="branchCov" title="Branch 0 was taken 13725 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      13725 :     if (!pdb)</span></a>
 <a name="782"><span class="lineNum">     782 </span>                :            :         return false;</a>
-<a name="783"><span class="lineNum">     783 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 13617 times"> + </span>]:<span class="lineCov">      13617 :     if (fReadOnly)</span></a>
+<a name="783"><span class="lineNum">     783 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 13725 times"> + </span>]:<span class="lineCov">      13725 :     if (fReadOnly)</span></a>
 <a name="784"><span class="lineNum">     784 </span>                :<span class="lineNoCov">          0 :         assert(!&quot;Erase called on database in read-only mode&quot;);</span></a>
 <a name="785"><span class="lineNum">     785 </span>                :            : </a>
-<a name="786"><span class="lineNum">     786 </span>                :<span class="lineCov">      13617 :     SafeDbt datKey(key.data(), key.size());</span></a>
+<a name="786"><span class="lineNum">     786 </span>                :<span class="lineCov">      13725 :     SafeDbt datKey(key.data(), key.size());</span></a>
 <a name="787"><span class="lineNum">     787 </span>                :            : </a>
-<a name="788"><span class="lineNum">     788 </span>        [<span class="branchCov" title="Branch 0 was taken 13617 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      13617 :     int ret = pdb-&gt;del(activeTxn, datKey, 0);</span></a>
-<a name="789"><span class="lineNum">     789 </span>                :<span class="lineCov">      13617 :     return (ret == 0 || ret == DB_NOTFOUND);</span></a>
+<a name="788"><span class="lineNum">     788 </span>        [<span class="branchCov" title="Branch 0 was taken 13725 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      13725 :     int ret = pdb-&gt;del(activeTxn, datKey, 0);</span></a>
+<a name="789"><span class="lineNum">     789 </span>                :<span class="lineCov">      13725 :     return (ret == 0 || ret == DB_NOTFOUND);</span></a>
 <a name="790"><span class="lineNum">     790 </span>                :            : }</a>
 <a name="791"><span class="lineNum">     791 </span>                :            : </a>
-<a name="792"><span class="lineNum">     792 </span>                :<span class="lineCov">     121575 : bool BerkeleyBatch::HasKey(CDataStream&amp;&amp; key)</span></a>
+<a name="792"><span class="lineNum">     792 </span>                :<span class="lineCov">     122064 : bool BerkeleyBatch::HasKey(CDataStream&amp;&amp; key)</span></a>
 <a name="793"><span class="lineNum">     793 </span>                :            : {</a>
-<a name="794"><span class="lineNum">     794 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121575 :     if (!pdb)</span></a>
+<a name="794"><span class="lineNum">     794 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122064 :     if (!pdb)</span></a>
 <a name="795"><span class="lineNum">     795 </span>                :            :         return false;</a>
 <a name="796"><span class="lineNum">     796 </span>                :            : </a>
-<a name="797"><span class="lineNum">     797 </span>                :<span class="lineCov">     121575 :     SafeDbt datKey(key.data(), key.size());</span></a>
+<a name="797"><span class="lineNum">     797 </span>                :<span class="lineCov">     122064 :     SafeDbt datKey(key.data(), key.size());</span></a>
 <a name="798"><span class="lineNum">     798 </span>                :            : </a>
-<a name="799"><span class="lineNum">     799 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121575 :     int ret = pdb-&gt;exists(activeTxn, datKey, 0);</span></a>
-<a name="800"><span class="lineNum">     800 </span>                :<span class="lineCov">     121575 :     return ret == 0;</span></a>
+<a name="799"><span class="lineNum">     799 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122064 :     int ret = pdb-&gt;exists(activeTxn, datKey, 0);</span></a>
+<a name="800"><span class="lineNum">     800 </span>                :<span class="lineCov">     122064 :     return ret == 0;</span></a>
 <a name="801"><span class="lineNum">     801 </span>                :            : }</a>
 <a name="802"><span class="lineNum">     802 </span>                :            : </a>
-<a name="803"><span class="lineNum">     803 </span>                :<span class="lineCov">     121581 : void BerkeleyDatabase::AddRef()</span></a>
+<a name="803"><span class="lineNum">     803 </span>                :<span class="lineCov">     122070 : void BerkeleyDatabase::AddRef()</span></a>
 <a name="804"><span class="lineNum">     804 </span>                :            : {</a>
-<a name="805"><span class="lineNum">     805 </span>                :<span class="lineCov">     121581 :     LOCK(cs_db);</span></a>
-<a name="806"><span class="lineNum">     806 </span>        [<span class="branchCov" title="Branch 0 was taken 296 times"> + </span><span class="branchCov" title="Branch 1 was taken 121285 times"> + </span>]:<span class="lineCov">     121581 :     if (m_refcount &lt; 0) {</span></a>
-<a name="807"><span class="lineNum">     807 </span>                :<span class="lineCov">        296 :         m_refcount = 1;</span></a>
+<a name="805"><span class="lineNum">     805 </span>                :<span class="lineCov">     122070 :     LOCK(cs_db);</span></a>
+<a name="806"><span class="lineNum">     806 </span>        [<span class="branchCov" title="Branch 0 was taken 239 times"> + </span><span class="branchCov" title="Branch 1 was taken 121831 times"> + </span>]:<span class="lineCov">     122070 :     if (m_refcount &lt; 0) {</span></a>
+<a name="807"><span class="lineNum">     807 </span>                :<span class="lineCov">        239 :         m_refcount = 1;</span></a>
 <a name="808"><span class="lineNum">     808 </span>                :            :     } else {</a>
-<a name="809"><span class="lineNum">     809 </span>        [<span class="branchCov" title="Branch 0 was taken 121581 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121581 :         m_refcount++;</span></a>
+<a name="809"><span class="lineNum">     809 </span>        [<span class="branchCov" title="Branch 0 was taken 122070 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122070 :         m_refcount++;</span></a>
 <a name="810"><span class="lineNum">     810 </span>                :            :     }</a>
-<a name="811"><span class="lineNum">     811 </span>                :<span class="lineCov">     121581 : }</span></a>
+<a name="811"><span class="lineNum">     811 </span>                :<span class="lineCov">     122070 : }</span></a>
 <a name="812"><span class="lineNum">     812 </span>                :            : </a>
-<a name="813"><span class="lineNum">     813 </span>                :<span class="lineCov">     121575 : void BerkeleyDatabase::RemoveRef()</span></a>
+<a name="813"><span class="lineNum">     813 </span>                :<span class="lineCov">     122064 : void BerkeleyDatabase::RemoveRef()</span></a>
 <a name="814"><span class="lineNum">     814 </span>                :            : {</a>
-<a name="815"><span class="lineNum">     815 </span>                :<span class="lineCov">     121575 :     LOCK(cs_db);</span></a>
-<a name="816"><span class="lineNum">     816 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121575 :     m_refcount--;</span></a>
-<a name="817"><span class="lineNum">     817 </span>        [<span class="branchCov" title="Branch 0 was taken 121575 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     121575 :     if (env) env-&gt;m_db_in_use.notify_all();</span></a>
-<a name="818"><span class="lineNum">     818 </span>                :<span class="lineCov">     121575 : }</span></a>
+<a name="815"><span class="lineNum">     815 </span>                :<span class="lineCov">     122064 :     LOCK(cs_db);</span></a>
+<a name="816"><span class="lineNum">     816 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122064 :     m_refcount--;</span></a>
+<a name="817"><span class="lineNum">     817 </span>        [<span class="branchCov" title="Branch 0 was taken 122064 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     122064 :     if (env) env-&gt;m_db_in_use.notify_all();</span></a>
+<a name="818"><span class="lineNum">     818 </span>                :<span class="lineCov">     122064 : }</span></a>
 <a name="819"><span class="lineNum">     819 </span>                :            : </a>
-<a name="820"><span class="lineNum">     820 </span>                :<span class="lineCov">     121565 : std::unique_ptr&lt;DatabaseBatch&gt; BerkeleyDatabase::MakeBatch(bool flush_on_close)</span></a>
+<a name="820"><span class="lineNum">     820 </span>                :<span class="lineCov">     122054 : std::unique_ptr&lt;DatabaseBatch&gt; BerkeleyDatabase::MakeBatch(bool flush_on_close)</span></a>
 <a name="821"><span class="lineNum">     821 </span>                :            : {</a>
-<a name="822"><span class="lineNum">     822 </span>                :<span class="lineCov">     121565 :     return std::make_unique&lt;BerkeleyBatch&gt;(*this, false, flush_on_close);</span></a>
+<a name="822"><span class="lineNum">     822 </span>                :<span class="lineCov">     122054 :     return std::make_unique&lt;BerkeleyBatch&gt;(*this, false, flush_on_close);</span></a>
 <a name="823"><span class="lineNum">     823 </span>                :            : }</a>
 <a name="824"><span class="lineNum">     824 </span>                :            : </a>
 <a name="825"><span class="lineNum">     825 </span>                :<span class="lineCov">        630 : std::unique_ptr&lt;BerkeleyDatabase&gt; MakeBerkeleyDatabase(const fs::path&amp; path, const DatabaseOptions&amp; options, DatabaseStatus&amp; status, bilingual_str&amp; error)</span></a>

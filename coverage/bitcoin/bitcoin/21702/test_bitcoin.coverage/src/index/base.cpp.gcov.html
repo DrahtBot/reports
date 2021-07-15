@@ -392,11 +392,11 @@
 <a name="309"><span class="lineNum">     309 </span>                :<span class="lineNoCov">          0 :     Commit();</span></a>
 <a name="310"><span class="lineNum">     310 </span>                :            : }</a>
 <a name="311"><span class="lineNum">     311 </span>                :            : </a>
-<a name="312"><span class="lineNum">     312 </span>                :<span class="lineCov">         55 : bool BaseIndex::BlockUntilSyncedToCurrentChain() const</span></a>
+<a name="312"><span class="lineNum">     312 </span>                :<span class="lineCov">         56 : bool BaseIndex::BlockUntilSyncedToCurrentChain() const</span></a>
 <a name="313"><span class="lineNum">     313 </span>                :            : {</a>
-<a name="314"><span class="lineNum">     314 </span>                :<span class="lineCov">         55 :     AssertLockNotHeld(cs_main);</span></a>
+<a name="314"><span class="lineNum">     314 </span>                :<span class="lineCov">         56 :     AssertLockNotHeld(cs_main);</span></a>
 <a name="315"><span class="lineNum">     315 </span>                :            : </a>
-<a name="316"><span class="lineNum">     316 </span>        [<span class="branchCov" title="Branch 0 was taken 27 times"> + </span><span class="branchCov" title="Branch 1 was taken 28 times"> + </span>]:<span class="lineCov">         55 :     if (!m_synced) {</span></a>
+<a name="316"><span class="lineNum">     316 </span>        [<span class="branchCov" title="Branch 0 was taken 27 times"> + </span><span class="branchCov" title="Branch 1 was taken 29 times"> + </span>]:<span class="lineCov">         56 :     if (!m_synced) {</span></a>
 <a name="317"><span class="lineNum">     317 </span>                :            :         return false;</a>
 <a name="318"><span class="lineNum">     318 </span>                :            :     }</a>
 <a name="319"><span class="lineNum">     319 </span>                :            : </a>
@@ -406,14 +406,14 @@
 <a name="323"><span class="lineNum">     323 </span>                :<span class="lineCov">         27 :         LOCK(cs_main);</span></a>
 <a name="324"><span class="lineNum">     324 </span>        [<span class="branchCov" title="Branch 0 was taken 27 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         27 :         const CBlockIndex* chain_tip = m_chainstate-&gt;m_chain.Tip();</span></a>
 <a name="325"><span class="lineNum">     325 </span>        [<span class="branchCov" title="Branch 0 was taken 27 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         27 :         const CBlockIndex* best_block_index = m_best_block_index.load();</span></a>
-<a name="326"><span class="lineNum">     326 </span>  [<span class="branchCov" title="Branch 0 was taken 27 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 23 times"> + </span><span class="branchCov" title="Branch 3 was taken 4 times"> + </span>]:<span class="lineCov">         27 :         if (best_block_index-&gt;GetAncestor(chain_tip-&gt;nHeight) == chain_tip) {</span></a>
-<a name="327"><span class="lineNum">     327 </span>        [<span class="branchCov" title="Branch 0 was taken 23 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         78 :             return true;</span></a>
+<a name="326"><span class="lineNum">     326 </span>  [<span class="branchCov" title="Branch 0 was taken 27 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 20 times"> + </span><span class="branchCov" title="Branch 3 was taken 7 times"> + </span>]:<span class="lineCov">         27 :         if (best_block_index-&gt;GetAncestor(chain_tip-&gt;nHeight) == chain_tip) {</span></a>
+<a name="327"><span class="lineNum">     327 </span>        [<span class="branchCov" title="Branch 0 was taken 20 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         76 :             return true;</span></a>
 <a name="328"><span class="lineNum">     328 </span>                :            :         }</a>
 <a name="329"><span class="lineNum">     329 </span>                :            :     }</a>
 <a name="330"><span class="lineNum">     330 </span>                :            : </a>
-<a name="331"><span class="lineNum">     331 </span>  [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          8 :     LogPrintf(&quot;%s: %s is catching up on block notifications\n&quot;, __func__, GetName());</span></a>
-<a name="332"><span class="lineNum">     332 </span>                :<span class="lineCov">          4 :     SyncWithValidationInterfaceQueue();</span></a>
-<a name="333"><span class="lineNum">     333 </span>                :<span class="lineCov">          4 :     return true;</span></a>
+<a name="331"><span class="lineNum">     331 </span>  [<span class="branchCov" title="Branch 0 was taken 7 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 7 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">         14 :     LogPrintf(&quot;%s: %s is catching up on block notifications\n&quot;, __func__, GetName());</span></a>
+<a name="332"><span class="lineNum">     332 </span>                :<span class="lineCov">          7 :     SyncWithValidationInterfaceQueue();</span></a>
+<a name="333"><span class="lineNum">     333 </span>                :<span class="lineCov">          7 :     return true;</span></a>
 <a name="334"><span class="lineNum">     334 </span>                :            : }</a>
 <a name="335"><span class="lineNum">     335 </span>                :            : </a>
 <a name="336"><span class="lineNum">     336 </span>                :<span class="lineCov">          7 : void BaseIndex::Interrupt()</span></a>

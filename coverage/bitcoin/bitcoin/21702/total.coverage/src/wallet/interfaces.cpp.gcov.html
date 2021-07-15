@@ -577,30 +577,30 @@
 <a name="499"><span class="lineNum">     499 </span>                :            : class WalletClientImpl : public WalletClient</a>
 <a name="500"><span class="lineNum">     500 </span>                :            : {</a>
 <a name="501"><span class="lineNum">     501 </span>                :            : public:</a>
-<a name="502"><span class="lineNum">     502 </span>                :<span class="lineCov">       1150 :     WalletClientImpl(Chain&amp; chain, ArgsManager&amp; args)</span></a>
-<a name="503"><span class="lineNum">     503 </span>        [<span class="branchCov" title="Branch 0 was taken 1150 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1150 :     {</span></a>
-<a name="504"><span class="lineNum">     504 </span>                :<span class="lineCov">       1150 :         m_context.chain = &amp;chain;</span></a>
-<a name="505"><span class="lineNum">     505 </span>                :<span class="lineCov">       1150 :         m_context.args = &amp;args;</span></a>
-<a name="506"><span class="lineNum">     506 </span>                :<span class="lineCov">       1150 :     }</span></a>
-<a name="507"><span class="lineNum">     507 </span>                :<span class="lineCov">       2298 :     ~WalletClientImpl() override { UnloadWallets(); }</span></a>
+<a name="502"><span class="lineNum">     502 </span>                :<span class="lineCov">       1152 :     WalletClientImpl(Chain&amp; chain, ArgsManager&amp; args)</span></a>
+<a name="503"><span class="lineNum">     503 </span>        [<span class="branchCov" title="Branch 0 was taken 1152 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       1152 :     {</span></a>
+<a name="504"><span class="lineNum">     504 </span>                :<span class="lineCov">       1152 :         m_context.chain = &amp;chain;</span></a>
+<a name="505"><span class="lineNum">     505 </span>                :<span class="lineCov">       1152 :         m_context.args = &amp;args;</span></a>
+<a name="506"><span class="lineNum">     506 </span>                :<span class="lineCov">       1152 :     }</span></a>
+<a name="507"><span class="lineNum">     507 </span>                :<span class="lineCov">       2302 :     ~WalletClientImpl() override { UnloadWallets(); }</span></a>
 <a name="508"><span class="lineNum">     508 </span>                :            : </a>
 <a name="509"><span class="lineNum">     509 </span>                :            :     //! ChainClient methods</a>
-<a name="510"><span class="lineNum">     510 </span>                :<span class="lineCov">        692 :     void registerRpcs() override</span></a>
+<a name="510"><span class="lineNum">     510 </span>                :<span class="lineCov">        693 :     void registerRpcs() override</span></a>
 <a name="511"><span class="lineNum">     511 </span>                :            :     {</a>
-<a name="512"><span class="lineNum">     512 </span>        [<span class="branchCov" title="Branch 0 was taken 42904 times"> + </span><span class="branchCov" title="Branch 1 was taken 692 times"> + </span>]:<span class="lineCov">      43596 :         for (const CRPCCommand&amp; command : GetWalletRPCCommands()) {</span></a>
-<a name="513"><span class="lineNum">     513 </span>                :<span class="lineCov">     122206 :             m_rpc_commands.emplace_back(command.category, command.name, [this, &amp;command](const JSONRPCRequest&amp; request, UniValue&amp; result, bool last_handler) {</span></a>
-<a name="514"><span class="lineNum">     514 </span>                :<span class="lineCov">      52868 :                 JSONRPCRequest wallet_request = request;</span></a>
-<a name="515"><span class="lineNum">     515 </span>                :<span class="lineCov">      26434 :                 wallet_request.context = &amp;m_context;</span></a>
-<a name="516"><span class="lineNum">     516 </span>        [<span class="branchCov" title="Branch 0 was taken 25116 times"> + </span><span class="branchCov" title="Branch 1 was taken 1318 times"> + </span>]:<span class="lineCov">      51550 :                 return command.actor(wallet_request, result, last_handler);</span></a>
-<a name="517"><span class="lineNum">     517 </span>                :<span class="lineCov">      42904 :             }, command.argNames, command.unique_id);</span></a>
-<a name="518"><span class="lineNum">     518 </span>        [<span class="branchCov" title="Branch 0 was taken 42904 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      42904 :             m_rpc_handlers.emplace_back(m_context.chain-&gt;handleRpc(m_rpc_commands.back()));</span></a>
+<a name="512"><span class="lineNum">     512 </span>        [<span class="branchCov" title="Branch 0 was taken 42966 times"> + </span><span class="branchCov" title="Branch 1 was taken 693 times"> + </span>]:<span class="lineCov">      43659 :         for (const CRPCCommand&amp; command : GetWalletRPCCommands()) {</span></a>
+<a name="513"><span class="lineNum">     513 </span>                :<span class="lineCov">     122520 :             m_rpc_commands.emplace_back(command.category, command.name, [this, &amp;command](const JSONRPCRequest&amp; request, UniValue&amp; result, bool last_handler) {</span></a>
+<a name="514"><span class="lineNum">     514 </span>                :<span class="lineCov">      53036 :                 JSONRPCRequest wallet_request = request;</span></a>
+<a name="515"><span class="lineNum">     515 </span>                :<span class="lineCov">      26518 :                 wallet_request.context = &amp;m_context;</span></a>
+<a name="516"><span class="lineNum">     516 </span>        [<span class="branchCov" title="Branch 0 was taken 25200 times"> + </span><span class="branchCov" title="Branch 1 was taken 1318 times"> + </span>]:<span class="lineCov">      51718 :                 return command.actor(wallet_request, result, last_handler);</span></a>
+<a name="517"><span class="lineNum">     517 </span>                :<span class="lineCov">      42966 :             }, command.argNames, command.unique_id);</span></a>
+<a name="518"><span class="lineNum">     518 </span>        [<span class="branchCov" title="Branch 0 was taken 42966 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      42966 :             m_rpc_handlers.emplace_back(m_context.chain-&gt;handleRpc(m_rpc_commands.back()));</span></a>
 <a name="519"><span class="lineNum">     519 </span>                :            :         }</a>
-<a name="520"><span class="lineNum">     520 </span>                :<span class="lineCov">        692 :     }</span></a>
-<a name="521"><span class="lineNum">     521 </span>                :<span class="lineCov">        687 :     bool verify() override { return VerifyWallets(*m_context.chain); }</span></a>
-<a name="522"><span class="lineNum">     522 </span>                :<span class="lineCov">        645 :     bool load() override { return LoadWallets(*m_context.chain); }</span></a>
-<a name="523"><span class="lineNum">     523 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 640 times"> + </span>]:<span class="lineCov">       1280 :     void start(CScheduler&amp; scheduler) override { return StartWallets(scheduler, *Assert(m_context.args)); }</span></a>
-<a name="524"><span class="lineNum">     524 </span>                :<span class="lineCov">        685 :     void flush() override { return FlushWallets(); }</span></a>
-<a name="525"><span class="lineNum">     525 </span>                :<span class="lineCov">        685 :     void stop() override { return StopWallets(); }</span></a>
+<a name="520"><span class="lineNum">     520 </span>                :<span class="lineCov">        693 :     }</span></a>
+<a name="521"><span class="lineNum">     521 </span>                :<span class="lineCov">        688 :     bool verify() override { return VerifyWallets(*m_context.chain); }</span></a>
+<a name="522"><span class="lineNum">     522 </span>                :<span class="lineCov">        646 :     bool load() override { return LoadWallets(*m_context.chain); }</span></a>
+<a name="523"><span class="lineNum">     523 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 641 times"> + </span>]:<span class="lineCov">       1282 :     void start(CScheduler&amp; scheduler) override { return StartWallets(scheduler, *Assert(m_context.args)); }</span></a>
+<a name="524"><span class="lineNum">     524 </span>                :<span class="lineCov">        686 :     void flush() override { return FlushWallets(); }</span></a>
+<a name="525"><span class="lineNum">     525 </span>                :<span class="lineCov">        686 :     void stop() override { return StopWallets(); }</span></a>
 <a name="526"><span class="lineNum">     526 </span>                :<span class="lineCov">        510 :     void setMockTime(int64_t time) override { return SetMockTime(time); }</span></a>
 <a name="527"><span class="lineNum">     527 </span>                :            : </a>
 <a name="528"><span class="lineNum">     528 </span>                :            :     //! WalletClient methods</a>
@@ -658,9 +658,9 @@
 <a name="579"><span class="lineNum">     579 </span>                :            : namespace interfaces {</a>
 <a name="580"><span class="lineNum">     580 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 : std::unique_ptr&lt;Wallet&gt; MakeWallet(const std::shared_ptr&lt;CWallet&gt;&amp; wallet) { return wallet ? std::make_unique&lt;wallet::WalletImpl&gt;(wallet) : nullptr; }</span></a>
 <a name="581"><span class="lineNum">     581 </span>                :            : </a>
-<a name="582"><span class="lineNum">     582 </span>                :<span class="lineCov">       1150 : std::unique_ptr&lt;WalletClient&gt; MakeWalletClient(Chain&amp; chain, ArgsManager&amp; args)</span></a>
+<a name="582"><span class="lineNum">     582 </span>                :<span class="lineCov">       1152 : std::unique_ptr&lt;WalletClient&gt; MakeWalletClient(Chain&amp; chain, ArgsManager&amp; args)</span></a>
 <a name="583"><span class="lineNum">     583 </span>                :            : {</a>
-<a name="584"><span class="lineNum">     584 </span>                :<span class="lineCov">       1150 :     return std::make_unique&lt;wallet::WalletClientImpl&gt;(chain, args);</span></a>
+<a name="584"><span class="lineNum">     584 </span>                :<span class="lineCov">       1152 :     return std::make_unique&lt;wallet::WalletClientImpl&gt;(chain, args);</span></a>
 <a name="585"><span class="lineNum">     585 </span>                :            : }</a>
 <a name="586"><span class="lineNum">     586 </span>                :            : } // namespace interfaces</a>
 </pre>

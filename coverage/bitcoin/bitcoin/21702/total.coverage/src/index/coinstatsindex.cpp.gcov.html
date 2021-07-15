@@ -89,7 +89,7 @@
 <a name="18"><span class="lineNum">      18 </span>                :            : </a>
 <a name="19"><span class="lineNum">      19 </span>                :            : namespace {</a>
 <a name="20"><span class="lineNum">      20 </span>                :            : </a>
-<a name="21"><span class="lineNum">      21 </span>                :<span class="lineCov">       1257 : struct DBVal {</span></a>
+<a name="21"><span class="lineNum">      21 </span>                :<span class="lineCov">       1250 : struct DBVal {</span></a>
 <a name="22"><span class="lineNum">      22 </span>                :            :     uint256 muhash;</a>
 <a name="23"><span class="lineNum">      23 </span>                :            :     uint64_t transaction_output_count;</a>
 <a name="24"><span class="lineNum">      24 </span>                :            :     uint64_t bogo_size;</a>
@@ -129,11 +129,11 @@
 <span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 548 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
 <a name="58"><span class="lineNum">      58 </span>                :            : </a>
 <a name="59"><span class="lineNum">      59 </span>                :            :     template &lt;typename Stream&gt;</a>
-<a name="60"><span class="lineNum">      60 </span>                :<span class="lineCov">       1240 :     void Serialize(Stream&amp; s) const</span></a>
+<a name="60"><span class="lineNum">      60 </span>                :<span class="lineCov">       1233 :     void Serialize(Stream&amp; s) const</span></a>
 <a name="61"><span class="lineNum">      61 </span>                :            :     {</a>
-<a name="62"><span class="lineNum">      62 </span>                :<span class="lineCov">       1240 :         ser_writedata8(s, DB_BLOCK_HEIGHT);</span></a>
-<a name="63"><span class="lineNum">      63 </span>                :<span class="lineCov">       1240 :         ser_writedata32be(s, height);</span></a>
-<a name="64"><span class="lineNum">      64 </span>                :<span class="lineCov">       1240 :     }</span></a>
+<a name="62"><span class="lineNum">      62 </span>                :<span class="lineCov">       1233 :         ser_writedata8(s, DB_BLOCK_HEIGHT);</span></a>
+<a name="63"><span class="lineNum">      63 </span>                :<span class="lineCov">       1233 :         ser_writedata32be(s, height);</span></a>
+<a name="64"><span class="lineNum">      64 </span>                :<span class="lineCov">       1233 :     }</span></a>
 <a name="65"><span class="lineNum">      65 </span>                :            : </a>
 <a name="66"><span class="lineNum">      66 </span>                :            :     template &lt;typename Stream&gt;</a>
 <a name="67"><span class="lineNum">      67 </span>                :<span class="lineCov">         19 :     void Unserialize(Stream&amp; s)</span></a>
@@ -363,13 +363,13 @@
 <a name="286"><span class="lineNum">     286 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :     return BaseIndex::Rewind(current_tip, new_tip);</span></a>
 <a name="287"><span class="lineNum">     287 </span>                :            : }</a>
 <a name="288"><span class="lineNum">     288 </span>                :            : </a>
-<a name="289"><span class="lineNum">     289 </span>                :<span class="lineCov">        129 : static bool LookUpOne(const CDBWrapper&amp; db, const CBlockIndex* block_index, DBVal&amp; result)</span></a>
+<a name="289"><span class="lineNum">     289 </span>                :<span class="lineCov">        122 : static bool LookUpOne(const CDBWrapper&amp; db, const CBlockIndex* block_index, DBVal&amp; result)</span></a>
 <a name="290"><span class="lineNum">     290 </span>                :            : {</a>
 <a name="291"><span class="lineNum">     291 </span>                :            :     // First check if the result is stored under the height index and the value</a>
 <a name="292"><span class="lineNum">     292 </span>                :            :     // there matches the block hash. This should be the case if the block is on</a>
 <a name="293"><span class="lineNum">     293 </span>                :            :     // the active chain.</a>
-<a name="294"><span class="lineNum">     294 </span>                :<span class="lineCov">        129 :     std::pair&lt;uint256, DBVal&gt; read_out;</span></a>
-<a name="295"><span class="lineNum">     295 </span>        [<span class="branchCov" title="Branch 0 was taken 69 times"> + </span><span class="branchCov" title="Branch 1 was taken 60 times"> + </span>]:<span class="lineCov">        129 :     if (!db.Read(DBHeightKey(block_index-&gt;nHeight), read_out)) {</span></a>
+<a name="294"><span class="lineNum">     294 </span>                :<span class="lineCov">        122 :     std::pair&lt;uint256, DBVal&gt; read_out;</span></a>
+<a name="295"><span class="lineNum">     295 </span>        [<span class="branchCov" title="Branch 0 was taken 69 times"> + </span><span class="branchCov" title="Branch 1 was taken 53 times"> + </span>]:<span class="lineCov">        122 :     if (!db.Read(DBHeightKey(block_index-&gt;nHeight), read_out)) {</span></a>
 <a name="296"><span class="lineNum">     296 </span>                :            :         return false;</a>
 <a name="297"><span class="lineNum">     297 </span>                :            :     }</a>
 <a name="298"><span class="lineNum">     298 </span>        [<span class="branchCov" title="Branch 0 was taken 64 times"> + </span><span class="branchCov" title="Branch 1 was taken 5 times"> + </span>]:<span class="lineCov">         69 :     if (read_out.first == block_index-&gt;GetBlockHash()) {</span></a>
@@ -382,10 +382,10 @@
 <a name="305"><span class="lineNum">     305 </span>                :<span class="lineCov">          5 :     return db.Read(DBHashKey(block_index-&gt;GetBlockHash()), result);</span></a>
 <a name="306"><span class="lineNum">     306 </span>                :            : }</a>
 <a name="307"><span class="lineNum">     307 </span>                :            : </a>
-<a name="308"><span class="lineNum">     308 </span>                :<span class="lineCov">        128 : bool CoinStatsIndex::LookUpStats(const CBlockIndex* block_index, CCoinsStats&amp; coins_stats) const</span></a>
+<a name="308"><span class="lineNum">     308 </span>                :<span class="lineCov">        121 : bool CoinStatsIndex::LookUpStats(const CBlockIndex* block_index, CCoinsStats&amp; coins_stats) const</span></a>
 <a name="309"><span class="lineNum">     309 </span>                :            : {</a>
-<a name="310"><span class="lineNum">     310 </span>                :<span class="lineCov">        128 :     DBVal entry;</span></a>
-<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 65 times"> + </span><span class="branchCov" title="Branch 1 was taken 63 times"> + </span>]:<span class="lineCov">        128 :     if (!LookUpOne(*m_db, block_index, entry)) {</span></a>
+<a name="310"><span class="lineNum">     310 </span>                :<span class="lineCov">        121 :     DBVal entry;</span></a>
+<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 65 times"> + </span><span class="branchCov" title="Branch 1 was taken 56 times"> + </span>]:<span class="lineCov">        121 :     if (!LookUpOne(*m_db, block_index, entry)) {</span></a>
 <a name="312"><span class="lineNum">     312 </span>                :            :         return false;</a>
 <a name="313"><span class="lineNum">     313 </span>                :            :     }</a>
 <a name="314"><span class="lineNum">     314 </span>                :            : </a>
