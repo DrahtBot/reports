@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-07-27 07:59:08</td>
+            <td class="headerValue">2021-07-27 08:37:56</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">132</td>
@@ -182,7 +182,7 @@
 <a name="111"><span class="lineNum">     111 </span>                :            :      * which is hard to implement without std::address_of.</a>
 <a name="112"><span class="lineNum">     112 </span>                :            :      */</a>
 <a name="113"><span class="lineNum">     113 </span>                :            :     template &lt;typename T, typename std::enable_if&lt;std::is_convertible&lt;T (*)[], C (*)[]&gt;::value, int&gt;::type = 0&gt;</a>
-<a name="114"><span class="lineNum">     114 </span>                :<span class="lineCov">   15074811 :     constexpr Span(T* begin, std::size_t size) noexcept : m_data(begin), m_size(size) {}</span></a>
+<a name="114"><span class="lineNum">     114 </span>                :<span class="lineCov">   15077780 :     constexpr Span(T* begin, std::size_t size) noexcept : m_data(begin), m_size(size) {}</span></a>
 <a name="115"><span class="lineNum">     115 </span>                :            : </a>
 <a name="116"><span class="lineNum">     116 </span>                :            :     /** Construct a span from a begin and end pointer.</a>
 <a name="117"><span class="lineNum">     117 </span>                :            :      *</a>
@@ -204,7 +204,7 @@
 <a name="133"><span class="lineNum">     133 </span>                :            :      *  For example this means that a Span&lt;T&gt; can be converted into a Span&lt;const T&gt;.</a>
 <a name="134"><span class="lineNum">     134 </span>                :            :      */</a>
 <a name="135"><span class="lineNum">     135 </span>                :            :     template &lt;typename O, typename std::enable_if&lt;std::is_convertible&lt;O (*)[], C (*)[]&gt;::value, int&gt;::type = 0&gt;</a>
-<a name="136"><span class="lineNum">     136 </span>                :<span class="lineCov">      48565 :     constexpr Span(const Span&lt;O&gt;&amp; other) noexcept : m_data(other.m_data), m_size(other.m_size) {}</span></a>
+<a name="136"><span class="lineNum">     136 </span>                :<span class="lineCov">      48468 :     constexpr Span(const Span&lt;O&gt;&amp; other) noexcept : m_data(other.m_data), m_size(other.m_size) {}</span></a>
 <a name="137"><span class="lineNum">     137 </span>                :            : </a>
 <a name="138"><span class="lineNum">     138 </span>                :            :     /** Default copy constructor. */</a>
 <a name="139"><span class="lineNum">     139 </span>                :            :     constexpr Span(const Span&amp;) noexcept = default;</a>
@@ -214,7 +214,7 @@
 <a name="143"><span class="lineNum">     143 </span>                :            : </a>
 <a name="144"><span class="lineNum">     144 </span>                :            :     /** Construct a Span from an array. This matches the corresponding C++20 std::span constructor. */</a>
 <a name="145"><span class="lineNum">     145 </span>                :            :     template &lt;int N&gt;</a>
-<a name="146"><span class="lineNum">     146 </span>                :<span class="lineCov">    4812045 :     constexpr Span(C (&amp;a)[N]) noexcept : m_data(a), m_size(N) {}</span></a>
+<a name="146"><span class="lineNum">     146 </span>                :<span class="lineCov">    4898801 :     constexpr Span(C (&amp;a)[N]) noexcept : m_data(a), m_size(N) {}</span></a>
 <a name="147"><span class="lineNum">     147 </span>                :            : </a>
 <a name="148"><span class="lineNum">     148 </span>                :            :     /** Construct a Span for objects with .data() and .size() (std::string, std::array, std::vector, ...).</a>
 <a name="149"><span class="lineNum">     149 </span>                :            :      *</a>
@@ -224,22 +224,22 @@
 <a name="153"><span class="lineNum">     153 </span>                :            :      * Note that this restriction does not exist when converting arrays or other Spans (see above).</a>
 <a name="154"><span class="lineNum">     154 </span>                :            :      */</a>
 <a name="155"><span class="lineNum">     155 </span>                :            :     template &lt;typename V&gt;</a>
-<a name="156"><span class="lineNum">     156 </span>                :<span class="lineCov">   11431165 :     constexpr Span(V&amp; other SPAN_ATTR_LIFETIMEBOUND,</span></a>
+<a name="156"><span class="lineNum">     156 </span>                :<span class="lineCov">   11474665 :     constexpr Span(V&amp; other SPAN_ATTR_LIFETIMEBOUND,</span></a>
 <a name="157"><span class="lineNum">     157 </span>                :            :         typename std::enable_if&lt;!is_Span&lt;V&gt;::value &amp;&amp;</a>
 <a name="158"><span class="lineNum">     158 </span>                :            :                                 std::is_convertible&lt;typename std::remove_pointer&lt;decltype(std::declval&lt;V&amp;&gt;().data())&gt;::type (*)[], C (*)[]&gt;::value &amp;&amp;</a>
 <a name="159"><span class="lineNum">     159 </span>                :            :                                 std::is_convertible&lt;decltype(std::declval&lt;V&amp;&gt;().size()), std::size_t&gt;::value, std::nullptr_t&gt;::type = nullptr)</a>
-<a name="160"><span class="lineNum">     160 </span>                :<span class="lineCov">   11431165 :         : m_data(other.data()), m_size(other.size()){}</span></a>
+<a name="160"><span class="lineNum">     160 </span>                :<span class="lineCov">   11474665 :         : m_data(other.data()), m_size(other.size()){}</span></a>
 <a name="161"><span class="lineNum">     161 </span>                :            : </a>
 <a name="162"><span class="lineNum">     162 </span>                :            :     template &lt;typename V&gt;</a>
-<a name="163"><span class="lineNum">     163 </span>                :<span class="lineCov">   57281928 :     constexpr Span(const V&amp; other SPAN_ATTR_LIFETIMEBOUND,</span></a>
+<a name="163"><span class="lineNum">     163 </span>                :<span class="lineCov">   57535122 :     constexpr Span(const V&amp; other SPAN_ATTR_LIFETIMEBOUND,</span></a>
 <a name="164"><span class="lineNum">     164 </span>                :            :         typename std::enable_if&lt;!is_Span&lt;V&gt;::value &amp;&amp;</a>
 <a name="165"><span class="lineNum">     165 </span>                :            :                                 std::is_convertible&lt;typename std::remove_pointer&lt;decltype(std::declval&lt;const V&amp;&gt;().data())&gt;::type (*)[], C (*)[]&gt;::value &amp;&amp;</a>
 <a name="166"><span class="lineNum">     166 </span>                :            :                                 std::is_convertible&lt;decltype(std::declval&lt;const V&amp;&gt;().size()), std::size_t&gt;::value, std::nullptr_t&gt;::type = nullptr)</a>
-<a name="167"><span class="lineNum">     167 </span>                :<span class="lineCov">   57281928 :         : m_data(other.data()), m_size(other.size()){}</span></a>
+<a name="167"><span class="lineNum">     167 </span>                :<span class="lineCov">   57535122 :         : m_data(other.data()), m_size(other.size()){}</span></a>
 <a name="168"><span class="lineNum">     168 </span>                :            : </a>
-<a name="169"><span class="lineNum">     169 </span>                :<span class="lineCov">   83384425 :     constexpr C* data() const noexcept { return m_data; }</span></a>
-<a name="170"><span class="lineNum">     170 </span>                :<span class="lineCov">   40411525 :     constexpr C* begin() const noexcept { return m_data; }</span></a>
-<a name="171"><span class="lineNum">     171 </span>                :<span class="lineCov">  453917551 :     constexpr C* end() const noexcept { return m_data + m_size; }</span></a>
+<a name="169"><span class="lineNum">     169 </span>                :<span class="lineCov">   83936143 :     constexpr C* data() const noexcept { return m_data; }</span></a>
+<a name="170"><span class="lineNum">     170 </span>                :<span class="lineCov">   40753382 :     constexpr C* begin() const noexcept { return m_data; }</span></a>
+<a name="171"><span class="lineNum">     171 </span>                :<span class="lineCov">  454004070 :     constexpr C* end() const noexcept { return m_data + m_size; }</span></a>
 <a name="172"><span class="lineNum">     172 </span>                :<span class="lineCov">        207 :     CONSTEXPR_IF_NOT_DEBUG C&amp; front() const noexcept</span></a>
 <a name="173"><span class="lineNum">     173 </span>                :            :     {</a>
 <a name="174"><span class="lineNum">     174 </span>                :            :         ASSERT_IF_DEBUG(size() &gt; 0);</a>
@@ -250,7 +250,7 @@
 <a name="179"><span class="lineNum">     179 </span>                :            :         ASSERT_IF_DEBUG(size() &gt; 0);</a>
 <a name="180"><span class="lineNum">     180 </span>                :<span class="lineCov">       1750 :         return m_data[m_size - 1];</span></a>
 <a name="181"><span class="lineNum">     181 </span>                :            :     }</a>
-<a name="182"><span class="lineNum">     182 </span>                :<span class="lineCov">  181890122 :     constexpr std::size_t size() const noexcept { return m_size; }</span></a>
+<a name="182"><span class="lineNum">     182 </span>                :<span class="lineCov">  182532678 :     constexpr std::size_t size() const noexcept { return m_size; }</span></a>
 <a name="183"><span class="lineNum">     183 </span>                :<span class="lineCov">      14196 :     constexpr bool empty() const noexcept { return size() == 0; }</span></a>
 <a name="184"><span class="lineNum">     184 </span>                :<span class="lineCov">   21261297 :     CONSTEXPR_IF_NOT_DEBUG C&amp; operator[](std::size_t pos) const noexcept</span></a>
 <a name="185"><span class="lineNum">     185 </span>                :            :     {</a>
@@ -262,20 +262,20 @@
 <a name="191"><span class="lineNum">     191 </span>                :            :         ASSERT_IF_DEBUG(size() &gt;= offset);</a>
 <a name="192"><span class="lineNum">     192 </span>                :<span class="lineCov">    8777164 :         return Span&lt;C&gt;(m_data + offset, m_size - offset);</span></a>
 <a name="193"><span class="lineNum">     193 </span>                :            :     }</a>
-<a name="194"><span class="lineNum">     194 </span>                :<span class="lineCov">       7212 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; subspan(std::size_t offset, std::size_t count) const noexcept</span></a>
+<a name="194"><span class="lineNum">     194 </span>                :<span class="lineCov">       7419 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; subspan(std::size_t offset, std::size_t count) const noexcept</span></a>
 <a name="195"><span class="lineNum">     195 </span>                :            :     {</a>
 <a name="196"><span class="lineNum">     196 </span>                :            :         ASSERT_IF_DEBUG(size() &gt;= offset + count);</a>
-<a name="197"><span class="lineNum">     197 </span>                :<span class="lineCov">       7212 :         return Span&lt;C&gt;(m_data + offset, count);</span></a>
+<a name="197"><span class="lineNum">     197 </span>                :<span class="lineCov">       7419 :         return Span&lt;C&gt;(m_data + offset, count);</span></a>
 <a name="198"><span class="lineNum">     198 </span>                :            :     }</a>
 <a name="199"><span class="lineNum">     199 </span>                :<span class="lineCov">    2295484 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; first(std::size_t count) const noexcept</span></a>
 <a name="200"><span class="lineNum">     200 </span>                :            :     {</a>
 <a name="201"><span class="lineNum">     201 </span>                :            :         ASSERT_IF_DEBUG(size() &gt;= count);</a>
 <a name="202"><span class="lineNum">     202 </span>                :<span class="lineCov">    2295484 :         return Span&lt;C&gt;(m_data, count);</span></a>
 <a name="203"><span class="lineNum">     203 </span>                :            :     }</a>
-<a name="204"><span class="lineNum">     204 </span>                :<span class="lineCov">       5622 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; last(std::size_t count) const noexcept</span></a>
+<a name="204"><span class="lineNum">     204 </span>                :<span class="lineCov">       6015 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; last(std::size_t count) const noexcept</span></a>
 <a name="205"><span class="lineNum">     205 </span>                :            :     {</a>
 <a name="206"><span class="lineNum">     206 </span>                :            :          ASSERT_IF_DEBUG(size() &gt;= count);</a>
-<a name="207"><span class="lineNum">     207 </span>                :<span class="lineCov">       5622 :          return Span&lt;C&gt;(m_data + m_size - count, count);</span></a>
+<a name="207"><span class="lineNum">     207 </span>                :<span class="lineCov">       6015 :          return Span&lt;C&gt;(m_data + m_size - count, count);</span></a>
 <a name="208"><span class="lineNum">     208 </span>                :            :     }</a>
 <a name="209"><span class="lineNum">     209 </span>                :            : </a>
 <a name="210"><span class="lineNum">     210 </span>  [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     111687 :     friend constexpr bool operator==(const Span&amp; a, const Span&amp; b) noexcept { return a.size() == b.size() &amp;&amp; std::equal(a.begin(), a.end(), b.begin()); }</span></a>
@@ -294,7 +294,7 @@
 <a name="223"><span class="lineNum">     223 </span>                :            : /** MakeSpan for temporaries / rvalue references, only supporting const output. */</a>
 <a name="224"><span class="lineNum">     224 </span>                :<span class="lineCov">       9061 : template &lt;typename V&gt; constexpr auto MakeSpan(V&amp;&amp; v SPAN_ATTR_LIFETIMEBOUND) -&gt; typename std::enable_if&lt;!std::is_lvalue_reference&lt;V&gt;::value, Span&lt;const typename std::remove_pointer&lt;decltype(v.data())&gt;::type&gt;&gt;::type { return std::forward&lt;V&gt;(v); }</span></a>
 <a name="225"><span class="lineNum">     225 </span>                :            : /** MakeSpan for (lvalue) references, supporting mutable output. */</a>
-<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">    4936964 : template &lt;typename V&gt; constexpr auto MakeSpan(V&amp; v SPAN_ATTR_LIFETIMEBOUND) -&gt; Span&lt;typename std::remove_pointer&lt;decltype(v.data())&gt;::type&gt; { return v; }</span></a>
+<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">    4981020 : template &lt;typename V&gt; constexpr auto MakeSpan(V&amp; v SPAN_ATTR_LIFETIMEBOUND) -&gt; Span&lt;typename std::remove_pointer&lt;decltype(v.data())&gt;::type&gt; { return v; }</span></a>
 <a name="227"><span class="lineNum">     227 </span>                :            : </a>
 <a name="228"><span class="lineNum">     228 </span>                :            : /** Pop the last element off a span, and return a reference to that element. */</a>
 <a name="229"><span class="lineNum">     229 </span>                :            : template &lt;typename T&gt;</a>
@@ -308,16 +308,16 @@
 <a name="237"><span class="lineNum">     237 </span>                :            : }</a>
 <a name="238"><span class="lineNum">     238 </span>                :            : </a>
 <a name="239"><span class="lineNum">     239 </span>                :            : // Helper functions to safely cast to unsigned char pointers.</a>
-<a name="240"><span class="lineNum">     240 </span>                :<span class="lineCov">      14812 : inline unsigned char* UCharCast(char* c) { return (unsigned char*)c; }</span></a>
+<a name="240"><span class="lineNum">     240 </span>                :<span class="lineCov">      14715 : inline unsigned char* UCharCast(char* c) { return (unsigned char*)c; }</span></a>
 <a name="241"><span class="lineNum">     241 </span>                :<span class="lineCov">      36539 : inline unsigned char* UCharCast(unsigned char* c) { return c; }</span></a>
 <a name="242"><span class="lineNum">     242 </span>                :<span class="lineCov">      73586 : inline const unsigned char* UCharCast(const char* c) { return (unsigned char*)c; }</span></a>
-<a name="243"><span class="lineNum">     243 </span>                :<span class="lineCov">    2570828 : inline const unsigned char* UCharCast(const unsigned char* c) { return c; }</span></a>
+<a name="243"><span class="lineNum">     243 </span>                :<span class="lineCov">    2570670 : inline const unsigned char* UCharCast(const unsigned char* c) { return c; }</span></a>
 <a name="244"><span class="lineNum">     244 </span>                :            : </a>
 <a name="245"><span class="lineNum">     245 </span>                :            : // Helper function to safely convert a Span to a Span&lt;[const] unsigned char&gt;.</a>
-<a name="246"><span class="lineNum">     246 </span>                :<span class="lineCov">    2695765 : template &lt;typename T&gt; constexpr auto UCharSpanCast(Span&lt;T&gt; s) -&gt; Span&lt;typename std::remove_pointer&lt;decltype(UCharCast(s.data()))&gt;::type&gt; { return {UCharCast(s.data()), s.size()}; }</span></a>
+<a name="246"><span class="lineNum">     246 </span>                :<span class="lineCov">    2695510 : template &lt;typename T&gt; constexpr auto UCharSpanCast(Span&lt;T&gt; s) -&gt; Span&lt;typename std::remove_pointer&lt;decltype(UCharCast(s.data()))&gt;::type&gt; { return {UCharCast(s.data()), s.size()}; }</span></a>
 <a name="247"><span class="lineNum">     247 </span>                :            : </a>
 <a name="248"><span class="lineNum">     248 </span>                :            : /** Like MakeSpan, but for (const) unsigned char member types only. Only works for (un)signed char containers. */</a>
-<a name="249"><span class="lineNum">     249 </span>                :<span class="lineCov">    2695765 : template &lt;typename V&gt; constexpr auto MakeUCharSpan(V&amp;&amp; v) -&gt; decltype(UCharSpanCast(MakeSpan(std::forward&lt;V&gt;(v)))) { return UCharSpanCast(MakeSpan(std::forward&lt;V&gt;(v))); }</span></a>
+<a name="249"><span class="lineNum">     249 </span>                :<span class="lineCov">    2695510 : template &lt;typename V&gt; constexpr auto MakeUCharSpan(V&amp;&amp; v) -&gt; decltype(UCharSpanCast(MakeSpan(std::forward&lt;V&gt;(v)))) { return UCharSpanCast(MakeSpan(std::forward&lt;V&gt;(v))); }</span></a>
 <a name="250"><span class="lineNum">     250 </span>                :            : </a>
 <a name="251"><span class="lineNum">     251 </span>                :            : #endif</a>
 </pre>
