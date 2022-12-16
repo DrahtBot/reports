@@ -1,0 +1,565 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/univalue/lib/univalue_read.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/univalue/lib</a> - univalue_read.cpp<span style="font-size: 80%;"> (source / <a href="univalue_read.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">264</td>
+            <td class="headerCovTableEntry">275</td>
+            <td class="headerCovTableEntryHi">96.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2000-01-01 12:00:00</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">237</td>
+            <td class="headerCovTableEntry">300</td>
+            <td class="headerCovTableEntryMed">79.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright 2014 BitPay Inc.</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or https://opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : #include &lt;univalue.h&gt;</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #include &lt;univalue_utffilter.h&gt;</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #include &lt;cstdio&gt;</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;cstdint&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;cstring&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #include &lt;string&gt;</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : #include &lt;vector&gt;</a>
+<a name="13"><span class="lineNum">      13 </span>                :            : </a>
+<a name="14"><span class="lineNum">      14 </span>                :            : /*</a>
+<a name="15"><span class="lineNum">      15 </span>                :            :  * According to stackexchange, the original json test suite wanted</a>
+<a name="16"><span class="lineNum">      16 </span>                :            :  * to limit depth to 22.  Widely-deployed PHP bails at depth 512,</a>
+<a name="17"><span class="lineNum">      17 </span>                :            :  * so we will follow PHP's lead, which should be more than sufficient</a>
+<a name="18"><span class="lineNum">      18 </span>                :            :  * (further stackexchange comments indicate depth &gt; 32 rarely occurs).</a>
+<a name="19"><span class="lineNum">      19 </span>                :            :  */</a>
+<a name="20"><span class="lineNum">      20 </span>                :            : static constexpr size_t MAX_JSON_DEPTH = 512;</a>
+<a name="21"><span class="lineNum">      21 </span>                :            : </a>
+<a name="22"><span class="lineNum">      22 </span>                :<span class="lineCov">    5012051 : static bool json_isdigit(int ch)</span></a>
+<a name="23"><span class="lineNum">      23 </span>                :            : {</a>
+<a name="24"><span class="lineNum">      24 </span>  [<span class="branchCov" title="Branch 0 was taken 4652920 times"> + </span><span class="branchCov" title="Branch 1 was taken 359131 times"> + </span><span class="branchCov" title="Branch 2 was taken 4440763 times"> + </span><span class="branchCov" title="Branch 3 was taken 212157 times"> + </span>]:<span class="lineCov">    5012051 :     return ((ch &gt;= '0') &amp;&amp; (ch &lt;= '9'));</span></a>
+<a name="25"><span class="lineNum">      25 </span>                :            : }</a>
+<a name="26"><span class="lineNum">      26 </span>                :            : </a>
+<a name="27"><span class="lineNum">      27 </span>                :            : // convert hexadecimal string to unsigned integer</a>
+<a name="28"><span class="lineNum">      28 </span>                :<span class="lineCov">        427 : static const char *hatoui(const char *first, const char *last,</span></a>
+<a name="29"><span class="lineNum">      29 </span>                :            :                           unsigned int&amp; out)</a>
+<a name="30"><span class="lineNum">      30 </span>                :            : {</a>
+<a name="31"><span class="lineNum">      31 </span>                :<span class="lineCov">        427 :     unsigned int result = 0;</span></a>
+<a name="32"><span class="lineNum">      32 </span>        [<span class="branchCov" title="Branch 0 was taken 1708 times"> + </span><span class="branchCov" title="Branch 1 was taken 427 times"> + </span>]:<span class="lineCov">       2135 :     for (; first != last; ++first)</span></a>
+<a name="33"><span class="lineNum">      33 </span>                :            :     {</a>
+<a name="34"><span class="lineNum">      34 </span>                :            :         int digit;</a>
+<a name="35"><span class="lineNum">      35 </span>        [<span class="branchCov" title="Branch 0 was taken 895 times"> + </span><span class="branchCov" title="Branch 1 was taken 813 times"> + </span>]:<span class="lineCov">       1708 :         if (json_isdigit(*first))</span></a>
+<a name="36"><span class="lineNum">      36 </span>                :<span class="lineCov">        895 :             digit = *first - '0';</span></a>
+<a name="37"><span class="lineNum">      37 </span>                :            : </a>
+<a name="38"><span class="lineNum">      38 </span>  [<span class="branchCov" title="Branch 0 was taken 791 times"> + </span><span class="branchCov" title="Branch 1 was taken 22 times"> + </span><span class="branchCov" title="Branch 2 was taken 791 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        813 :         else if (*first &gt;= 'a' &amp;&amp; *first &lt;= 'f')</span></a>
+<a name="39"><span class="lineNum">      39 </span>                :<span class="lineCov">        791 :             digit = *first - 'a' + 10;</span></a>
+<a name="40"><span class="lineNum">      40 </span>                :            : </a>
+<a name="41"><span class="lineNum">      41 </span>  [<span class="branchCov" title="Branch 0 was taken 22 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 22 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">         22 :         else if (*first &gt;= 'A' &amp;&amp; *first &lt;= 'F')</span></a>
+<a name="42"><span class="lineNum">      42 </span>                :<span class="lineCov">         22 :             digit = *first - 'A' + 10;</span></a>
+<a name="43"><span class="lineNum">      43 </span>                :            : </a>
+<a name="44"><span class="lineNum">      44 </span>                :            :         else</a>
+<a name="45"><span class="lineNum">      45 </span>                :            :             break;</a>
+<a name="46"><span class="lineNum">      46 </span>                :            : </a>
+<a name="47"><span class="lineNum">      47 </span>                :<span class="lineCov">       1708 :         result = 16 * result + digit;</span></a>
+<a name="48"><span class="lineNum">      48 </span>                :            :     }</a>
+<a name="49"><span class="lineNum">      49 </span>                :<span class="lineCov">        427 :     out = result;</span></a>
+<a name="50"><span class="lineNum">      50 </span>                :            : </a>
+<a name="51"><span class="lineNum">      51 </span>                :<span class="lineCov">        427 :     return first;</span></a>
+<a name="52"><span class="lineNum">      52 </span>                :            : }</a>
+<a name="53"><span class="lineNum">      53 </span>                :            : </a>
+<a name="54"><span class="lineNum">      54 </span>                :<span class="lineCov">    4907374 : enum jtokentype getJsonToken(std::string&amp; tokenVal, unsigned int&amp; consumed,</span></a>
+<a name="55"><span class="lineNum">      55 </span>                :            :                             const char *raw, const char *end)</a>
+<a name="56"><span class="lineNum">      56 </span>                :            : {</a>
+<a name="57"><span class="lineNum">      57 </span>                :<span class="lineCov">    4907374 :     tokenVal.clear();</span></a>
+<a name="58"><span class="lineNum">      58 </span>                :<span class="lineCov">    4907374 :     consumed = 0;</span></a>
+<a name="59"><span class="lineNum">      59 </span>                :            : </a>
+<a name="60"><span class="lineNum">      60 </span>                :<span class="lineCov">    4907374 :     const char *rawStart = raw;</span></a>
+<a name="61"><span class="lineNum">      61 </span>                :            : </a>
+<a name="62"><span class="lineNum">      62 </span>  [<span class="branchCov" title="Branch 0 was taken 6273503 times"> + </span><span class="branchCov" title="Branch 1 was taken 136408 times"> + </span><span class="branchCov" title="Branch 2 was taken 1502537 times"> + </span><span class="branchCov" title="Branch 3 was taken 4770966 times"> + </span> :<span class="lineCov">    6409911 :     while (raw &lt; end &amp;&amp; (json_isspace(*raw)))          // skip whitespace</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1502537 times"> + </span><span class="branchCov" title="Branch 5 was taken 4907374 times"> + </span>]
+<a name="63"><span class="lineNum">      63 </span>                :<span class="lineCov">    1502537 :         raw++;</span></a>
+<a name="64"><span class="lineNum">      64 </span>                :            : </a>
+<a name="65"><span class="lineNum">      65 </span>        [<span class="branchCov" title="Branch 0 was taken 136408 times"> + </span><span class="branchCov" title="Branch 1 was taken 4770966 times"> + </span>]:<span class="lineCov">    4907374 :     if (raw &gt;= end)</span></a>
+<a name="66"><span class="lineNum">      66 </span>                :<span class="lineCov">     136408 :         return JTOK_NONE;</span></a>
+<a name="67"><span class="lineNum">      67 </span>                :            : </a>
+<a name="68"><span class="lineNum">      68 </span>  [<span class="branchCov" title="Branch 0 was taken 220647 times"> + </span><span class="branchCov" title="Branch 1 was taken 220636 times"> + </span><span class="branchCov" title="Branch 2 was taken 77522 times"> + </span><span class="branchCov" title="Branch 3 was taken 76973 times"> + </span> :<span class="lineCov">    4770966 :     switch (*raw) {</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 614595 times"> + </span><span class="branchCov" title="Branch 5 was taken 852055 times"> + </span><span class="branchCov" title="Branch 6 was taken 11874 times"> + </span><span class="branchCov" title="Branch 7 was taken 1371424 times"> + </span><span class="branchCov" title="Branch 8 was taken 1325220 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 9 was taken 20 times"> + </span>]
+<a name="69"><span class="lineNum">      69 </span>                :            : </a>
+<a name="70"><span class="lineNum">      70 </span>                :<span class="lineCov">     220647 :     case '{':</span></a>
+<a name="71"><span class="lineNum">      71 </span>                :<span class="lineCov">     220647 :         raw++;</span></a>
+<a name="72"><span class="lineNum">      72 </span>                :<span class="lineCov">     220647 :         consumed = (raw - rawStart);</span></a>
+<a name="73"><span class="lineNum">      73 </span>                :<span class="lineCov">     220647 :         return JTOK_OBJ_OPEN;</span></a>
+<a name="74"><span class="lineNum">      74 </span>                :<span class="lineCov">     220636 :     case '}':</span></a>
+<a name="75"><span class="lineNum">      75 </span>                :<span class="lineCov">     220636 :         raw++;</span></a>
+<a name="76"><span class="lineNum">      76 </span>                :<span class="lineCov">     220636 :         consumed = (raw - rawStart);</span></a>
+<a name="77"><span class="lineNum">      77 </span>                :<span class="lineCov">     220636 :         return JTOK_OBJ_CLOSE;</span></a>
+<a name="78"><span class="lineNum">      78 </span>                :<span class="lineCov">      77522 :     case '[':</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :<span class="lineCov">      77522 :         raw++;</span></a>
+<a name="80"><span class="lineNum">      80 </span>                :<span class="lineCov">      77522 :         consumed = (raw - rawStart);</span></a>
+<a name="81"><span class="lineNum">      81 </span>                :<span class="lineCov">      77522 :         return JTOK_ARR_OPEN;</span></a>
+<a name="82"><span class="lineNum">      82 </span>                :<span class="lineCov">      76973 :     case ']':</span></a>
+<a name="83"><span class="lineNum">      83 </span>                :<span class="lineCov">      76973 :         raw++;</span></a>
+<a name="84"><span class="lineNum">      84 </span>                :<span class="lineCov">      76973 :         consumed = (raw - rawStart);</span></a>
+<a name="85"><span class="lineNum">      85 </span>                :<span class="lineCov">      76973 :         return JTOK_ARR_CLOSE;</span></a>
+<a name="86"><span class="lineNum">      86 </span>                :            : </a>
+<a name="87"><span class="lineNum">      87 </span>                :<span class="lineCov">     614595 :     case ':':</span></a>
+<a name="88"><span class="lineNum">      88 </span>                :<span class="lineCov">     614595 :         raw++;</span></a>
+<a name="89"><span class="lineNum">      89 </span>                :<span class="lineCov">     614595 :         consumed = (raw - rawStart);</span></a>
+<a name="90"><span class="lineNum">      90 </span>                :<span class="lineCov">     614595 :         return JTOK_COLON;</span></a>
+<a name="91"><span class="lineNum">      91 </span>                :<span class="lineCov">     852055 :     case ',':</span></a>
+<a name="92"><span class="lineNum">      92 </span>                :<span class="lineCov">     852055 :         raw++;</span></a>
+<a name="93"><span class="lineNum">      93 </span>                :<span class="lineCov">     852055 :         consumed = (raw - rawStart);</span></a>
+<a name="94"><span class="lineNum">      94 </span>                :<span class="lineCov">     852055 :         return JTOK_COMMA;</span></a>
+<a name="95"><span class="lineNum">      95 </span>                :            : </a>
+<a name="96"><span class="lineNum">      96 </span>                :<span class="lineCov">      11874 :     case 'n':</span></a>
+<a name="97"><span class="lineNum">      97 </span>                :            :     case 't':</a>
+<a name="98"><span class="lineNum">      98 </span>                :            :     case 'f':</a>
+<a name="99"><span class="lineNum">      99 </span>        [<span class="branchCov" title="Branch 0 was taken 4705 times"> + </span><span class="branchCov" title="Branch 1 was taken 7169 times"> + </span>]:<span class="lineCov">      11874 :         if (!strncmp(raw, &quot;null&quot;, 4)) {</span></a>
+<a name="100"><span class="lineNum">     100 </span>                :<span class="lineCov">       4705 :             raw += 4;</span></a>
+<a name="101"><span class="lineNum">     101 </span>                :<span class="lineCov">       4705 :             consumed = (raw - rawStart);</span></a>
+<a name="102"><span class="lineNum">     102 </span>                :<span class="lineCov">       4705 :             return JTOK_KW_NULL;</span></a>
+<a name="103"><span class="lineNum">     103 </span>        [<span class="branchCov" title="Branch 0 was taken 4877 times"> + </span><span class="branchCov" title="Branch 1 was taken 2292 times"> + </span>]:<span class="lineCov">       7169 :         } else if (!strncmp(raw, &quot;true&quot;, 4)) {</span></a>
+<a name="104"><span class="lineNum">     104 </span>                :<span class="lineCov">       4877 :             raw += 4;</span></a>
+<a name="105"><span class="lineNum">     105 </span>                :<span class="lineCov">       4877 :             consumed = (raw - rawStart);</span></a>
+<a name="106"><span class="lineNum">     106 </span>                :<span class="lineCov">       4877 :             return JTOK_KW_TRUE;</span></a>
+<a name="107"><span class="lineNum">     107 </span>        [<span class="branchCov" title="Branch 0 was taken 2284 times"> + </span><span class="branchCov" title="Branch 1 was taken 8 times"> + </span>]:<span class="lineCov">       2292 :         } else if (!strncmp(raw, &quot;false&quot;, 5)) {</span></a>
+<a name="108"><span class="lineNum">     108 </span>                :<span class="lineCov">       2284 :             raw += 5;</span></a>
+<a name="109"><span class="lineNum">     109 </span>                :<span class="lineCov">       2284 :             consumed = (raw - rawStart);</span></a>
+<a name="110"><span class="lineNum">     110 </span>                :<span class="lineCov">       2284 :             return JTOK_KW_FALSE;</span></a>
+<a name="111"><span class="lineNum">     111 </span>                :            :         } else</a>
+<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">          8 :             return JTOK_ERR;</span></a>
+<a name="113"><span class="lineNum">     113 </span>                :            : </a>
+<a name="114"><span class="lineNum">     114 </span>                :<span class="lineCov">    1371424 :     case '-':</span></a>
+<a name="115"><span class="lineNum">     115 </span>                :            :     case '0':</a>
+<a name="116"><span class="lineNum">     116 </span>                :            :     case '1':</a>
+<a name="117"><span class="lineNum">     117 </span>                :            :     case '2':</a>
+<a name="118"><span class="lineNum">     118 </span>                :            :     case '3':</a>
+<a name="119"><span class="lineNum">     119 </span>                :            :     case '4':</a>
+<a name="120"><span class="lineNum">     120 </span>                :            :     case '5':</a>
+<a name="121"><span class="lineNum">     121 </span>                :            :     case '6':</a>
+<a name="122"><span class="lineNum">     122 </span>                :            :     case '7':</a>
+<a name="123"><span class="lineNum">     123 </span>                :            :     case '8':</a>
+<a name="124"><span class="lineNum">     124 </span>                :            :     case '9': {</a>
+<a name="125"><span class="lineNum">     125 </span>                :            :         // part 1: int</a>
+<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">    2742848 :         std::string numStr;</span></a>
+<a name="127"><span class="lineNum">     127 </span>                :            : </a>
+<a name="128"><span class="lineNum">     128 </span>                :<span class="lineCov">    1371424 :         const char *first = raw;</span></a>
+<a name="129"><span class="lineNum">     129 </span>                :            : </a>
+<a name="130"><span class="lineNum">     130 </span>                :<span class="lineCov">    1371424 :         const char *firstDigit = first;</span></a>
+<a name="131"><span class="lineNum">     131 </span>        [<span class="branchCov" title="Branch 0 was taken 39212 times"> + </span><span class="branchCov" title="Branch 1 was taken 1332212 times"> + </span>]:<span class="lineCov">    1371424 :         if (!json_isdigit(*firstDigit))</span></a>
+<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">      39212 :             firstDigit++;</span></a>
+<a name="133"><span class="lineNum">     133 </span>  [<span class="branchCov" title="Branch 0 was taken 266236 times"> + </span><span class="branchCov" title="Branch 1 was taken 1105188 times"> + </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 266235 times"> + </span> :<span class="lineCov">    1371424 :         if ((*firstDigit == '0') &amp;&amp; json_isdigit(firstDigit[1]))</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchCov" title="Branch 5 was taken 1371423 times"> + </span>]
+<a name="134"><span class="lineNum">     134 </span>                :<span class="lineCov">          1 :             return JTOK_ERR;</span></a>
+<a name="135"><span class="lineNum">     135 </span>                :            : </a>
+<a name="136"><span class="lineNum">     136 </span>        [<span class="branchCov" title="Branch 0 was taken 1371423 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1371423 :         numStr += *raw;                       // copy first char</span></a>
+<a name="137"><span class="lineNum">     137 </span>                :<span class="lineCov">    1371423 :         raw++;</span></a>
+<a name="138"><span class="lineNum">     138 </span>                :            : </a>
+<a name="139"><span class="lineNum">     139 </span>  [<span class="branchCov" title="Branch 0 was taken 39212 times"> + </span><span class="branchCov" title="Branch 1 was taken 1332211 times"> + </span><span class="branchCov" title="Branch 2 was taken 39212 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">    1371423 :         if ((*first == '-') &amp;&amp; (raw &lt; end) &amp;&amp; (!json_isdigit(*raw)))</span></a>
+<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 39212 times"> + </span><span class="branchNoCov" title="Branch 6 was not taken"> - </span><span class="branchCov" title="Branch 7 was taken 1371423 times"> + </span>]
+<a name="140"><span class="lineNum">     140 </span>                :<span class="lineNoCov">          0 :             return JTOK_ERR;</span></a>
+<a name="141"><span class="lineNum">     141 </span>                :            : </a>
+<a name="142"><span class="lineNum">     142 </span>  [<span class="branchCov" title="Branch 0 was taken 2979539 times"> + </span><span class="branchCov" title="Branch 1 was taken 1129184 times"> + </span><span class="branchCov" title="Branch 2 was taken 2737300 times"> + </span><span class="branchCov" title="Branch 3 was taken 242239 times"> + </span> :<span class="lineCov">    4108723 :         while (raw &lt; end &amp;&amp; json_isdigit(*raw)) {  // copy digits</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 2737300 times"> + </span><span class="branchCov" title="Branch 5 was taken 1371423 times"> + </span>]
+<a name="143"><span class="lineNum">     143 </span>        [<span class="branchCov" title="Branch 0 was taken 2737300 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    2737300 :             numStr += *raw;</span></a>
+<a name="144"><span class="lineNum">     144 </span>                :<span class="lineCov">    2737300 :             raw++;</span></a>
+<a name="145"><span class="lineNum">     145 </span>                :            :         }</a>
+<a name="146"><span class="lineNum">     146 </span>                :            : </a>
+<a name="147"><span class="lineNum">     147 </span>                :            :         // part 2: frac</a>
+<a name="148"><span class="lineNum">     148 </span>  [<span class="branchCov" title="Branch 0 was taken 242239 times"> + </span><span class="branchCov" title="Branch 1 was taken 1129184 times"> + </span><span class="branchCov" title="Branch 2 was taken 46290 times"> + </span><span class="branchCov" title="Branch 3 was taken 195949 times"> + </span>]:<span class="lineCov">    1371423 :         if (raw &lt; end &amp;&amp; *raw == '.') {</span></a>
+<a name="149"><span class="lineNum">     149 </span>        [<span class="branchCov" title="Branch 0 was taken 46290 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      46290 :             numStr += *raw;                   // copy .</span></a>
+<a name="150"><span class="lineNum">     150 </span>                :<span class="lineCov">      46290 :             raw++;</span></a>
+<a name="151"><span class="lineNum">     151 </span>                :            : </a>
+<a name="152"><span class="lineNum">     152 </span>  [<span class="branchCov" title="Branch 0 was taken 46290 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 46290 times"> + </span> :<span class="lineCov">      46290 :             if (raw &gt;= end || !json_isdigit(*raw))</span></a>
+<span class="lineNum">         </span>         <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 46290 times"> + </span>]
+<a name="153"><span class="lineNum">     153 </span>                :<span class="lineNoCov">          0 :                 return JTOK_ERR;</span></a>
+<a name="154"><span class="lineNum">     154 </span>  [<span class="branchCov" title="Branch 0 was taken 267750 times"> + </span><span class="branchCov" title="Branch 1 was taken 30820 times"> + </span><span class="branchCov" title="Branch 2 was taken 252280 times"> + </span><span class="branchCov" title="Branch 3 was taken 15470 times"> + </span> :<span class="lineCov">     298570 :             while (raw &lt; end &amp;&amp; json_isdigit(*raw)) { // copy digits</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 252280 times"> + </span><span class="branchCov" title="Branch 5 was taken 46290 times"> + </span>]
+<a name="155"><span class="lineNum">     155 </span>        [<span class="branchCov" title="Branch 0 was taken 252280 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     252280 :                 numStr += *raw;</span></a>
+<a name="156"><span class="lineNum">     156 </span>                :<span class="lineCov">     252280 :                 raw++;</span></a>
+<a name="157"><span class="lineNum">     157 </span>                :            :             }</a>
+<a name="158"><span class="lineNum">     158 </span>                :            :         }</a>
+<a name="159"><span class="lineNum">     159 </span>                :            : </a>
+<a name="160"><span class="lineNum">     160 </span>                :            :         // part 3: exp</a>
+<a name="161"><span class="lineNum">     161 </span>  [<span class="branchCov" title="Branch 0 was taken 211419 times"> + </span><span class="branchCov" title="Branch 1 was taken 1160004 times"> + </span><span class="branchCov" title="Branch 2 was taken 200557 times"> + </span><span class="branchCov" title="Branch 3 was taken 10862 times"> + </span> :<span class="lineCov">    1371423 :         if (raw &lt; end &amp;&amp; (*raw == 'e' || *raw == 'E')) {</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 2 times"> + </span><span class="branchCov" title="Branch 5 was taken 200555 times"> + </span>]
+<a name="162"><span class="lineNum">     162 </span>        [<span class="branchCov" title="Branch 0 was taken 10864 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      10864 :             numStr += *raw;                   // copy E</span></a>
+<a name="163"><span class="lineNum">     163 </span>                :<span class="lineCov">      10864 :             raw++;</span></a>
+<a name="164"><span class="lineNum">     164 </span>                :            : </a>
+<a name="165"><span class="lineNum">     165 </span>  [<span class="branchCov" title="Branch 0 was taken 10864 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 24 times"> + </span><span class="branchCov" title="Branch 3 was taken 10840 times"> + </span> :<span class="lineCov">      10864 :             if (raw &lt; end &amp;&amp; (*raw == '-' || *raw == '+')) { // copy +/-</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 17 times"> + </span><span class="branchCov" title="Branch 5 was taken 7 times"> + </span>]
+<a name="166"><span class="lineNum">     166 </span>        [<span class="branchCov" title="Branch 0 was taken 10857 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      10857 :                 numStr += *raw;</span></a>
+<a name="167"><span class="lineNum">     167 </span>                :<span class="lineCov">      10857 :                 raw++;</span></a>
+<a name="168"><span class="lineNum">     168 </span>                :            :             }</a>
+<a name="169"><span class="lineNum">     169 </span>                :            : </a>
+<a name="170"><span class="lineNum">     170 </span>  [<span class="branchCov" title="Branch 0 was taken 10864 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3 times"> + </span><span class="branchCov" title="Branch 3 was taken 10861 times"> + </span> :<span class="lineCov">      10864 :             if (raw &gt;= end || !json_isdigit(*raw))</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 3 times"> + </span><span class="branchCov" title="Branch 5 was taken 10861 times"> + </span>]
+<a name="171"><span class="lineNum">     171 </span>                :<span class="lineCov">          3 :                 return JTOK_ERR;</span></a>
+<a name="172"><span class="lineNum">     172 </span>  [<span class="branchCov" title="Branch 0 was taken 29028 times"> + </span><span class="branchCov" title="Branch 1 was taken 3545 times"> + </span><span class="branchCov" title="Branch 2 was taken 21712 times"> + </span><span class="branchCov" title="Branch 3 was taken 7316 times"> + </span> :<span class="lineCov">      32573 :             while (raw &lt; end &amp;&amp; json_isdigit(*raw)) { // copy digits</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 21712 times"> + </span><span class="branchCov" title="Branch 5 was taken 10861 times"> + </span>]
+<a name="173"><span class="lineNum">     173 </span>        [<span class="branchCov" title="Branch 0 was taken 21712 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      21712 :                 numStr += *raw;</span></a>
+<a name="174"><span class="lineNum">     174 </span>                :<span class="lineCov">      21712 :                 raw++;</span></a>
+<a name="175"><span class="lineNum">     175 </span>                :            :             }</a>
+<a name="176"><span class="lineNum">     176 </span>                :            :         }</a>
+<a name="177"><span class="lineNum">     177 </span>                :            : </a>
+<a name="178"><span class="lineNum">     178 </span>        [<span class="branchCov" title="Branch 0 was taken 1371420 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1371420 :         tokenVal = numStr;</span></a>
+<a name="179"><span class="lineNum">     179 </span>                :<span class="lineCov">    1371420 :         consumed = (raw - rawStart);</span></a>
+<a name="180"><span class="lineNum">     180 </span>                :<span class="lineCov">    1371420 :         return JTOK_NUMBER;</span></a>
+<a name="181"><span class="lineNum">     181 </span>                :            :         }</a>
+<a name="182"><span class="lineNum">     182 </span>                :            : </a>
+<a name="183"><span class="lineNum">     183 </span>                :<span class="lineCov">    1325220 :     case '&quot;': {</span></a>
+<a name="184"><span class="lineNum">     184 </span>                :<span class="lineCov">    1325220 :         raw++;                                // skip &quot;</span></a>
+<a name="185"><span class="lineNum">     185 </span>                :            : </a>
+<a name="186"><span class="lineNum">     186 </span>                :<span class="lineCov">    2650440 :         std::string valStr;</span></a>
+<a name="187"><span class="lineNum">     187 </span>                :<span class="lineCov">    1325220 :         JSONUTF8StringFilter writer(valStr);</span></a>
+<a name="188"><span class="lineNum">     188 </span>                :            : </a>
+<a name="189"><span class="lineNum">     189 </span>                :            :         while (true) {</a>
+<a name="190"><span class="lineNum">     190 </span>  [<span class="branchCov" title="Branch 0 was taken 287359023 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 3 times"> + </span><span class="branchCov" title="Branch 3 was taken 287359020 times"> + </span>]:<span class="lineCov">  287359024 :             if (raw &gt;= end || (unsigned char)*raw &lt; 0x20)</span></a>
+<a name="191"><span class="lineNum">     191 </span>                :<span class="lineCov">          4 :                 return JTOK_ERR;</span></a>
+<a name="192"><span class="lineNum">     192 </span>                :            : </a>
+<a name="193"><span class="lineNum">     193 </span>        [<span class="branchCov" title="Branch 0 was taken 499 times"> + </span><span class="branchCov" title="Branch 1 was taken 287358521 times"> + </span>]:<span class="lineCov">  287359020 :             else if (*raw == '\\') {</span></a>
+<a name="194"><span class="lineNum">     194 </span>                :<span class="lineCov">        499 :                 raw++;                        // skip backslash</span></a>
+<a name="195"><span class="lineNum">     195 </span>                :            : </a>
+<a name="196"><span class="lineNum">     196 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 499 times"> + </span>]:<span class="lineCov">        499 :                 if (raw &gt;= end)</span></a>
+<a name="197"><span class="lineNum">     197 </span>                :<span class="lineNoCov">          0 :                     return JTOK_ERR;</span></a>
+<a name="198"><span class="lineNum">     198 </span>                :            : </a>
+<a name="199"><span class="lineNum">     199 </span>  [<span class="branchCov" title="Branch 0 was taken 12 times"> + </span><span class="branchCov" title="Branch 1 was taken 4 times"> + </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchCov" title="Branch 3 was taken 4 times"> + </span> :<span class="lineCov">        499 :                 switch (*raw) {</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 4 times"> + </span><span class="branchCov" title="Branch 5 was taken 34 times"> + </span><span class="branchCov" title="Branch 6 was taken 4 times"> + </span><span class="branchCov" title="Branch 7 was taken 4 times"> + </span><span class="branchCov" title="Branch 8 was taken 427 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 9 was taken 4 times"> + </span>]
+<a name="200"><span class="lineNum">     200 </span>        [<span class="branchCov" title="Branch 0 was taken 12 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         12 :                 case '&quot;':  writer.push_back('\&quot;'); break;</span></a>
+<a name="201"><span class="lineNum">     201 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          4 :                 case '\\': writer.push_back('\\'); break;</span></a>
+<a name="202"><span class="lineNum">     202 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          2 :                 case '/':  writer.push_back('/'); break;</span></a>
+<a name="203"><span class="lineNum">     203 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          4 :                 case 'b':  writer.push_back('\b'); break;</span></a>
+<a name="204"><span class="lineNum">     204 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          4 :                 case 'f':  writer.push_back('\f'); break;</span></a>
+<a name="205"><span class="lineNum">     205 </span>        [<span class="branchCov" title="Branch 0 was taken 34 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         34 :                 case 'n':  writer.push_back('\n'); break;</span></a>
+<a name="206"><span class="lineNum">     206 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          4 :                 case 'r':  writer.push_back('\r'); break;</span></a>
+<a name="207"><span class="lineNum">     207 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          4 :                 case 't':  writer.push_back('\t'); break;</span></a>
+<a name="208"><span class="lineNum">     208 </span>                :            : </a>
+<a name="209"><span class="lineNum">     209 </span>                :<span class="lineCov">        427 :                 case 'u': {</span></a>
+<a name="210"><span class="lineNum">     210 </span>                :            :                     unsigned int codepoint;</a>
+<a name="211"><span class="lineNum">     211 </span>  [<span class="branchCov" title="Branch 0 was taken 427 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 427 times"> + </span>]:<span class="lineCov">        854 :                     if (raw + 1 + 4 &gt;= end ||</span></a>
+<a name="212"><span class="lineNum">     212 </span>                :<span class="lineCov">        427 :                         hatoui(raw + 1, raw + 1 + 4, codepoint) !=</span></a>
+<a name="213"><span class="lineNum">     213 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 427 times"> + </span>]:<span class="lineCov">        427 :                                raw + 1 + 4)</span></a>
+<a name="214"><span class="lineNum">     214 </span>                :<span class="lineNoCov">          0 :                         return JTOK_ERR;</span></a>
+<a name="215"><span class="lineNum">     215 </span>        [<span class="branchCov" title="Branch 0 was taken 427 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        427 :                     writer.push_back_u(codepoint);</span></a>
+<a name="216"><span class="lineNum">     216 </span>                :<span class="lineCov">        427 :                     raw += 4;</span></a>
+<a name="217"><span class="lineNum">     217 </span>                :<span class="lineCov">        427 :                     break;</span></a>
+<a name="218"><span class="lineNum">     218 </span>                :            :                     }</a>
+<a name="219"><span class="lineNum">     219 </span>                :<span class="lineCov">          4 :                 default:</span></a>
+<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">          4 :                     return JTOK_ERR;</span></a>
+<a name="221"><span class="lineNum">     221 </span>                :            : </a>
+<a name="222"><span class="lineNum">     222 </span>                :            :                 }</a>
+<a name="223"><span class="lineNum">     223 </span>                :            : </a>
+<a name="224"><span class="lineNum">     224 </span>                :<span class="lineCov">        495 :                 raw++;                        // skip esc'd char</span></a>
+<a name="225"><span class="lineNum">     225 </span>                :            :             }</a>
+<a name="226"><span class="lineNum">     226 </span>                :            : </a>
+<a name="227"><span class="lineNum">     227 </span>        [<span class="branchCov" title="Branch 0 was taken 1325212 times"> + </span><span class="branchCov" title="Branch 1 was taken 286033309 times"> + </span>]:<span class="lineCov">  287358521 :             else if (*raw == '&quot;') {</span></a>
+<a name="228"><span class="lineNum">     228 </span>                :<span class="lineCov">    1325212 :                 raw++;                        // skip &quot;</span></a>
+<a name="229"><span class="lineNum">     229 </span>                :<span class="lineCov">    1325212 :                 break;                        // stop scanning</span></a>
+<a name="230"><span class="lineNum">     230 </span>                :            :             }</a>
+<a name="231"><span class="lineNum">     231 </span>                :            : </a>
+<a name="232"><span class="lineNum">     232 </span>                :            :             else {</a>
+<a name="233"><span class="lineNum">     233 </span>        [<span class="branchCov" title="Branch 0 was taken 286033309 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">  286033309 :                 writer.push_back(static_cast&lt;unsigned char&gt;(*raw));</span></a>
+<a name="234"><span class="lineNum">     234 </span>                :<span class="lineCov">  286033309 :                 raw++;</span></a>
+<a name="235"><span class="lineNum">     235 </span>                :            :             }</a>
+<a name="236"><span class="lineNum">     236 </span>                :<span class="lineCov">  286033804 :         }</span></a>
+<a name="237"><span class="lineNum">     237 </span>                :            : </a>
+<a name="238"><span class="lineNum">     238 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchCov" title="Branch 1 was taken 1325208 times"> + </span>]:<span class="lineCov">    1325212 :         if (!writer.finalize())</span></a>
+<a name="239"><span class="lineNum">     239 </span>                :<span class="lineCov">          4 :             return JTOK_ERR;</span></a>
+<a name="240"><span class="lineNum">     240 </span>        [<span class="branchCov" title="Branch 0 was taken 1325208 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1325208 :         tokenVal = valStr;</span></a>
+<a name="241"><span class="lineNum">     241 </span>                :<span class="lineCov">    1325208 :         consumed = (raw - rawStart);</span></a>
+<a name="242"><span class="lineNum">     242 </span>                :<span class="lineCov">    1325208 :         return JTOK_STRING;</span></a>
+<a name="243"><span class="lineNum">     243 </span>                :            :         }</a>
+<a name="244"><span class="lineNum">     244 </span>                :            : </a>
+<a name="245"><span class="lineNum">     245 </span>                :<span class="lineCov">         20 :     default:</span></a>
+<a name="246"><span class="lineNum">     246 </span>                :<span class="lineCov">         20 :         return JTOK_ERR;</span></a>
+<a name="247"><span class="lineNum">     247 </span>                :            :     }</a>
+<a name="248"><span class="lineNum">     248 </span>                :            : }</a>
+<a name="249"><span class="lineNum">     249 </span>                :            : </a>
+<a name="250"><span class="lineNum">     250 </span>                :            : enum expect_bits : unsigned {</a>
+<a name="251"><span class="lineNum">     251 </span>                :            :     EXP_OBJ_NAME = (1U &lt;&lt; 0),</a>
+<a name="252"><span class="lineNum">     252 </span>                :            :     EXP_COLON = (1U &lt;&lt; 1),</a>
+<a name="253"><span class="lineNum">     253 </span>                :            :     EXP_ARR_VALUE = (1U &lt;&lt; 2),</a>
+<a name="254"><span class="lineNum">     254 </span>                :            :     EXP_VALUE = (1U &lt;&lt; 3),</a>
+<a name="255"><span class="lineNum">     255 </span>                :            :     EXP_NOT_VALUE = (1U &lt;&lt; 4),</a>
+<a name="256"><span class="lineNum">     256 </span>                :            : };</a>
+<a name="257"><span class="lineNum">     257 </span>                :            : </a>
+<a name="258"><span class="lineNum">     258 </span>                :            : #define expect(bit) (expectMask &amp; (EXP_##bit))</a>
+<a name="259"><span class="lineNum">     259 </span>                :            : #define setExpect(bit) (expectMask |= EXP_##bit)</a>
+<a name="260"><span class="lineNum">     260 </span>                :            : #define clearExpect(bit) (expectMask &amp;= ~EXP_##bit)</a>
+<a name="261"><span class="lineNum">     261 </span>                :            : </a>
+<a name="262"><span class="lineNum">     262 </span>                :<span class="lineCov">     136471 : bool UniValue::read(const char *raw, size_t size)</span></a>
+<a name="263"><span class="lineNum">     263 </span>                :            : {</a>
+<a name="264"><span class="lineNum">     264 </span>                :<span class="lineCov">     136471 :     clear();</span></a>
+<a name="265"><span class="lineNum">     265 </span>                :            : </a>
+<a name="266"><span class="lineNum">     266 </span>                :<span class="lineCov">     136471 :     uint32_t expectMask = 0;</span></a>
+<a name="267"><span class="lineNum">     267 </span>                :<span class="lineCov">     272942 :     std::vector&lt;UniValue*&gt; stack;</span></a>
+<a name="268"><span class="lineNum">     268 </span>                :            : </a>
+<a name="269"><span class="lineNum">     269 </span>                :<span class="lineCov">     272942 :     std::string tokenVal;</span></a>
+<a name="270"><span class="lineNum">     270 </span>                :            :     unsigned int consumed;</a>
+<a name="271"><span class="lineNum">     271 </span>                :<span class="lineCov">     136471 :     enum jtokentype tok = JTOK_NONE;</span></a>
+<a name="272"><span class="lineNum">     272 </span>                :<span class="lineCov">     136471 :     enum jtokentype last_tok = JTOK_NONE;</span></a>
+<a name="273"><span class="lineNum">     273 </span>                :<span class="lineCov">     136471 :     const char* end = raw + size;</span></a>
+<a name="274"><span class="lineNum">     274 </span>                :<span class="lineCov">    3470940 :     do {</span></a>
+<a name="275"><span class="lineNum">     275 </span>                :<span class="lineCov">    3607411 :         last_tok = tok;</span></a>
+<a name="276"><span class="lineNum">     276 </span>                :            : </a>
+<a name="277"><span class="lineNum">     277 </span>        [<span class="branchCov" title="Branch 0 was taken 3607411 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    3607411 :         tok = getJsonToken(tokenVal, consumed, raw, end);</span></a>
+<a name="278"><span class="lineNum">     278 </span>  [<span class="branchCov" title="Branch 0 was taken 3607407 times"> + </span><span class="branchCov" title="Branch 1 was taken 4 times"> + </span><span class="branchCov" title="Branch 2 was taken 40 times"> + </span><span class="branchCov" title="Branch 3 was taken 3607367 times"> + </span>]:<span class="lineCov">    3607411 :         if (tok == JTOK_NONE || tok == JTOK_ERR)</span></a>
+<a name="279"><span class="lineNum">     279 </span>                :<span class="lineCov">         44 :             return false;</span></a>
+<a name="280"><span class="lineNum">     280 </span>                :<span class="lineCov">    3607367 :         raw += consumed;</span></a>
+<a name="281"><span class="lineNum">     281 </span>                :            : </a>
+<a name="282"><span class="lineNum">     282 </span>        [<span class="branchCov" title="Branch 0 was taken 1841777 times"> + </span><span class="branchCov" title="Branch 1 was taken 220646 times"> + </span>]:<span class="lineCov">    5669790 :         bool isValueOpen = jsonTokenIsValue(tok) ||</span></a>
+<a name="283"><span class="lineNum">     283 </span>  [<span class="branchCov" title="Branch 0 was taken 2062423 times"> + </span><span class="branchCov" title="Branch 1 was taken 1544944 times"> + </span><span class="branchCov" title="Branch 2 was taken 77521 times"> + </span><span class="branchCov" title="Branch 3 was taken 1764256 times"> + </span>]:<span class="lineCov">    5669790 :             tok == JTOK_OBJ_OPEN || tok == JTOK_ARR_OPEN;</span></a>
+<a name="284"><span class="lineNum">     284 </span>                :            : </a>
+<a name="285"><span class="lineNum">     285 </span>        [<span class="branchCov" title="Branch 0 was taken 614591 times"> + </span><span class="branchCov" title="Branch 1 was taken 2992776 times"> + </span>]:<span class="lineCov">    3607367 :         if (expect(VALUE)) {</span></a>
+<a name="286"><span class="lineNum">     286 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 614589 times"> + </span>]:<span class="lineCov">     614591 :             if (!isValueOpen)</span></a>
+<a name="287"><span class="lineNum">     287 </span>                :<span class="lineCov">          2 :                 return false;</span></a>
+<a name="288"><span class="lineNum">     288 </span>                :<span class="lineCov">     614589 :             clearExpect(VALUE);</span></a>
+<a name="289"><span class="lineNum">     289 </span>                :            : </a>
+<a name="290"><span class="lineNum">     290 </span>        [<span class="branchCov" title="Branch 0 was taken 478770 times"> + </span><span class="branchCov" title="Branch 1 was taken 2514006 times"> + </span>]:<span class="lineCov">    2992776 :         } else if (expect(ARR_VALUE)) {</span></a>
+<a name="291"><span class="lineNum">     291 </span>  [<span class="branchCov" title="Branch 0 was taken 1312 times"> + </span><span class="branchCov" title="Branch 1 was taken 477458 times"> + </span><span class="branchCov" title="Branch 2 was taken 1310 times"> + </span><span class="branchCov" title="Branch 3 was taken 2 times"> + </span>]:<span class="lineCov">     478770 :             bool isArrValue = isValueOpen || (tok == JTOK_ARR_CLOSE);</span></a>
+<a name="292"><span class="lineNum">     292 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 478768 times"> + </span>]:<span class="lineCov">     478770 :             if (!isArrValue)</span></a>
+<a name="293"><span class="lineNum">     293 </span>                :<span class="lineCov">          2 :                 return false;</span></a>
+<a name="294"><span class="lineNum">     294 </span>                :            : </a>
+<a name="295"><span class="lineNum">     295 </span>                :<span class="lineCov">     478768 :             clearExpect(ARR_VALUE);</span></a>
+<a name="296"><span class="lineNum">     296 </span>                :            : </a>
+<a name="297"><span class="lineNum">     297 </span>        [<span class="branchCov" title="Branch 0 was taken 671417 times"> + </span><span class="branchCov" title="Branch 1 was taken 1842589 times"> + </span>]:<span class="lineCov">    2514006 :         } else if (expect(OBJ_NAME)) {</span></a>
+<a name="298"><span class="lineNum">     298 </span>  [<span class="branchCov" title="Branch 0 was taken 614595 times"> + </span><span class="branchCov" title="Branch 1 was taken 56822 times"> + </span><span class="branchCov" title="Branch 2 was taken 614595 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     671417 :             bool isObjName = (tok == JTOK_OBJ_CLOSE || tok == JTOK_STRING);</span></a>
+<a name="299"><span class="lineNum">     299 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 671417 times"> + </span>]:<span class="lineCov">     671417 :             if (!isObjName)</span></a>
+<a name="300"><span class="lineNum">     300 </span>                :<span class="lineNoCov">          0 :                 return false;</span></a>
+<a name="301"><span class="lineNum">     301 </span>                :            : </a>
+<a name="302"><span class="lineNum">     302 </span>        [<span class="branchCov" title="Branch 0 was taken 614595 times"> + </span><span class="branchCov" title="Branch 1 was taken 1227994 times"> + </span>]:<span class="lineCov">    1842589 :         } else if (expect(COLON)) {</span></a>
+<a name="303"><span class="lineNum">     303 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 614593 times"> + </span>]:<span class="lineCov">     614595 :             if (tok != JTOK_COLON)</span></a>
+<a name="304"><span class="lineNum">     304 </span>                :<span class="lineCov">          2 :                 return false;</span></a>
+<a name="305"><span class="lineNum">     305 </span>                :<span class="lineCov">     614593 :             clearExpect(COLON);</span></a>
+<a name="306"><span class="lineNum">     306 </span>                :            : </a>
+<a name="307"><span class="lineNum">     307 </span>  [<span class="branchCov" title="Branch 0 was taken 1227994 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1227993 times"> + </span>]:<span class="lineCov">    1227994 :         } else if (!expect(COLON) &amp;&amp; (tok == JTOK_COLON)) {</span></a>
+<a name="308"><span class="lineNum">     308 </span>                :<span class="lineCov">          1 :             return false;</span></a>
+<a name="309"><span class="lineNum">     309 </span>                :            :         }</a>
+<a name="310"><span class="lineNum">     310 </span>                :            : </a>
+<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 1706120 times"> + </span><span class="branchCov" title="Branch 1 was taken 1901240 times"> + </span>]:<span class="lineCov">    3607360 :         if (expect(NOT_VALUE)) {</span></a>
+<a name="312"><span class="lineNum">     312 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 1706118 times"> + </span>]:<span class="lineCov">    1706120 :             if (isValueOpen)</span></a>
+<a name="313"><span class="lineNum">     313 </span>                :<span class="lineCov">          2 :                 return false;</span></a>
+<a name="314"><span class="lineNum">     314 </span>                :<span class="lineCov">    1706118 :             clearExpect(NOT_VALUE);</span></a>
+<a name="315"><span class="lineNum">     315 </span>                :            :         }</a>
+<a name="316"><span class="lineNum">     316 </span>                :            : </a>
+<a name="317"><span class="lineNum">     317 </span>  [<span class="branchCov" title="Branch 0 was taken 298167 times"> + </span><span class="branchCov" title="Branch 1 was taken 297606 times"> + </span><span class="branchCov" title="Branch 2 was taken 614593 times"> + </span><span class="branchCov" title="Branch 3 was taken 852051 times"> + </span> :<span class="lineCov">    3607358 :         switch (tok) {</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 11864 times"> + </span><span class="branchCov" title="Branch 5 was taken 207871 times"> + </span><span class="branchCov" title="Branch 6 was taken 1325206 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="318"><span class="lineNum">     318 </span>                :            : </a>
+<a name="319"><span class="lineNum">     319 </span>                :<span class="lineCov">     298167 :         case JTOK_OBJ_OPEN:</span></a>
+<a name="320"><span class="lineNum">     320 </span>                :            :         case JTOK_ARR_OPEN: {</a>
+<a name="321"><span class="lineNum">     321 </span>        [<span class="branchCov" title="Branch 0 was taken 220646 times"> + </span><span class="branchCov" title="Branch 1 was taken 77521 times"> + </span>]:<span class="lineCov">     298167 :             VType utyp = (tok == JTOK_OBJ_OPEN ? VOBJ : VARR);</span></a>
+<a name="322"><span class="lineNum">     322 </span>        [<span class="branchCov" title="Branch 0 was taken 136459 times"> + </span><span class="branchCov" title="Branch 1 was taken 161708 times"> + </span>]:<span class="lineCov">     298167 :             if (!stack.size()) {</span></a>
+<a name="323"><span class="lineNum">     323 </span>        [<span class="branchCov" title="Branch 0 was taken 135929 times"> + </span><span class="branchCov" title="Branch 1 was taken 530 times"> + </span>]:<span class="lineCov">     136459 :                 if (utyp == VOBJ)</span></a>
+<a name="324"><span class="lineNum">     324 </span>        [<span class="branchCov" title="Branch 0 was taken 135929 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     135929 :                     setObject();</span></a>
+<a name="325"><span class="lineNum">     325 </span>                :            :                 else</a>
+<a name="326"><span class="lineNum">     326 </span>        [<span class="branchCov" title="Branch 0 was taken 530 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        530 :                     setArray();</span></a>
+<a name="327"><span class="lineNum">     327 </span>        [<span class="branchCov" title="Branch 0 was taken 136459 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     136459 :                 stack.push_back(this);</span></a>
+<a name="328"><span class="lineNum">     328 </span>                :            :             } else {</a>
+<a name="329"><span class="lineNum">     329 </span>                :<span class="lineCov">     323416 :                 UniValue tmpVal(utyp);</span></a>
+<a name="330"><span class="lineNum">     330 </span>                :<span class="lineCov">     161708 :                 UniValue *top = stack.back();</span></a>
+<a name="331"><span class="lineNum">     331 </span>        [<span class="branchCov" title="Branch 0 was taken 161708 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     161708 :                 top-&gt;values.push_back(tmpVal);</span></a>
+<a name="332"><span class="lineNum">     332 </span>                :            : </a>
+<a name="333"><span class="lineNum">     333 </span>                :<span class="lineCov">     161708 :                 UniValue *newTop = &amp;(top-&gt;values.back());</span></a>
+<a name="334"><span class="lineNum">     334 </span>        [<span class="branchCov" title="Branch 0 was taken 161708 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     161708 :                 stack.push_back(newTop);</span></a>
+<a name="335"><span class="lineNum">     335 </span>                :            :             }</a>
+<a name="336"><span class="lineNum">     336 </span>                :            : </a>
+<a name="337"><span class="lineNum">     337 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 298166 times"> + </span>]:<span class="lineCov">     298167 :             if (stack.size() &gt; MAX_JSON_DEPTH)</span></a>
+<a name="338"><span class="lineNum">     338 </span>                :<span class="lineCov">          1 :                 return false;</span></a>
+<a name="339"><span class="lineNum">     339 </span>                :            : </a>
+<a name="340"><span class="lineNum">     340 </span>        [<span class="branchCov" title="Branch 0 was taken 220646 times"> + </span><span class="branchCov" title="Branch 1 was taken 77520 times"> + </span>]:<span class="lineCov">     298166 :             if (utyp == VOBJ)</span></a>
+<a name="341"><span class="lineNum">     341 </span>                :<span class="lineCov">     220646 :                 setExpect(OBJ_NAME);</span></a>
+<a name="342"><span class="lineNum">     342 </span>                :            :             else</a>
+<a name="343"><span class="lineNum">     343 </span>                :<span class="lineCov">      77520 :                 setExpect(ARR_VALUE);</span></a>
+<a name="344"><span class="lineNum">     344 </span>                :<span class="lineCov">     298166 :             break;</span></a>
+<a name="345"><span class="lineNum">     345 </span>                :            :             }</a>
+<a name="346"><span class="lineNum">     346 </span>                :            : </a>
+<a name="347"><span class="lineNum">     347 </span>                :<span class="lineCov">     297606 :         case JTOK_OBJ_CLOSE:</span></a>
+<a name="348"><span class="lineNum">     348 </span>                :            :         case JTOK_ARR_CLOSE: {</a>
+<a name="349"><span class="lineNum">     349 </span>  [<span class="branchCov" title="Branch 0 was taken 297606 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchCov" title="Branch 3 was taken 297604 times"> + </span> :<span class="lineCov">     297606 :             if (!stack.size() || (last_tok == JTOK_COMMA))</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 2 times"> + </span><span class="branchCov" title="Branch 5 was taken 297604 times"> + </span>]
+<a name="350"><span class="lineNum">     350 </span>                :<span class="lineCov">          2 :                 return false;</span></a>
+<a name="351"><span class="lineNum">     351 </span>                :            : </a>
+<a name="352"><span class="lineNum">     352 </span>        [<span class="branchCov" title="Branch 0 was taken 220634 times"> + </span><span class="branchCov" title="Branch 1 was taken 76970 times"> + </span>]:<span class="lineCov">     297604 :             VType utyp = (tok == JTOK_OBJ_CLOSE ? VOBJ : VARR);</span></a>
+<a name="353"><span class="lineNum">     353 </span>                :<span class="lineCov">     297604 :             UniValue *top = stack.back();</span></a>
+<a name="354"><span class="lineNum">     354 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 297603 times"> + </span>]:<span class="lineCov">     297604 :             if (utyp != top-&gt;getType())</span></a>
+<a name="355"><span class="lineNum">     355 </span>                :<span class="lineCov">          1 :                 return false;</span></a>
+<a name="356"><span class="lineNum">     356 </span>                :            : </a>
+<a name="357"><span class="lineNum">     357 </span>                :<span class="lineCov">     297603 :             stack.pop_back();</span></a>
+<a name="358"><span class="lineNum">     358 </span>                :<span class="lineCov">     297603 :             clearExpect(OBJ_NAME);</span></a>
+<a name="359"><span class="lineNum">     359 </span>                :<span class="lineCov">     297603 :             setExpect(NOT_VALUE);</span></a>
+<a name="360"><span class="lineNum">     360 </span>                :<span class="lineCov">     297603 :             break;</span></a>
+<a name="361"><span class="lineNum">     361 </span>                :            :             }</a>
+<a name="362"><span class="lineNum">     362 </span>                :            : </a>
+<a name="363"><span class="lineNum">     363 </span>                :<span class="lineCov">     614593 :         case JTOK_COLON: {</span></a>
+<a name="364"><span class="lineNum">     364 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 614593 times"> + </span>]:<span class="lineCov">     614593 :             if (!stack.size())</span></a>
+<a name="365"><span class="lineNum">     365 </span>                :<span class="lineNoCov">          0 :                 return false;</span></a>
+<a name="366"><span class="lineNum">     366 </span>                :            : </a>
+<a name="367"><span class="lineNum">     367 </span>                :<span class="lineCov">     614593 :             UniValue *top = stack.back();</span></a>
+<a name="368"><span class="lineNum">     368 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 614593 times"> + </span>]:<span class="lineCov">     614593 :             if (top-&gt;getType() != VOBJ)</span></a>
+<a name="369"><span class="lineNum">     369 </span>                :<span class="lineNoCov">          0 :                 return false;</span></a>
+<a name="370"><span class="lineNum">     370 </span>                :            : </a>
+<a name="371"><span class="lineNum">     371 </span>                :<span class="lineCov">     614593 :             setExpect(VALUE);</span></a>
+<a name="372"><span class="lineNum">     372 </span>                :<span class="lineCov">     614593 :             break;</span></a>
+<a name="373"><span class="lineNum">     373 </span>                :            :             }</a>
+<a name="374"><span class="lineNum">     374 </span>                :            : </a>
+<a name="375"><span class="lineNum">     375 </span>                :<span class="lineCov">     852051 :         case JTOK_COMMA: {</span></a>
+<a name="376"><span class="lineNum">     376 </span>        [<span class="branchCov" title="Branch 0 was taken 852051 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1704102 :             if (!stack.size() ||</span></a>
+<a name="377"><span class="lineNum">     377 </span>  [<span class="branchCov" title="Branch 0 was taken 852051 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 852051 times"> + </span> :<span class="lineCov">    1704102 :                 (last_tok == JTOK_COMMA) || (last_tok == JTOK_ARR_OPEN))</span></a>
+<span class="lineNum">         </span>         <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 852051 times"> + </span>]
+<a name="378"><span class="lineNum">     378 </span>                :<span class="lineNoCov">          0 :                 return false;</span></a>
+<a name="379"><span class="lineNum">     379 </span>                :            : </a>
+<a name="380"><span class="lineNum">     380 </span>                :<span class="lineCov">     852051 :             UniValue *top = stack.back();</span></a>
+<a name="381"><span class="lineNum">     381 </span>        [<span class="branchCov" title="Branch 0 was taken 450774 times"> + </span><span class="branchCov" title="Branch 1 was taken 401277 times"> + </span>]:<span class="lineCov">     852051 :             if (top-&gt;getType() == VOBJ)</span></a>
+<a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">     450774 :                 setExpect(OBJ_NAME);</span></a>
+<a name="383"><span class="lineNum">     383 </span>                :            :             else</a>
+<a name="384"><span class="lineNum">     384 </span>                :<span class="lineCov">     401277 :                 setExpect(ARR_VALUE);</span></a>
+<a name="385"><span class="lineNum">     385 </span>                :<span class="lineCov">     852051 :             break;</span></a>
+<a name="386"><span class="lineNum">     386 </span>                :            :             }</a>
+<a name="387"><span class="lineNum">     387 </span>                :            : </a>
+<a name="388"><span class="lineNum">     388 </span>                :<span class="lineCov">      11864 :         case JTOK_KW_NULL:</span></a>
+<a name="389"><span class="lineNum">     389 </span>                :            :         case JTOK_KW_TRUE:</a>
+<a name="390"><span class="lineNum">     390 </span>                :            :         case JTOK_KW_FALSE: {</a>
+<a name="391"><span class="lineNum">     391 </span>                :<span class="lineCov">      23728 :             UniValue tmpVal;</span></a>
+<a name="392"><span class="lineNum">     392 </span>                :            :             switch (tok) {</a>
+<a name="393"><span class="lineNum">     393 </span>                :<span class="lineCov">       4704 :             case JTOK_KW_NULL:</span></a>
+<a name="394"><span class="lineNum">     394 </span>                :            :                 // do nothing more</a>
+<a name="395"><span class="lineNum">     395 </span>                :<span class="lineCov">       4704 :                 break;</span></a>
+<a name="396"><span class="lineNum">     396 </span>                :<span class="lineCov">       4876 :             case JTOK_KW_TRUE:</span></a>
+<a name="397"><span class="lineNum">     397 </span>        [<span class="branchCov" title="Branch 0 was taken 4876 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       4876 :                 tmpVal.setBool(true);</span></a>
+<a name="398"><span class="lineNum">     398 </span>                :<span class="lineCov">       4876 :                 break;</span></a>
+<a name="399"><span class="lineNum">     399 </span>                :<span class="lineCov">       2284 :             case JTOK_KW_FALSE:</span></a>
+<a name="400"><span class="lineNum">     400 </span>        [<span class="branchCov" title="Branch 0 was taken 2284 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       2284 :                 tmpVal.setBool(false);</span></a>
+<a name="401"><span class="lineNum">     401 </span>                :<span class="lineCov">       2284 :                 break;</span></a>
+<a name="402"><span class="lineNum">     402 </span>                :<span class="lineNoCov">          0 :             default: /* impossible */ break;</span></a>
+<a name="403"><span class="lineNum">     403 </span>                :            :             }</a>
+<a name="404"><span class="lineNum">     404 </span>                :            : </a>
+<a name="405"><span class="lineNum">     405 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 11861 times"> + </span>]:<span class="lineCov">      11864 :             if (!stack.size()) {</span></a>
+<a name="406"><span class="lineNum">     406 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          3 :                 *this = tmpVal;</span></a>
+<a name="407"><span class="lineNum">     407 </span>                :<span class="lineCov">          3 :                 break;</span></a>
+<a name="408"><span class="lineNum">     408 </span>                :            :             }</a>
+<a name="409"><span class="lineNum">     409 </span>                :            : </a>
+<a name="410"><span class="lineNum">     410 </span>                :<span class="lineCov">      11861 :             UniValue *top = stack.back();</span></a>
+<a name="411"><span class="lineNum">     411 </span>        [<span class="branchCov" title="Branch 0 was taken 11861 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      11861 :             top-&gt;values.push_back(tmpVal);</span></a>
+<a name="412"><span class="lineNum">     412 </span>                :            : </a>
+<a name="413"><span class="lineNum">     413 </span>                :<span class="lineCov">      11861 :             setExpect(NOT_VALUE);</span></a>
+<a name="414"><span class="lineNum">     414 </span>                :<span class="lineCov">      11861 :             break;</span></a>
+<a name="415"><span class="lineNum">     415 </span>                :            :             }</a>
+<a name="416"><span class="lineNum">     416 </span>                :            : </a>
+<a name="417"><span class="lineNum">     417 </span>                :<span class="lineCov">     207871 :         case JTOK_NUMBER: {</span></a>
+<a name="418"><span class="lineNum">     418 </span>        [<span class="branchCov" title="Branch 0 was taken 207871 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     415742 :             UniValue tmpVal(VNUM, tokenVal);</span></a>
+<a name="419"><span class="lineNum">     419 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 207870 times"> + </span>]:<span class="lineCov">     207871 :             if (!stack.size()) {</span></a>
+<a name="420"><span class="lineNum">     420 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          1 :                 *this = tmpVal;</span></a>
+<a name="421"><span class="lineNum">     421 </span>                :<span class="lineCov">          1 :                 break;</span></a>
+<a name="422"><span class="lineNum">     422 </span>                :            :             }</a>
+<a name="423"><span class="lineNum">     423 </span>                :            : </a>
+<a name="424"><span class="lineNum">     424 </span>                :<span class="lineCov">     207870 :             UniValue *top = stack.back();</span></a>
+<a name="425"><span class="lineNum">     425 </span>        [<span class="branchCov" title="Branch 0 was taken 207870 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     207870 :             top-&gt;values.push_back(tmpVal);</span></a>
+<a name="426"><span class="lineNum">     426 </span>                :            : </a>
+<a name="427"><span class="lineNum">     427 </span>                :<span class="lineCov">     207870 :             setExpect(NOT_VALUE);</span></a>
+<a name="428"><span class="lineNum">     428 </span>                :<span class="lineCov">     207870 :             break;</span></a>
+<a name="429"><span class="lineNum">     429 </span>                :            :             }</a>
+<a name="430"><span class="lineNum">     430 </span>                :            : </a>
+<a name="431"><span class="lineNum">     431 </span>                :<span class="lineCov">    1325206 :         case JTOK_STRING: {</span></a>
+<a name="432"><span class="lineNum">     432 </span>        [<span class="branchCov" title="Branch 0 was taken 614595 times"> + </span><span class="branchCov" title="Branch 1 was taken 710611 times"> + </span>]:<span class="lineCov">    1325206 :             if (expect(OBJ_NAME)) {</span></a>
+<a name="433"><span class="lineNum">     433 </span>                :<span class="lineCov">     614595 :                 UniValue *top = stack.back();</span></a>
+<a name="434"><span class="lineNum">     434 </span>        [<span class="branchCov" title="Branch 0 was taken 614595 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     614595 :                 top-&gt;keys.push_back(tokenVal);</span></a>
+<a name="435"><span class="lineNum">     435 </span>                :<span class="lineCov">     614595 :                 clearExpect(OBJ_NAME);</span></a>
+<a name="436"><span class="lineNum">     436 </span>                :<span class="lineCov">     614595 :                 setExpect(COLON);</span></a>
+<a name="437"><span class="lineNum">     437 </span>                :            :             } else {</a>
+<a name="438"><span class="lineNum">     438 </span>        [<span class="branchCov" title="Branch 0 was taken 710611 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     710611 :                 UniValue tmpVal(VSTR, tokenVal);</span></a>
+<a name="439"><span class="lineNum">     439 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 710608 times"> + </span>]:<span class="lineCov">     710611 :                 if (!stack.size()) {</span></a>
+<a name="440"><span class="lineNum">     440 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          3 :                     *this = tmpVal;</span></a>
+<a name="441"><span class="lineNum">     441 </span>                :<span class="lineCov">          3 :                     break;</span></a>
+<a name="442"><span class="lineNum">     442 </span>                :            :                 }</a>
+<a name="443"><span class="lineNum">     443 </span>                :<span class="lineCov">     710608 :                 UniValue *top = stack.back();</span></a>
+<a name="444"><span class="lineNum">     444 </span>        [<span class="branchCov" title="Branch 0 was taken 710608 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     710608 :                 top-&gt;values.push_back(tmpVal);</span></a>
+<a name="445"><span class="lineNum">     445 </span>                :            :             }</a>
+<a name="446"><span class="lineNum">     446 </span>                :            : </a>
+<a name="447"><span class="lineNum">     447 </span>                :<span class="lineCov">    1325203 :             setExpect(NOT_VALUE);</span></a>
+<a name="448"><span class="lineNum">     448 </span>                :<span class="lineCov">    1325203 :             break;</span></a>
+<a name="449"><span class="lineNum">     449 </span>                :            :             }</a>
+<a name="450"><span class="lineNum">     450 </span>                :            : </a>
+<a name="451"><span class="lineNum">     451 </span>                :<span class="lineNoCov">          0 :         default:</span></a>
+<a name="452"><span class="lineNum">     452 </span>                :<span class="lineNoCov">          0 :             return false;</span></a>
+<a name="453"><span class="lineNum">     453 </span>                :            :         }</a>
+<a name="454"><span class="lineNum">     454 </span>        [<span class="branchCov" title="Branch 0 was taken 3470940 times"> + </span><span class="branchCov" title="Branch 1 was taken 136414 times"> + </span>]:<span class="lineCov">    3607354 :     } while (!stack.empty ());</span></a>
+<a name="455"><span class="lineNum">     455 </span>                :            : </a>
+<a name="456"><span class="lineNum">     456 </span>                :            :     /* Check that nothing follows the initial construct (parsed above).  */</a>
+<a name="457"><span class="lineNum">     457 </span>        [<span class="branchCov" title="Branch 0 was taken 136414 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     136414 :     tok = getJsonToken(tokenVal, consumed, raw, end);</span></a>
+<a name="458"><span class="lineNum">     458 </span>        [<span class="branchCov" title="Branch 0 was taken 10 times"> + </span><span class="branchCov" title="Branch 1 was taken 136404 times"> + </span>]:<span class="lineCov">     136414 :     if (tok != JTOK_NONE)</span></a>
+<a name="459"><span class="lineNum">     459 </span>                :<span class="lineCov">         10 :         return false;</span></a>
+<a name="460"><span class="lineNum">     460 </span>                :            : </a>
+<a name="461"><span class="lineNum">     461 </span>                :<span class="lineCov">     136404 :     return true;</span></a>
+<a name="462"><span class="lineNum">     462 </span>                :            : }</a>
+<a name="463"><span class="lineNum">     463 </span>                :            : </a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
