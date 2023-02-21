@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/base58.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - base58.cpp<span style="font-size: 80%;"> (source / <a href="base58.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">84</td>
+            <td class="headerCovTableEntry">85</td>
+            <td class="headerCovTableEntryHi">98.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2000-01-01 12:00:00</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">84</td>
+            <td class="headerCovTableEntry">106</td>
+            <td class="headerCovTableEntryMed">79.2 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2014-2021 The Bitcoin Core developers</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : #include &lt;base58.h&gt;</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : </a>
+<a name="7"><span class="lineNum">       7 </span>                :            : #include &lt;hash.h&gt;</a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #include &lt;uint256.h&gt;</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;util/strencodings.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;util/string.h&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : </a>
+<a name="12"><span class="lineNum">      12 </span>                :            : #include &lt;assert.h&gt;</a>
+<a name="13"><span class="lineNum">      13 </span>                :            : #include &lt;string.h&gt;</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : </a>
+<a name="15"><span class="lineNum">      15 </span>                :            : #include &lt;limits&gt;</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : </a>
+<a name="17"><span class="lineNum">      17 </span>                :            : /** All alphanumeric characters except for &quot;0&quot;, &quot;I&quot;, &quot;O&quot;, and &quot;l&quot; */</a>
+<a name="18"><span class="lineNum">      18 </span>                :            : static const char* pszBase58 = &quot;123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz&quot;;</a>
+<a name="19"><span class="lineNum">      19 </span>                :            : static const int8_t mapBase58[256] = {</a>
+<a name="20"><span class="lineNum">      20 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="21"><span class="lineNum">      21 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="22"><span class="lineNum">      22 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="23"><span class="lineNum">      23 </span>                :            :     -1, 0, 1, 2, 3, 4, 5, 6,  7, 8,-1,-1,-1,-1,-1,-1,</a>
+<a name="24"><span class="lineNum">      24 </span>                :            :     -1, 9,10,11,12,13,14,15, 16,-1,17,18,19,20,21,-1,</a>
+<a name="25"><span class="lineNum">      25 </span>                :            :     22,23,24,25,26,27,28,29, 30,31,32,-1,-1,-1,-1,-1,</a>
+<a name="26"><span class="lineNum">      26 </span>                :            :     -1,33,34,35,36,37,38,39, 40,41,42,43,-1,44,45,46,</a>
+<a name="27"><span class="lineNum">      27 </span>                :            :     47,48,49,50,51,52,53,54, 55,56,57,-1,-1,-1,-1,-1,</a>
+<a name="28"><span class="lineNum">      28 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="29"><span class="lineNum">      29 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="30"><span class="lineNum">      30 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="31"><span class="lineNum">      31 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="32"><span class="lineNum">      32 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="33"><span class="lineNum">      33 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="34"><span class="lineNum">      34 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="35"><span class="lineNum">      35 </span>                :            :     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,</a>
+<a name="36"><span class="lineNum">      36 </span>                :            : };</a>
+<a name="37"><span class="lineNum">      37 </span>                :            : </a>
+<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">     356969 : [[nodiscard]] static bool DecodeBase58(const char* psz, std::vector&lt;unsigned char&gt;&amp; vch, int max_ret_len)</span></a>
+<a name="39"><span class="lineNum">      39 </span>                :            : {</a>
+<a name="40"><span class="lineNum">      40 </span>                :            :     // Skip leading spaces.</a>
+<a name="41"><span class="lineNum">      41 </span>  [<span class="branchCov" title="Branch 0 was taken 356956 times"> + </span><span class="branchCov" title="Branch 1 was taken 13 times"> + </span><span class="branchCov" title="Branch 2 was taken 14 times"> + </span><span class="branchCov" title="Branch 3 was taken 356942 times"> + </span> :<span class="lineCov">     356969 :     while (*psz &amp;&amp; IsSpace(*psz))</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 14 times"> + </span><span class="branchCov" title="Branch 5 was taken 356955 times"> + </span>]
+<a name="42"><span class="lineNum">      42 </span>                :<span class="lineCov">         14 :         psz++;</span></a>
+<a name="43"><span class="lineNum">      43 </span>                :            :     // Skip and count leading '1's.</a>
+<a name="44"><span class="lineNum">      44 </span>                :<span class="lineCov">     356955 :     int zeroes = 0;</span></a>
+<a name="45"><span class="lineNum">      45 </span>                :<span class="lineCov">     356955 :     int length = 0;</span></a>
+<a name="46"><span class="lineNum">      46 </span>        [<span class="branchCov" title="Branch 0 was taken 55002 times"> + </span><span class="branchCov" title="Branch 1 was taken 356725 times"> + </span>]:<span class="lineCov">     411727 :     while (*psz == '1') {</span></a>
+<a name="47"><span class="lineNum">      47 </span>                :<span class="lineCov">      55002 :         zeroes++;</span></a>
+<a name="48"><span class="lineNum">      48 </span>        [<span class="branchCov" title="Branch 0 was taken 230 times"> + </span><span class="branchCov" title="Branch 1 was taken 54772 times"> + </span>]:<span class="lineCov">      55002 :         if (zeroes &gt; max_ret_len) return false;</span></a>
+<a name="49"><span class="lineNum">      49 </span>                :<span class="lineCov">      54772 :         psz++;</span></a>
+<a name="50"><span class="lineNum">      50 </span>                :            :     }</a>
+<a name="51"><span class="lineNum">      51 </span>                :            :     // Allocate enough space in big-endian base256 representation.</a>
+<a name="52"><span class="lineNum">      52 </span>                :<span class="lineCov">     356725 :     int size = strlen(psz) * 733 /1000 + 1; // log(58) / log(256), rounded up.</span></a>
+<a name="53"><span class="lineNum">      53 </span>        [<span class="branchCov" title="Branch 0 was taken 356725 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     713450 :     std::vector&lt;unsigned char&gt; b256(size);</span></a>
+<a name="54"><span class="lineNum">      54 </span>                :            :     // Process the characters.</a>
+<a name="55"><span class="lineNum">      55 </span>                :            :     static_assert(std::size(mapBase58) == 256, &quot;mapBase58.size() should be 256&quot;); // guarantee not out of range</a>
+<a name="56"><span class="lineNum">      56 </span>  [<span class="branchCov" title="Branch 0 was taken 18840405 times"> + </span><span class="branchCov" title="Branch 1 was taken 354357 times"> + </span><span class="branchCov" title="Branch 2 was taken 18840397 times"> + </span><span class="branchCov" title="Branch 3 was taken 8 times"> + </span> :<span class="lineCov">   19194762 :     while (*psz &amp;&amp; !IsSpace(*psz)) {</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 18840397 times"> + </span><span class="branchCov" title="Branch 5 was taken 354365 times"> + </span>]
+<a name="57"><span class="lineNum">      57 </span>                :            :         // Decode base58 character</a>
+<a name="58"><span class="lineNum">      58 </span>                :<span class="lineCov">   18840397 :         int carry = mapBase58[(uint8_t)*psz];</span></a>
+<a name="59"><span class="lineNum">      59 </span>        [<span class="branchCov" title="Branch 0 was taken 1385 times"> + </span><span class="branchCov" title="Branch 1 was taken 18839012 times"> + </span>]:<span class="lineCov">   18840397 :         if (carry == -1)  // Invalid b58 character</span></a>
+<a name="60"><span class="lineNum">      60 </span>                :<span class="lineCov">       1385 :             return false;</span></a>
+<a name="61"><span class="lineNum">      61 </span>                :<span class="lineCov">   18839012 :         int i = 0;</span></a>
+<a name="62"><span class="lineNum">      62 </span>  [<span class="branchCov" title="Branch 0 was taken 25409981 times"> + </span><span class="branchCov" title="Branch 1 was taken 392160775 times"> + </span><span class="branchCov" title="Branch 2 was taken 6570969 times"> + </span><span class="branchCov" title="Branch 3 was taken 18839012 times"> + </span> :<span class="lineCov">  417570756 :         for (std::vector&lt;unsigned char&gt;::reverse_iterator it = b256.rbegin(); (carry != 0 || i &lt; length) &amp;&amp; (it != b256.rend()); ++it, ++i) {</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 398731744 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 398731744 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 398731744 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 9 was taken 18839012 times"> + </span>]
+<a name="63"><span class="lineNum">      63 </span>                :<span class="lineCov">  398731744 :             carry += 58 * (*it);</span></a>
+<a name="64"><span class="lineNum">      64 </span>                :<span class="lineCov">  398731744 :             *it = carry % 256;</span></a>
+<a name="65"><span class="lineNum">      65 </span>                :<span class="lineCov">  398731744 :             carry /= 256;</span></a>
+<a name="66"><span class="lineNum">      66 </span>                :            :         }</a>
+<a name="67"><span class="lineNum">      67 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 18839012 times"> + </span>]:<span class="lineCov">   18839012 :         assert(carry == 0);</span></a>
+<a name="68"><span class="lineNum">      68 </span>                :<span class="lineCov">   18839012 :         length = i;</span></a>
+<a name="69"><span class="lineNum">      69 </span>        [<span class="branchCov" title="Branch 0 was taken 975 times"> + </span><span class="branchCov" title="Branch 1 was taken 18838037 times"> + </span>]:<span class="lineCov">   18839012 :         if (length + zeroes &gt; max_ret_len) return false;</span></a>
+<a name="70"><span class="lineNum">      70 </span>                :<span class="lineCov">   18838037 :         psz++;</span></a>
+<a name="71"><span class="lineNum">      71 </span>                :            :     }</a>
+<a name="72"><span class="lineNum">      72 </span>                :            :     // Skip trailing spaces.</a>
+<a name="73"><span class="lineNum">      73 </span>        [<span class="branchCov" title="Branch 0 was taken 20 times"> + </span><span class="branchCov" title="Branch 1 was taken 354365 times"> + </span>]:<span class="lineCov">     354385 :     while (IsSpace(*psz))</span></a>
+<a name="74"><span class="lineNum">      74 </span>                :<span class="lineCov">         20 :         psz++;</span></a>
+<a name="75"><span class="lineNum">      75 </span>        [<span class="branchCov" title="Branch 0 was taken 7 times"> + </span><span class="branchCov" title="Branch 1 was taken 354358 times"> + </span>]:<span class="lineCov">     354365 :     if (*psz != 0)</span></a>
+<a name="76"><span class="lineNum">      76 </span>                :<span class="lineCov">          7 :         return false;</span></a>
+<a name="77"><span class="lineNum">      77 </span>                :            :     // Skip leading zeroes in b256.</a>
+<a name="78"><span class="lineNum">      78 </span>                :<span class="lineCov">     354358 :     std::vector&lt;unsigned char&gt;::iterator it = b256.begin() + (size - length);</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :            :     // Copy result into output vector.</a>
+<a name="80"><span class="lineNum">      80 </span>        [<span class="branchCov" title="Branch 0 was taken 354358 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     354358 :     vch.reserve(zeroes + (b256.end() - it));</span></a>
+<a name="81"><span class="lineNum">      81 </span>        [<span class="branchCov" title="Branch 0 was taken 354358 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     354358 :     vch.assign(zeroes, 0x00);</span></a>
+<a name="82"><span class="lineNum">      82 </span>        [<span class="branchCov" title="Branch 0 was taken 13717189 times"> + </span><span class="branchCov" title="Branch 1 was taken 354358 times"> + </span>]:<span class="lineCov">   14071547 :     while (it != b256.end())</span></a>
+<a name="83"><span class="lineNum">      83 </span>        [<span class="branchCov" title="Branch 0 was taken 13717189 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   13717189 :         vch.push_back(*(it++));</span></a>
+<a name="84"><span class="lineNum">      84 </span>                :<span class="lineCov">     354358 :     return true;</span></a>
+<a name="85"><span class="lineNum">      85 </span>                :            : }</a>
+<a name="86"><span class="lineNum">      86 </span>                :            : </a>
+<a name="87"><span class="lineNum">      87 </span>                :<span class="lineCov">     243094 : std::string EncodeBase58(Span&lt;const unsigned char&gt; input)</span></a>
+<a name="88"><span class="lineNum">      88 </span>                :            : {</a>
+<a name="89"><span class="lineNum">      89 </span>                :            :     // Skip &amp; count leading zeroes.</a>
+<a name="90"><span class="lineNum">      90 </span>                :<span class="lineCov">     243094 :     int zeroes = 0;</span></a>
+<a name="91"><span class="lineNum">      91 </span>                :<span class="lineCov">     243094 :     int length = 0;</span></a>
+<a name="92"><span class="lineNum">      92 </span>  [<span class="branchCov" title="Branch 0 was taken 275655 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span><span class="branchCov" title="Branch 2 was taken 32563 times"> + </span><span class="branchCov" title="Branch 3 was taken 243092 times"> + </span> :<span class="lineCov">     275657 :     while (input.size() &gt; 0 &amp;&amp; input[0] == 0) {</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 32563 times"> + </span><span class="branchCov" title="Branch 5 was taken 243094 times"> + </span>]
+<a name="93"><span class="lineNum">      93 </span>                :<span class="lineCov">      32563 :         input = input.subspan(1);</span></a>
+<a name="94"><span class="lineNum">      94 </span>                :<span class="lineCov">      32563 :         zeroes++;</span></a>
+<a name="95"><span class="lineNum">      95 </span>                :            :     }</a>
+<a name="96"><span class="lineNum">      96 </span>                :            :     // Allocate enough space in big-endian base58 representation.</a>
+<a name="97"><span class="lineNum">      97 </span>                :<span class="lineCov">     243094 :     int size = input.size() * 138 / 100 + 1; // log(256) / log(58), rounded up.</span></a>
+<a name="98"><span class="lineNum">      98 </span>        [<span class="branchCov" title="Branch 0 was taken 243094 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     486188 :     std::vector&lt;unsigned char&gt; b58(size);</span></a>
+<a name="99"><span class="lineNum">      99 </span>                :            :     // Process the bytes.</a>
+<a name="100"><span class="lineNum">     100 </span>        [<span class="branchCov" title="Branch 0 was taken 16250163 times"> + </span><span class="branchCov" title="Branch 1 was taken 243092 times"> + </span>]:<span class="lineCov">   16493250 :     while (input.size() &gt; 0) {</span></a>
+<a name="101"><span class="lineNum">     101 </span>                :<span class="lineCov">   16250163 :         int carry = input[0];</span></a>
+<a name="102"><span class="lineNum">     102 </span>                :<span class="lineCov">   16250163 :         int i = 0;</span></a>
+<a name="103"><span class="lineNum">     103 </span>                :            :         // Apply &quot;b58 = b58 * 256 + ch&quot;.</a>
+<a name="104"><span class="lineNum">     104 </span>  [<span class="branchCov" title="Branch 0 was taken 20990434 times"> + </span><span class="branchCov" title="Branch 1 was taken 850310171 times"> + </span><span class="branchCov" title="Branch 2 was taken 4739351 times"> + </span><span class="branchCov" title="Branch 3 was taken 16251083 times"> + </span> :<span class="lineCov">  871299586 :         for (std::vector&lt;unsigned char&gt;::reverse_iterator it = b58.rbegin(); (carry != 0 || i &lt; length) &amp;&amp; (it != b58.rend()); it++, i++) {</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 855057257 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 855058185 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 855058398 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 9 was taken 16249942 times"> + </span>]
+<a name="105"><span class="lineNum">     105 </span>                :<span class="lineCov">  855058398 :             carry += 256 * (*it);</span></a>
+<a name="106"><span class="lineNum">     106 </span>                :<span class="lineCov">  855046645 :             *it = carry % 58;</span></a>
+<a name="107"><span class="lineNum">     107 </span>        [<span class="branchCov" title="Branch 0 was taken 855049423 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">  855059106 :             carry /= 58;</span></a>
+<a name="108"><span class="lineNum">     108 </span>                :            :         }</a>
+<a name="109"><span class="lineNum">     109 </span>                :            : </a>
+<a name="110"><span class="lineNum">     110 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 16249942 times"> + </span>]:<span class="lineCov">   16249942 :         assert(carry == 0);</span></a>
+<a name="111"><span class="lineNum">     111 </span>                :<span class="lineCov">   16249942 :         length = i;</span></a>
+<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">   16249942 :         input = input.subspan(1);</span></a>
+<a name="113"><span class="lineNum">     113 </span>                :            :     }</a>
+<a name="114"><span class="lineNum">     114 </span>                :            :     // Skip leading zeroes in base58 result.</a>
+<a name="115"><span class="lineNum">     115 </span>                :<span class="lineCov">     243092 :     std::vector&lt;unsigned char&gt;::iterator it = b58.begin() + (size - length);</span></a>
+<a name="116"><span class="lineNum">     116 </span>  [<span class="branchCov" title="Branch 0 was taken 243092 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 243092 times"> + </span> :<span class="lineCov">     243094 :     while (it != b58.end() &amp;&amp; *it == 0)</span></a>
+<span class="lineNum">         </span>         <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchCov" title="Branch 5 was taken 243094 times"> + </span>]
+<a name="117"><span class="lineNum">     117 </span>                :<span class="lineNoCov">          0 :         it++;</span></a>
+<a name="118"><span class="lineNum">     118 </span>                :            :     // Translate the result into a string.</a>
+<a name="119"><span class="lineNum">     119 </span>                :<span class="lineCov">     243094 :     std::string str;</span></a>
+<a name="120"><span class="lineNum">     120 </span>        [<span class="branchCov" title="Branch 0 was taken 243094 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     243094 :     str.reserve(zeroes + (b58.end() - it));</span></a>
+<a name="121"><span class="lineNum">     121 </span>        [<span class="branchCov" title="Branch 0 was taken 243094 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     243094 :     str.assign(zeroes, '1');</span></a>
+<a name="122"><span class="lineNum">     122 </span>        [<span class="branchCov" title="Branch 0 was taken 22027738 times"> + </span><span class="branchCov" title="Branch 1 was taken 243094 times"> + </span>]:<span class="lineCov">   22270835 :     while (it != b58.end())</span></a>
+<a name="123"><span class="lineNum">     123 </span>        [<span class="branchCov" title="Branch 0 was taken 22027741 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   22027738 :         str += pszBase58[*(it++)];</span></a>
+<a name="124"><span class="lineNum">     124 </span>                :<span class="lineCov">     486188 :     return str;</span></a>
+<a name="125"><span class="lineNum">     125 </span>                :            : }</a>
+<a name="126"><span class="lineNum">     126 </span>                :            : </a>
+<a name="127"><span class="lineNum">     127 </span>                :<span class="lineCov">        337 : bool DecodeBase58(const std::string&amp; str, std::vector&lt;unsigned char&gt;&amp; vchRet, int max_ret_len)</span></a>
+<a name="128"><span class="lineNum">     128 </span>                :            : {</a>
+<a name="129"><span class="lineNum">     129 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 334 times"> + </span>]:<span class="lineCov">        337 :     if (!ContainsNoNUL(str)) {</span></a>
+<a name="130"><span class="lineNum">     130 </span>                :<span class="lineCov">          3 :         return false;</span></a>
+<a name="131"><span class="lineNum">     131 </span>                :            :     }</a>
+<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">        334 :     return DecodeBase58(str.c_str(), vchRet, max_ret_len);</span></a>
+<a name="133"><span class="lineNum">     133 </span>                :            : }</a>
+<a name="134"><span class="lineNum">     134 </span>                :            : </a>
+<a name="135"><span class="lineNum">     135 </span>                :<span class="lineCov">     243080 : std::string EncodeBase58Check(Span&lt;const unsigned char&gt; input)</span></a>
+<a name="136"><span class="lineNum">     136 </span>                :            : {</a>
+<a name="137"><span class="lineNum">     137 </span>                :            :     // add 4-byte hash check to the end</a>
+<a name="138"><span class="lineNum">     138 </span>        [<span class="branchCov" title="Branch 0 was taken 243080 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     486160 :     std::vector&lt;unsigned char&gt; vch(input.begin(), input.end());</span></a>
+<a name="139"><span class="lineNum">     139 </span>        [<span class="branchCov" title="Branch 0 was taken 243080 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     243080 :     uint256 hash = Hash(vch);</span></a>
+<a name="140"><span class="lineNum">     140 </span>        [<span class="branchCov" title="Branch 0 was taken 243080 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     243080 :     vch.insert(vch.end(), (unsigned char*)&amp;hash, (unsigned char*)&amp;hash + 4);</span></a>
+<a name="141"><span class="lineNum">     141 </span>        [<span class="branchCov" title="Branch 0 was taken 243080 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     486160 :     return EncodeBase58(vch);</span></a>
+<a name="142"><span class="lineNum">     142 </span>                :            : }</a>
+<a name="143"><span class="lineNum">     143 </span>                :            : </a>
+<a name="144"><span class="lineNum">     144 </span>                :<span class="lineCov">     356621 : [[nodiscard]] static bool DecodeBase58Check(const char* psz, std::vector&lt;unsigned char&gt;&amp; vchRet, int max_ret_len)</span></a>
+<a name="145"><span class="lineNum">     145 </span>                :            : {</a>
+<a name="146"><span class="lineNum">     146 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 356621 times"> + </span><span class="branchCov" title="Branch 2 was taken 354196 times"> + </span><span class="branchCov" title="Branch 3 was taken 2425 times"> + </span> :<span class="lineCov">     710817 :     if (!DecodeBase58(psz, vchRet, max_ret_len &gt; std::numeric_limits&lt;int&gt;::max() - 4 ? std::numeric_limits&lt;int&gt;::max() : max_ret_len + 4) ||</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 20 times"> + </span><span class="branchCov" title="Branch 5 was taken 354176 times"> + </span><span class="branchCov" title="Branch 6 was taken 2445 times"> + </span><span class="branchCov" title="Branch 7 was taken 354176 times"> + </span>]
+<a name="147"><span class="lineNum">     147 </span>                :<span class="lineCov">     354196 :         (vchRet.size() &lt; 4)) {</span></a>
+<a name="148"><span class="lineNum">     148 </span>                :<span class="lineCov">       2445 :         vchRet.clear();</span></a>
+<a name="149"><span class="lineNum">     149 </span>                :<span class="lineCov">       2445 :         return false;</span></a>
+<a name="150"><span class="lineNum">     150 </span>                :            :     }</a>
+<a name="151"><span class="lineNum">     151 </span>                :            :     // re-calculate the checksum, ensure it matches the included 4-byte checksum</a>
+<a name="152"><span class="lineNum">     152 </span>                :<span class="lineCov">     354176 :     uint256 hash = Hash(Span{vchRet}.first(vchRet.size() - 4));</span></a>
+<a name="153"><span class="lineNum">     153 </span>        [<span class="branchCov" title="Branch 0 was taken 75 times"> + </span><span class="branchCov" title="Branch 1 was taken 354101 times"> + </span>]:<span class="lineCov">     354176 :     if (memcmp(&amp;hash, &amp;vchRet[vchRet.size() - 4], 4) != 0) {</span></a>
+<a name="154"><span class="lineNum">     154 </span>                :<span class="lineCov">         75 :         vchRet.clear();</span></a>
+<a name="155"><span class="lineNum">     155 </span>                :<span class="lineCov">         75 :         return false;</span></a>
+<a name="156"><span class="lineNum">     156 </span>                :            :     }</a>
+<a name="157"><span class="lineNum">     157 </span>                :<span class="lineCov">     354101 :     vchRet.resize(vchRet.size() - 4);</span></a>
+<a name="158"><span class="lineNum">     158 </span>                :<span class="lineCov">     354101 :     return true;</span></a>
+<a name="159"><span class="lineNum">     159 </span>                :            : }</a>
+<a name="160"><span class="lineNum">     160 </span>                :            : </a>
+<a name="161"><span class="lineNum">     161 </span>                :<span class="lineCov">     356622 : bool DecodeBase58Check(const std::string&amp; str, std::vector&lt;unsigned char&gt;&amp; vchRet, int max_ret)</span></a>
+<a name="162"><span class="lineNum">     162 </span>                :            : {</a>
+<a name="163"><span class="lineNum">     163 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 356621 times"> + </span>]:<span class="lineCov">     356622 :     if (!ContainsNoNUL(str)) {</span></a>
+<a name="164"><span class="lineNum">     164 </span>                :<span class="lineCov">          1 :         return false;</span></a>
+<a name="165"><span class="lineNum">     165 </span>                :            :     }</a>
+<a name="166"><span class="lineNum">     166 </span>                :<span class="lineCov">     356621 :     return DecodeBase58Check(str.c_str(), vchRet, max_ret);</span></a>
+<a name="167"><span class="lineNum">     167 </span>                :            : }</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
