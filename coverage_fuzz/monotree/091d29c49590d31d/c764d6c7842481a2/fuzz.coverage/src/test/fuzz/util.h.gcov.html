@@ -1,0 +1,484 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/util.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/test/fuzz</a> - util.h<span style="font-size: 80%;"> (source / <a href="util.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">150</td>
+            <td class="headerCovTableEntry">151</td>
+            <td class="headerCovTableEntryHi">99.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2023-10-19 20:42:17</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">155</td>
+            <td class="headerCovTableEntry">157</td>
+            <td class="headerCovTableEntryHi">98.7 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">276</td>
+            <td class="headerCovTableEntry">390</td>
+            <td class="headerCovTableEntryLo">70.8 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2009-2022 The Bitcoin Core developers</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : #ifndef BITCOIN_TEST_FUZZ_UTIL_H</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #define BITCOIN_TEST_FUZZ_UTIL_H</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #include &lt;addresstype.h&gt;</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;arith_uint256.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;coins.h&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #include &lt;compat/compat.h&gt;</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : #include &lt;consensus/amount.h&gt;</a>
+<a name="13"><span class="lineNum">      13 </span>                :            : #include &lt;consensus/consensus.h&gt;</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : #include &lt;key.h&gt;</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : #include &lt;merkleblock.h&gt;</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : #include &lt;primitives/transaction.h&gt;</a>
+<a name="17"><span class="lineNum">      17 </span>                :            : #include &lt;script/script.h&gt;</a>
+<a name="18"><span class="lineNum">      18 </span>                :            : #include &lt;serialize.h&gt;</a>
+<a name="19"><span class="lineNum">      19 </span>                :            : #include &lt;streams.h&gt;</a>
+<a name="20"><span class="lineNum">      20 </span>                :            : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</a>
+<a name="21"><span class="lineNum">      21 </span>                :            : #include &lt;test/fuzz/fuzz.h&gt;</a>
+<a name="22"><span class="lineNum">      22 </span>                :            : #include &lt;uint256.h&gt;</a>
+<a name="23"><span class="lineNum">      23 </span>                :            : #include &lt;version.h&gt;</a>
+<a name="24"><span class="lineNum">      24 </span>                :            : </a>
+<a name="25"><span class="lineNum">      25 </span>                :            : #include &lt;algorithm&gt;</a>
+<a name="26"><span class="lineNum">      26 </span>                :            : #include &lt;array&gt;</a>
+<a name="27"><span class="lineNum">      27 </span>                :            : #include &lt;cstdint&gt;</a>
+<a name="28"><span class="lineNum">      28 </span>                :            : #include &lt;cstdio&gt;</a>
+<a name="29"><span class="lineNum">      29 </span>                :            : #include &lt;optional&gt;</a>
+<a name="30"><span class="lineNum">      30 </span>                :            : #include &lt;string&gt;</a>
+<a name="31"><span class="lineNum">      31 </span>                :            : #include &lt;vector&gt;</a>
+<a name="32"><span class="lineNum">      32 </span>                :            : </a>
+<a name="33"><span class="lineNum">      33 </span>                :            : class PeerManager;</a>
+<a name="34"><span class="lineNum">      34 </span>                :            : </a>
+<a name="35"><span class="lineNum">      35 </span>                :            : template &lt;typename... Callables&gt;</a>
+<a name="36"><span class="lineNum">      36 </span>                :<span class="lineCov">  168614522 : size_t CallOneOf(FuzzedDataProvider&amp; fuzzed_data_provider, Callables... callables)</span></a>
+<a name="37"><span class="lineNum">      37 </span>                :            : {</a>
+<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">  168614522 :     constexpr size_t call_size{sizeof...(callables)};</span></a>
+<a name="39"><span class="lineNum">      39 </span>                :            :     static_assert(call_size &gt;= 1);</a>
+<a name="40"><span class="lineNum">      40 </span>                :<span class="lineCov">  168614522 :     const size_t call_index{fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, call_size - 1)};</span></a>
+<a name="41"><span class="lineNum">      41 </span>                :            : </a>
+<a name="42"><span class="lineNum">      42 </span>                :<span class="lineCov">  168614522 :     size_t i{0};</span></a>
+<a name="43"><span class="lineNum">      43 </span>  [<span class="branchCov" title="Branch 0 was taken 31 times"> + </span><span class="branchCov" title="Branch 1 was taken 31 times"> + </span><span class="branchCov" title="Branch 2 was taken 31 times"> + </span><span class="branchCov" title="Branch 3 was taken 31 times"> + </span> :<span class="lineCov">  168614522 :     ((i++ == call_index ? callables() : void()), ...);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 30 times"> + </span><span class="branchCov" title="Branch 5 was taken 30 times"> + </span><span class="branchCov" title="Branch 6 was taken 26 times"> + </span><span class="branchCov" title="Branch 7 was taken 26 times"> + </span><span class="branchCov" title="Branch 8 was taken 21 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 9 was taken 21 times"> + </span><span class="branchCov" title="Branch 10 was taken 21 times"> + </span><span class="branchCov" title="Branch 11 was taken 21 times"> + </span><span class="branchCov" title="Branch 12 was taken 18 times"> + </span><span class="branchCov" title="Branch 13 was taken 18 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 15 times"> + </span><span class="branchCov" title="Branch 15 was taken 15 times"> + </span><span class="branchCov" title="Branch 16 was taken 14 times"> + </span><span class="branchCov" title="Branch 17 was taken 14 times"> + </span><span class="branchCov" title="Branch 18 was taken 14 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 19 was taken 14 times"> + </span><span class="branchCov" title="Branch 20 was taken 13 times"> + </span><span class="branchCov" title="Branch 21 was taken 13 times"> + </span><span class="branchCov" title="Branch 22 was taken 13 times"> + </span><span class="branchCov" title="Branch 23 was taken 13 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 24 was taken 11 times"> + </span><span class="branchCov" title="Branch 25 was taken 11 times"> + </span><span class="branchCov" title="Branch 26 was taken 10 times"> + </span><span class="branchCov" title="Branch 27 was taken 10 times"> + </span><span class="branchCov" title="Branch 28 was taken 9 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 29 was taken 9 times"> + </span><span class="branchCov" title="Branch 30 was taken 9 times"> + </span><span class="branchCov" title="Branch 31 was taken 9 times"> + </span><span class="branchCov" title="Branch 32 was taken 8 times"> + </span><span class="branchCov" title="Branch 33 was taken 8 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 34 was taken 6 times"> + </span><span class="branchCov" title="Branch 35 was taken 6 times"> + </span><span class="branchCov" title="Branch 36 was taken 6 times"> + </span><span class="branchCov" title="Branch 37 was taken 6 times"> + </span><span class="branchCov" title="Branch 38 was taken 6 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 39 was taken 6 times"> + </span><span class="branchCov" title="Branch 40 was taken 4 times"> + </span><span class="branchCov" title="Branch 41 was taken 4 times"> + </span><span class="branchCov" title="Branch 42 was taken 3 times"> + </span><span class="branchCov" title="Branch 43 was taken 3 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 44 was taken 3 times"> + </span><span class="branchCov" title="Branch 45 was taken 3 times"> + </span><span class="branchCov" title="Branch 46 was taken 3 times"> + </span><span class="branchCov" title="Branch 47 was taken 3 times"> + </span><span class="branchCov" title="Branch 48 was taken 2 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 49 was taken 2 times"> + </span><span class="branchCov" title="Branch 50 was taken 2 times"> + </span><span class="branchCov" title="Branch 51 was taken 2 times"> + </span><span class="branchCov" title="Branch 52 was taken 2 times"> + </span><span class="branchCov" title="Branch 53 was taken 2 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 54 was taken 2 times"> + </span><span class="branchCov" title="Branch 55 was taken 2 times"> + </span><span class="branchCov" title="Branch 56 was taken 1 time"> + </span><span class="branchCov" title="Branch 57 was taken 1 time"> + </span><span class="branchCov" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 59 was taken 1 time"> + </span><span class="branchCov" title="Branch 60 was taken 1 time"> + </span><span class="branchCov" title="Branch 61 was taken 1 time"> + </span><span class="branchCov" title="Branch 62 was taken 1 time"> + </span><span class="branchCov" title="Branch 63 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 64 was taken 1 time"> + </span><span class="branchCov" title="Branch 65 was taken 1 time"> + </span><span class="branchCov" title="Branch 66 was taken 1 time"> + </span><span class="branchCov" title="Branch 67 was taken 1 time"> + </span><span class="branchCov" title="Branch 68 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 69 was taken 1 time"> + </span><span class="branchCov" title="Branch 70 was taken 1 time"> + </span><span class="branchCov" title="Branch 71 was taken 1 time"> + </span><span class="branchCov" title="Branch 72 was taken 1 time"> + </span><span class="branchCov" title="Branch 73 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 74 was taken 1 time"> + </span><span class="branchCov" title="Branch 75 was taken 1 time"> + </span><span class="branchCov" title="Branch 76 was taken 1 time"> + </span><span class="branchCov" title="Branch 77 was taken 1 time"> + </span><span class="branchCov" title="Branch 78 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 79 was taken 1 time"> + </span><span class="branchCov" title="Branch 80 was taken 1 time"> + </span><span class="branchCov" title="Branch 81 was taken 1 time"> + </span><span class="branchCov" title="Branch 82 was taken 1 time"> + </span><span class="branchCov" title="Branch 83 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 84 was taken 1 time"> + </span><span class="branchCov" title="Branch 85 was taken 1 time"> + </span><span class="branchCov" title="Branch 86 was taken 1 time"> + </span><span class="branchCov" title="Branch 87 was taken 1 time"> + </span><span class="branchCov" title="Branch 88 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>      <span class="branchCov" title="Branch 89 was taken 1 time"> + </span><span class="branchCov" title="Branch 90 was taken 1 time"> + </span><span class="branchCov" title="Branch 91 was taken 1 time"> + </span>]
+<a name="44"><span class="lineNum">      44 </span>                :<span class="lineCov">  168468864 :     return call_size;</span></a>
+<a name="45"><span class="lineNum">      45 </span>                :            : }</a>
+<a name="46"><span class="lineNum">      46 </span>                :            : </a>
+<a name="47"><span class="lineNum">      47 </span>                :            : template &lt;typename Collection&gt;</a>
+<a name="48"><span class="lineNum">      48 </span>                :<span class="lineCov">   27482706 : auto&amp; PickValue(FuzzedDataProvider&amp; fuzzed_data_provider, Collection&amp; col)</span></a>
+<a name="49"><span class="lineNum">      49 </span>                :            : {</a>
+<a name="50"><span class="lineNum">      50 </span>                :<span class="lineCov">   27482706 :     auto sz{col.size()};</span></a>
+<a name="51"><span class="lineNum">      51 </span>  [<span class="branchCov" title="Branch 0 was taken 7 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">   27482706 :     assert(sz &gt;= 1);</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="52"><span class="lineNum">      52 </span>                :<span class="lineCov">   27482706 :     auto it = col.begin();</span></a>
+<a name="53"><span class="lineNum">      53 </span>                :<span class="lineCov">   27482706 :     std::advance(it, fuzzed_data_provider.ConsumeIntegralInRange&lt;decltype(sz)&gt;(0, sz - 1));</span></a>
+<a name="54"><span class="lineNum">      54 </span>                :<span class="lineCov">   27482706 :     return *it;</span></a>
+<a name="55"><span class="lineNum">      55 </span>                :            : }</a>
+<a name="56"><span class="lineNum">      56 </span>                :            : </a>
+<a name="57"><span class="lineNum">      57 </span>                :            : template&lt;typename B = uint8_t&gt;</a>
+<a name="58"><span class="lineNum">      58 </span>                :<span class="lineCov">   12079724 : [[nodiscard]] inline std::vector&lt;B&gt; ConsumeRandomLengthByteVector(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></a>
+<a name="59"><span class="lineNum">      59 </span>                :            : {</a>
+<a name="60"><span class="lineNum">      60 </span>                :            :     static_assert(sizeof(B) == 1);</a>
+<a name="61"><span class="lineNum">      61 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">   24159448 :     const std::string s = max_length ?</span></a>
+<a name="62"><span class="lineNum">      62 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     768616 :                               fuzzed_data_provider.ConsumeRandomLengthString(*max_length) :</span></a>
+<a name="63"><span class="lineNum">      63 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   11311108 :                               fuzzed_data_provider.ConsumeRandomLengthString();</span></a>
+<a name="64"><span class="lineNum">      64 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   12079724 :     std::vector&lt;B&gt; ret(s.size());</span></a>
+<a name="65"><span class="lineNum">      65 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   12079724 :     std::copy(s.begin(), s.end(), reinterpret_cast&lt;char*&gt;(ret.data()));</span></a>
+<a name="66"><span class="lineNum">      66 </span>                :<span class="lineCov">   12079724 :     return ret;</span></a>
+<a name="67"><span class="lineNum">      67 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   12079724 : }</span></a>
+<a name="68"><span class="lineNum">      68 </span>                :            : </a>
+<a name="69"><span class="lineNum">      69 </span>                :<span class="lineCov">      13961 : [[nodiscard]] inline std::vector&lt;bool&gt; ConsumeRandomLengthBitVector(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></a>
+<a name="70"><span class="lineNum">      70 </span>                :            : {</a>
+<a name="71"><span class="lineNum">      71 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      13961 :     return BytesToBits(ConsumeRandomLengthByteVector(fuzzed_data_provider, max_length));</span></a>
+<a name="72"><span class="lineNum">      72 </span>                :            : }</a>
+<a name="73"><span class="lineNum">      73 </span>                :            : </a>
+<a name="74"><span class="lineNum">      74 </span>                :<span class="lineCov">      17186 : [[nodiscard]] inline DataStream ConsumeDataStream(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></a>
+<a name="75"><span class="lineNum">      75 </span>                :            : {</a>
+<a name="76"><span class="lineNum">      76 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      17186 :     return DataStream{ConsumeRandomLengthByteVector(fuzzed_data_provider, max_length)};</span></a>
+<a name="77"><span class="lineNum">      77 </span>                :            : }</a>
+<a name="78"><span class="lineNum">      78 </span>                :            : </a>
+<a name="79"><span class="lineNum">      79 </span>                :<span class="lineCov">     320271 : [[nodiscard]] inline std::vector&lt;std::string&gt; ConsumeRandomLengthStringVector(FuzzedDataProvider&amp; fuzzed_data_provider, const size_t max_vector_size = 16, const size_t max_string_length = 16) noexcept</span></a>
+<a name="80"><span class="lineNum">      80 </span>                :            : {</a>
+<a name="81"><span class="lineNum">      81 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     320271 :     const size_t n_elements = fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, max_vector_size);</span></a>
+<a name="82"><span class="lineNum">      82 </span>                :<span class="lineCov">     320271 :     std::vector&lt;std::string&gt; r;</span></a>
+<a name="83"><span class="lineNum">      83 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    2014458 :     for (size_t i = 0; i &lt; n_elements; ++i) {</span></a>
+<a name="84"><span class="lineNum">      84 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    1694187 :         r.push_back(fuzzed_data_provider.ConsumeRandomLengthString(max_string_length));</span></a>
+<a name="85"><span class="lineNum">      85 </span>                :<span class="lineCov">    1694187 :     }</span></a>
+<a name="86"><span class="lineNum">      86 </span>                :<span class="lineCov">     320271 :     return r;</span></a>
+<a name="87"><span class="lineNum">      87 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     320271 : }</span></a>
+<a name="88"><span class="lineNum">      88 </span>                :            : </a>
+<a name="89"><span class="lineNum">      89 </span>                :            : template &lt;typename T&gt;</a>
+<a name="90"><span class="lineNum">      90 </span>                :<span class="lineCov">       4611 : [[nodiscard]] inline std::vector&lt;T&gt; ConsumeRandomLengthIntegralVector(FuzzedDataProvider&amp; fuzzed_data_provider, const size_t max_vector_size = 16) noexcept</span></a>
+<a name="91"><span class="lineNum">      91 </span>                :            : {</a>
+<a name="92"><span class="lineNum">      92 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       4611 :     const size_t n_elements = fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, max_vector_size);</span></a>
+<a name="93"><span class="lineNum">      93 </span>                :<span class="lineCov">       4611 :     std::vector&lt;T&gt; r;</span></a>
+<a name="94"><span class="lineNum">      94 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span>]:<span class="lineCov">      28469 :     for (size_t i = 0; i &lt; n_elements; ++i) {</span></a>
+<a name="95"><span class="lineNum">      95 </span>  [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">      23858 :         r.push_back(fuzzed_data_provider.ConsumeIntegral&lt;T&gt;());</span></a>
+<a name="96"><span class="lineNum">      96 </span>                :<span class="lineCov">      23858 :     }</span></a>
+<a name="97"><span class="lineNum">      97 </span>                :<span class="lineCov">       4611 :     return r;</span></a>
+<a name="98"><span class="lineNum">      98 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       4611 : }</span></a>
+<a name="99"><span class="lineNum">      99 </span>                :            : </a>
+<a name="100"><span class="lineNum">     100 </span>                :            : template &lt;typename P&gt;</a>
+<a name="101"><span class="lineNum">     101 </span>                :            : [[nodiscard]] P ConsumeDeserializationParams(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept;</a>
+<a name="102"><span class="lineNum">     102 </span>                :            : </a>
+<a name="103"><span class="lineNum">     103 </span>                :            : template &lt;typename T, typename P&gt;</a>
+<a name="104"><span class="lineNum">     104 </span>                :<span class="lineCov">      12939 : [[nodiscard]] std::optional&lt;T&gt; ConsumeDeserializable(FuzzedDataProvider&amp; fuzzed_data_provider, const P&amp; params, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></a>
+<a name="105"><span class="lineNum">     105 </span>                :            : {</a>
+<a name="106"><span class="lineNum">     106 </span>                :<span class="lineCov">      12939 :     const std::vector&lt;uint8_t&gt; buffer{ConsumeRandomLengthByteVector(fuzzed_data_provider, max_length)};</span></a>
+<a name="107"><span class="lineNum">     107 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      12939 :     DataStream ds{buffer};</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 14 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span>]
+<a name="108"><span class="lineNum">     108 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      12939 :     T obj;</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="109"><span class="lineNum">     109 </span>                :            :     try {</a>
+<a name="110"><span class="lineNum">     110 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">      12939 :         ds &gt;&gt; WithParams(params, obj);</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchCov" title="Branch 7 was taken 1 time"> + </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 1 time"> + </span><span class="branchCov" title="Branch 11 was taken 1 time"> + </span><span class="branchCov" title="Branch 12 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 14 was taken 1 time"> + </span><span class="branchCov" title="Branch 15 was taken 1 time"> + </span>]
+<a name="111"><span class="lineNum">     111 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      12939 :     } catch (const std::ios_base::failure&amp;) {</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="112"><span class="lineNum">     112 </span>                :<span class="lineCov">       8258 :         return std::nullopt;</span></a>
+<a name="113"><span class="lineNum">     113 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">       8258 :     }</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="114"><span class="lineNum">     114 </span>                :<span class="lineCov">       4681 :     return obj;</span></a>
+<a name="115"><span class="lineNum">     115 </span>                :<span class="lineCov">      21197 : }</span></a>
+<a name="116"><span class="lineNum">     116 </span>                :            : </a>
+<a name="117"><span class="lineNum">     117 </span>                :            : template &lt;typename T&gt;</a>
+<a name="118"><span class="lineNum">     118 </span>                :<span class="lineCov">    3644225 : [[nodiscard]] inline std::optional&lt;T&gt; ConsumeDeserializable(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></a>
+<a name="119"><span class="lineNum">     119 </span>                :            : {</a>
+<a name="120"><span class="lineNum">     120 </span>                :<span class="lineCov">    3644225 :     const std::vector&lt;uint8_t&gt; buffer = ConsumeRandomLengthByteVector(fuzzed_data_provider, max_length);</span></a>
+<a name="121"><span class="lineNum">     121 </span>  [<span class="branchCov" title="Branch 0 was taken 9 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 9 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">    3644225 :     CDataStream ds{buffer, SER_NETWORK, INIT_PROTO_VERSION};</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchNoExec" title="Branch 16 was not executed"> # </span><span class="branchNoExec" title="Branch 17 was not executed"> # </span><span class="branchNoExec" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">         </span>   <span class="branchNoExec" title="Branch 19 was not executed"> # </span><span class="branchNoExec" title="Branch 20 was not executed"> # </span><span class="branchNoExec" title="Branch 21 was not executed"> # </span><span class="branchNoExec" title="Branch 22 was not executed"> # </span> 
+<span class="lineNum">         </span>            <span class="branchNoExec" title="Branch 23 was not executed"> # </span>]
+<a name="122"><span class="lineNum">     122 </span>  [<span class="branchCov" title="Branch 0 was taken 8 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">    3644225 :     T obj;</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">         </span>            <span class="branchNoExec" title="Branch 9 was not executed"> # </span>]
+<a name="123"><span class="lineNum">     123 </span>                :            :     try {</a>
+<a name="124"><span class="lineNum">     124 </span>  [<span class="branchCov" title="Branch 0 was taken 9 times"> + </span><span class="branchCov" title="Branch 1 was taken 9 times"> + </span><span class="branchCov" title="Branch 2 was taken 6 times"> + </span><span class="branchCov" title="Branch 3 was taken 6 times"> + </span> :<span class="lineCov">    3644225 :         ds &gt;&gt; obj;</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchCov" title="Branch 5 was taken 1 time"> + </span><span class="branchCov" title="Branch 6 was taken 2 times"> + </span><span class="branchCov" title="Branch 7 was taken 2 times"> + </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">         </span>      <span class="branchNoExec" title="Branch 9 was not executed"> # </span><span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span>]
+<a name="125"><span class="lineNum">     125 </span>  [<span class="branchCov" title="Branch 0 was taken 9 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">    3644225 :     } catch (const std::ios_base::failure&amp;) {</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">         </span>      <span class="branchNoExec" title="Branch 9 was not executed"> # </span><span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span>]
+<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">    1832776 :         return std::nullopt;</span></a>
+<a name="127"><span class="lineNum">     127 </span>  [<span class="branchCov" title="Branch 0 was taken 9 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">    1832776 :     }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">         </span>      <span class="branchNoExec" title="Branch 9 was not executed"> # </span><span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span>]
+<a name="128"><span class="lineNum">     128 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    1811449 :     return obj;</span></a>
+<a name="129"><span class="lineNum">     129 </span>                :<span class="lineCov">    5477001 : }</span></a>
+<a name="130"><span class="lineNum">     130 </span>                :            : </a>
+<a name="131"><span class="lineNum">     131 </span>                :            : template &lt;typename WeakEnumType, size_t size&gt;</a>
+<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">    5113732 : [[nodiscard]] WeakEnumType ConsumeWeakEnum(FuzzedDataProvider&amp; fuzzed_data_provider, const WeakEnumType (&amp;all_types)[size]) noexcept</span></a>
+<a name="133"><span class="lineNum">     133 </span>                :            : {</a>
+<a name="134"><span class="lineNum">     134 </span>  [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchCov" title="Branch 3 was taken 2 times"> + </span>]:<span class="lineCov">   10227464 :     return fuzzed_data_provider.ConsumeBool() ?</span></a>
+<a name="135"><span class="lineNum">     135 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4760813 :                fuzzed_data_provider.PickValueInArray&lt;WeakEnumType&gt;(all_types) :</span></a>
+<a name="136"><span class="lineNum">     136 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     352919 :                WeakEnumType(fuzzed_data_provider.ConsumeIntegral&lt;typename std::underlying_type&lt;WeakEnumType&gt;::type&gt;());</span></a>
+<a name="137"><span class="lineNum">     137 </span>                :            : }</a>
+<a name="138"><span class="lineNum">     138 </span>                :            : </a>
+<a name="139"><span class="lineNum">     139 </span>                :<span class="lineCov">    2326086 : [[nodiscard]] inline opcodetype ConsumeOpcodeType(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></a>
+<a name="140"><span class="lineNum">     140 </span>                :            : {</a>
+<a name="141"><span class="lineNum">     141 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    2326086 :     return static_cast&lt;opcodetype&gt;(fuzzed_data_provider.ConsumeIntegralInRange&lt;uint32_t&gt;(0, MAX_OPCODE));</span></a>
+<a name="142"><span class="lineNum">     142 </span>                :            : }</a>
+<a name="143"><span class="lineNum">     143 </span>                :            : </a>
+<a name="144"><span class="lineNum">     144 </span>                :            : [[nodiscard]] CAmount ConsumeMoney(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;CAmount&gt;&amp; max = std::nullopt) noexcept;</a>
+<a name="145"><span class="lineNum">     145 </span>                :            : </a>
+<a name="146"><span class="lineNum">     146 </span>                :            : [[nodiscard]] int64_t ConsumeTime(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;int64_t&gt;&amp; min = std::nullopt, const std::optional&lt;int64_t&gt;&amp; max = std::nullopt) noexcept;</a>
+<a name="147"><span class="lineNum">     147 </span>                :            : </a>
+<a name="148"><span class="lineNum">     148 </span>                :            : [[nodiscard]] CMutableTransaction ConsumeTransaction(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;std::vector&lt;uint256&gt;&gt;&amp; prevout_txids, const int max_num_in = 10, const int max_num_out = 10) noexcept;</a>
+<a name="149"><span class="lineNum">     149 </span>                :            : </a>
+<a name="150"><span class="lineNum">     150 </span>                :            : [[nodiscard]] CScriptWitness ConsumeScriptWitness(FuzzedDataProvider&amp; fuzzed_data_provider, const size_t max_stack_elem_size = 32) noexcept;</a>
+<a name="151"><span class="lineNum">     151 </span>                :            : </a>
+<a name="152"><span class="lineNum">     152 </span>                :            : [[nodiscard]] CScript ConsumeScript(FuzzedDataProvider&amp; fuzzed_data_provider, const bool maybe_p2wsh = false) noexcept;</a>
+<a name="153"><span class="lineNum">     153 </span>                :            : </a>
+<a name="154"><span class="lineNum">     154 </span>                :            : [[nodiscard]] uint32_t ConsumeSequence(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept;</a>
+<a name="155"><span class="lineNum">     155 </span>                :            : </a>
+<a name="156"><span class="lineNum">     156 </span>                :<span class="lineCov">    1902245 : [[nodiscard]] inline CScriptNum ConsumeScriptNum(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></a>
+<a name="157"><span class="lineNum">     157 </span>                :            : {</a>
+<a name="158"><span class="lineNum">     158 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    1902245 :     return CScriptNum{fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;()};</span></a>
+<a name="159"><span class="lineNum">     159 </span>                :            : }</a>
+<a name="160"><span class="lineNum">     160 </span>                :            : </a>
+<a name="161"><span class="lineNum">     161 </span>                :<span class="lineCov">       5840 : [[nodiscard]] inline uint160 ConsumeUInt160(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></a>
+<a name="162"><span class="lineNum">     162 </span>                :            : {</a>
+<a name="163"><span class="lineNum">     163 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       5840 :     const std::vector&lt;uint8_t&gt; v160 = fuzzed_data_provider.ConsumeBytes&lt;uint8_t&gt;(160 / 8);</span></a>
+<a name="164"><span class="lineNum">     164 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">       5840 :     if (v160.size() != 160 / 8) {</span></a>
+<a name="165"><span class="lineNum">     165 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        406 :         return {};</span></a>
+<a name="166"><span class="lineNum">     166 </span>                :            :     }</a>
+<a name="167"><span class="lineNum">     167 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       5434 :     return uint160{v160};</span></a>
+<a name="168"><span class="lineNum">     168 </span>                :<span class="lineCov">       5840 : }</span></a>
+<a name="169"><span class="lineNum">     169 </span>                :            : </a>
+<a name="170"><span class="lineNum">     170 </span>                :<span class="lineCov">     400169 : [[nodiscard]] inline uint256 ConsumeUInt256(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></a>
+<a name="171"><span class="lineNum">     171 </span>                :            : {</a>
+<a name="172"><span class="lineNum">     172 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     400169 :     const std::vector&lt;uint8_t&gt; v256 = fuzzed_data_provider.ConsumeBytes&lt;uint8_t&gt;(256 / 8);</span></a>
+<a name="173"><span class="lineNum">     173 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">     400169 :     if (v256.size() != 256 / 8) {</span></a>
+<a name="174"><span class="lineNum">     174 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       6353 :         return {};</span></a>
+<a name="175"><span class="lineNum">     175 </span>                :            :     }</a>
+<a name="176"><span class="lineNum">     176 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     393816 :     return uint256{v256};</span></a>
+<a name="177"><span class="lineNum">     177 </span>                :<span class="lineCov">     400169 : }</span></a>
+<a name="178"><span class="lineNum">     178 </span>                :            : </a>
+<a name="179"><span class="lineNum">     179 </span>                :<span class="lineCov">     132600 : [[nodiscard]] inline arith_uint256 ConsumeArithUInt256(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></a>
+<a name="180"><span class="lineNum">     180 </span>                :            : {</a>
+<a name="181"><span class="lineNum">     181 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     132600 :     return UintToArith256(ConsumeUInt256(fuzzed_data_provider));</span></a>
+<a name="182"><span class="lineNum">     182 </span>                :            : }</a>
+<a name="183"><span class="lineNum">     183 </span>                :            : </a>
+<a name="184"><span class="lineNum">     184 </span>                :            : [[nodiscard]] CTxDestination ConsumeTxDestination(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept;</a>
+<a name="185"><span class="lineNum">     185 </span>                :            : </a>
+<a name="186"><span class="lineNum">     186 </span>                :            : [[nodiscard]] CKey ConsumePrivateKey(FuzzedDataProvider&amp; fuzzed_data_provider, std::optional&lt;bool&gt; compressed = std::nullopt) noexcept;</a>
+<a name="187"><span class="lineNum">     187 </span>                :            : </a>
+<a name="188"><span class="lineNum">     188 </span>                :            : template &lt;typename T&gt;</a>
+<a name="189"><span class="lineNum">     189 </span>                :<span class="lineCov">      15203 : [[nodiscard]] bool MultiplicationOverflow(const T i, const T j) noexcept</span></a>
+<a name="190"><span class="lineNum">     190 </span>                :            : {</a>
+<a name="191"><span class="lineNum">     191 </span>                :            :     static_assert(std::is_integral&lt;T&gt;::value, &quot;Integral required.&quot;);</a>
+<a name="192"><span class="lineNum">     192 </span>                :            :     if (std::numeric_limits&lt;T&gt;::is_signed) {</a>
+<a name="193"><span class="lineNum">     193 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">       9663 :         if (i &gt; 0) {</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchCov" title="Branch 5 was taken 1 time"> + </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchCov" title="Branch 7 was taken 1 time"> + </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 9 was taken 1 time"> + </span>]
+<a name="194"><span class="lineNum">     194 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">       2396 :             if (j &gt; 0) {</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchCov" title="Branch 5 was taken 1 time"> + </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchCov" title="Branch 7 was taken 1 time"> + </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 9 was taken 1 time"> + </span>]
+<a name="195"><span class="lineNum">     195 </span>                :<span class="lineCov">       1396 :                 return i &gt; (std::numeric_limits&lt;T&gt;::max() / j);</span></a>
+<a name="196"><span class="lineNum">     196 </span>                :            :             } else {</a>
+<a name="197"><span class="lineNum">     197 </span>                :<span class="lineCov">       1000 :                 return j &lt; (std::numeric_limits&lt;T&gt;::min() / i);</span></a>
+<a name="198"><span class="lineNum">     198 </span>                :            :             }</a>
+<a name="199"><span class="lineNum">     199 </span>                :            :         } else {</a>
+<a name="200"><span class="lineNum">     200 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">       7267 :             if (j &gt; 0) {</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchCov" title="Branch 5 was taken 1 time"> + </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchCov" title="Branch 7 was taken 1 time"> + </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 9 was taken 1 time"> + </span>]
+<a name="201"><span class="lineNum">     201 </span>                :<span class="lineCov">       1402 :                 return i &lt; (std::numeric_limits&lt;T&gt;::min() / j);</span></a>
+<a name="202"><span class="lineNum">     202 </span>                :            :             } else {</a>
+<a name="203"><span class="lineNum">     203 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">       5865 :                 return i != 0 &amp;&amp; (j &lt; (std::numeric_limits&lt;T&gt;::max() / i));</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchCov" title="Branch 5 was taken 1 time"> + </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchCov" title="Branch 7 was taken 1 time"> + </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 9 was taken 1 time"> + </span>]
+<a name="204"><span class="lineNum">     204 </span>                :            :             }</a>
+<a name="205"><span class="lineNum">     205 </span>                :            :         }</a>
+<a name="206"><span class="lineNum">     206 </span>                :            :     } else {</a>
+<a name="207"><span class="lineNum">     207 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span> :<span class="lineCov">       5540 :         return j != 0 &amp;&amp; i &gt; std::numeric_limits&lt;T&gt;::max() / j;</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchCov" title="Branch 5 was taken 1 time"> + </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchCov" title="Branch 7 was taken 1 time"> + </span>]
+<a name="208"><span class="lineNum">     208 </span>                :            :     }</a>
+<a name="209"><span class="lineNum">     209 </span>                :<span class="lineCov">       9663 : }</span></a>
+<a name="210"><span class="lineNum">     210 </span>                :            : </a>
+<a name="211"><span class="lineNum">     211 </span>                :            : [[nodiscard]] bool ContainsSpentInput(const CTransaction&amp; tx, const CCoinsViewCache&amp; inputs) noexcept;</a>
+<a name="212"><span class="lineNum">     212 </span>                :            : </a>
+<a name="213"><span class="lineNum">     213 </span>                :            : /**</a>
+<a name="214"><span class="lineNum">     214 </span>                :            :  * Sets errno to a value selected from the given std::array `errnos`.</a>
+<a name="215"><span class="lineNum">     215 </span>                :            :  */</a>
+<a name="216"><span class="lineNum">     216 </span>                :            : template &lt;typename T, size_t size&gt;</a>
+<a name="217"><span class="lineNum">     217 </span>                :<span class="lineCov">     748014 : void SetFuzzedErrNo(FuzzedDataProvider&amp; fuzzed_data_provider, const std::array&lt;T, size&gt;&amp; errnos)</span></a>
+<a name="218"><span class="lineNum">     218 </span>                :            : {</a>
+<a name="219"><span class="lineNum">     219 </span>                :<span class="lineCov">     748014 :     errno = fuzzed_data_provider.PickValueInArray(errnos);</span></a>
+<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">     748014 : }</span></a>
+<a name="221"><span class="lineNum">     221 </span>                :            : </a>
+<a name="222"><span class="lineNum">     222 </span>                :            : /*</a>
+<a name="223"><span class="lineNum">     223 </span>                :            :  * Sets a fuzzed errno in the range [0, 133 (EHWPOISON)]. Can be used from functions emulating</a>
+<a name="224"><span class="lineNum">     224 </span>                :            :  * standard library functions that set errno, or in other contexts where the value of errno</a>
+<a name="225"><span class="lineNum">     225 </span>                :            :  * might be relevant for the execution path that will be taken.</a>
+<a name="226"><span class="lineNum">     226 </span>                :            :  */</a>
+<a name="227"><span class="lineNum">     227 </span>                :<span class="lineCov">     160095 : inline void SetFuzzedErrNo(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></a>
+<a name="228"><span class="lineNum">     228 </span>                :            : {</a>
+<a name="229"><span class="lineNum">     229 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     160095 :     errno = fuzzed_data_provider.ConsumeIntegralInRange&lt;int&gt;(0, 133);</span></a>
+<a name="230"><span class="lineNum">     230 </span>                :<span class="lineCov">     160095 : }</span></a>
+<a name="231"><span class="lineNum">     231 </span>                :            : </a>
+<a name="232"><span class="lineNum">     232 </span>                :            : /**</a>
+<a name="233"><span class="lineNum">     233 </span>                :            :  * Returns a byte vector of specified size regardless of the number of remaining bytes available</a>
+<a name="234"><span class="lineNum">     234 </span>                :            :  * from the fuzzer. Pads with zero value bytes if needed to achieve the specified size.</a>
+<a name="235"><span class="lineNum">     235 </span>                :            :  */</a>
+<a name="236"><span class="lineNum">     236 </span>                :            : template&lt;typename B = uint8_t&gt;</a>
+<a name="237"><span class="lineNum">     237 </span>                :<span class="lineCov">      73024 : [[nodiscard]] inline std::vector&lt;B&gt; ConsumeFixedLengthByteVector(FuzzedDataProvider&amp; fuzzed_data_provider, const size_t length) noexcept</span></a>
+<a name="238"><span class="lineNum">     238 </span>                :            : {</a>
+<a name="239"><span class="lineNum">     239 </span>                :            :     static_assert(sizeof(B) == 1);</a>
+<a name="240"><span class="lineNum">     240 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      73024 :     auto random_bytes = fuzzed_data_provider.ConsumeBytes&lt;B&gt;(length);</span></a>
+<a name="241"><span class="lineNum">     241 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      73024 :     random_bytes.resize(length);</span></a>
+<a name="242"><span class="lineNum">     242 </span>                :<span class="lineCov">      73024 :     return random_bytes;</span></a>
+<a name="243"><span class="lineNum">     243 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      73024 : }</span></a>
+<a name="244"><span class="lineNum">     244 </span>                :            : </a>
+<a name="245"><span class="lineNum">     245 </span>                :            : class FuzzedFileProvider</a>
+<a name="246"><span class="lineNum">     246 </span>                :            : {</a>
+<a name="247"><span class="lineNum">     247 </span>                :            :     FuzzedDataProvider&amp; m_fuzzed_data_provider;</a>
+<a name="248"><span class="lineNum">     248 </span>                :<span class="lineCov">      15894 :     int64_t m_offset = 0;</span></a>
+<a name="249"><span class="lineNum">     249 </span>                :            : </a>
+<a name="250"><span class="lineNum">     250 </span>                :            : public:</a>
+<a name="251"><span class="lineNum">     251 </span>                :<span class="lineCov">      15894 :     FuzzedFileProvider(FuzzedDataProvider&amp; fuzzed_data_provider) : m_fuzzed_data_provider{fuzzed_data_provider}</span></a>
+<a name="252"><span class="lineNum">     252 </span>                :            :     {</a>
+<a name="253"><span class="lineNum">     253 </span>                :<span class="lineCov">      15894 :     }</span></a>
+<a name="254"><span class="lineNum">     254 </span>                :            : </a>
+<a name="255"><span class="lineNum">     255 </span>                :            :     FILE* open();</a>
+<a name="256"><span class="lineNum">     256 </span>                :            : </a>
+<a name="257"><span class="lineNum">     257 </span>                :            :     static ssize_t read(void* cookie, char* buf, size_t size);</a>
+<a name="258"><span class="lineNum">     258 </span>                :            : </a>
+<a name="259"><span class="lineNum">     259 </span>                :            :     static ssize_t write(void* cookie, const char* buf, size_t size);</a>
+<a name="260"><span class="lineNum">     260 </span>                :            : </a>
+<a name="261"><span class="lineNum">     261 </span>                :            :     static int seek(void* cookie, int64_t* offset, int whence);</a>
+<a name="262"><span class="lineNum">     262 </span>                :            : </a>
+<a name="263"><span class="lineNum">     263 </span>                :            :     static int close(void* cookie);</a>
+<a name="264"><span class="lineNum">     264 </span>                :            : };</a>
+<a name="265"><span class="lineNum">     265 </span>                :            : </a>
+<a name="266"><span class="lineNum">     266 </span>                :<span class="lineCov">       8753 : [[nodiscard]] inline FuzzedFileProvider ConsumeFile(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></a>
+<a name="267"><span class="lineNum">     267 </span>                :            : {</a>
+<a name="268"><span class="lineNum">     268 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       8753 :     return {fuzzed_data_provider};</span></a>
+<a name="269"><span class="lineNum">     269 </span>                :            : }</a>
+<a name="270"><span class="lineNum">     270 </span>                :            : </a>
+<a name="271"><span class="lineNum">     271 </span>                :            : class FuzzedAutoFileProvider</a>
+<a name="272"><span class="lineNum">     272 </span>                :            : {</a>
+<a name="273"><span class="lineNum">     273 </span>                :            :     FuzzedFileProvider m_fuzzed_file_provider;</a>
+<a name="274"><span class="lineNum">     274 </span>                :            : </a>
+<a name="275"><span class="lineNum">     275 </span>                :            : public:</a>
+<a name="276"><span class="lineNum">     276 </span>                :<span class="lineCov">       7141 :     FuzzedAutoFileProvider(FuzzedDataProvider&amp; fuzzed_data_provider) : m_fuzzed_file_provider{fuzzed_data_provider}</span></a>
+<a name="277"><span class="lineNum">     277 </span>                :            :     {</a>
+<a name="278"><span class="lineNum">     278 </span>                :<span class="lineCov">       7141 :     }</span></a>
+<a name="279"><span class="lineNum">     279 </span>                :            : </a>
+<a name="280"><span class="lineNum">     280 </span>                :<span class="lineCov">       7141 :     AutoFile open()</span></a>
+<a name="281"><span class="lineNum">     281 </span>                :            :     {</a>
+<a name="282"><span class="lineNum">     282 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       7141 :         return AutoFile{m_fuzzed_file_provider.open()};</span></a>
+<a name="283"><span class="lineNum">     283 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="284"><span class="lineNum">     284 </span>                :            : };</a>
+<a name="285"><span class="lineNum">     285 </span>                :            : </a>
+<a name="286"><span class="lineNum">     286 </span>                :<span class="lineCov">       7141 : [[nodiscard]] inline FuzzedAutoFileProvider ConsumeAutoFile(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></a>
+<a name="287"><span class="lineNum">     287 </span>                :            : {</a>
+<a name="288"><span class="lineNum">     288 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       7141 :     return {fuzzed_data_provider};</span></a>
+<a name="289"><span class="lineNum">     289 </span>                :            : }</a>
+<a name="290"><span class="lineNum">     290 </span>                :            : </a>
+<a name="291"><span class="lineNum">     291 </span>                :            : #define WRITE_TO_STREAM_CASE(type, consume) \</a>
+<a name="292"><span class="lineNum">     292 </span>                :            :     [&amp;] {                                   \</a>
+<a name="293"><span class="lineNum">     293 </span>                :            :         type o = consume;                   \</a>
+<a name="294"><span class="lineNum">     294 </span>                :            :         stream &lt;&lt; o;                        \</a>
+<a name="295"><span class="lineNum">     295 </span>                :            :     }</a>
+<a name="296"><span class="lineNum">     296 </span>                :            : template &lt;typename Stream&gt;</a>
+<a name="297"><span class="lineNum">     297 </span>                :<span class="lineCov">      34234 : void WriteToStream(FuzzedDataProvider&amp; fuzzed_data_provider, Stream&amp; stream) noexcept</span></a>
+<a name="298"><span class="lineNum">     298 </span>                :            : {</a>
+<a name="299"><span class="lineNum">     299 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">      96529 :     while (fuzzed_data_provider.ConsumeBool()) {</span></a>
+<a name="300"><span class="lineNum">     300 </span>                :            :         try {</a>
+<a name="301"><span class="lineNum">     301 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">      91746 :             CallOneOf(</span></a>
+<a name="302"><span class="lineNum">     302 </span>                :<span class="lineCov">      91746 :                 fuzzed_data_provider,</span></a>
+<a name="303"><span class="lineNum">     303 </span>                :<span class="lineCov">     112474 :                 WRITE_TO_STREAM_CASE(bool, fuzzed_data_provider.ConsumeBool()),</span></a>
+<a name="304"><span class="lineNum">     304 </span>                :<span class="lineCov">     118767 :                 WRITE_TO_STREAM_CASE(int8_t, fuzzed_data_provider.ConsumeIntegral&lt;int8_t&gt;()),</span></a>
+<a name="305"><span class="lineNum">     305 </span>                :<span class="lineCov">      99177 :                 WRITE_TO_STREAM_CASE(uint8_t, fuzzed_data_provider.ConsumeIntegral&lt;uint8_t&gt;()),</span></a>
+<a name="306"><span class="lineNum">     306 </span>                :<span class="lineCov">     105547 :                 WRITE_TO_STREAM_CASE(int16_t, fuzzed_data_provider.ConsumeIntegral&lt;int16_t&gt;()),</span></a>
+<a name="307"><span class="lineNum">     307 </span>                :<span class="lineCov">      95879 :                 WRITE_TO_STREAM_CASE(uint16_t, fuzzed_data_provider.ConsumeIntegral&lt;uint16_t&gt;()),</span></a>
+<a name="308"><span class="lineNum">     308 </span>                :<span class="lineCov">      95259 :                 WRITE_TO_STREAM_CASE(int32_t, fuzzed_data_provider.ConsumeIntegral&lt;int32_t&gt;()),</span></a>
+<a name="309"><span class="lineNum">     309 </span>                :<span class="lineCov">      92812 :                 WRITE_TO_STREAM_CASE(uint32_t, fuzzed_data_provider.ConsumeIntegral&lt;uint32_t&gt;()),</span></a>
+<a name="310"><span class="lineNum">     310 </span>                :<span class="lineCov">      96408 :                 WRITE_TO_STREAM_CASE(int64_t, fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;()),</span></a>
+<a name="311"><span class="lineNum">     311 </span>                :<span class="lineCov">      93242 :                 WRITE_TO_STREAM_CASE(uint64_t, fuzzed_data_provider.ConsumeIntegral&lt;uint64_t&gt;()),</span></a>
+<a name="312"><span class="lineNum">     312 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">      95787 :                 WRITE_TO_STREAM_CASE(std::string, fuzzed_data_provider.ConsumeRandomLengthString(32)),</span></a>
+<a name="313"><span class="lineNum">     313 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">      95600 :                 WRITE_TO_STREAM_CASE(std::vector&lt;uint8_t&gt;, ConsumeRandomLengthIntegralVector&lt;uint8_t&gt;(fuzzed_data_provider)));</span></a>
+<a name="314"><span class="lineNum">     314 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      91746 :         } catch (const std::ios_base::failure&amp;) {</span></a>
+<a name="315"><span class="lineNum">     315 </span>                :            :             break;</a>
+<a name="316"><span class="lineNum">     316 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      29451 :         }</span></a>
+<a name="317"><span class="lineNum">     317 </span>                :            :     }</a>
+<a name="318"><span class="lineNum">     318 </span>                :<span class="lineCov">      63685 : }</span></a>
+<a name="319"><span class="lineNum">     319 </span>                :            : </a>
+<a name="320"><span class="lineNum">     320 </span>                :            : #define READ_FROM_STREAM_CASE(type) \</a>
+<a name="321"><span class="lineNum">     321 </span>                :            :     [&amp;] {                           \</a>
+<a name="322"><span class="lineNum">     322 </span>                :            :         type o;                     \</a>
+<a name="323"><span class="lineNum">     323 </span>                :            :         stream &gt;&gt; o;                \</a>
+<a name="324"><span class="lineNum">     324 </span>                :            :     }</a>
+<a name="325"><span class="lineNum">     325 </span>                :            : template &lt;typename Stream&gt;</a>
+<a name="326"><span class="lineNum">     326 </span>                :<span class="lineCov">     110675 : void ReadFromStream(FuzzedDataProvider&amp; fuzzed_data_provider, Stream&amp; stream) noexcept</span></a>
+<a name="327"><span class="lineNum">     327 </span>                :            : {</a>
+<a name="328"><span class="lineNum">     328 </span>  [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchCov" title="Branch 3 was taken 2 times"> + </span>]:<span class="lineCov">     207074 :     while (fuzzed_data_provider.ConsumeBool()) {</span></a>
+<a name="329"><span class="lineNum">     329 </span>                :            :         try {</a>
+<a name="330"><span class="lineNum">     330 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">     202348 :             CallOneOf(</span></a>
+<a name="331"><span class="lineNum">     331 </span>                :<span class="lineCov">     202348 :                 fuzzed_data_provider,</span></a>
+<a name="332"><span class="lineNum">     332 </span>                :<span class="lineCov">     207830 :                 READ_FROM_STREAM_CASE(bool),</span></a>
+<a name="333"><span class="lineNum">     333 </span>                :<span class="lineCov">     205272 :                 READ_FROM_STREAM_CASE(int8_t),</span></a>
+<a name="334"><span class="lineNum">     334 </span>                :<span class="lineCov">     215374 :                 READ_FROM_STREAM_CASE(uint8_t),</span></a>
+<a name="335"><span class="lineNum">     335 </span>                :<span class="lineCov">     206081 :                 READ_FROM_STREAM_CASE(int16_t),</span></a>
+<a name="336"><span class="lineNum">     336 </span>                :<span class="lineCov">     205773 :                 READ_FROM_STREAM_CASE(uint16_t),</span></a>
+<a name="337"><span class="lineNum">     337 </span>                :<span class="lineCov">     211171 :                 READ_FROM_STREAM_CASE(int32_t),</span></a>
+<a name="338"><span class="lineNum">     338 </span>                :<span class="lineCov">     217865 :                 READ_FROM_STREAM_CASE(uint32_t),</span></a>
+<a name="339"><span class="lineNum">     339 </span>                :<span class="lineCov">     311577 :                 READ_FROM_STREAM_CASE(int64_t),</span></a>
+<a name="340"><span class="lineNum">     340 </span>                :<span class="lineCov">     207987 :                 READ_FROM_STREAM_CASE(uint64_t),</span></a>
+<a name="341"><span class="lineNum">     341 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">     215649 :                 READ_FROM_STREAM_CASE(std::string),</span></a>
+<a name="342"><span class="lineNum">     342 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">     223597 :                 READ_FROM_STREAM_CASE(std::vector&lt;uint8_t&gt;));</span></a>
+<a name="343"><span class="lineNum">     343 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     202348 :         } catch (const std::ios_base::failure&amp;) {</span></a>
+<a name="344"><span class="lineNum">     344 </span>                :            :             break;</a>
+<a name="345"><span class="lineNum">     345 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     105949 :         }</span></a>
+<a name="346"><span class="lineNum">     346 </span>                :            :     }</a>
+<a name="347"><span class="lineNum">     347 </span>                :<span class="lineCov">     216624 : }</span></a>
+<a name="348"><span class="lineNum">     348 </span>                :            : </a>
+<a name="349"><span class="lineNum">     349 </span>                :            : #endif // BITCOIN_TEST_FUZZ_UTIL_H</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 1.16</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
