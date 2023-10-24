@@ -1,0 +1,586 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/crypto/chacha20.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/crypto</a> - chacha20.cpp<span style="font-size: 80%;"> (source / <a href="chacha20.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">267</td>
+            <td class="headerCovTableEntry">267</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2023-10-24 17:30:42</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">419</td>
+            <td class="headerCovTableEntry">808</td>
+            <td class="headerCovTableEntryLo">51.9 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2017-2022 The Bitcoin Core developers</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : // Based on the public domain implementation 'merged' by D. J. Bernstein</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : // See https://cr.yp.to/chacha.html.</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #include &lt;crypto/common.h&gt;</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;crypto/chacha20.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;support/cleanse.h&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #include &lt;span.h&gt;</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : </a>
+<a name="13"><span class="lineNum">      13 </span>                :            : #include &lt;algorithm&gt;</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : #include &lt;string.h&gt;</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : </a>
+<a name="16"><span class="lineNum">      16 </span>                :<span class="lineCov"> 5312090880 : constexpr static inline uint32_t rotl32(uint32_t v, int c) { return (v &lt;&lt; c) | (v &gt;&gt; (32 - c)); }</span></a>
+<a name="17"><span class="lineNum">      17 </span>                :            : </a>
+<a name="18"><span class="lineNum">      18 </span>                :            : #define QUARTERROUND(a,b,c,d) \</a>
+<a name="19"><span class="lineNum">      19 </span>                :            :   a += b; d = rotl32(d ^ a, 16); \</a>
+<a name="20"><span class="lineNum">      20 </span>                :            :   c += d; b = rotl32(b ^ c, 12); \</a>
+<a name="21"><span class="lineNum">      21 </span>                :            :   a += b; d = rotl32(d ^ a, 8); \</a>
+<a name="22"><span class="lineNum">      22 </span>                :            :   c += d; b = rotl32(b ^ c, 7);</a>
+<a name="23"><span class="lineNum">      23 </span>                :            : </a>
+<a name="24"><span class="lineNum">      24 </span>                :            : #define REPEAT10(a) do { {a}; {a}; {a}; {a}; {a}; {a}; {a}; {a}; {a}; {a}; } while(0)</a>
+<a name="25"><span class="lineNum">      25 </span>                :            : </a>
+<a name="26"><span class="lineNum">      26 </span>                :<span class="lineCov">    8803550 : void ChaCha20Aligned::SetKey(Span&lt;const std::byte&gt; key) noexcept</span></a>
+<a name="27"><span class="lineNum">      27 </span>                :            : {</a>
+<a name="28"><span class="lineNum">      28 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    8803550 :     assert(key.size() == KEYLEN);</span></a>
+<a name="29"><span class="lineNum">      29 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    8803550 :     input[0] = ReadLE32(UCharCast(key.data() + 0));</span></a>
+<a name="30"><span class="lineNum">      30 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    8803550 :     input[1] = ReadLE32(UCharCast(key.data() + 4));</span></a>
+<a name="31"><span class="lineNum">      31 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    8803550 :     input[2] = ReadLE32(UCharCast(key.data() + 8));</span></a>
+<a name="32"><span class="lineNum">      32 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    8803550 :     input[3] = ReadLE32(UCharCast(key.data() + 12));</span></a>
+<a name="33"><span class="lineNum">      33 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    8803550 :     input[4] = ReadLE32(UCharCast(key.data() + 16));</span></a>
+<a name="34"><span class="lineNum">      34 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    8803550 :     input[5] = ReadLE32(UCharCast(key.data() + 20));</span></a>
+<a name="35"><span class="lineNum">      35 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    8803550 :     input[6] = ReadLE32(UCharCast(key.data() + 24));</span></a>
+<a name="36"><span class="lineNum">      36 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">    8803550 :     input[7] = ReadLE32(UCharCast(key.data() + 28));</span></a>
+<a name="37"><span class="lineNum">      37 </span>                :<span class="lineCov">    8803550 :     input[8] = 0;</span></a>
+<a name="38"><span class="lineNum">      38 </span>                :<span class="lineCov">    8803550 :     input[9] = 0;</span></a>
+<a name="39"><span class="lineNum">      39 </span>                :<span class="lineCov">    8803550 :     input[10] = 0;</span></a>
+<a name="40"><span class="lineNum">      40 </span>                :<span class="lineCov">    8803550 :     input[11] = 0;</span></a>
+<a name="41"><span class="lineNum">      41 </span>                :<span class="lineCov">    8803550 : }</span></a>
+<a name="42"><span class="lineNum">      42 </span>                :            : </a>
+<a name="43"><span class="lineNum">      43 </span>                :<span class="lineCov">    4473597 : ChaCha20Aligned::~ChaCha20Aligned()</span></a>
+<a name="44"><span class="lineNum">      44 </span>                :            : {</a>
+<a name="45"><span class="lineNum">      45 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4473597 :     memory_cleanse(input, sizeof(input));</span></a>
+<a name="46"><span class="lineNum">      46 </span>                :<span class="lineCov">    4473597 : }</span></a>
+<a name="47"><span class="lineNum">      47 </span>                :            : </a>
+<a name="48"><span class="lineNum">      48 </span>                :<span class="lineCov">    4473597 : ChaCha20Aligned::ChaCha20Aligned(Span&lt;const std::byte&gt; key) noexcept</span></a>
+<a name="49"><span class="lineNum">      49 </span>                :            : {</a>
+<a name="50"><span class="lineNum">      50 </span>                :<span class="lineCov">    4473597 :     SetKey(key);</span></a>
+<a name="51"><span class="lineNum">      51 </span>                :<span class="lineCov">    4473597 : }</span></a>
+<a name="52"><span class="lineNum">      52 </span>                :            : </a>
+<a name="53"><span class="lineNum">      53 </span>                :<span class="lineCov">     109377 : void ChaCha20Aligned::Seek(Nonce96 nonce, uint32_t block_counter) noexcept</span></a>
+<a name="54"><span class="lineNum">      54 </span>                :            : {</a>
+<a name="55"><span class="lineNum">      55 </span>                :<span class="lineCov">     109377 :     input[8] = block_counter;</span></a>
+<a name="56"><span class="lineNum">      56 </span>                :<span class="lineCov">     109377 :     input[9] = nonce.first;</span></a>
+<a name="57"><span class="lineNum">      57 </span>                :<span class="lineCov">     109377 :     input[10] = nonce.second;</span></a>
+<a name="58"><span class="lineNum">      58 </span>                :<span class="lineCov">     109377 :     input[11] = nonce.second &gt;&gt; 32;</span></a>
+<a name="59"><span class="lineNum">      59 </span>                :<span class="lineCov">     109377 : }</span></a>
+<a name="60"><span class="lineNum">      60 </span>                :            : </a>
+<a name="61"><span class="lineNum">      61 </span>                :<span class="lineCov">    6879569 : inline void ChaCha20Aligned::Keystream(Span&lt;std::byte&gt; output) noexcept</span></a>
+<a name="62"><span class="lineNum">      62 </span>                :            : {</a>
+<a name="63"><span class="lineNum">      63 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6879569 :     unsigned char* c = UCharCast(output.data());</span></a>
+<a name="64"><span class="lineNum">      64 </span>                :<span class="lineCov">    6879569 :     size_t blocks = output.size() / BLOCKLEN;</span></a>
+<a name="65"><span class="lineNum">      65 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6879569 :     assert(blocks * BLOCKLEN == output.size());</span></a>
+<a name="66"><span class="lineNum">      66 </span>                :            : </a>
+<a name="67"><span class="lineNum">      67 </span>                :            :     uint32_t x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15;</a>
+<a name="68"><span class="lineNum">      68 </span>                :            :     uint32_t j4, j5, j6, j7, j8, j9, j10, j11, j12, j13, j14, j15;</a>
+<a name="69"><span class="lineNum">      69 </span>                :            : </a>
+<a name="70"><span class="lineNum">      70 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6879569 :     if (!blocks) return;</span></a>
+<a name="71"><span class="lineNum">      71 </span>                :            : </a>
+<a name="72"><span class="lineNum">      72 </span>                :<span class="lineCov">    6879569 :     j4 = input[0];</span></a>
+<a name="73"><span class="lineNum">      73 </span>                :<span class="lineCov">    6879569 :     j5 = input[1];</span></a>
+<a name="74"><span class="lineNum">      74 </span>                :<span class="lineCov">    6879569 :     j6 = input[2];</span></a>
+<a name="75"><span class="lineNum">      75 </span>                :<span class="lineCov">    6879569 :     j7 = input[3];</span></a>
+<a name="76"><span class="lineNum">      76 </span>                :<span class="lineCov">    6879569 :     j8 = input[4];</span></a>
+<a name="77"><span class="lineNum">      77 </span>                :<span class="lineCov">    6879569 :     j9 = input[5];</span></a>
+<a name="78"><span class="lineNum">      78 </span>                :<span class="lineCov">    6879569 :     j10 = input[6];</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :<span class="lineCov">    6879569 :     j11 = input[7];</span></a>
+<a name="80"><span class="lineNum">      80 </span>                :<span class="lineCov">    6879569 :     j12 = input[8];</span></a>
+<a name="81"><span class="lineNum">      81 </span>                :<span class="lineCov">    6879569 :     j13 = input[9];</span></a>
+<a name="82"><span class="lineNum">      82 </span>                :<span class="lineCov">    6879569 :     j14 = input[10];</span></a>
+<a name="83"><span class="lineNum">      83 </span>                :<span class="lineCov">    6879569 :     j15 = input[11];</span></a>
+<a name="84"><span class="lineNum">      84 </span>                :            : </a>
+<a name="85"><span class="lineNum">      85 </span>                :<span class="lineCov">    9874635 :     for (;;) {</span></a>
+<a name="86"><span class="lineNum">      86 </span>                :<span class="lineCov">    9874635 :         x0 = 0x61707865;</span></a>
+<a name="87"><span class="lineNum">      87 </span>                :<span class="lineCov">    9874635 :         x1 = 0x3320646e;</span></a>
+<a name="88"><span class="lineNum">      88 </span>                :<span class="lineCov">    9874635 :         x2 = 0x79622d32;</span></a>
+<a name="89"><span class="lineNum">      89 </span>                :<span class="lineCov">    9874635 :         x3 = 0x6b206574;</span></a>
+<a name="90"><span class="lineNum">      90 </span>                :<span class="lineCov">    9874635 :         x4 = j4;</span></a>
+<a name="91"><span class="lineNum">      91 </span>                :<span class="lineCov">    9874635 :         x5 = j5;</span></a>
+<a name="92"><span class="lineNum">      92 </span>                :<span class="lineCov">    9874635 :         x6 = j6;</span></a>
+<a name="93"><span class="lineNum">      93 </span>                :<span class="lineCov">    9874635 :         x7 = j7;</span></a>
+<a name="94"><span class="lineNum">      94 </span>                :<span class="lineCov">    9874635 :         x8 = j8;</span></a>
+<a name="95"><span class="lineNum">      95 </span>                :<span class="lineCov">    9874635 :         x9 = j9;</span></a>
+<a name="96"><span class="lineNum">      96 </span>                :<span class="lineCov">    9874635 :         x10 = j10;</span></a>
+<a name="97"><span class="lineNum">      97 </span>                :<span class="lineCov">    9874635 :         x11 = j11;</span></a>
+<a name="98"><span class="lineNum">      98 </span>                :<span class="lineCov">    9874635 :         x12 = j12;</span></a>
+<a name="99"><span class="lineNum">      99 </span>                :<span class="lineCov">    9874635 :         x13 = j13;</span></a>
+<a name="100"><span class="lineNum">     100 </span>                :<span class="lineCov">    9874635 :         x14 = j14;</span></a>
+<a name="101"><span class="lineNum">     101 </span>                :<span class="lineCov">    9874635 :         x15 = j15;</span></a>
+<a name="102"><span class="lineNum">     102 </span>                :            : </a>
+<a name="103"><span class="lineNum">     103 </span>                :            :         // The 20 inner ChaCha20 rounds are unrolled here for performance.</a>
+<a name="104"><span class="lineNum">     104 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">    9874635 :         REPEAT10(</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 19 was not taken"> - </span><span class="branchCov" title="Branch 20 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span><span class="branchCov" title="Branch 22 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 24 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 25 was not taken"> - </span><span class="branchCov" title="Branch 26 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 27 was not taken"> - </span><span class="branchCov" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 29 was not taken"> - </span><span class="branchCov" title="Branch 30 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 31 was not taken"> - </span><span class="branchCov" title="Branch 32 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 34 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 35 was not taken"> - </span><span class="branchCov" title="Branch 36 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 37 was not taken"> - </span><span class="branchCov" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 39 was not taken"> - </span><span class="branchCov" title="Branch 40 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 41 was not taken"> - </span><span class="branchCov" title="Branch 42 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 44 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 45 was not taken"> - </span><span class="branchCov" title="Branch 46 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 47 was not taken"> - </span><span class="branchCov" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 49 was not taken"> - </span><span class="branchCov" title="Branch 50 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 51 was not taken"> - </span><span class="branchCov" title="Branch 52 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 53 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 54 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 55 was not taken"> - </span><span class="branchCov" title="Branch 56 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 57 was not taken"> - </span><span class="branchCov" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 59 was not taken"> - </span><span class="branchCov" title="Branch 60 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 61 was not taken"> - </span><span class="branchCov" title="Branch 62 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 63 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 64 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 65 was not taken"> - </span><span class="branchCov" title="Branch 66 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 67 was not taken"> - </span><span class="branchCov" title="Branch 68 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 69 was not taken"> - </span><span class="branchCov" title="Branch 70 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 71 was not taken"> - </span><span class="branchCov" title="Branch 72 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 73 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 74 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 75 was not taken"> - </span><span class="branchCov" title="Branch 76 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 77 was not taken"> - </span><span class="branchCov" title="Branch 78 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 79 was not taken"> - </span><span class="branchCov" title="Branch 80 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 81 was not taken"> - </span><span class="branchCov" title="Branch 82 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 83 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 84 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 85 was not taken"> - </span><span class="branchCov" title="Branch 86 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 87 was not taken"> - </span><span class="branchCov" title="Branch 88 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 89 was not taken"> - </span><span class="branchCov" title="Branch 90 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 91 was not taken"> - </span><span class="branchCov" title="Branch 92 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 93 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 94 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 95 was not taken"> - </span><span class="branchCov" title="Branch 96 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 97 was not taken"> - </span><span class="branchCov" title="Branch 98 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 99 was not taken"> - </span><span class="branchCov" title="Branch 100 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 101 was not taken"> - </span><span class="branchCov" title="Branch 102 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 103 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 104 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 105 was not taken"> - </span><span class="branchCov" title="Branch 106 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 107 was not taken"> - </span><span class="branchCov" title="Branch 108 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 109 was not taken"> - </span><span class="branchCov" title="Branch 110 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 111 was not taken"> - </span><span class="branchCov" title="Branch 112 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 113 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 114 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 115 was not taken"> - </span><span class="branchCov" title="Branch 116 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 117 was not taken"> - </span><span class="branchCov" title="Branch 118 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 119 was not taken"> - </span><span class="branchCov" title="Branch 120 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 121 was not taken"> - </span><span class="branchCov" title="Branch 122 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 123 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 124 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 125 was not taken"> - </span><span class="branchCov" title="Branch 126 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 127 was not taken"> - </span><span class="branchCov" title="Branch 128 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 129 was not taken"> - </span><span class="branchCov" title="Branch 130 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 131 was not taken"> - </span><span class="branchCov" title="Branch 132 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 133 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 134 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 135 was not taken"> - </span><span class="branchCov" title="Branch 136 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 137 was not taken"> - </span><span class="branchCov" title="Branch 138 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 139 was not taken"> - </span><span class="branchCov" title="Branch 140 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 141 was not taken"> - </span><span class="branchCov" title="Branch 142 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 143 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 144 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 145 was not taken"> - </span><span class="branchCov" title="Branch 146 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 147 was not taken"> - </span><span class="branchCov" title="Branch 148 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 149 was not taken"> - </span><span class="branchCov" title="Branch 150 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 151 was not taken"> - </span><span class="branchCov" title="Branch 152 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 153 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 154 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 155 was not taken"> - </span><span class="branchCov" title="Branch 156 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 157 was not taken"> - </span><span class="branchCov" title="Branch 158 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 159 was not taken"> - </span><span class="branchCov" title="Branch 160 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 161 was not taken"> - </span><span class="branchCov" title="Branch 162 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 163 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 164 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 165 was not taken"> - </span><span class="branchCov" title="Branch 166 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 167 was not taken"> - </span><span class="branchCov" title="Branch 168 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 169 was not taken"> - </span><span class="branchCov" title="Branch 170 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 171 was not taken"> - </span><span class="branchCov" title="Branch 172 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 173 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 174 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 175 was not taken"> - </span><span class="branchCov" title="Branch 176 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 177 was not taken"> - </span><span class="branchCov" title="Branch 178 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 179 was not taken"> - </span><span class="branchCov" title="Branch 180 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 181 was not taken"> - </span><span class="branchCov" title="Branch 182 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 183 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 184 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 185 was not taken"> - </span><span class="branchCov" title="Branch 186 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 187 was not taken"> - </span><span class="branchCov" title="Branch 188 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 189 was not taken"> - </span><span class="branchCov" title="Branch 190 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 191 was not taken"> - </span><span class="branchCov" title="Branch 192 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 193 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 194 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 195 was not taken"> - </span><span class="branchCov" title="Branch 196 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 197 was not taken"> - </span><span class="branchCov" title="Branch 198 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 199 was not taken"> - </span><span class="branchCov" title="Branch 200 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 201 was not taken"> - </span><span class="branchCov" title="Branch 202 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 203 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 204 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 205 was not taken"> - </span><span class="branchCov" title="Branch 206 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 207 was not taken"> - </span><span class="branchCov" title="Branch 208 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 209 was not taken"> - </span><span class="branchCov" title="Branch 210 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 211 was not taken"> - </span><span class="branchCov" title="Branch 212 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 213 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 214 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 215 was not taken"> - </span><span class="branchCov" title="Branch 216 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 217 was not taken"> - </span><span class="branchCov" title="Branch 218 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 219 was not taken"> - </span><span class="branchCov" title="Branch 220 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 221 was not taken"> - </span><span class="branchCov" title="Branch 222 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 223 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 224 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 225 was not taken"> - </span><span class="branchCov" title="Branch 226 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 227 was not taken"> - </span><span class="branchCov" title="Branch 228 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 229 was not taken"> - </span><span class="branchCov" title="Branch 230 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 231 was not taken"> - </span><span class="branchCov" title="Branch 232 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 233 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 234 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 235 was not taken"> - </span><span class="branchCov" title="Branch 236 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 237 was not taken"> - </span><span class="branchCov" title="Branch 238 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 239 was not taken"> - </span><span class="branchCov" title="Branch 240 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 241 was not taken"> - </span><span class="branchCov" title="Branch 242 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 243 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 244 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 245 was not taken"> - </span><span class="branchCov" title="Branch 246 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 247 was not taken"> - </span><span class="branchCov" title="Branch 248 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 249 was not taken"> - </span><span class="branchCov" title="Branch 250 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 251 was not taken"> - </span><span class="branchCov" title="Branch 252 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 253 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 254 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 255 was not taken"> - </span><span class="branchCov" title="Branch 256 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 257 was not taken"> - </span><span class="branchCov" title="Branch 258 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 259 was not taken"> - </span><span class="branchCov" title="Branch 260 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 261 was not taken"> - </span><span class="branchCov" title="Branch 262 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 263 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 264 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 265 was not taken"> - </span><span class="branchCov" title="Branch 266 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 267 was not taken"> - </span><span class="branchCov" title="Branch 268 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 269 was not taken"> - </span><span class="branchCov" title="Branch 270 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 271 was not taken"> - </span><span class="branchCov" title="Branch 272 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 273 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 274 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 275 was not taken"> - </span><span class="branchCov" title="Branch 276 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 277 was not taken"> - </span><span class="branchCov" title="Branch 278 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 279 was not taken"> - </span><span class="branchCov" title="Branch 280 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 281 was not taken"> - </span><span class="branchCov" title="Branch 282 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 283 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 284 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 285 was not taken"> - </span><span class="branchCov" title="Branch 286 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 287 was not taken"> - </span><span class="branchCov" title="Branch 288 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 289 was not taken"> - </span><span class="branchCov" title="Branch 290 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 291 was not taken"> - </span><span class="branchCov" title="Branch 292 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 293 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 294 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 295 was not taken"> - </span><span class="branchCov" title="Branch 296 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 297 was not taken"> - </span><span class="branchCov" title="Branch 298 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 299 was not taken"> - </span><span class="branchCov" title="Branch 300 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 301 was not taken"> - </span><span class="branchCov" title="Branch 302 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 303 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 304 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 305 was not taken"> - </span><span class="branchCov" title="Branch 306 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 307 was not taken"> - </span><span class="branchCov" title="Branch 308 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 309 was not taken"> - </span><span class="branchCov" title="Branch 310 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 311 was not taken"> - </span><span class="branchCov" title="Branch 312 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 313 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 314 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 315 was not taken"> - </span><span class="branchCov" title="Branch 316 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 317 was not taken"> - </span><span class="branchCov" title="Branch 318 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 319 was not taken"> - </span><span class="branchCov" title="Branch 320 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 321 was not taken"> - </span><span class="branchCov" title="Branch 322 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 323 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 324 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 325 was not taken"> - </span><span class="branchCov" title="Branch 326 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 327 was not taken"> - </span><span class="branchCov" title="Branch 328 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 329 was not taken"> - </span><span class="branchCov" title="Branch 330 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 331 was not taken"> - </span><span class="branchCov" title="Branch 332 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 333 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 334 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 335 was not taken"> - </span><span class="branchCov" title="Branch 336 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 337 was not taken"> - </span><span class="branchCov" title="Branch 338 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 339 was not taken"> - </span><span class="branchCov" title="Branch 340 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 341 was not taken"> - </span><span class="branchCov" title="Branch 342 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 343 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 344 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 345 was not taken"> - </span><span class="branchCov" title="Branch 346 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 347 was not taken"> - </span><span class="branchCov" title="Branch 348 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 349 was not taken"> - </span><span class="branchCov" title="Branch 350 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 351 was not taken"> - </span><span class="branchCov" title="Branch 352 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 353 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 354 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 355 was not taken"> - </span><span class="branchCov" title="Branch 356 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 357 was not taken"> - </span><span class="branchCov" title="Branch 358 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 359 was not taken"> - </span><span class="branchCov" title="Branch 360 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 361 was not taken"> - </span><span class="branchCov" title="Branch 362 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 363 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 364 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 365 was not taken"> - </span><span class="branchCov" title="Branch 366 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 367 was not taken"> - </span><span class="branchCov" title="Branch 368 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 369 was not taken"> - </span><span class="branchCov" title="Branch 370 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 371 was not taken"> - </span><span class="branchCov" title="Branch 372 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 373 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 374 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 375 was not taken"> - </span><span class="branchCov" title="Branch 376 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 377 was not taken"> - </span><span class="branchCov" title="Branch 378 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 379 was not taken"> - </span><span class="branchCov" title="Branch 380 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 381 was not taken"> - </span><span class="branchCov" title="Branch 382 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 383 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 384 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 385 was not taken"> - </span><span class="branchCov" title="Branch 386 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 387 was not taken"> - </span><span class="branchCov" title="Branch 388 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 389 was not taken"> - </span><span class="branchCov" title="Branch 390 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 391 was not taken"> - </span><span class="branchCov" title="Branch 392 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 393 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 394 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 395 was not taken"> - </span><span class="branchCov" title="Branch 396 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 397 was not taken"> - </span><span class="branchCov" title="Branch 398 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 399 was not taken"> - </span><span class="branchCov" title="Branch 400 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 401 was not taken"> - </span><span class="branchCov" title="Branch 402 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 403 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 404 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 405 was not taken"> - </span><span class="branchCov" title="Branch 406 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 407 was not taken"> - </span><span class="branchCov" title="Branch 408 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 409 was not taken"> - </span><span class="branchCov" title="Branch 410 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 411 was not taken"> - </span><span class="branchCov" title="Branch 412 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 413 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 414 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 415 was not taken"> - </span><span class="branchCov" title="Branch 416 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 417 was not taken"> - </span><span class="branchCov" title="Branch 418 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 419 was not taken"> - </span><span class="branchCov" title="Branch 420 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 421 was not taken"> - </span><span class="branchCov" title="Branch 422 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 423 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 424 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 425 was not taken"> - </span><span class="branchCov" title="Branch 426 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 427 was not taken"> - </span><span class="branchCov" title="Branch 428 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 429 was not taken"> - </span><span class="branchCov" title="Branch 430 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 431 was not taken"> - </span><span class="branchCov" title="Branch 432 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 433 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 434 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 435 was not taken"> - </span><span class="branchCov" title="Branch 436 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 437 was not taken"> - </span><span class="branchCov" title="Branch 438 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 439 was not taken"> - </span><span class="branchCov" title="Branch 440 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 441 was not taken"> - </span><span class="branchCov" title="Branch 442 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 443 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 444 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 445 was not taken"> - </span><span class="branchCov" title="Branch 446 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 447 was not taken"> - </span><span class="branchCov" title="Branch 448 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 449 was not taken"> - </span><span class="branchCov" title="Branch 450 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 451 was not taken"> - </span><span class="branchCov" title="Branch 452 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 453 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 454 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 455 was not taken"> - </span><span class="branchCov" title="Branch 456 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 457 was not taken"> - </span><span class="branchCov" title="Branch 458 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 459 was not taken"> - </span><span class="branchCov" title="Branch 460 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 461 was not taken"> - </span><span class="branchCov" title="Branch 462 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 463 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 464 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 465 was not taken"> - </span><span class="branchCov" title="Branch 466 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 467 was not taken"> - </span><span class="branchCov" title="Branch 468 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 469 was not taken"> - </span><span class="branchCov" title="Branch 470 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 471 was not taken"> - </span><span class="branchCov" title="Branch 472 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 473 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 474 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 475 was not taken"> - </span><span class="branchCov" title="Branch 476 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 477 was not taken"> - </span><span class="branchCov" title="Branch 478 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 479 was not taken"> - </span><span class="branchCov" title="Branch 480 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 481 was not taken"> - </span><span class="branchCov" title="Branch 482 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 483 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 484 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 485 was not taken"> - </span><span class="branchCov" title="Branch 486 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 487 was not taken"> - </span><span class="branchCov" title="Branch 488 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 489 was not taken"> - </span><span class="branchCov" title="Branch 490 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 491 was not taken"> - </span><span class="branchCov" title="Branch 492 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 493 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 494 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 495 was not taken"> - </span><span class="branchCov" title="Branch 496 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 497 was not taken"> - </span><span class="branchCov" title="Branch 498 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 499 was not taken"> - </span><span class="branchCov" title="Branch 500 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 501 was not taken"> - </span><span class="branchCov" title="Branch 502 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 503 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 504 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 505 was not taken"> - </span><span class="branchCov" title="Branch 506 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 507 was not taken"> - </span><span class="branchCov" title="Branch 508 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 509 was not taken"> - </span><span class="branchCov" title="Branch 510 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 511 was not taken"> - </span><span class="branchCov" title="Branch 512 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 513 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 514 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 515 was not taken"> - </span><span class="branchCov" title="Branch 516 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 517 was not taken"> - </span><span class="branchCov" title="Branch 518 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 519 was not taken"> - </span><span class="branchCov" title="Branch 520 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 521 was not taken"> - </span><span class="branchCov" title="Branch 522 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 523 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 524 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 525 was not taken"> - </span><span class="branchCov" title="Branch 526 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 527 was not taken"> - </span><span class="branchCov" title="Branch 528 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 529 was not taken"> - </span><span class="branchCov" title="Branch 530 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 531 was not taken"> - </span><span class="branchCov" title="Branch 532 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 533 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 534 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 535 was not taken"> - </span><span class="branchCov" title="Branch 536 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 537 was not taken"> - </span><span class="branchCov" title="Branch 538 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 539 was not taken"> - </span><span class="branchCov" title="Branch 540 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 541 was not taken"> - </span><span class="branchCov" title="Branch 542 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 543 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 544 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 545 was not taken"> - </span><span class="branchCov" title="Branch 546 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 547 was not taken"> - </span><span class="branchCov" title="Branch 548 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 549 was not taken"> - </span><span class="branchCov" title="Branch 550 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 551 was not taken"> - </span><span class="branchCov" title="Branch 552 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 553 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 554 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 555 was not taken"> - </span><span class="branchCov" title="Branch 556 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 557 was not taken"> - </span><span class="branchCov" title="Branch 558 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 559 was not taken"> - </span><span class="branchCov" title="Branch 560 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 561 was not taken"> - </span><span class="branchCov" title="Branch 562 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 563 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 564 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 565 was not taken"> - </span><span class="branchCov" title="Branch 566 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 567 was not taken"> - </span><span class="branchCov" title="Branch 568 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 569 was not taken"> - </span><span class="branchCov" title="Branch 570 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 571 was not taken"> - </span><span class="branchCov" title="Branch 572 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 573 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 574 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 575 was not taken"> - </span><span class="branchCov" title="Branch 576 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 577 was not taken"> - </span><span class="branchCov" title="Branch 578 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 579 was not taken"> - </span><span class="branchCov" title="Branch 580 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 581 was not taken"> - </span><span class="branchCov" title="Branch 582 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 583 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 584 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 585 was not taken"> - </span><span class="branchCov" title="Branch 586 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 587 was not taken"> - </span><span class="branchCov" title="Branch 588 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 589 was not taken"> - </span><span class="branchCov" title="Branch 590 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 591 was not taken"> - </span><span class="branchCov" title="Branch 592 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 593 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 594 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 595 was not taken"> - </span><span class="branchCov" title="Branch 596 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 597 was not taken"> - </span><span class="branchCov" title="Branch 598 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 599 was not taken"> - </span><span class="branchCov" title="Branch 600 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 601 was not taken"> - </span><span class="branchCov" title="Branch 602 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 603 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 604 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 605 was not taken"> - </span><span class="branchCov" title="Branch 606 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 607 was not taken"> - </span><span class="branchCov" title="Branch 608 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 609 was not taken"> - </span><span class="branchCov" title="Branch 610 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 611 was not taken"> - </span><span class="branchCov" title="Branch 612 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 613 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 614 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 615 was not taken"> - </span><span class="branchCov" title="Branch 616 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 617 was not taken"> - </span><span class="branchCov" title="Branch 618 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 619 was not taken"> - </span><span class="branchCov" title="Branch 620 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 621 was not taken"> - </span><span class="branchCov" title="Branch 622 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 623 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 624 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 625 was not taken"> - </span><span class="branchCov" title="Branch 626 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 627 was not taken"> - </span><span class="branchCov" title="Branch 628 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 629 was not taken"> - </span><span class="branchCov" title="Branch 630 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 631 was not taken"> - </span><span class="branchCov" title="Branch 632 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 633 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 634 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 635 was not taken"> - </span><span class="branchCov" title="Branch 636 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 637 was not taken"> - </span><span class="branchCov" title="Branch 638 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 639 was not taken"> - </span>]
+<a name="105"><span class="lineNum">     105 </span>                :            :             QUARTERROUND( x0, x4, x8,x12);</a>
+<a name="106"><span class="lineNum">     106 </span>                :            :             QUARTERROUND( x1, x5, x9,x13);</a>
+<a name="107"><span class="lineNum">     107 </span>                :            :             QUARTERROUND( x2, x6,x10,x14);</a>
+<a name="108"><span class="lineNum">     108 </span>                :            :             QUARTERROUND( x3, x7,x11,x15);</a>
+<a name="109"><span class="lineNum">     109 </span>                :            :             QUARTERROUND( x0, x5,x10,x15);</a>
+<a name="110"><span class="lineNum">     110 </span>                :            :             QUARTERROUND( x1, x6,x11,x12);</a>
+<a name="111"><span class="lineNum">     111 </span>                :            :             QUARTERROUND( x2, x7, x8,x13);</a>
+<a name="112"><span class="lineNum">     112 </span>                :            :             QUARTERROUND( x3, x4, x9,x14);</a>
+<a name="113"><span class="lineNum">     113 </span>                :            :         );</a>
+<a name="114"><span class="lineNum">     114 </span>                :            : </a>
+<a name="115"><span class="lineNum">     115 </span>                :<span class="lineCov">    9874635 :         x0 += 0x61707865;</span></a>
+<a name="116"><span class="lineNum">     116 </span>                :<span class="lineCov">    9874635 :         x1 += 0x3320646e;</span></a>
+<a name="117"><span class="lineNum">     117 </span>                :<span class="lineCov">    9874635 :         x2 += 0x79622d32;</span></a>
+<a name="118"><span class="lineNum">     118 </span>                :<span class="lineCov">    9874635 :         x3 += 0x6b206574;</span></a>
+<a name="119"><span class="lineNum">     119 </span>                :<span class="lineCov">    9874635 :         x4 += j4;</span></a>
+<a name="120"><span class="lineNum">     120 </span>                :<span class="lineCov">    9874635 :         x5 += j5;</span></a>
+<a name="121"><span class="lineNum">     121 </span>                :<span class="lineCov">    9874635 :         x6 += j6;</span></a>
+<a name="122"><span class="lineNum">     122 </span>                :<span class="lineCov">    9874635 :         x7 += j7;</span></a>
+<a name="123"><span class="lineNum">     123 </span>                :<span class="lineCov">    9874635 :         x8 += j8;</span></a>
+<a name="124"><span class="lineNum">     124 </span>                :<span class="lineCov">    9874635 :         x9 += j9;</span></a>
+<a name="125"><span class="lineNum">     125 </span>                :<span class="lineCov">    9874635 :         x10 += j10;</span></a>
+<a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">    9874635 :         x11 += j11;</span></a>
+<a name="127"><span class="lineNum">     127 </span>                :<span class="lineCov">    9874635 :         x12 += j12;</span></a>
+<a name="128"><span class="lineNum">     128 </span>                :<span class="lineCov">    9874635 :         x13 += j13;</span></a>
+<a name="129"><span class="lineNum">     129 </span>                :<span class="lineCov">    9874635 :         x14 += j14;</span></a>
+<a name="130"><span class="lineNum">     130 </span>                :<span class="lineCov">    9874635 :         x15 += j15;</span></a>
+<a name="131"><span class="lineNum">     131 </span>                :            : </a>
+<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">    9874635 :         ++j12;</span></a>
+<a name="133"><span class="lineNum">     133 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    9874635 :         if (!j12) ++j13;</span></a>
+<a name="134"><span class="lineNum">     134 </span>                :            : </a>
+<a name="135"><span class="lineNum">     135 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 0, x0);</span></a>
+<a name="136"><span class="lineNum">     136 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 4, x1);</span></a>
+<a name="137"><span class="lineNum">     137 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9877389 :         WriteLE32(c + 8, x2);</span></a>
+<a name="138"><span class="lineNum">     138 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 12, x3);</span></a>
+<a name="139"><span class="lineNum">     139 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 16, x4);</span></a>
+<a name="140"><span class="lineNum">     140 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9877389 :         WriteLE32(c + 20, x5);</span></a>
+<a name="141"><span class="lineNum">     141 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 24, x6);</span></a>
+<a name="142"><span class="lineNum">     142 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 28, x7);</span></a>
+<a name="143"><span class="lineNum">     143 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 32, x8);</span></a>
+<a name="144"><span class="lineNum">     144 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 36, x9);</span></a>
+<a name="145"><span class="lineNum">     145 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 40, x10);</span></a>
+<a name="146"><span class="lineNum">     146 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 44, x11);</span></a>
+<a name="147"><span class="lineNum">     147 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 48, x12);</span></a>
+<a name="148"><span class="lineNum">     148 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 52, x13);</span></a>
+<a name="149"><span class="lineNum">     149 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 56, x14);</span></a>
+<a name="150"><span class="lineNum">     150 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    9874635 :         WriteLE32(c + 60, x15);</span></a>
+<a name="151"><span class="lineNum">     151 </span>                :            : </a>
+<a name="152"><span class="lineNum">     152 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    9874635 :         if (blocks == 1) {</span></a>
+<a name="153"><span class="lineNum">     153 </span>                :<span class="lineCov">    6879569 :             input[8] = j12;</span></a>
+<a name="154"><span class="lineNum">     154 </span>                :<span class="lineCov">    6879569 :             input[9] = j13;</span></a>
+<a name="155"><span class="lineNum">     155 </span>                :<span class="lineCov">    6879569 :             return;</span></a>
+<a name="156"><span class="lineNum">     156 </span>                :            :         }</a>
+<a name="157"><span class="lineNum">     157 </span>                :<span class="lineCov">    2995066 :         blocks -= 1;</span></a>
+<a name="158"><span class="lineNum">     158 </span>                :<span class="lineCov">    2995066 :         c += BLOCKLEN;</span></a>
+<a name="159"><span class="lineNum">     159 </span>                :            :     }</a>
+<a name="160"><span class="lineNum">     160 </span>                :<span class="lineCov">    6879569 : }</span></a>
+<a name="161"><span class="lineNum">     161 </span>                :            : </a>
+<a name="162"><span class="lineNum">     162 </span>                :<span class="lineCov">      31789 : inline void ChaCha20Aligned::Crypt(Span&lt;const std::byte&gt; in_bytes, Span&lt;std::byte&gt; out_bytes) noexcept</span></a>
+<a name="163"><span class="lineNum">     163 </span>                :            : {</a>
+<a name="164"><span class="lineNum">     164 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      31789 :     assert(in_bytes.size() == out_bytes.size());</span></a>
+<a name="165"><span class="lineNum">     165 </span>                :<span class="lineCov">      31789 :     const unsigned char* m = UCharCast(in_bytes.data());</span></a>
+<a name="166"><span class="lineNum">     166 </span>                :<span class="lineCov">      31789 :     unsigned char* c = UCharCast(out_bytes.data());</span></a>
+<a name="167"><span class="lineNum">     167 </span>                :<span class="lineCov">      31789 :     size_t blocks = out_bytes.size() / BLOCKLEN;</span></a>
+<a name="168"><span class="lineNum">     168 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">      31789 :     assert(blocks * BLOCKLEN == out_bytes.size());</span></a>
+<a name="169"><span class="lineNum">     169 </span>                :            : </a>
+<a name="170"><span class="lineNum">     170 </span>                :            :     uint32_t x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15;</a>
+<a name="171"><span class="lineNum">     171 </span>                :            :     uint32_t j4, j5, j6, j7, j8, j9, j10, j11, j12, j13, j14, j15;</a>
+<a name="172"><span class="lineNum">     172 </span>                :            : </a>
+<a name="173"><span class="lineNum">     173 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      31789 :     if (!blocks) return;</span></a>
+<a name="174"><span class="lineNum">     174 </span>                :            : </a>
+<a name="175"><span class="lineNum">     175 </span>                :<span class="lineCov">      31789 :     j4 = input[0];</span></a>
+<a name="176"><span class="lineNum">     176 </span>                :<span class="lineCov">      31789 :     j5 = input[1];</span></a>
+<a name="177"><span class="lineNum">     177 </span>                :<span class="lineCov">      31789 :     j6 = input[2];</span></a>
+<a name="178"><span class="lineNum">     178 </span>                :<span class="lineCov">      31789 :     j7 = input[3];</span></a>
+<a name="179"><span class="lineNum">     179 </span>                :<span class="lineCov">      31789 :     j8 = input[4];</span></a>
+<a name="180"><span class="lineNum">     180 </span>                :<span class="lineCov">      31789 :     j9 = input[5];</span></a>
+<a name="181"><span class="lineNum">     181 </span>                :<span class="lineCov">      31789 :     j10 = input[6];</span></a>
+<a name="182"><span class="lineNum">     182 </span>                :<span class="lineCov">      31789 :     j11 = input[7];</span></a>
+<a name="183"><span class="lineNum">     183 </span>                :<span class="lineCov">      31789 :     j12 = input[8];</span></a>
+<a name="184"><span class="lineNum">     184 </span>                :<span class="lineCov">      31789 :     j13 = input[9];</span></a>
+<a name="185"><span class="lineNum">     185 </span>                :<span class="lineCov">      31789 :     j14 = input[10];</span></a>
+<a name="186"><span class="lineNum">     186 </span>                :<span class="lineCov">      31789 :     j15 = input[11];</span></a>
+<a name="187"><span class="lineNum">     187 </span>                :            : </a>
+<a name="188"><span class="lineNum">     188 </span>                :<span class="lineCov">    6725649 :     for (;;) {</span></a>
+<a name="189"><span class="lineNum">     189 </span>                :<span class="lineCov">    6725649 :         x0 = 0x61707865;</span></a>
+<a name="190"><span class="lineNum">     190 </span>                :<span class="lineCov">    6725649 :         x1 = 0x3320646e;</span></a>
+<a name="191"><span class="lineNum">     191 </span>                :<span class="lineCov">    6725649 :         x2 = 0x79622d32;</span></a>
+<a name="192"><span class="lineNum">     192 </span>                :<span class="lineCov">    6725649 :         x3 = 0x6b206574;</span></a>
+<a name="193"><span class="lineNum">     193 </span>                :<span class="lineCov">    6725649 :         x4 = j4;</span></a>
+<a name="194"><span class="lineNum">     194 </span>                :<span class="lineCov">    6725649 :         x5 = j5;</span></a>
+<a name="195"><span class="lineNum">     195 </span>                :<span class="lineCov">    6725649 :         x6 = j6;</span></a>
+<a name="196"><span class="lineNum">     196 </span>                :<span class="lineCov">    6725649 :         x7 = j7;</span></a>
+<a name="197"><span class="lineNum">     197 </span>                :<span class="lineCov">    6725649 :         x8 = j8;</span></a>
+<a name="198"><span class="lineNum">     198 </span>                :<span class="lineCov">    6725649 :         x9 = j9;</span></a>
+<a name="199"><span class="lineNum">     199 </span>                :<span class="lineCov">    6725649 :         x10 = j10;</span></a>
+<a name="200"><span class="lineNum">     200 </span>                :<span class="lineCov">    6725649 :         x11 = j11;</span></a>
+<a name="201"><span class="lineNum">     201 </span>                :<span class="lineCov">    6725649 :         x12 = j12;</span></a>
+<a name="202"><span class="lineNum">     202 </span>                :<span class="lineCov">    6725649 :         x13 = j13;</span></a>
+<a name="203"><span class="lineNum">     203 </span>                :<span class="lineCov">    6725649 :         x14 = j14;</span></a>
+<a name="204"><span class="lineNum">     204 </span>                :<span class="lineCov">    6725649 :         x15 = j15;</span></a>
+<a name="205"><span class="lineNum">     205 </span>                :            : </a>
+<a name="206"><span class="lineNum">     206 </span>                :            :         // The 20 inner ChaCha20 rounds are unrolled here for performance.</a>
+<a name="207"><span class="lineNum">     207 </span>                :<span class="lineCov">    6725649 :         REPEAT10(</span></a>
+<a name="208"><span class="lineNum">     208 </span>                :            :             QUARTERROUND( x0, x4, x8,x12);</a>
+<a name="209"><span class="lineNum">     209 </span>                :            :             QUARTERROUND( x1, x5, x9,x13);</a>
+<a name="210"><span class="lineNum">     210 </span>                :            :             QUARTERROUND( x2, x6,x10,x14);</a>
+<a name="211"><span class="lineNum">     211 </span>                :            :             QUARTERROUND( x3, x7,x11,x15);</a>
+<a name="212"><span class="lineNum">     212 </span>                :            :             QUARTERROUND( x0, x5,x10,x15);</a>
+<a name="213"><span class="lineNum">     213 </span>                :            :             QUARTERROUND( x1, x6,x11,x12);</a>
+<a name="214"><span class="lineNum">     214 </span>                :            :             QUARTERROUND( x2, x7, x8,x13);</a>
+<a name="215"><span class="lineNum">     215 </span>                :            :             QUARTERROUND( x3, x4, x9,x14);</a>
+<a name="216"><span class="lineNum">     216 </span>                :            :         );</a>
+<a name="217"><span class="lineNum">     217 </span>                :            : </a>
+<a name="218"><span class="lineNum">     218 </span>                :<span class="lineCov">    6725649 :         x0 += 0x61707865;</span></a>
+<a name="219"><span class="lineNum">     219 </span>                :<span class="lineCov">    6725649 :         x1 += 0x3320646e;</span></a>
+<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">    6725649 :         x2 += 0x79622d32;</span></a>
+<a name="221"><span class="lineNum">     221 </span>                :<span class="lineCov">    6725649 :         x3 += 0x6b206574;</span></a>
+<a name="222"><span class="lineNum">     222 </span>                :<span class="lineCov">    6725649 :         x4 += j4;</span></a>
+<a name="223"><span class="lineNum">     223 </span>                :<span class="lineCov">    6725649 :         x5 += j5;</span></a>
+<a name="224"><span class="lineNum">     224 </span>                :<span class="lineCov">    6725649 :         x6 += j6;</span></a>
+<a name="225"><span class="lineNum">     225 </span>                :<span class="lineCov">    6725649 :         x7 += j7;</span></a>
+<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">    6725649 :         x8 += j8;</span></a>
+<a name="227"><span class="lineNum">     227 </span>                :<span class="lineCov">    6725649 :         x9 += j9;</span></a>
+<a name="228"><span class="lineNum">     228 </span>                :<span class="lineCov">    6725649 :         x10 += j10;</span></a>
+<a name="229"><span class="lineNum">     229 </span>                :<span class="lineCov">    6725649 :         x11 += j11;</span></a>
+<a name="230"><span class="lineNum">     230 </span>                :<span class="lineCov">    6725649 :         x12 += j12;</span></a>
+<a name="231"><span class="lineNum">     231 </span>                :<span class="lineCov">    6725649 :         x13 += j13;</span></a>
+<a name="232"><span class="lineNum">     232 </span>                :<span class="lineCov">    6725649 :         x14 += j14;</span></a>
+<a name="233"><span class="lineNum">     233 </span>                :<span class="lineCov">    6725649 :         x15 += j15;</span></a>
+<a name="234"><span class="lineNum">     234 </span>                :            : </a>
+<a name="235"><span class="lineNum">     235 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x0 ^= ReadLE32(m + 0);</span></a>
+<a name="236"><span class="lineNum">     236 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x1 ^= ReadLE32(m + 4);</span></a>
+<a name="237"><span class="lineNum">     237 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x2 ^= ReadLE32(m + 8);</span></a>
+<a name="238"><span class="lineNum">     238 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x3 ^= ReadLE32(m + 12);</span></a>
+<a name="239"><span class="lineNum">     239 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x4 ^= ReadLE32(m + 16);</span></a>
+<a name="240"><span class="lineNum">     240 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x5 ^= ReadLE32(m + 20);</span></a>
+<a name="241"><span class="lineNum">     241 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x6 ^= ReadLE32(m + 24);</span></a>
+<a name="242"><span class="lineNum">     242 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x7 ^= ReadLE32(m + 28);</span></a>
+<a name="243"><span class="lineNum">     243 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x8 ^= ReadLE32(m + 32);</span></a>
+<a name="244"><span class="lineNum">     244 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x9 ^= ReadLE32(m + 36);</span></a>
+<a name="245"><span class="lineNum">     245 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x10 ^= ReadLE32(m + 40);</span></a>
+<a name="246"><span class="lineNum">     246 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x11 ^= ReadLE32(m + 44);</span></a>
+<a name="247"><span class="lineNum">     247 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x12 ^= ReadLE32(m + 48);</span></a>
+<a name="248"><span class="lineNum">     248 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x13 ^= ReadLE32(m + 52);</span></a>
+<a name="249"><span class="lineNum">     249 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x14 ^= ReadLE32(m + 56);</span></a>
+<a name="250"><span class="lineNum">     250 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6725649 :         x15 ^= ReadLE32(m + 60);</span></a>
+<a name="251"><span class="lineNum">     251 </span>                :            : </a>
+<a name="252"><span class="lineNum">     252 </span>                :<span class="lineCov">    6725649 :         ++j12;</span></a>
+<a name="253"><span class="lineNum">     253 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    6725649 :         if (!j12) ++j13;</span></a>
+<a name="254"><span class="lineNum">     254 </span>                :            : </a>
+<a name="255"><span class="lineNum">     255 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 0, x0);</span></a>
+<a name="256"><span class="lineNum">     256 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 4, x1);</span></a>
+<a name="257"><span class="lineNum">     257 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 8, x2);</span></a>
+<a name="258"><span class="lineNum">     258 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 12, x3);</span></a>
+<a name="259"><span class="lineNum">     259 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 16, x4);</span></a>
+<a name="260"><span class="lineNum">     260 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 20, x5);</span></a>
+<a name="261"><span class="lineNum">     261 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 24, x6);</span></a>
+<a name="262"><span class="lineNum">     262 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 28, x7);</span></a>
+<a name="263"><span class="lineNum">     263 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 32, x8);</span></a>
+<a name="264"><span class="lineNum">     264 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 36, x9);</span></a>
+<a name="265"><span class="lineNum">     265 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 40, x10);</span></a>
+<a name="266"><span class="lineNum">     266 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 44, x11);</span></a>
+<a name="267"><span class="lineNum">     267 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 48, x12);</span></a>
+<a name="268"><span class="lineNum">     268 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 52, x13);</span></a>
+<a name="269"><span class="lineNum">     269 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 56, x14);</span></a>
+<a name="270"><span class="lineNum">     270 </span>                :<span class="lineCov">    6725649 :         WriteLE32(c + 60, x15);</span></a>
+<a name="271"><span class="lineNum">     271 </span>                :            : </a>
+<a name="272"><span class="lineNum">     272 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    6725649 :         if (blocks == 1) {</span></a>
+<a name="273"><span class="lineNum">     273 </span>                :<span class="lineCov">      31789 :             input[8] = j12;</span></a>
+<a name="274"><span class="lineNum">     274 </span>                :<span class="lineCov">      31789 :             input[9] = j13;</span></a>
+<a name="275"><span class="lineNum">     275 </span>                :<span class="lineCov">      31789 :             return;</span></a>
+<a name="276"><span class="lineNum">     276 </span>                :            :         }</a>
+<a name="277"><span class="lineNum">     277 </span>                :<span class="lineCov">    6693860 :         blocks -= 1;</span></a>
+<a name="278"><span class="lineNum">     278 </span>                :<span class="lineCov">    6693860 :         c += BLOCKLEN;</span></a>
+<a name="279"><span class="lineNum">     279 </span>                :<span class="lineCov">    6693860 :         m += BLOCKLEN;</span></a>
+<a name="280"><span class="lineNum">     280 </span>                :            :     }</a>
+<a name="281"><span class="lineNum">     281 </span>                :<span class="lineCov">      31789 : }</span></a>
+<a name="282"><span class="lineNum">     282 </span>                :            : </a>
+<a name="283"><span class="lineNum">     283 </span>                :<span class="lineCov">   16125116 : void ChaCha20::Keystream(Span&lt;std::byte&gt; out) noexcept</span></a>
+<a name="284"><span class="lineNum">     284 </span>                :            : {</a>
+<a name="285"><span class="lineNum">     285 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">   16125116 :     if (out.empty()) return;</span></a>
+<a name="286"><span class="lineNum">     286 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">   16093634 :     if (m_bufleft) {</span></a>
+<a name="287"><span class="lineNum">     287 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   10855092 :         unsigned reuse = std::min&lt;size_t&gt;(m_bufleft, out.size());</span></a>
+<a name="288"><span class="lineNum">     288 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">   10855092 :         std::copy(m_buffer.end() - m_bufleft, m_buffer.end() - m_bufleft + reuse, out.begin());</span></a>
+<a name="289"><span class="lineNum">     289 </span>                :<span class="lineCov">   10855092 :         m_bufleft -= reuse;</span></a>
+<a name="290"><span class="lineNum">     290 </span>                :<span class="lineCov">   10855092 :         out = out.subspan(reuse);</span></a>
+<a name="291"><span class="lineNum">     291 </span>                :<span class="lineCov">   10855092 :     }</span></a>
+<a name="292"><span class="lineNum">     292 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">   16093634 :     if (out.size() &gt;= m_aligned.BLOCKLEN) {</span></a>
+<a name="293"><span class="lineNum">     293 </span>                :<span class="lineCov">      61023 :         size_t blocks = out.size() / m_aligned.BLOCKLEN;</span></a>
+<a name="294"><span class="lineNum">     294 </span>                :<span class="lineCov">      61023 :         m_aligned.Keystream(out.first(blocks * m_aligned.BLOCKLEN));</span></a>
+<a name="295"><span class="lineNum">     295 </span>                :<span class="lineCov">      61023 :         out = out.subspan(blocks * m_aligned.BLOCKLEN);</span></a>
+<a name="296"><span class="lineNum">     296 </span>                :<span class="lineCov">      61023 :     }</span></a>
+<a name="297"><span class="lineNum">     297 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">   16093634 :     if (!out.empty()) {</span></a>
+<a name="298"><span class="lineNum">     298 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6729033 :         m_aligned.Keystream(m_buffer);</span></a>
+<a name="299"><span class="lineNum">     299 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    6729033 :         std::copy(m_buffer.begin(), m_buffer.begin() + out.size(), out.begin());</span></a>
+<a name="300"><span class="lineNum">     300 </span>                :<span class="lineCov">    6729033 :         m_bufleft = m_aligned.BLOCKLEN - out.size();</span></a>
+<a name="301"><span class="lineNum">     301 </span>                :<span class="lineCov">    6729033 :     }</span></a>
+<a name="302"><span class="lineNum">     302 </span>                :<span class="lineCov">   16125116 : }</span></a>
+<a name="303"><span class="lineNum">     303 </span>                :            : </a>
+<a name="304"><span class="lineNum">     304 </span>                :<span class="lineCov">     222425 : void ChaCha20::Crypt(Span&lt;const std::byte&gt; input, Span&lt;std::byte&gt; output) noexcept</span></a>
+<a name="305"><span class="lineNum">     305 </span>                :            : {</a>
+<a name="306"><span class="lineNum">     306 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     222425 :     assert(input.size() == output.size());</span></a>
+<a name="307"><span class="lineNum">     307 </span>                :            : </a>
+<a name="308"><span class="lineNum">     308 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">     222425 :     if (!input.size()) return;</span></a>
+<a name="309"><span class="lineNum">     309 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">     152203 :     if (m_bufleft) {</span></a>
+<a name="310"><span class="lineNum">     310 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      92187 :         unsigned reuse = std::min&lt;size_t&gt;(m_bufleft, input.size());</span></a>
+<a name="311"><span class="lineNum">     311 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    1587514 :         for (unsigned i = 0; i &lt; reuse; i++) {</span></a>
+<a name="312"><span class="lineNum">     312 </span>                :<span class="lineCov">    1495327 :             output[i] = input[i] ^ m_buffer[m_aligned.BLOCKLEN - m_bufleft + i];</span></a>
+<a name="313"><span class="lineNum">     313 </span>                :<span class="lineCov">    1495327 :         }</span></a>
+<a name="314"><span class="lineNum">     314 </span>                :<span class="lineCov">      92187 :         m_bufleft -= reuse;</span></a>
+<a name="315"><span class="lineNum">     315 </span>                :<span class="lineCov">      92187 :         output = output.subspan(reuse);</span></a>
+<a name="316"><span class="lineNum">     316 </span>                :<span class="lineCov">      92187 :         input = input.subspan(reuse);</span></a>
+<a name="317"><span class="lineNum">     317 </span>                :<span class="lineCov">      92187 :     }</span></a>
+<a name="318"><span class="lineNum">     318 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">     152203 :     if (input.size() &gt;= m_aligned.BLOCKLEN) {</span></a>
+<a name="319"><span class="lineNum">     319 </span>                :<span class="lineCov">      31789 :         size_t blocks = input.size() / m_aligned.BLOCKLEN;</span></a>
+<a name="320"><span class="lineNum">     320 </span>                :<span class="lineCov">      31789 :         m_aligned.Crypt(input.first(blocks * m_aligned.BLOCKLEN), output.first(blocks * m_aligned.BLOCKLEN));</span></a>
+<a name="321"><span class="lineNum">     321 </span>                :<span class="lineCov">      31789 :         output = output.subspan(blocks * m_aligned.BLOCKLEN);</span></a>
+<a name="322"><span class="lineNum">     322 </span>                :<span class="lineCov">      31789 :         input = input.subspan(blocks * m_aligned.BLOCKLEN);</span></a>
+<a name="323"><span class="lineNum">     323 </span>                :<span class="lineCov">      31789 :     }</span></a>
+<a name="324"><span class="lineNum">     324 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">     152203 :     if (!input.empty()) {</span></a>
+<a name="325"><span class="lineNum">     325 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      88347 :         m_aligned.Keystream(m_buffer);</span></a>
+<a name="326"><span class="lineNum">     326 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">    1319710 :         for (unsigned i = 0; i &lt; input.size(); i++) {</span></a>
+<a name="327"><span class="lineNum">     327 </span>                :<span class="lineCov">    1231363 :             output[i] = input[i] ^ m_buffer[i];</span></a>
+<a name="328"><span class="lineNum">     328 </span>                :<span class="lineCov">    1231363 :         }</span></a>
+<a name="329"><span class="lineNum">     329 </span>                :<span class="lineCov">      88347 :         m_bufleft = m_aligned.BLOCKLEN - input.size();</span></a>
+<a name="330"><span class="lineNum">     330 </span>                :<span class="lineCov">      88347 :     }</span></a>
+<a name="331"><span class="lineNum">     331 </span>                :<span class="lineCov">     222425 : }</span></a>
+<a name="332"><span class="lineNum">     332 </span>                :            : </a>
+<a name="333"><span class="lineNum">     333 </span>                :<span class="lineCov">    4472431 : ChaCha20::~ChaCha20()</span></a>
+<a name="334"><span class="lineNum">     334 </span>                :            : {</a>
+<a name="335"><span class="lineNum">     335 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4472431 :     memory_cleanse(m_buffer.data(), m_buffer.size());</span></a>
+<a name="336"><span class="lineNum">     336 </span>                :<span class="lineCov">    4472431 : }</span></a>
+<a name="337"><span class="lineNum">     337 </span>                :            : </a>
+<a name="338"><span class="lineNum">     338 </span>                :<span class="lineCov">    4329953 : void ChaCha20::SetKey(Span&lt;const std::byte&gt; key) noexcept</span></a>
+<a name="339"><span class="lineNum">     339 </span>                :            : {</a>
+<a name="340"><span class="lineNum">     340 </span>                :<span class="lineCov">    4329953 :     m_aligned.SetKey(key);</span></a>
+<a name="341"><span class="lineNum">     341 </span>                :<span class="lineCov">    4329953 :     m_bufleft = 0;</span></a>
+<a name="342"><span class="lineNum">     342 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">    4329953 :     memory_cleanse(m_buffer.data(), m_buffer.size());</span></a>
+<a name="343"><span class="lineNum">     343 </span>                :<span class="lineCov">    4329953 : }</span></a>
+<a name="344"><span class="lineNum">     344 </span>                :            : </a>
+<a name="345"><span class="lineNum">     345 </span>                :<span class="lineCov">       2754 : FSChaCha20::FSChaCha20(Span&lt;const std::byte&gt; key, uint32_t rekey_interval) noexcept :</span></a>
+<a name="346"><span class="lineNum">     346 </span>                :<span class="lineCov">       2754 :     m_chacha20(key), m_rekey_interval(rekey_interval)</span></a>
+<a name="347"><span class="lineNum">     347 </span>                :            : {</a>
+<a name="348"><span class="lineNum">     348 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       2754 :     assert(key.size() == KEYLEN);</span></a>
+<a name="349"><span class="lineNum">     349 </span>                :<span class="lineCov">       2754 : }</span></a>
+<a name="350"><span class="lineNum">     350 </span>                :            : </a>
+<a name="351"><span class="lineNum">     351 </span>                :<span class="lineCov">      63985 : void FSChaCha20::Crypt(Span&lt;const std::byte&gt; input, Span&lt;std::byte&gt; output) noexcept</span></a>
+<a name="352"><span class="lineNum">     352 </span>                :            : {</a>
+<a name="353"><span class="lineNum">     353 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      63985 :     assert(input.size() == output.size());</span></a>
+<a name="354"><span class="lineNum">     354 </span>                :            : </a>
+<a name="355"><span class="lineNum">     355 </span>                :            :     // Invoke internal stream cipher for actual encryption/decryption.</a>
+<a name="356"><span class="lineNum">     356 </span>                :<span class="lineCov">      63985 :     m_chacha20.Crypt(input, output);</span></a>
+<a name="357"><span class="lineNum">     357 </span>                :            : </a>
+<a name="358"><span class="lineNum">     358 </span>                :            :     // Rekey after m_rekey_interval encryptions/decryptions.</a>
+<a name="359"><span class="lineNum">     359 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">      63985 :     if (++m_chunk_counter == m_rekey_interval) {</span></a>
+<a name="360"><span class="lineNum">     360 </span>                :            :         // Get new key from the stream cipher.</a>
+<a name="361"><span class="lineNum">     361 </span>                :            :         std::byte new_key[KEYLEN];</a>
+<a name="362"><span class="lineNum">     362 </span>                :<span class="lineCov">       5309 :         m_chacha20.Keystream(new_key);</span></a>
+<a name="363"><span class="lineNum">     363 </span>                :            :         // Update its key.</a>
+<a name="364"><span class="lineNum">     364 </span>                :<span class="lineCov">       5309 :         m_chacha20.SetKey(new_key);</span></a>
+<a name="365"><span class="lineNum">     365 </span>                :            :         // Wipe the key (a copy remains inside m_chacha20, where it'll be wiped on the next rekey</a>
+<a name="366"><span class="lineNum">     366 </span>                :            :         // or on destruction).</a>
+<a name="367"><span class="lineNum">     367 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       5309 :         memory_cleanse(new_key, sizeof(new_key));</span></a>
+<a name="368"><span class="lineNum">     368 </span>                :            :         // Set the nonce for the new section of output.</a>
+<a name="369"><span class="lineNum">     369 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       5309 :         m_chacha20.Seek({0, ++m_rekey_counter}, 0);</span></a>
+<a name="370"><span class="lineNum">     370 </span>                :            :         // Reset the chunk counter.</a>
+<a name="371"><span class="lineNum">     371 </span>                :<span class="lineCov">       5309 :         m_chunk_counter = 0;</span></a>
+<a name="372"><span class="lineNum">     372 </span>                :<span class="lineCov">       5309 :     }</span></a>
+<a name="373"><span class="lineNum">     373 </span>                :<span class="lineCov">      63985 : }</span></a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 1.16</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
