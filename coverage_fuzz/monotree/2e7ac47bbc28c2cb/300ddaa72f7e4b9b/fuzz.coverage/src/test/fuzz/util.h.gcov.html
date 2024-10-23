@@ -1,0 +1,503 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/util.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - util.h<span style="font-size: 80%;"> (source / <a href="util.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">19.0&nbsp;%</td>
+            <td class="headerCovTableEntry">126</td>
+            <td class="headerCovTableEntry">24</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-10-23 17:21:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">3.5&nbsp;%</td>
+            <td class="headerCovTableEntry">143</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">5.3&nbsp;%</td>
+            <td class="headerCovTableEntry">512</td>
+            <td class="headerCovTableEntry">27</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_TEST_FUZZ_UTIL_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_TEST_FUZZ_UTIL_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;addresstype.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;arith_uint256.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;coins.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;compat/compat.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;consensus/amount.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;consensus/consensus.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;key.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;merkleblock.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;script/script.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;serialize.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;streams.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #include &lt;array&gt;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #include &lt;cstdio&gt;</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #include &lt;string&gt;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : class PeerManager;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : template &lt;typename... Callables&gt;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC tlaBgGNC">       31865 : size_t CallOneOf(FuzzedDataProvider&amp; fuzzed_data_provider, Callables... callables)</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : {</span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">       31865 :     constexpr size_t call_size{sizeof...(callables)};</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     static_assert(call_size &gt;= 1);</span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">       31865 :     const size_t call_index{fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, call_size - 1)};</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     size_t i{0};</span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaGNC">       31865 :     ((i++ == call_index ? callables() : void()), ...);</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 13 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 10220 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10467 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 2675 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 3 was taken 18012 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 7792 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 12895 times"> + </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 18 was not executed"> # </span><span class="tlaUNC" title="Branch 19 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span><span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 22 was not executed"> # </span><span class="tlaUNC" title="Branch 23 was not executed"> # </span><span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span><span class="tlaUNC" title="Branch 26 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 27 was not executed"> # </span><span class="tlaUNC" title="Branch 28 was not executed"> # </span><span class="tlaUNC" title="Branch 29 was not executed"> # </span><span class="tlaUNC" title="Branch 30 was not executed"> # </span><span class="tlaUNC" title="Branch 31 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 32 was not executed"> # </span><span class="tlaUNC" title="Branch 33 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 11 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 13 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 18 was not executed"> # </span><span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 23 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 18 was not executed"> # </span><span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 23 was not executed"> # </span><span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span><span class="tlaUNC" title="Branch 26 was not executed"> # </span><span class="tlaUNC" title="Branch 27 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 28 was not executed"> # </span><span class="tlaUNC" title="Branch 29 was not executed"> # </span><span class="tlaUNC" title="Branch 30 was not executed"> # </span><span class="tlaUNC" title="Branch 31 was not executed"> # </span><span class="tlaUNC" title="Branch 32 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 33 was not executed"> # </span><span class="tlaUNC" title="Branch 34 was not executed"> # </span><span class="tlaUNC" title="Branch 35 was not executed"> # </span><span class="tlaUNC" title="Branch 36 was not executed"> # </span><span class="tlaUNC" title="Branch 37 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 38 was not executed"> # </span><span class="tlaUNC" title="Branch 39 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span><span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 21 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span><span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span><span class="tlaUNC" title="Branch 23 was not executed"> # </span><span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 26 was not executed"> # </span><span class="tlaUNC" title="Branch 27 was not executed"> # </span><span class="tlaUNC" title="Branch 28 was not executed"> # </span><span class="tlaUNC" title="Branch 29 was not executed"> # </span><span class="tlaUNC" title="Branch 30 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 31 was not executed"> # </span><span class="tlaUNC" title="Branch 32 was not executed"> # </span><span class="tlaUNC" title="Branch 33 was not executed"> # </span><span class="tlaUNC" title="Branch 34 was not executed"> # </span><span class="tlaUNC" title="Branch 35 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 36 was not executed"> # </span><span class="tlaUNC" title="Branch 37 was not executed"> # </span><span class="tlaUNC" title="Branch 38 was not executed"> # </span><span class="tlaUNC" title="Branch 39 was not executed"> # </span><span class="tlaUNC" title="Branch 40 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 41 was not executed"> # </span><span class="tlaUNC" title="Branch 42 was not executed"> # </span><span class="tlaUNC" title="Branch 43 was not executed"> # </span><span class="tlaUNC" title="Branch 44 was not executed"> # </span><span class="tlaUNC" title="Branch 45 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 46 was not executed"> # </span><span class="tlaUNC" title="Branch 47 was not executed"> # </span><span class="tlaUNC" title="Branch 48 was not executed"> # </span><span class="tlaUNC" title="Branch 49 was not executed"> # </span><span class="tlaUNC" title="Branch 50 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 51 was not executed"> # </span><span class="tlaUNC" title="Branch 52 was not executed"> # </span><span class="tlaUNC" title="Branch 53 was not executed"> # </span><span class="tlaUNC" title="Branch 54 was not executed"> # </span><span class="tlaUNC" title="Branch 55 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 56 was not executed"> # </span><span class="tlaUNC" title="Branch 57 was not executed"> # </span><span class="tlaUNC" title="Branch 58 was not executed"> # </span><span class="tlaUNC" title="Branch 59 was not executed"> # </span><span class="tlaUNC" title="Branch 60 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 61 was not executed"> # </span><span class="tlaUNC" title="Branch 62 was not executed"> # </span><span class="tlaUNC" title="Branch 63 was not executed"> # </span><span class="tlaUNC" title="Branch 64 was not executed"> # </span><span class="tlaUNC" title="Branch 65 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 66 was not executed"> # </span><span class="tlaUNC" title="Branch 67 was not executed"> # </span><span class="tlaUNC" title="Branch 68 was not executed"> # </span><span class="tlaUNC" title="Branch 69 was not executed"> # </span><span class="tlaUNC" title="Branch 70 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 71 was not executed"> # </span><span class="tlaUNC" title="Branch 72 was not executed"> # </span><span class="tlaUNC" title="Branch 73 was not executed"> # </span><span class="tlaUNC" title="Branch 74 was not executed"> # </span><span class="tlaUNC" title="Branch 75 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 76 was not executed"> # </span><span class="tlaUNC" title="Branch 77 was not executed"> # </span><span class="tlaUNC" title="Branch 78 was not executed"> # </span><span class="tlaUNC" title="Branch 79 was not executed"> # </span><span class="tlaUNC" title="Branch 80 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 81 was not executed"> # </span><span class="tlaUNC" title="Branch 82 was not executed"> # </span><span class="tlaUNC" title="Branch 83 was not executed"> # </span><span class="tlaUNC" title="Branch 84 was not executed"> # </span><span class="tlaUNC" title="Branch 85 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 86 was not executed"> # </span><span class="tlaUNC" title="Branch 87 was not executed"> # </span><span class="tlaUNC" title="Branch 88 was not executed"> # </span><span class="tlaUNC" title="Branch 89 was not executed"> # </span><span class="tlaUNC" title="Branch 90 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 91 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 18 was not executed"> # </span><span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 23 was not executed"> # </span><span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span><span class="tlaUNC" title="Branch 26 was not executed"> # </span><span class="tlaUNC" title="Branch 27 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 28 was not executed"> # </span><span class="tlaUNC" title="Branch 29 was not executed"> # </span><span class="tlaUNC" title="Branch 30 was not executed"> # </span><span class="tlaUNC" title="Branch 31 was not executed"> # </span><span class="tlaUNC" title="Branch 32 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 33 was not executed"> # </span><span class="tlaUNC" title="Branch 34 was not executed"> # </span><span class="tlaUNC" title="Branch 35 was not executed"> # </span><span class="tlaUNC" title="Branch 36 was not executed"> # </span><span class="tlaUNC" title="Branch 37 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 38 was not executed"> # </span><span class="tlaUNC" title="Branch 39 was not executed"> # </span><span class="tlaUNC" title="Branch 40 was not executed"> # </span><span class="tlaUNC" title="Branch 41 was not executed"> # </span><span class="tlaUNC" title="Branch 42 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 43 was not executed"> # </span><span class="tlaUNC" title="Branch 44 was not executed"> # </span><span class="tlaUNC" title="Branch 45 was not executed"> # </span><span class="tlaUNC" title="Branch 46 was not executed"> # </span><span class="tlaUNC" title="Branch 47 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 48 was not executed"> # </span><span class="tlaUNC" title="Branch 49 was not executed"> # </span><span class="tlaUNC" title="Branch 50 was not executed"> # </span><span class="tlaUNC" title="Branch 51 was not executed"> # </span><span class="tlaUNC" title="Branch 52 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 53 was not executed"> # </span><span class="tlaUNC" title="Branch 54 was not executed"> # </span><span class="tlaUNC" title="Branch 55 was not executed"> # </span><span class="tlaUNC" title="Branch 56 was not executed"> # </span><span class="tlaUNC" title="Branch 57 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 58 was not executed"> # </span><span class="tlaUNC" title="Branch 59 was not executed"> # </span><span class="tlaUNC" title="Branch 60 was not executed"> # </span><span class="tlaUNC" title="Branch 61 was not executed"> # </span><span class="tlaUNC" title="Branch 62 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 63 was not executed"> # </span><span class="tlaUNC" title="Branch 64 was not executed"> # </span><span class="tlaUNC" title="Branch 65 was not executed"> # </span><span class="tlaUNC" title="Branch 66 was not executed"> # </span><span class="tlaUNC" title="Branch 67 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 68 was not executed"> # </span><span class="tlaUNC" title="Branch 69 was not executed"> # </span><span class="tlaUNC" title="Branch 70 was not executed"> # </span><span class="tlaUNC" title="Branch 71 was not executed"> # </span><span class="tlaUNC" title="Branch 72 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 73 was not executed"> # </span><span class="tlaUNC" title="Branch 74 was not executed"> # </span><span class="tlaUNC" title="Branch 75 was not executed"> # </span><span class="tlaUNC" title="Branch 76 was not executed"> # </span><span class="tlaUNC" title="Branch 77 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 78 was not executed"> # </span><span class="tlaUNC" title="Branch 79 was not executed"> # </span><span class="tlaUNC" title="Branch 80 was not executed"> # </span><span class="tlaUNC" title="Branch 81 was not executed"> # </span><span class="tlaUNC" title="Branch 82 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 83 was not executed"> # </span><span class="tlaUNC" title="Branch 84 was not executed"> # </span><span class="tlaUNC" title="Branch 85 was not executed"> # </span><span class="tlaUNC" title="Branch 86 was not executed"> # </span><span class="tlaUNC" title="Branch 87 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 88 was not executed"> # </span><span class="tlaUNC" title="Branch 89 was not executed"> # </span><span class="tlaUNC" title="Branch 90 was not executed"> # </span><span class="tlaUNC" title="Branch 91 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span><span class="tlaUNC" title="Branch 23 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span><span class="tlaUNC" title="Branch 26 was not executed"> # </span><span class="tlaUNC" title="Branch 27 was not executed"> # </span><span class="tlaUNC" title="Branch 28 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 29 was not executed"> # </span><span class="tlaUNC" title="Branch 30 was not executed"> # </span><span class="tlaUNC" title="Branch 31 was not executed"> # </span><span class="tlaUNC" title="Branch 32 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 33 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 1484 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9694 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1040 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 3 was taken 10138 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 2120 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 9058 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 1071 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 10107 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 8 was taken 1937 times"> + </span><span class="tlaGBC" title="Branch 9 was taken 9241 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 1727 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 9451 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 1799 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 13 was taken 9379 times"> + </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 17 was not executed"> # </span>]
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">       31865 :     return call_size;</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : }</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : </span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : template &lt;typename Collection&gt;</span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC tlaBgUNC">           0 : auto&amp; PickValue(FuzzedDataProvider&amp; fuzzed_data_provider, Collection&amp; col)</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : {</span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaUNC">           0 :     auto sz{col.size()};</span></span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     assert(sz &gt;= 1);</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaUNC">           0 :     auto it = col.begin();</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaUNC">           0 :     std::advance(it, fuzzed_data_provider.ConsumeIntegralInRange&lt;decltype(sz)&gt;(0, sz - 1));</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaUNC">           0 :     return *it;</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : }</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : </span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : template&lt;typename B = uint8_t&gt;</span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaGBC" title="Branch 0 was taken 1071 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1597 times"> + </span>]:<span class="tlaGNC tlaBgGNC">        2668 : [[nodiscard]] inline std::vector&lt;B&gt; ConsumeRandomLengthByteVector(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : {</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     static_assert(sizeof(B) == 1);</span>
+<span id="L60"><span class="lineNum">      60</span>         [<span class="tlaGBC" title="Branch 0 was taken 1071 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1597 times"> + </span>]:<span class="tlaGNC">        2668 :     const std::string s = max_length ?</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">        1071 :                               fuzzed_data_provider.ConsumeRandomLengthString(*max_length) :</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :                               fuzzed_data_provider.ConsumeRandomLengthString();</span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">        2668 :     std::vector&lt;B&gt; ret(s.size());</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">        2668 :     std::copy(s.begin(), s.end(), reinterpret_cast&lt;char*&gt;(ret.data()));</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">        2668 :     return ret;</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">        2668 : }</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : </span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaUNC tlaBgUNC">           0 : [[nodiscard]] inline std::vector&lt;bool&gt; ConsumeRandomLengthBitVector(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : {</span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaUNC">           0 :     return BytesToBits(ConsumeRandomLengthByteVector(fuzzed_data_provider, max_length));</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : }</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] inline DataStream ConsumeDataStream(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : {</span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaUNC">           0 :     return DataStream{ConsumeRandomLengthByteVector(fuzzed_data_provider, max_length)};</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : }</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : </span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] inline std::vector&lt;std::string&gt; ConsumeRandomLengthStringVector(FuzzedDataProvider&amp; fuzzed_data_provider, const size_t max_vector_size = 16, const size_t max_string_length = 16) noexcept</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : {</span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaUNC">           0 :     const size_t n_elements = fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, max_vector_size);</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;std::string&gt; r;</span></span>
+<span id="L82"><span class="lineNum">      82</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (size_t i = 0; i &lt; n_elements; ++i) {</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaUNC">           0 :         r.push_back(fuzzed_data_provider.ConsumeRandomLengthString(max_string_length));</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     }</span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaUNC">           0 :     return r;</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : }</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : </span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : template &lt;typename T&gt;</span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] inline std::vector&lt;T&gt; ConsumeRandomLengthIntegralVector(FuzzedDataProvider&amp; fuzzed_data_provider, const size_t max_vector_size = 16) noexcept</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : {</span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaUNC">           0 :     const size_t n_elements = fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, max_vector_size);</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;T&gt; r;</span></span>
+<span id="L93"><span class="lineNum">      93</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (size_t i = 0; i &lt; n_elements; ++i) {</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaUNC">           0 :         r.push_back(fuzzed_data_provider.ConsumeIntegral&lt;T&gt;());</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     }</span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaUNC">           0 :     return r;</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : }</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : </span>
+<span id="L99"><span class="lineNum">      99</span>                 :             : template &lt;typename P&gt;</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : [[nodiscard]] P ConsumeDeserializationParams(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept;</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : </span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : template &lt;typename T, typename P&gt;</span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] std::optional&lt;T&gt; ConsumeDeserializable(FuzzedDataProvider&amp; fuzzed_data_provider, const P&amp; params, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : {</span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaUNC">           0 :     const std::vector&lt;uint8_t&gt; buffer{ConsumeRandomLengthByteVector(fuzzed_data_provider, max_length)};</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaUNC">           0 :     DataStream ds{buffer};</span></span>
+<span id="L107"><span class="lineNum">     107</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     T obj;</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     try {</span>
+<span id="L109"><span class="lineNum">     109</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         ds &gt;&gt; params(obj);</span></span>
+<span id="L110"><span class="lineNum">     110</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaUNC">           0 :     } catch (const std::ios_base::failure&amp;) {</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaUNC">           0 :         return std::nullopt;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     }</span>
+<span id="L113"><span class="lineNum">     113</span>                 :<span class="tlaUNC">           0 :     return obj;</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : </span>
+<span id="L116"><span class="lineNum">     116</span>                 :             : template &lt;typename T&gt;</span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC tlaBgGNC">        1597 : [[nodiscard]] inline std::optional&lt;T&gt; ConsumeDeserializable(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;size_t&gt;&amp; max_length = std::nullopt) noexcept</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : {</span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">        1597 :     const std::vector&lt;uint8_t&gt; buffer = ConsumeRandomLengthByteVector(fuzzed_data_provider, max_length);</span></span>
+<span id="L120"><span class="lineNum">     120</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaGNC">        1597 :     DataStream ds{buffer};</span></span>
+<span id="L121"><span class="lineNum">     121</span>         [<span class="tlaGBC" title="Branch 0 was taken 1501 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 96 times"> + </span>]:<span class="tlaGNC">        1597 :     T obj;</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     try {</span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">        1501 :         ds &gt;&gt; obj;</span></span>
+<span id="L124"><span class="lineNum">     124</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 96 times"> + </span>]:<span class="tlaGNC">          96 :     } catch (const std::ios_base::failure&amp;) {</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">          96 :         return std::nullopt;</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     }</span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaGNC">        1501 :     return obj;</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">        1597 : }</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : template &lt;typename WeakEnumType, size_t size&gt;</span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaUNC tlaBgUNC">           0 : [[nodiscard]] WeakEnumType ConsumeWeakEnum(FuzzedDataProvider&amp; fuzzed_data_provider, const WeakEnumType (&amp;all_types)[size]) noexcept</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : {</span>
+<span id="L133"><span class="lineNum">     133</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return fuzzed_data_provider.ConsumeBool() ?</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaUNC">           0 :                fuzzed_data_provider.PickValueInArray&lt;WeakEnumType&gt;(all_types) :</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaUNC">           0 :                WeakEnumType(fuzzed_data_provider.ConsumeIntegral&lt;typename std::underlying_type&lt;WeakEnumType&gt;::type&gt;());</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :             : }</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] inline opcodetype ConsumeOpcodeType(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             : {</span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC tlaBgGNC">        1727 :     return static_cast&lt;opcodetype&gt;(fuzzed_data_provider.ConsumeIntegralInRange&lt;uint32_t&gt;(0, MAX_OPCODE));</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : }</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : </span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : [[nodiscard]] CAmount ConsumeMoney(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;CAmount&gt;&amp; max = std::nullopt) noexcept;</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : [[nodiscard]] int64_t ConsumeTime(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;int64_t&gt;&amp; min = std::nullopt, const std::optional&lt;int64_t&gt;&amp; max = std::nullopt) noexcept;</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : </span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : [[nodiscard]] CMutableTransaction ConsumeTransaction(FuzzedDataProvider&amp; fuzzed_data_provider, const std::optional&lt;std::vector&lt;Txid&gt;&gt;&amp; prevout_txids, const int max_num_in = 10, const int max_num_out = 10) noexcept;</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>                 :             : [[nodiscard]] CScriptWitness ConsumeScriptWitness(FuzzedDataProvider&amp; fuzzed_data_provider, const size_t max_stack_elem_size = 32) noexcept;</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : </span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : [[nodiscard]] CScript ConsumeScript(FuzzedDataProvider&amp; fuzzed_data_provider, const bool maybe_p2wsh = false) noexcept;</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : </span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : [[nodiscard]] uint32_t ConsumeSequence(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept;</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : </span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">        1799 : [[nodiscard]] inline CScriptNum ConsumeScriptNum(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :             : {</span>
+<span id="L157"><span class="lineNum">     157</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaGNC">        1799 :     return CScriptNum{fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;()};</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L158"><span class="lineNum">     158</span>                 :             : }</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaUNC tlaBgUNC">           0 : [[nodiscard]] inline uint160 ConsumeUInt160(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :             : {</span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaUNC">           0 :     const std::vector&lt;uint8_t&gt; v160 = fuzzed_data_provider.ConsumeBytes&lt;uint8_t&gt;(160 / 8);</span></span>
+<span id="L163"><span class="lineNum">     163</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (v160.size() != 160 / 8) {</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaUNC">           0 :         return {};</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :     }</span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaUNC">           0 :     return uint160{v160};</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :             : </span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] inline uint256 ConsumeUInt256(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             : {</span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaUNC">           0 :     const std::vector&lt;uint8_t&gt; v256 = fuzzed_data_provider.ConsumeBytes&lt;uint8_t&gt;(256 / 8);</span></span>
+<span id="L172"><span class="lineNum">     172</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (v256.size() != 256 / 8) {</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaUNC">           0 :         return {};</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     }</span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaUNC">           0 :     return uint256{v256};</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : </span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] inline arith_uint256 ConsumeArithUInt256(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : {</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaUNC">           0 :     return UintToArith256(ConsumeUInt256(fuzzed_data_provider));</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : }</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             : </span>
+<span id="L183"><span class="lineNum">     183</span>                 :             : [[nodiscard]] std::map&lt;COutPoint, Coin&gt; ConsumeCoins(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept;</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             : </span>
+<span id="L185"><span class="lineNum">     185</span>                 :             : [[nodiscard]] CTxDestination ConsumeTxDestination(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept;</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             : </span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : [[nodiscard]] CKey ConsumePrivateKey(FuzzedDataProvider&amp; fuzzed_data_provider, std::optional&lt;bool&gt; compressed = std::nullopt) noexcept;</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             : </span>
+<span id="L189"><span class="lineNum">     189</span>                 :             : template &lt;typename T&gt;</span>
+<span id="L190"><span class="lineNum">     190</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] bool MultiplicationOverflow(const T i, const T j) noexcept</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : {</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     static_assert(std::is_integral&lt;T&gt;::value, &quot;Integral required.&quot;);</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     if (std::numeric_limits&lt;T&gt;::is_signed) {</span>
+<span id="L194"><span class="lineNum">     194</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (i &gt; 0) {</span></span>
+<span id="L195"><span class="lineNum">     195</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (j &gt; 0) {</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaUNC">           0 :                 return i &gt; (std::numeric_limits&lt;T&gt;::max() / j);</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :             } else {</span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaUNC">           0 :                 return j &lt; (std::numeric_limits&lt;T&gt;::min() / i);</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :             }</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :         } else {</span>
+<span id="L201"><span class="lineNum">     201</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (j &gt; 0) {</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :<span class="tlaUNC">           0 :                 return i &lt; (std::numeric_limits&lt;T&gt;::min() / j);</span></span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :             } else {</span>
+<span id="L204"><span class="lineNum">     204</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 return i != 0 &amp;&amp; (j &lt; (std::numeric_limits&lt;T&gt;::max() / i));</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :             }</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :         }</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :     } else {</span>
+<span id="L208"><span class="lineNum">     208</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return j != 0 &amp;&amp; i &gt; std::numeric_limits&lt;T&gt;::max() / j;</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     }</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : }</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             : </span>
+<span id="L212"><span class="lineNum">     212</span>                 :             : [[nodiscard]] bool ContainsSpentInput(const CTransaction&amp; tx, const CCoinsViewCache&amp; inputs) noexcept;</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : /**</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :  * Sets errno to a value selected from the given std::array `errnos`.</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :  */</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : template &lt;typename T, size_t size&gt;</span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaUNC">           0 : void SetFuzzedErrNo(FuzzedDataProvider&amp; fuzzed_data_provider, const std::array&lt;T, size&gt;&amp; errnos)</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : {</span>
+<span id="L220"><span class="lineNum">     220</span>                 :<span class="tlaUNC">           0 :     errno = fuzzed_data_provider.PickValueInArray(errnos);</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : </span>
+<span id="L223"><span class="lineNum">     223</span>                 :             : /*</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :  * Sets a fuzzed errno in the range [0, 133 (EHWPOISON)]. Can be used from functions emulating</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :  * standard library functions that set errno, or in other contexts where the value of errno</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :  * might be relevant for the execution path that will be taken.</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :  */</span>
+<span id="L228"><span class="lineNum">     228</span>                 :<span class="tlaUNC">           0 : inline void SetFuzzedErrNo(FuzzedDataProvider&amp; fuzzed_data_provider) noexcept</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : {</span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaUNC">           0 :     errno = fuzzed_data_provider.ConsumeIntegralInRange&lt;int&gt;(0, 133);</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :             : </span>
+<span id="L233"><span class="lineNum">     233</span>                 :             : /**</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :  * Returns a byte vector of specified size regardless of the number of remaining bytes available</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :  * from the fuzzer. Pads with zero value bytes if needed to achieve the specified size.</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :  */</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             : template&lt;typename B = uint8_t&gt;</span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaUNC">           0 : [[nodiscard]] inline std::vector&lt;B&gt; ConsumeFixedLengthByteVector(FuzzedDataProvider&amp; fuzzed_data_provider, const size_t length) noexcept</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : {</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     static_assert(sizeof(B) == 1);</span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaUNC">           0 :     auto random_bytes = fuzzed_data_provider.ConsumeBytes&lt;B&gt;(length);</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaUNC">           0 :     random_bytes.resize(length);</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaUNC">           0 :     return random_bytes;</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : }</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             : </span>
+<span id="L246"><span class="lineNum">     246</span>                 :             : class FuzzedFileProvider</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             : {</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :     FuzzedDataProvider&amp; m_fuzzed_data_provider;</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     int64_t m_offset = 0;</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             : </span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : public:</span>
+<span id="L252"><span class="lineNum">     252</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     FuzzedFileProvider(FuzzedDataProvider&amp; fuzzed_data_provider) : m_fuzzed_data_provider{fuzzed_data_provider}</span></span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     {</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :     }</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : </span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :     FILE* open();</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             : </span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :     static ssize_t read(void* cookie, char* buf, size_t size);</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             : </span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :     static ssize_t write(void* cookie, const char* buf, size_t size);</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             : </span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :     static int seek(void* cookie, int64_t* offset, int whence);</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             : </span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :     static int close(void* cookie);</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             : };</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             : </span>
+<span id="L267"><span class="lineNum">     267</span>                 :             : #define WRITE_TO_STREAM_CASE(type, consume) \</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     [&amp;] {                                   \</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :         type o = consume;                   \</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :         stream &lt;&lt; o;                        \</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     }</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : template &lt;typename Stream&gt;</span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaUNC">           0 : void WriteToStream(FuzzedDataProvider&amp; fuzzed_data_provider, Stream&amp; stream) noexcept</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :             : {</span>
+<span id="L275"><span class="lineNum">     275</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     while (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :         try {</span>
+<span id="L277"><span class="lineNum">     277</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             CallOneOf(</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :                 fuzzed_data_provider,</span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(bool, fuzzed_data_provider.ConsumeBool()),</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(int8_t, fuzzed_data_provider.ConsumeIntegral&lt;int8_t&gt;()),</span></span>
+<span id="L281"><span class="lineNum">     281</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(uint8_t, fuzzed_data_provider.ConsumeIntegral&lt;uint8_t&gt;()),</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(int16_t, fuzzed_data_provider.ConsumeIntegral&lt;int16_t&gt;()),</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(uint16_t, fuzzed_data_provider.ConsumeIntegral&lt;uint16_t&gt;()),</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(int32_t, fuzzed_data_provider.ConsumeIntegral&lt;int32_t&gt;()),</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(uint32_t, fuzzed_data_provider.ConsumeIntegral&lt;uint32_t&gt;()),</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(int64_t, fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;()),</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(uint64_t, fuzzed_data_provider.ConsumeIntegral&lt;uint64_t&gt;()),</span></span>
+<span id="L288"><span class="lineNum">     288</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(std::string, fuzzed_data_provider.ConsumeRandomLengthString(32)),</span></span>
+<span id="L289"><span class="lineNum">     289</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 WRITE_TO_STREAM_CASE(std::vector&lt;uint8_t&gt;, ConsumeRandomLengthIntegralVector&lt;uint8_t&gt;(fuzzed_data_provider)));</span></span>
+<span id="L290"><span class="lineNum">     290</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaUNC">           0 :         } catch (const std::ios_base::failure&amp;) {</span></span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :             break;</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :         }</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :     }</span>
+<span id="L294"><span class="lineNum">     294</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :             : </span>
+<span id="L296"><span class="lineNum">     296</span>                 :             : #define READ_FROM_STREAM_CASE(type) \</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :     [&amp;] {                           \</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :         type o;                     \</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :         stream &gt;&gt; o;                \</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :     }</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             : template &lt;typename Stream&gt;</span>
+<span id="L302"><span class="lineNum">     302</span>                 :<span class="tlaUNC">           0 : void ReadFromStream(FuzzedDataProvider&amp; fuzzed_data_provider, Stream&amp; stream) noexcept</span></span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : {</span>
+<span id="L304"><span class="lineNum">     304</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     while (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :         try {</span>
+<span id="L306"><span class="lineNum">     306</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             CallOneOf(</span></span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :                 fuzzed_data_provider,</span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(bool),</span></span>
+<span id="L309"><span class="lineNum">     309</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(int8_t),</span></span>
+<span id="L310"><span class="lineNum">     310</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(uint8_t),</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(int16_t),</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(uint16_t),</span></span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(int32_t),</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(uint32_t),</span></span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(int64_t),</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(uint64_t),</span></span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(std::string),</span></span>
+<span id="L318"><span class="lineNum">     318</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 READ_FROM_STREAM_CASE(std::vector&lt;uint8_t&gt;));</span></span>
+<span id="L319"><span class="lineNum">     319</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaUNC">           0 :         } catch (const std::ios_base::failure&amp;) {</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :             break;</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :         }</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :     }</span>
+<span id="L323"><span class="lineNum">     323</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L324"><span class="lineNum">     324</span>                 :             : </span>
+<span id="L325"><span class="lineNum">     325</span>                 :             : #endif // BITCOIN_TEST_FUZZ_UTIL_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
