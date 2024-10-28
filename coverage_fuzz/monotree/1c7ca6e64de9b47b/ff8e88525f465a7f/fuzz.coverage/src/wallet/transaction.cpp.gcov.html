@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/wallet/transaction.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/wallet">src/wallet</a> - transaction.cpp<span style="font-size: 80%;"> (source / <a href="transaction.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-10-28 12:32:15</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;wallet/transaction.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;interfaces/chain.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : using interfaces::FoundBlock;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : namespace wallet {</span>
+<span id="L12"><span class="lineNum">      12</span>                 :<span class="tlaUNC tlaBgUNC">           0 : bool CWalletTx::IsEquivalentTo(const CWalletTx&amp; _tx) const</span></span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : {</span>
+<span id="L14"><span class="lineNum">      14</span>                 :<span class="tlaUNC">           0 :         CMutableTransaction tx1 {*this-&gt;tx};</span></span>
+<span id="L15"><span class="lineNum">      15</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         CMutableTransaction tx2 {*_tx.tx};</span></span>
+<span id="L16"><span class="lineNum">      16</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         for (auto&amp; txin : tx1.vin) txin.scriptSig = CScript();</span></span>
+<span id="L17"><span class="lineNum">      17</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         for (auto&amp; txin : tx2.vin) txin.scriptSig = CScript();</span></span>
+<span id="L18"><span class="lineNum">      18</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return CTransaction(tx1) == CTransaction(tx2);</span></span>
+<span id="L19"><span class="lineNum">      19</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaUNC">           0 : bool CWalletTx::InMempool() const</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : {</span>
+<span id="L23"><span class="lineNum">      23</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return state&lt;TxStateInMempool&gt;();</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : }</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaUNC">           0 : int64_t CWalletTx::GetTxTime() const</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : {</span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaUNC">           0 :     int64_t n = nTimeSmart;</span></span>
+<span id="L29"><span class="lineNum">      29</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return n ? n : nTimeReceived;</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : }</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaUNC">           0 : void CWalletTx::updateState(interfaces::Chain&amp; chain)</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : {</span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaUNC">           0 :     bool active;</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaUNC">           0 :     auto lookup_block = [&amp;](const uint256&amp; hash, int&amp; height, TxState&amp; state) {</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :         // If tx block (or conflicting block) was reorged out of chain</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :         // while the wallet was shutdown, change tx status to UNCONFIRMED</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :         // and reset block height, hash, and index. ABANDONED tx don't have</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :         // associated blocks and don't need to be updated. The case where a</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :         // transaction was reorged out while online and then reconfirmed</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :         // while offline is covered by the rescan logic.</span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (!chain.findBlock(hash, FoundBlock().inActiveChain(active).height(height)) || !active) {</span></span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             state = TxStateInactive{};</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :         }</span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaUNC">           0 :     };</span></span>
+<span id="L46"><span class="lineNum">      46</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (auto* conf = state&lt;TxStateConfirmed&gt;()) {</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaUNC">           0 :         lookup_block(conf-&gt;confirmed_block_hash, conf-&gt;confirmed_block_height, m_state);</span></span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     } else if (auto* conf = state&lt;TxStateBlockConflicted&gt;()) {</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaUNC">           0 :         lookup_block(conf-&gt;conflicting_block_hash, conf-&gt;conflicting_block_height, m_state);</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     }</span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaUNC">           0 : void CWalletTx::CopyFrom(const CWalletTx&amp; _tx)</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : {</span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaUNC">           0 :     *this = _tx;</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : } // namespace wallet</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/wallet/transaction.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/wallet">src/wallet</a> - transaction.h<span style="font-size: 80%;"> (source / <a href="transaction.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">113</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-10-28 12:32:15</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">426</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_WALLET_TRANSACTION_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_WALLET_TRANSACTION_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;attributes.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;consensus/amount.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;tinyformat.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/overloaded.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;util/strencodings.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;util/string.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;wallet/types.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;bitset&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;map&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;variant&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : </span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : namespace interfaces {</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : class Chain;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : } // namespace interfaces</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : </span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : namespace wallet {</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : //! State of transaction confirmed in a block.</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : struct TxStateConfirmed {</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     uint256 confirmed_block_hash;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     int confirmed_block_height;</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     int position_in_block;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC tlaBgUNC">           0 :     explicit TxStateConfirmed(const uint256&amp; block_hash, int height, int index) : confirmed_block_hash(block_hash), confirmed_block_height(height), position_in_block(index) {}</span></span>
+<span class="lineNum">        </span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::string toString() const { return strprintf(&quot;Confirmed (block=%s, height=%i, index=%i)&quot;, confirmed_block_hash.ToString(), confirmed_block_height, position_in_block); }</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : };</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : //! State of transaction added to mempool.</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : struct TxStateInMempool {</span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaUNC">           0 :     std::string toString() const { return strprintf(&quot;InMempool&quot;); }</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : };</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : //! State of rejected transaction that conflicts with a confirmed block.</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : struct TxStateBlockConflicted {</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     uint256 conflicting_block_hash;</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     int conflicting_block_height;</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : </span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaUNC">           0 :     explicit TxStateBlockConflicted(const uint256&amp; block_hash, int height) : conflicting_block_hash(block_hash), conflicting_block_height(height) {}</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::string toString() const { return strprintf(&quot;BlockConflicted (block=%s, height=%i)&quot;, conflicting_block_hash.ToString(), conflicting_block_height); }</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : };</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : //! State of transaction not confirmed or conflicting with a known block and</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : //! not in the mempool. May conflict with the mempool, or with an unknown block,</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : //! or be abandoned, never broadcast, or rejected from the mempool for another</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : //! reason.</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : struct TxStateInactive {</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     bool abandoned;</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : </span>
+<span id="L61"><span class="lineNum">      61</span> [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> :<span class="tlaUNC">           0 :     explicit TxStateInactive(bool abandoned = false) : abandoned(abandoned) {}</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 11 was not executed"> # </span>]
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaUNC">           0 :     std::string toString() const { return strprintf(&quot;Inactive (abandoned=%i)&quot;, abandoned); }</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : };</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : //! State of transaction loaded in an unrecognized state with unexpected hash or</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : //! index values. Treated as inactive (with serialized hash and index values</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : //! preserved) by default, but may enter another state if transaction is added</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : //! to the mempool, or confirmed, or abandoned, or found conflicting.</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : struct TxStateUnrecognized {</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     uint256 block_hash;</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     int index;</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaUNC">           0 :     TxStateUnrecognized(const uint256&amp; block_hash, int index) : block_hash(block_hash), index(index) {}</span></span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::string toString() const { return strprintf(&quot;Unrecognized (block=%s, index=%i)&quot;, block_hash.ToString(), index); }</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : };</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : </span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : //! All possible CWalletTx states</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : using TxState = std::variant&lt;TxStateConfirmed, TxStateInMempool, TxStateBlockConflicted, TxStateInactive, TxStateUnrecognized&gt;;</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : //! Subset of states transaction sync logic is implemented to handle.</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : using SyncTxState = std::variant&lt;TxStateConfirmed, TxStateInMempool, TxStateInactive&gt;;</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : </span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : //! Try to interpret deserialized TxStateUnrecognized data as a recognized state.</span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaUNC">           0 : static inline TxState TxStateInterpretSerialized(TxStateUnrecognized data)</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : {</span>
+<span id="L86"><span class="lineNum">      86</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (data.block_hash == uint256::ZERO) {</span></span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (data.index == 0) return TxStateInactive{};</span></span>
+<span id="L88"><span class="lineNum">      88</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     } else if (data.block_hash == uint256::ONE) {</span></span>
+<span id="L89"><span class="lineNum">      89</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (data.index == -1) return TxStateInactive{/*abandoned=*/true};</span></span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     } else if (data.index &gt;= 0) {</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaUNC">           0 :         return TxStateConfirmed{data.block_hash, /*height=*/-1, data.index};</span></span>
+<span id="L92"><span class="lineNum">      92</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     } else if (data.index == -1) {</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaUNC">           0 :         return TxStateBlockConflicted{data.block_hash, /*height=*/-1};</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     }</span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaUNC">           0 :     return data;</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : }</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : //! Get TxState serialized block hash. Inverse of TxStateInterpretSerialized.</span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaUNC">           0 : static inline uint256 TxStateSerializedBlockHash(const TxState&amp; state)</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : {</span>
+<span id="L101"><span class="lineNum">     101</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return std::visit(util::Overloaded{</span></span>
+<span id="L102"><span class="lineNum">     102</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         [](const TxStateInactive&amp; inactive) { return inactive.abandoned ? uint256::ONE : uint256::ZERO; },</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaUNC">           0 :         [](const TxStateInMempool&amp; in_mempool) { return uint256::ZERO; },</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaUNC">           0 :         [](const TxStateConfirmed&amp; confirmed) { return confirmed.confirmed_block_hash; },</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaUNC">           0 :         [](const TxStateBlockConflicted&amp; conflicted) { return conflicted.conflicting_block_hash; },</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaUNC">           0 :         [](const TxStateUnrecognized&amp; unrecognized) { return unrecognized.block_hash; }</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     }, state);</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : }</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             : </span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : //! Get TxState serialized block index. Inverse of TxStateInterpretSerialized.</span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaUNC">           0 : static inline int TxStateSerializedIndex(const TxState&amp; state)</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : {</span>
+<span id="L113"><span class="lineNum">     113</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return std::visit(util::Overloaded{</span></span>
+<span id="L114"><span class="lineNum">     114</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         [](const TxStateInactive&amp; inactive) { return inactive.abandoned ? -1 : 0; },</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :         [](const TxStateInMempool&amp; in_mempool) { return 0; },</span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaUNC">           0 :         [](const TxStateConfirmed&amp; confirmed) { return confirmed.position_in_block; },</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :         [](const TxStateBlockConflicted&amp; conflicted) { return -1; },</span>
+<span id="L118"><span class="lineNum">     118</span>                 :<span class="tlaUNC">           0 :         [](const TxStateUnrecognized&amp; unrecognized) { return unrecognized.index; }</span></span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :     }, state);</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : }</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             : </span>
+<span id="L122"><span class="lineNum">     122</span>                 :             : //! Return TxState or SyncTxState as a string for logging or debugging.</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : template&lt;typename T&gt;</span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaUNC">           0 : std::string TxStateString(const T&amp; state)</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : {</span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaUNC">           0 :     return std::visit([](const auto&amp; s) { return s.toString(); }, state);</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : }</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             : </span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : /**</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :  * Cachable amount subdivided into watchonly and spendable parts.</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :  */</span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaUNC">           0 : struct CachableAmount</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : {</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     // NO and ALL are never (supposed to be) cached</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :     std::bitset&lt;ISMINE_ENUM_ELEMENTS&gt; m_cached;</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :     CAmount m_value[ISMINE_ENUM_ELEMENTS];</span>
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaUNC">           0 :     inline void Reset()</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     {</span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaUNC">           0 :         m_cached.reset();</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :     }</span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaUNC">           0 :     void Set(isminefilter filter, CAmount value)</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     {</span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaUNC">           0 :         m_cached.set(filter);</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaUNC">           0 :         m_value[filter] = value;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     }</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : };</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>                 :             : typedef std::map&lt;std::string, std::string&gt; mapValue_t;</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : </span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : </span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : /** Legacy class used for deserializing vtxPrev for backwards compatibility.</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :  * vtxPrev was removed in commit 93a18a3650292afbb441a47d1fa1b94aeb0164e3,</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :  * but old wallet.dat files may still contain vtxPrev vectors of CMerkleTxs.</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :  * These need to get deserialized for field alignment when deserializing</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :  * a CWalletTx, but the deserialized values are discarded.**/</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : class CMerkleTx</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             : {</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : public:</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     template&lt;typename Stream&gt;</span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaUNC">           0 :     void Unserialize(Stream&amp; s)</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :     {</span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaUNC">           0 :         CTransactionRef tx;</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaUNC">           0 :         uint256 hashBlock;</span></span>
+<span id="L165"><span class="lineNum">     165</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         std::vector&lt;uint256&gt; vMerkleBranch;</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :         int nIndex;</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : </span>
+<span id="L168"><span class="lineNum">     168</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         s &gt;&gt; TX_WITH_WITNESS(tx) &gt;&gt; hashBlock &gt;&gt; vMerkleBranch &gt;&gt; nIndex;</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L169"><span class="lineNum">     169</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     }</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             : };</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             : </span>
+<span id="L172"><span class="lineNum">     172</span>                 :             : /**</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :  * A transaction with a bunch of additional info that only the owner cares about.</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :  * It includes any unrecorded transactions needed to link it back to the block chain.</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :  */</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             : class CWalletTx</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : {</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : public:</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     /**</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :      * Key/value map with information about the transaction.</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :      *</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :      * The following keys can be read and written through the map and are</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :      * serialized in the wallet database:</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :      *</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :      *     &quot;comment&quot;, &quot;to&quot;   - comment strings provided to sendtoaddress,</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :      *                         and sendmany wallet RPCs</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :      *     &quot;replaces_txid&quot;   - txid (as HexStr) of transaction replaced by</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :      *                         bumpfee on transaction created by bumpfee</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :      *     &quot;replaced_by_txid&quot; - txid (as HexStr) of transaction created by</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :      *                         bumpfee on transaction replaced by bumpfee</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :      *     &quot;from&quot;, &quot;message&quot; - obsolete fields that could be set in UI prior to</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :      *                         2011 (removed in commit 4d9b223)</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :      *</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :      * The following keys are serialized in the wallet database, but shouldn't</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :      * be read or written through the map (they will be temporarily added and</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :      * removed from the map during serialization):</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :      *</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :      *     &quot;fromaccount&quot;     - serialized strFromAccount value</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :      *     &quot;n&quot;               - serialized nOrderPos value</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :      *     &quot;timesmart&quot;       - serialized nTimeSmart value</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :      *     &quot;spent&quot;           - serialized vfSpent value that existed prior to</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :      *                         2014 (removed in commit 93a18a3)</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :      */</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :     mapValue_t mapValue;</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :     std::vector&lt;std::pair&lt;std::string, std::string&gt; &gt; vOrderForm;</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :     unsigned int fTimeReceivedIsTxTime;</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :     unsigned int nTimeReceived; //!&lt; time received by this node</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :     /**</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :      * Stable timestamp that never changes, and reflects the order a transaction</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :      * was added to the wallet. Timestamp is based on the block time for a</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :      * transaction added as part of a block, or else the time when the</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :      * transaction was received if it wasn't part of a block, with the timestamp</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :      * adjusted in both cases so timestamp order matches the order transactions</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :      * were added to the wallet. More details can be found in</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :      * CWallet::ComputeTimeSmart().</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :      */</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :     unsigned int nTimeSmart;</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :     /**</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :      * From me flag is set to 1 for transactions that were created by the wallet</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :      * on this bitcoin node, and set to 0 for transactions that were created</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :      * externally and came in through the network or sendrawtransaction RPC.</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :      */</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :     bool fFromMe;</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :     int64_t nOrderPos; //!&lt; position in ordered transaction list</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :     std::multimap&lt;int64_t, CWalletTx*&gt;::const_iterator m_it_wtxOrdered;</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             : </span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :     // memory only</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     enum AmountType { DEBIT, CREDIT, IMMATURE_CREDIT, AVAILABLE_CREDIT, AMOUNTTYPE_ENUM_ELEMENTS };</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     mutable CachableAmount m_amounts[AMOUNTTYPE_ENUM_ELEMENTS];</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     /**</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :      * This flag is true if all m_amounts caches are empty. This is particularly</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :      * useful in places where MarkDirty is conditionally called and the</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :      * condition can be expensive and thus can be skipped if the flag is true.</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :      * See MarkDestinationsDirty.</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :      */</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :     mutable bool m_is_cache_empty{true};</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :     mutable bool fChangeCached;</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :     mutable CAmount nChangeCached;</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : </span>
+<span id="L240"><span class="lineNum">     240</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     CWalletTx(CTransactionRef tx, const TxState&amp; state) : tx(std::move(tx)), m_state(state)</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :     {</span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaUNC">           0 :         Init();</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : </span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaUNC">           0 :     void Init()</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :     {</span>
+<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaUNC">           0 :         mapValue.clear();</span></span>
+<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaUNC">           0 :         vOrderForm.clear();</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :<span class="tlaUNC">           0 :         fTimeReceivedIsTxTime = false;</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaUNC">           0 :         nTimeReceived = 0;</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :<span class="tlaUNC">           0 :         nTimeSmart = 0;</span></span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaUNC">           0 :         fFromMe = false;</span></span>
+<span id="L253"><span class="lineNum">     253</span>                 :<span class="tlaUNC">           0 :         fChangeCached = false;</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaUNC">           0 :         nChangeCached = 0;</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaUNC">           0 :         nOrderPos = -1;</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :             : </span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :     CTransactionRef tx;</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :     TxState m_state;</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             : </span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :     // Set of mempool transactions that conflict</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :     // directly with the transaction, or that conflict</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :     // with an ancestor transaction. This set will be</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :     // empty if state is InMempool or Confirmed, but</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :     // can be nonempty if state is Inactive or</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :     // BlockConflicted.</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :     std::set&lt;Txid&gt; mempool_conflicts;</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             : </span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :     template&lt;typename Stream&gt;</span>
+<span id="L270"><span class="lineNum">     270</span>                 :<span class="tlaUNC">           0 :     void Serialize(Stream&amp; s) const</span></span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     {</span>
+<span id="L272"><span class="lineNum">     272</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         mapValue_t mapValueCopy = mapValue;</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :             : </span>
+<span id="L274"><span class="lineNum">     274</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         mapValueCopy[&quot;fromaccount&quot;] = &quot;&quot;;</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L275"><span class="lineNum">     275</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (nOrderPos != -1) {</span></span>
+<span id="L276"><span class="lineNum">     276</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :             mapValueCopy[&quot;n&quot;] = util::ToString(nOrderPos);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L277"><span class="lineNum">     277</span>                 :             :         }</span>
+<span id="L278"><span class="lineNum">     278</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (nTimeSmart) {</span></span>
+<span id="L279"><span class="lineNum">     279</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :             mapValueCopy[&quot;timesmart&quot;] = strprintf(&quot;%u&quot;, nTimeSmart);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L280"><span class="lineNum">     280</span>                 :             :         }</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             : </span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaUNC">           0 :         std::vector&lt;uint8_t&gt; dummy_vector1; //!&lt; Used to be vMerkleBranch</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaUNC">           0 :         std::vector&lt;uint8_t&gt; dummy_vector2; //!&lt; Used to be vtxPrev</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaUNC">           0 :         bool dummy_bool = false; //!&lt; Used to be fSpent</span></span>
+<span id="L285"><span class="lineNum">     285</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         uint256 serializedHash = TxStateSerializedBlockHash(m_state);</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaUNC">           0 :         int serializedIndex = TxStateSerializedIndex(m_state);</span></span>
+<span id="L287"><span class="lineNum">     287</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         s &lt;&lt; TX_WITH_WITNESS(tx) &lt;&lt; serializedHash &lt;&lt; dummy_vector1 &lt;&lt; serializedIndex &lt;&lt; dummy_vector2 &lt;&lt; mapValueCopy &lt;&lt; vOrderForm &lt;&lt; fTimeReceivedIsTxTime &lt;&lt; nTimeReceived &lt;&lt; fFromMe &lt;&lt; dummy_bool;</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span>]
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : </span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     template&lt;typename Stream&gt;</span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaUNC">           0 :     void Unserialize(Stream&amp; s)</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :     {</span>
+<span id="L293"><span class="lineNum">     293</span>                 :<span class="tlaUNC">           0 :         Init();</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :             : </span>
+<span id="L295"><span class="lineNum">     295</span>                 :<span class="tlaUNC">           0 :         std::vector&lt;uint256&gt; dummy_vector1; //!&lt; Used to be vMerkleBranch</span></span>
+<span id="L296"><span class="lineNum">     296</span>                 :<span class="tlaUNC">           0 :         std::vector&lt;CMerkleTx&gt; dummy_vector2; //!&lt; Used to be vtxPrev</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :         bool dummy_bool; //! Used to be fSpent</span>
+<span id="L298"><span class="lineNum">     298</span>                 :<span class="tlaUNC">           0 :         uint256 serialized_block_hash;</span></span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :         int serializedIndex;</span>
+<span id="L300"><span class="lineNum">     300</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         s &gt;&gt; TX_WITH_WITNESS(tx) &gt;&gt; serialized_block_hash &gt;&gt; dummy_vector1 &gt;&gt; serializedIndex &gt;&gt; dummy_vector2 &gt;&gt; mapValue &gt;&gt; vOrderForm &gt;&gt; fTimeReceivedIsTxTime &gt;&gt; nTimeReceived &gt;&gt; fFromMe &gt;&gt; dummy_bool;</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span>]
+<span id="L301"><span class="lineNum">     301</span>                 :             : </span>
+<span id="L302"><span class="lineNum">     302</span>                 :<span class="tlaUNC">           0 :         m_state = TxStateInterpretSerialized({serialized_block_hash, serializedIndex});</span></span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : </span>
+<span id="L304"><span class="lineNum">     304</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         const auto it_op = mapValue.find(&quot;n&quot;);</span></span>
+<span id="L305"><span class="lineNum">     305</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         nOrderPos = (it_op != mapValue.end()) ? LocaleIndependentAtoi&lt;int64_t&gt;(it_op-&gt;second) : -1;</span></span>
+<span id="L306"><span class="lineNum">     306</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         const auto it_ts = mapValue.find(&quot;timesmart&quot;);</span></span>
+<span id="L307"><span class="lineNum">     307</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         nTimeSmart = (it_ts != mapValue.end()) ? static_cast&lt;unsigned int&gt;(LocaleIndependentAtoi&lt;int64_t&gt;(it_ts-&gt;second)) : 0;</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             : </span>
+<span id="L309"><span class="lineNum">     309</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         mapValue.erase(&quot;fromaccount&quot;);</span></span>
+<span id="L310"><span class="lineNum">     310</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         mapValue.erase(&quot;spent&quot;);</span></span>
+<span id="L311"><span class="lineNum">     311</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         mapValue.erase(&quot;n&quot;);</span></span>
+<span id="L312"><span class="lineNum">     312</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         mapValue.erase(&quot;timesmart&quot;);</span></span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : </span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaUNC">           0 :     void SetTx(CTransactionRef arg)</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :     {</span>
+<span id="L317"><span class="lineNum">     317</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         tx = std::move(arg);</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :     }</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             : </span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :     //! make sure balances are recalculated</span>
+<span id="L321"><span class="lineNum">     321</span>                 :<span class="tlaUNC">           0 :     void MarkDirty()</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :     {</span>
+<span id="L323"><span class="lineNum">     323</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         m_amounts[DEBIT].Reset();</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L324"><span class="lineNum">     324</span>                 :<span class="tlaUNC">           0 :         m_amounts[CREDIT].Reset();</span></span>
+<span id="L325"><span class="lineNum">     325</span>                 :<span class="tlaUNC">           0 :         m_amounts[IMMATURE_CREDIT].Reset();</span></span>
+<span id="L326"><span class="lineNum">     326</span>                 :<span class="tlaUNC">           0 :         m_amounts[AVAILABLE_CREDIT].Reset();</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :<span class="tlaUNC">           0 :         fChangeCached = false;</span></span>
+<span id="L328"><span class="lineNum">     328</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         m_is_cache_empty = true;</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L329"><span class="lineNum">     329</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :             : </span>
+<span id="L331"><span class="lineNum">     331</span>                 :             :     /** True if only scriptSigs are different */</span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :     bool IsEquivalentTo(const CWalletTx&amp; tx) const;</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             : </span>
+<span id="L334"><span class="lineNum">     334</span>                 :             :     bool InMempool() const;</span>
+<span id="L335"><span class="lineNum">     335</span>                 :             : </span>
+<span id="L336"><span class="lineNum">     336</span>                 :             :     int64_t GetTxTime() const;</span>
+<span id="L337"><span class="lineNum">     337</span>                 :             : </span>
+<span id="L338"><span class="lineNum">     338</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     template&lt;typename T&gt; const T* state() const { return std::get_if&lt;T&gt;(&amp;m_state); }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span>]
+<span id="L339"><span class="lineNum">     339</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     template&lt;typename T&gt; T* state() { return std::get_if&lt;T&gt;(&amp;m_state); }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 13 was not executed"> # </span>]
+<span id="L340"><span class="lineNum">     340</span>                 :             : </span>
+<span id="L341"><span class="lineNum">     341</span>                 :             :     //! Update transaction state when attaching to a chain, filling in heights</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :     //! of conflicted and confirmed blocks</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :     void updateState(interfaces::Chain&amp; chain);</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             : </span>
+<span id="L345"><span class="lineNum">     345</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     bool isAbandoned() const { return state&lt;TxStateInactive&gt;() &amp;&amp; state&lt;TxStateInactive&gt;()-&gt;abandoned; }</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span><span class="tlaUNC" title="Branch 23 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span><span class="tlaUNC" title="Branch 26 was not executed"> # </span><span class="tlaUNC" title="Branch 27 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span><span class="tlaUNC" title="Branch 23 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span><span class="tlaUNC" title="Branch 26 was not executed"> # </span><span class="tlaUNC" title="Branch 27 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 23 was not executed"> # </span>]
+<span id="L346"><span class="lineNum">     346</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool isMempoolConflicted() const { return !mempool_conflicts.empty(); }</span></span>
+<span id="L347"><span class="lineNum">     347</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     bool isBlockConflicted() const { return state&lt;TxStateBlockConflicted&gt;(); }</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span>]
+<span id="L348"><span class="lineNum">     348</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     bool isInactive() const { return state&lt;TxStateInactive&gt;(); }</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L349"><span class="lineNum">     349</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     bool isUnconfirmed() const { return !isAbandoned() &amp;&amp; !isBlockConflicted() &amp;&amp; !isMempoolConflicted() &amp;&amp; !isConfirmed(); }</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L350"><span class="lineNum">     350</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool isConfirmed() const { return state&lt;TxStateConfirmed&gt;(); }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span id="L351"><span class="lineNum">     351</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     const Txid&amp; GetHash() const LIFETIMEBOUND { return tx-&gt;GetHash(); }</span></span>
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span>]
+<span id="L352"><span class="lineNum">     352</span>                 :<span class="tlaUNC">           0 :     const Wtxid&amp; GetWitnessHash() const LIFETIMEBOUND { return tx-&gt;GetWitnessHash(); }</span></span>
+<span id="L353"><span class="lineNum">     353</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     bool IsCoinBase() const { return tx-&gt;IsCoinBase(); }</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">        </span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]
+<span id="L354"><span class="lineNum">     354</span>                 :             : </span>
+<span id="L355"><span class="lineNum">     355</span>                 :             : private:</span>
+<span id="L356"><span class="lineNum">     356</span>                 :             :     // Disable copying of CWalletTx objects to prevent bugs where instances get</span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :     // copied in and out of the mapWallet map, and fields are updated in the</span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :     // wrong copy.</span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :     CWalletTx(const CWalletTx&amp;) = default;</span>
+<span id="L360"><span class="lineNum">     360</span>                 :<span class="tlaUNC">           0 :     CWalletTx&amp; operator=(const CWalletTx&amp;) = default;</span></span>
+<span id="L361"><span class="lineNum">     361</span>                 :             : public:</span>
+<span id="L362"><span class="lineNum">     362</span>                 :             :     // Instead have an explicit copy function</span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     void CopyFrom(const CWalletTx&amp;);</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             : };</span>
+<span id="L365"><span class="lineNum">     365</span>                 :             : </span>
+<span id="L366"><span class="lineNum">     366</span>                 :             : struct WalletTxOrderComparator {</span>
+<span id="L367"><span class="lineNum">     367</span>                 :<span class="tlaUNC">           0 :     bool operator()(const CWalletTx* a, const CWalletTx* b) const</span></span>
+<span id="L368"><span class="lineNum">     368</span>                 :             :     {</span>
+<span id="L369"><span class="lineNum">     369</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         return a-&gt;nOrderPos &lt; b-&gt;nOrderPos;</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L370"><span class="lineNum">     370</span>                 :             :     }</span>
+<span id="L371"><span class="lineNum">     371</span>                 :             : };</span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : } // namespace wallet</span>
+<span id="L373"><span class="lineNum">     373</span>                 :             : </span>
+<span id="L374"><span class="lineNum">     374</span>                 :             : #endif // BITCOIN_WALLET_TRANSACTION_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

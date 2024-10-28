@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/versionbits.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - versionbits.h<span style="font-size: 80%;"> (source / <a href="versionbits.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-10-28 12:32:15</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2016-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_VERSIONBITS_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_VERSIONBITS_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;chain.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;sync.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;map&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : /** What block version to use for new blocks (pre versionbits) */</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : static const int32_t VERSIONBITS_LAST_OLD_BLOCK_VERSION = 4;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : /** What bits to set in version for versionbits blocks */</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : static const int32_t VERSIONBITS_TOP_BITS = 0x20000000UL;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : /** What bitmask determines whether versionbits is in use */</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : static const int32_t VERSIONBITS_TOP_MASK = 0xE0000000UL;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : /** Total bits available for versionbits */</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : static const int32_t VERSIONBITS_NUM_BITS = 29;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : /** BIP 9 defines a finite-state-machine to deploy a softfork in multiple stages.</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :  *  State transitions happen during retarget period if conditions are met</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :  *  In case of reorg, transitions can go backward. Without transition, state is</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :  *  inherited between periods. All blocks of a period share the same state.</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :  */</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : enum class ThresholdState {</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     DEFINED,   // First state that each softfork starts out as. The genesis block is by definition in this state for each deployment.</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     STARTED,   // For blocks past the starttime.</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     LOCKED_IN, // For at least one retarget period after the first retarget period with STARTED blocks of which at least threshold have the associated bit set in nVersion, until min_activation_height is reached.</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     ACTIVE,    // For all blocks after the LOCKED_IN retarget period (final state)</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     FAILED,    // For all blocks once the first retarget period after the timeout time is hit, if LOCKED_IN wasn't already reached (final state)</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : };</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : </span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : // A map that gives the state for blocks whose height is a multiple of Period().</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : // The map is indexed by the block's parent, however, so all keys in the map</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : // will either be nullptr or a block with (height + 1) % Period() == 0.</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : typedef std::map&lt;const CBlockIndex*, ThresholdState&gt; ThresholdConditionCache;</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : /** Display status of an in-progress BIP9 softfork */</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : struct BIP9Stats {</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     /** Length of blocks of the BIP9 signalling period */</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     int period;</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     /** Number of blocks with the version bit set required to activate the softfork */</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     int threshold;</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     /** Number of blocks elapsed since the beginning of the current period */</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     int elapsed;</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     /** Number of blocks with the version bit set since the beginning of the current period */</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     int count;</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     /** False if there are not enough blocks left in this period to pass activation threshold */</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     bool possible;</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : };</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : /**</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :  * Abstract class that implements BIP9-style threshold logic, and caches results.</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :  */</span>
+<span id="L57"><span class="lineNum">      57</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC tlaBgUNC">           0 : class AbstractThresholdConditionChecker {</span></span>
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L58"><span class="lineNum">      58</span>                 :             : protected:</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     virtual bool Condition(const CBlockIndex* pindex, const Consensus::Params&amp; params) const =0;</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     virtual int64_t BeginTime(const Consensus::Params&amp; params) const =0;</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     virtual int64_t EndTime(const Consensus::Params&amp; params) const =0;</span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaUNC">           0 :     virtual int MinActivationHeight(const Consensus::Params&amp; params) const { return 0; }</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     virtual int Period(const Consensus::Params&amp; params) const =0;</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     virtual int Threshold(const Consensus::Params&amp; params) const =0;</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : </span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : public:</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :     /** Returns the numerical statistics of an in-progress BIP9 softfork in the period including pindex</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :      * If provided, signalling_blocks is set to true/false based on whether each block in the period signalled</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :      */</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     BIP9Stats GetStateStatisticsFor(const CBlockIndex* pindex, const Consensus::Params&amp; params, std::vector&lt;bool&gt;* signalling_blocks = nullptr) const;</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     /** Returns the state for pindex A based on parent pindexPrev B. Applies any state transition if conditions are present.</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :      *  Caches state from first block of period. */</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :     ThresholdState GetStateFor(const CBlockIndex* pindexPrev, const Consensus::Params&amp; params, ThresholdConditionCache&amp; cache) const;</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     /** Returns the height since when the ThresholdState has started for pindex A based on parent pindexPrev B, all blocks of a period share the same */</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     int GetStateSinceHeightFor(const CBlockIndex* pindexPrev, const Consensus::Params&amp; params, ThresholdConditionCache&amp; cache) const;</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : };</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : </span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : /** BIP 9 allows multiple softforks to be deployed in parallel. We cache</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :  *  per-period state for every one of them. */</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : class VersionBitsCache</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : {</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : private:</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     Mutex m_mutex;</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     ThresholdConditionCache m_caches[Consensus::MAX_VERSION_BITS_DEPLOYMENTS] GUARDED_BY(m_mutex);</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : </span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : public:</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     /** Get the numerical statistics for a given deployment for the signalling period that includes pindex.</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :      * If provided, signalling_blocks is set to true/false based on whether each block in the period signalled</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :      */</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     static BIP9Stats Statistics(const CBlockIndex* pindex, const Consensus::Params&amp; params, Consensus::DeploymentPos pos, std::vector&lt;bool&gt;* signalling_blocks = nullptr);</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     static uint32_t Mask(const Consensus::Params&amp; params, Consensus::DeploymentPos pos);</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : </span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     /** Get the BIP9 state for a given deployment for the block after pindexPrev. */</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     ThresholdState State(const CBlockIndex* pindexPrev, const Consensus::Params&amp; params, Consensus::DeploymentPos pos) EXCLUSIVE_LOCKS_REQUIRED(!m_mutex);</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :     /** Get the block height at which the BIP9 deployment switched into the state for the block after pindexPrev. */</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     int StateSinceHeight(const CBlockIndex* pindexPrev, const Consensus::Params&amp; params, Consensus::DeploymentPos pos) EXCLUSIVE_LOCKS_REQUIRED(!m_mutex);</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             : </span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     /** Determine what nVersion a new block should use</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :      */</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :     int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Params&amp; params) EXCLUSIVE_LOCKS_REQUIRED(!m_mutex);</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :     void Clear() EXCLUSIVE_LOCKS_REQUIRED(!m_mutex);</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : };</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : </span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : #endif // BITCOIN_VERSIONBITS_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
