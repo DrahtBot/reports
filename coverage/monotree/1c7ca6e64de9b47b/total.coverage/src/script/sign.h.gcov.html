@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/script/sign.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/script">src/script</a> - sign.h<span style="font-size: 80%;"> (source / <a href="sign.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-10-28 14:00:11</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">35.7&nbsp;%</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_SCRIPT_SIGN_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_SCRIPT_SIGN_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;attributes.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;coins.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;hash.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;pubkey.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;script/interpreter.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;script/keyorigin.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;script/signingprovider.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : class CKey;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : class CKeyID;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : class CScript;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : class CTransaction;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : class SigningProvider;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : struct bilingual_str;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : struct CMutableTransaction;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : /** Interface for signature creators. */</span>
+<span id="L28"><span class="lineNum">      28</span>         [<span class="tlaGBC" title="Branch 0 was taken 99458 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC tlaBgGNC">       99458 : class BaseSignatureCreator {</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : public:</span>
+<span id="L30"><span class="lineNum">      30</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      111913 :     virtual ~BaseSignatureCreator() = default;</span></span>
+<span class="lineNum">        </span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]
+<span id="L31"><span class="lineNum">      31</span>                 :             :     virtual const BaseSignatureChecker&amp; Checker() const =0;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     /** Create a singular (non-script) signature. */</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     virtual bool CreateSig(const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; vchSig, const CKeyID&amp; keyid, const CScript&amp; scriptCode, SigVersion sigversion) const =0;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     virtual bool CreateSchnorrSig(const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; sig, const XOnlyPubKey&amp; pubkey, const uint256* leaf_hash, const uint256* merkle_root, SigVersion sigversion) const =0;</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : };</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : /** A signature creator for transactions. */</span>
+<span id="L39"><span class="lineNum">      39</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      111913 : class MutableTransactionSignatureCreator : public BaseSignatureCreator</span></span>
+<span class="lineNum">        </span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]
+<span id="L40"><span class="lineNum">      40</span>                 :             : {</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     const CMutableTransaction&amp; m_txto;</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     unsigned int nIn;</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     int nHashType;</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     CAmount amount;</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     const MutableTransactionSignatureChecker checker;</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     const PrecomputedTransactionData* m_txdata;</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : public:</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     MutableTransactionSignatureCreator(const CMutableTransaction&amp; tx LIFETIMEBOUND, unsigned int input_idx, const CAmount&amp; amount, int hash_type);</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     MutableTransactionSignatureCreator(const CMutableTransaction&amp; tx LIFETIMEBOUND, unsigned int input_idx, const CAmount&amp; amount, const PrecomputedTransactionData* txdata, int hash_type);</span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">       27351 :     const BaseSignatureChecker&amp; Checker() const override { return checker; }</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     bool CreateSig(const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; vchSig, const CKeyID&amp; keyid, const CScript&amp; scriptCode, SigVersion sigversion) const override;</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     bool CreateSchnorrSig(const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; sig, const XOnlyPubKey&amp; pubkey, const uint256* leaf_hash, const uint256* merkle_root, SigVersion sigversion) const override;</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : };</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : </span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : /** A signature checker that accepts all signatures */</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : extern const BaseSignatureChecker&amp; DUMMY_CHECKER;</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : /** A signature creator that just produces 71-byte empty signatures. */</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : extern const BaseSignatureCreator&amp; DUMMY_SIGNATURE_CREATOR;</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : /** A signature creator that just produces 72-byte empty signatures. */</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : extern const BaseSignatureCreator&amp; DUMMY_MAXIMUM_SIGNATURE_CREATOR;</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : typedef std::pair&lt;CPubKey, std::vector&lt;unsigned char&gt;&gt; SigPair;</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : // This struct contains information from a transaction input and also contains signatures for that input.</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : // The information contained here can be used to create a signature and is also filled by ProduceSignature</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : // in order to construct final scriptSigs and scriptWitnesses.</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : struct SignatureData {</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     bool complete = false; ///&lt; Stores whether the scriptSig and scriptWitness are complete</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     bool witness = false; ///&lt; Stores whether the input this SigData corresponds to is a witness input</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     CScript scriptSig; ///&lt; The scriptSig of an input. Contains complete signatures or the traditional partial signatures format</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     CScript redeem_script; ///&lt; The redeemScript (if any) for the input</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :     CScript witness_script; ///&lt; The witnessScript (if any) for the input. witnessScripts are used in P2WSH outputs.</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     CScriptWitness scriptWitness; ///&lt; The scriptWitness of an input. Contains complete signatures or the traditional partial signatures format. scriptWitness is part of a transaction input per BIP 144.</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     TaprootSpendData tr_spenddata; ///&lt; Taproot spending data.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     std::optional&lt;TaprootBuilder&gt; tr_builder; ///&lt; Taproot tree used to build tr_spenddata.</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :     std::map&lt;CKeyID, SigPair&gt; signatures; ///&lt; BIP 174 style partial signatures for the input. May contain all signatures necessary for producing a final scriptSig or scriptWitness.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     std::map&lt;CKeyID, std::pair&lt;CPubKey, KeyOriginInfo&gt;&gt; misc_pubkeys;</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :     std::vector&lt;unsigned char&gt; taproot_key_path_sig; /// Schnorr signature for key path spending</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     std::map&lt;std::pair&lt;XOnlyPubKey, uint256&gt;, std::vector&lt;unsigned char&gt;&gt; taproot_script_sigs; ///&lt; (Partial) schnorr signatures, indexed by XOnlyPubKey and leaf_hash.</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     std::map&lt;XOnlyPubKey, std::pair&lt;std::set&lt;uint256&gt;, KeyOriginInfo&gt;&gt; taproot_misc_pubkeys; ///&lt; Miscellaneous Taproot pubkeys involved in this input along with their leaf script hashes and key origin data. Also includes the Taproot internal key (may have no leaf script hashes).</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     std::map&lt;CKeyID, XOnlyPubKey&gt; tap_pubkeys; ///&lt; Misc Taproot pubkeys involved in this input, by hash. (Equivalent of misc_pubkeys but for Taproot.)</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     std::vector&lt;CKeyID&gt; missing_pubkeys; ///&lt; KeyIDs of pubkeys which could not be found</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     std::vector&lt;CKeyID&gt; missing_sigs; ///&lt; KeyIDs of pubkeys for signatures which could not be found</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     uint160 missing_redeem_script; ///&lt; ScriptID of the missing redeemScript (if any)</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     uint256 missing_witness_script; ///&lt; SHA256 of the missing witnessScript (if any)</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     std::map&lt;std::vector&lt;uint8_t&gt;, std::vector&lt;uint8_t&gt;&gt; sha256_preimages; ///&lt; Mapping from a SHA256 hash to its preimage provided to solve a Script</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     std::map&lt;std::vector&lt;uint8_t&gt;, std::vector&lt;uint8_t&gt;&gt; hash256_preimages; ///&lt; Mapping from a HASH256 hash to its preimage provided to solve a Script</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     std::map&lt;std::vector&lt;uint8_t&gt;, std::vector&lt;uint8_t&gt;&gt; ripemd160_preimages; ///&lt; Mapping from a RIPEMD160 hash to its preimage provided to solve a Script</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     std::map&lt;std::vector&lt;uint8_t&gt;, std::vector&lt;uint8_t&gt;&gt; hash160_preimages; ///&lt; Mapping from a HASH160 hash to its preimage provided to solve a Script</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">     1019416 :     SignatureData() = default;</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :     explicit SignatureData(const CScript&amp; script) : scriptSig(script) {}</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     void MergeSignatureData(SignatureData sigdata);</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : };</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : /** Produce a script signature using a generic signature creator. */</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : bool ProduceSignature(const SigningProvider&amp; provider, const BaseSignatureCreator&amp; creator, const CScript&amp; scriptPubKey, SignatureData&amp; sigdata);</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             : </span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : /** Extract signature data from a transaction input, and insert it. */</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : SignatureData DataFromTransaction(const CMutableTransaction&amp; tx, unsigned int nIn, const CTxOut&amp; txout);</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : void UpdateInput(CTxIn&amp; input, const SignatureData&amp; data);</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : /** Check whether a scriptPubKey is known to be segwit. */</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : bool IsSegWitOutput(const SigningProvider&amp; provider, const CScript&amp; script);</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : </span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : /** Sign the CMutableTransaction */</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : bool SignTransaction(CMutableTransaction&amp; mtx, const SigningProvider* provider, const std::map&lt;COutPoint, Coin&gt;&amp; coins, int sighash, std::map&lt;int, bilingual_str&gt;&amp; input_errors);</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             : </span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : #endif // BITCOIN_SCRIPT_SIGN_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

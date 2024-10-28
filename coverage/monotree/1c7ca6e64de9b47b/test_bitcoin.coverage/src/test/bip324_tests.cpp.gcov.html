@@ -1,0 +1,441 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - test_bitcoin_coverage.info - src/test/bip324_tests.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test">src/test</a> - bip324_tests.cpp<span style="font-size: 80%;"> (source / <a href="bip324_tests.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">test_bitcoin_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">82</td>
+            <td class="headerCovTableEntry">82</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-10-28 13:38:31</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">54.1&nbsp;%</td>
+            <td class="headerCovTableEntry">362</td>
+            <td class="headerCovTableEntry">196</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2023 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;bip324.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;chainparams.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;key.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;pubkey.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;test/util/random.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;test/util/setup_common.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/strencodings.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;array&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;cstddef&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;boost/test/unit_test.hpp&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : namespace {</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC tlaBgGNC">           2 : struct BIP324Test : BasicTestingSetup {</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">           7 : void TestBIP324PacketVector(</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     uint32_t in_idx,</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     const std::string&amp; in_priv_ours_hex,</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     const std::string&amp; in_ellswift_ours_hex,</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     const std::string&amp; in_ellswift_theirs_hex,</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     bool in_initiating,</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     const std::string&amp; in_contents_hex,</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     uint32_t in_multiply,</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     const std::string&amp; in_aad_hex,</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     bool in_ignore,</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     const std::string&amp; mid_send_garbage_hex,</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     const std::string&amp; mid_recv_garbage_hex,</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     const std::string&amp; out_session_id_hex,</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     const std::string&amp; out_ciphertext_hex,</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     const std::string&amp; out_ciphertext_endswith_hex)</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : {</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     // Convert input from hex to char/byte vectors/arrays.</span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">           7 :     const auto in_priv_ours = ParseHex(in_priv_ours_hex);</span></span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto in_ellswift_ours = ParseHex&lt;std::byte&gt;(in_ellswift_ours_hex);</span></span>
+<span id="L44"><span class="lineNum">      44</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto in_ellswift_theirs = ParseHex&lt;std::byte&gt;(in_ellswift_theirs_hex);</span></span>
+<span id="L45"><span class="lineNum">      45</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto in_contents = ParseHex&lt;std::byte&gt;(in_contents_hex);</span></span>
+<span id="L46"><span class="lineNum">      46</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto in_aad = ParseHex&lt;std::byte&gt;(in_aad_hex);</span></span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto mid_send_garbage = ParseHex&lt;std::byte&gt;(mid_send_garbage_hex);</span></span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto mid_recv_garbage = ParseHex&lt;std::byte&gt;(mid_recv_garbage_hex);</span></span>
+<span id="L49"><span class="lineNum">      49</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto out_session_id = ParseHex&lt;std::byte&gt;(out_session_id_hex);</span></span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto out_ciphertext = ParseHex&lt;std::byte&gt;(out_ciphertext_hex);</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     const auto out_ciphertext_endswith = ParseHex&lt;std::byte&gt;(out_ciphertext_endswith_hex);</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     // Load keys</span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">           7 :     CKey key;</span></span>
+<span id="L55"><span class="lineNum">      55</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     key.Set(in_priv_ours.begin(), in_priv_ours.end(), true);</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">           7 :     EllSwiftPubKey ellswift_ours(in_ellswift_ours);</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">           7 :     EllSwiftPubKey ellswift_theirs(in_ellswift_theirs);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : </span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     // Instantiate encryption BIP324 cipher.</span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">           7 :     BIP324Cipher cipher(key, ellswift_ours);</span></span>
+<span id="L61"><span class="lineNum">      61</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">          14 :     BOOST_CHECK(!cipher);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L62"><span class="lineNum">      62</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">          21 :     BOOST_CHECK(cipher.GetOurPubKey() == ellswift_ours);</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">           7 :     cipher.Initialize(ellswift_theirs, in_initiating);</span></span>
+<span id="L64"><span class="lineNum">      64</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">          14 :     BOOST_CHECK(cipher);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L65"><span class="lineNum">      65</span>                 :             : </span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     // Compare session variables.</span>
+<span id="L67"><span class="lineNum">      67</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">          14 :     BOOST_CHECK(std::ranges::equal(out_session_id, cipher.GetSessionID()));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L68"><span class="lineNum">      68</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">          14 :     BOOST_CHECK(std::ranges::equal(mid_send_garbage, cipher.GetSendGarbageTerminator()));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L69"><span class="lineNum">      69</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">          14 :     BOOST_CHECK(std::ranges::equal(mid_recv_garbage, cipher.GetReceiveGarbageTerminator()));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L70"><span class="lineNum">      70</span>                 :             : </span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     // Vector of encrypted empty messages, encrypted in order to seek to the right position.</span>
+<span id="L72"><span class="lineNum">      72</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     std::vector&lt;std::vector&lt;std::byte&gt;&gt; dummies(in_idx);</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     // Seek to the numbered packet.</span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaGBC" title="Branch 0 was taken 3368 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">        3375 :     for (uint32_t i = 0; i &lt; in_idx; ++i) {</span></span>
+<span id="L76"><span class="lineNum">      76</span>         [<span class="tlaGBC" title="Branch 0 was taken 3368 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3368 :         dummies[i].resize(cipher.EXPANSION);</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">        3368 :         cipher.Encrypt({}, {}, true, dummies[i]);</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     }</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     // Construct contents and encrypt it.</span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">           7 :     std::vector&lt;std::byte&gt; contents;</span></span>
+<span id="L82"><span class="lineNum">      82</span>         [<span class="tlaGBC" title="Branch 0 was taken 167181 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">      167188 :     for (uint32_t i = 0; i &lt; in_multiply; ++i) {</span></span>
+<span id="L83"><span class="lineNum">      83</span>         [<span class="tlaGBC" title="Branch 0 was taken 167181 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      167181 :         contents.insert(contents.end(), in_contents.begin(), in_contents.end());</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     }</span>
+<span id="L85"><span class="lineNum">      85</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :     std::vector&lt;std::byte&gt; ciphertext(contents.size() + cipher.EXPANSION);</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :<span class="tlaGNC">           7 :     cipher.Encrypt(contents, in_aad, in_ignore, ciphertext);</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : </span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     // Verify ciphertext. Note that the test vectors specify either out_ciphertext (for short</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     // messages) or out_ciphertext_endswith (for long messages), so only check the relevant one.</span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           7 :     if (!out_ciphertext.empty()) {</span></span>
+<span id="L91"><span class="lineNum">      91</span>   [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           6 :         BOOST_CHECK(out_ciphertext == ciphertext);</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     } else {</span>
+<span id="L93"><span class="lineNum">      93</span>   [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           8 :         BOOST_CHECK(ciphertext.size() &gt;= out_ciphertext_endswith.size());</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L94"><span class="lineNum">      94</span>   [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           8 :         BOOST_CHECK(std::ranges::equal(out_ciphertext_endswith, Span{ciphertext}.last(out_ciphertext_endswith.size())));</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     }</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>         [<span class="tlaGBC" title="Branch 0 was taken 91 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">          98 :     for (unsigned error = 0; error &lt;= 12; ++error) {</span></span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :         // error selects a type of error introduced:</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :         // - error=0: no errors, decryption should be successful</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :         // - error=1: wrong side</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :         // - error=2..9: bit error in ciphertext</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :         // - error=10: bit error in aad</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :         // - error=11: extra 0x00 at end of aad</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :         // - error=12: message index wrong</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : </span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :         // Instantiate self-decrypting BIP324 cipher.</span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">          91 :         BIP324Cipher dec_cipher(key, ellswift_ours);</span></span>
+<span id="L108"><span class="lineNum">     108</span>   [<span class="tlaGBC" title="Branch 0 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         182 :         BOOST_CHECK(!dec_cipher);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L109"><span class="lineNum">     109</span>   [<span class="tlaGBC" title="Branch 0 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         273 :         BOOST_CHECK(dec_cipher.GetOurPubKey() == ellswift_ours);</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaGNC">          91 :         dec_cipher.Initialize(ellswift_theirs, (error == 1) ^ in_initiating, /*self_decrypt=*/true);</span></span>
+<span id="L111"><span class="lineNum">     111</span>   [<span class="tlaGBC" title="Branch 0 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         182 :         BOOST_CHECK(dec_cipher);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L112"><span class="lineNum">     112</span>                 :             : </span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :         // Compare session variables.</span>
+<span id="L114"><span class="lineNum">     114</span>   [<span class="tlaGBC" title="Branch 0 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         182 :         BOOST_CHECK(std::ranges::equal(out_session_id, dec_cipher.GetSessionID()) == (error != 1));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L115"><span class="lineNum">     115</span>   [<span class="tlaGBC" title="Branch 0 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         182 :         BOOST_CHECK(std::ranges::equal(mid_send_garbage, dec_cipher.GetSendGarbageTerminator()) == (error != 1));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L116"><span class="lineNum">     116</span>   [<span class="tlaGBC" title="Branch 0 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 91 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         182 :         BOOST_CHECK(std::ranges::equal(mid_recv_garbage, dec_cipher.GetReceiveGarbageTerminator()) == (error != 1));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 5 was taken 90 times"> + </span>]
+<span id="L117"><span class="lineNum">     117</span>                 :             : </span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :         // Seek to the numbered packet.</span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 90 times"> + </span>]:<span class="tlaGNC">          91 :         if (in_idx == 0 &amp;&amp; error == 12) continue;</span></span>
+<span id="L120"><span class="lineNum">     120</span>         [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 84 times"> + </span>]:<span class="tlaGNC">          90 :         uint32_t dec_idx = in_idx ^ (error == 12 ? (1U &lt;&lt; m_rng.randrange(16)) : 0);</span></span>
+<span id="L121"><span class="lineNum">     121</span>         [<span class="tlaGBC" title="Branch 0 was taken 65286 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 90 times"> + </span>]:<span class="tlaGNC">       65376 :         for (uint32_t i = 0; i &lt; dec_idx; ++i) {</span></span>
+<span id="L122"><span class="lineNum">     122</span>         [<span class="tlaGBC" title="Branch 0 was taken 43781 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 21505 times"> + </span>]:<span class="tlaGNC">       65286 :             unsigned use_idx = i &lt; in_idx ? i : 0;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">       65286 :             bool dec_ignore{false};</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">       65286 :             dec_cipher.DecryptLength(Span{dummies[use_idx]}.first(cipher.LENGTH_LEN));</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">       65286 :             dec_cipher.Decrypt(Span{dummies[use_idx]}.subspan(cipher.LENGTH_LEN), {}, dec_ignore, {});</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :         }</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : </span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :         // Construct copied (and possibly damaged) copy of ciphertext.</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :         // Decrypt length</span>
+<span id="L130"><span class="lineNum">     130</span>         [<span class="tlaGBC" title="Branch 0 was taken 90 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          90 :         auto to_decrypt = ciphertext;</span></span>
+<span id="L131"><span class="lineNum">     131</span>         [<span class="tlaGBC" title="Branch 0 was taken 56 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 34 times"> + </span>]:<span class="tlaGNC">          90 :         if (error &gt;= 2 &amp;&amp; error &lt;= 9) {</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">          56 :             to_decrypt[m_rng.randrange(to_decrypt.size())] ^= std::byte(1U &lt;&lt; (error - 2));</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :         }</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : </span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :         // Decrypt length and resize ciphertext to accommodate.</span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">          90 :         uint32_t dec_len = dec_cipher.DecryptLength(MakeByteSpan(to_decrypt).first(cipher.LENGTH_LEN));</span></span>
+<span id="L137"><span class="lineNum">     137</span>         [<span class="tlaGBC" title="Branch 0 was taken 90 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          90 :         to_decrypt.resize(dec_len + cipher.EXPANSION);</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :             : </span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :         // Construct copied (and possibly damaged) copy of aad.</span>
+<span id="L140"><span class="lineNum">     140</span>         [<span class="tlaGBC" title="Branch 0 was taken 90 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          90 :         auto dec_aad = in_aad;</span></span>
+<span id="L141"><span class="lineNum">     141</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 83 times"> + </span>]:<span class="tlaGNC">          90 :         if (error == 10) {</span></span>
+<span id="L142"><span class="lineNum">     142</span>         [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           7 :             if (in_aad.size() == 0) continue;</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">           1 :             dec_aad[m_rng.randrange(dec_aad.size())] ^= std::byte(1U &lt;&lt; m_rng.randrange(8));</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :         }</span>
+<span id="L145"><span class="lineNum">     145</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 77 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">          84 :         if (error == 11) dec_aad.push_back({});</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : </span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :         // Decrypt contents.</span>
+<span id="L148"><span class="lineNum">     148</span>         [<span class="tlaGBC" title="Branch 0 was taken 84 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          84 :         std::vector&lt;std::byte&gt; decrypted(dec_len);</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">          84 :         bool dec_ignore{false};</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaGNC">          84 :         bool dec_ok = dec_cipher.Decrypt(Span{to_decrypt}.subspan(cipher.LENGTH_LEN), dec_aad, dec_ignore, decrypted);</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : </span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :         // Verify result.</span>
+<span id="L153"><span class="lineNum">     153</span>   [<span class="tlaGBC" title="Branch 0 was taken 84 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 84 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         168 :         BOOST_CHECK(dec_ok == !error);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 77 times"> + </span>]
+<span id="L154"><span class="lineNum">     154</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 77 times"> + </span>]:<span class="tlaGNC">          84 :         if (dec_ok) {</span></span>
+<span id="L155"><span class="lineNum">     155</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">          14 :             BOOST_CHECK(decrypted == contents);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L156"><span class="lineNum">     156</span>   [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">          14 :             BOOST_CHECK(dec_ignore == in_ignore);</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :         }</span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">          91 :     }</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaGNC">           7 : }</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             : }; // struct BIP324Test</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             : </span>
+<span id="L162"><span class="lineNum">     162</span>                 :             : }  // namespace</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : </span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : BOOST_FIXTURE_TEST_SUITE(bip324_tests, BIP324Test)</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             : </span>
+<span id="L166"><span class="lineNum">     166</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           7 : BOOST_AUTO_TEST_CASE(packet_test_vectors) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 34 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 35 was not taken"> - </span><span class="tlaGBC" title="Branch 36 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 37 was not taken"> - </span><span class="tlaGBC" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 39 was not taken"> - </span><span class="tlaGBC" title="Branch 40 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span><span class="tlaGBC" title="Branch 42 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 44 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 45 was not taken"> - </span><span class="tlaGBC" title="Branch 46 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 47 was not taken"> - </span><span class="tlaGBC" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 49 was not taken"> - </span><span class="tlaGBC" title="Branch 50 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 51 was not taken"> - </span><span class="tlaGBC" title="Branch 52 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 53 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 54 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 55 was not taken"> - </span><span class="tlaGBC" title="Branch 56 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 57 was not taken"> - </span><span class="tlaGBC" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 59 was not taken"> - </span>]
+<span id="L167"><span class="lineNum">     167</span>                 :             :     // BIP324 key derivation uses network magic in the HKDF process. We use mainnet params here</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     // as that is what the test vectors are written for.</span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaGNC">           1 :     SelectParams(ChainType::MAIN);</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             : </span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     // The test vectors are converted using the following Python code in the BIP bip-0324/ directory:</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :     //</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     // import sys</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     // import csv</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     // with open('packet_encoding_test_vectors.csv', newline='', encoding='utf-8') as csvfile:</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     //     reader = csv.DictReader(csvfile)</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     //     quote = lambda x: &quot;\&quot;&quot; + x + &quot;\&quot;&quot;</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     //     for row in reader:</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     //         args = [</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     //             row['in_idx'],</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :     //             quote(row['in_priv_ours']),</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :     //             quote(row['in_ellswift_ours']),</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     //             quote(row['in_ellswift_theirs']),</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :     //             &quot;true&quot; if int(row['in_initiating']) else &quot;false&quot;,</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :     //             quote(row['in_contents']),</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     //             row['in_multiply'],</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :     //             quote(row['in_aad']),</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :     //             &quot;true&quot; if int(row['in_ignore']) else &quot;false&quot;,</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :     //             quote(row['mid_send_garbage_terminator']),</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :     //             quote(row['mid_recv_garbage_terminator']),</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :     //             quote(row['out_session_id']),</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     //             quote(row['out_ciphertext']),</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     //             quote(row['out_ciphertext_endswith'])</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :     //         ]</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :     //         print(&quot;    TestBIP324PacketVector(\n        &quot; + &quot;,\n        &quot;.join(args) + &quot;);&quot;)</span>
+<span id="L196"><span class="lineNum">     196</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     TestBIP324PacketVector(</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 19 was not taken"> - </span>]
+<span id="L197"><span class="lineNum">     197</span>                 :             :         1,</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :         &quot;61062ea5071d800bbfd59e2e8b53d47d194b095ae5a4df04936b49772ef0d4d7&quot;,</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :         &quot;ec0adff257bbfe500c188c80b4fdd640f6b45a482bbc15fc7cef5931deff0aa186f6eb9bba7b85dc4dcc28b28722de1e3d9108b985e2967045668f66098e475b&quot;,</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :         &quot;a4a94dfce69b4a2a0a099313d10f9f7e7d649d60501c9e1d274c300e0d89aafaffffffffffffffffffffffffffffffffffffffffffffffffffffffff8faf88d5&quot;,</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :         true,</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :         &quot;8e&quot;,</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :         1,</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :         &quot;&quot;,</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :         false,</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :         &quot;faef555dfcdb936425d84aba524758f3&quot;,</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :         &quot;02cb8ff24307a6e27de3b4e7ea3fa65b&quot;,</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :         &quot;ce72dffb015da62b0d0f5474cab8bc72605225b0cee3f62312ec680ec5f41ba5&quot;,</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :         &quot;7530d2a18720162ac09c25329a60d75adf36eda3c3&quot;,</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :         &quot;&quot;);</span>
+<span id="L211"><span class="lineNum">     211</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     TestBIP324PacketVector(</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 19 was not taken"> - </span>]
+<span id="L212"><span class="lineNum">     212</span>                 :             :         999,</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :         &quot;1f9c581b35231838f0f17cf0c979835baccb7f3abbbb96ffcc318ab71e6e126f&quot;,</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :         &quot;a1855e10e94e00baa23041d916e259f7044e491da6171269694763f018c7e63693d29575dcb464ac816baa1be353ba12e3876cba7628bd0bd8e755e721eb0140&quot;,</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :         &quot;fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f0000000000000000000000000000000000000000000000000000000000000000&quot;,</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :         false,</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :         &quot;3eb1d4e98035cfd8eeb29bac969ed3824a&quot;,</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :         1,</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :         &quot;&quot;,</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :         false,</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :         &quot;efb64fd80acd3825ac9bc2a67216535a&quot;,</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :         &quot;b3cb553453bceb002897e751ff7588bf&quot;,</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :         &quot;9267c54560607de73f18c563b76a2442718879c52dd39852885d4a3c9912c9ea&quot;,</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :         &quot;1da1bcf589f9b61872f45b7fa5371dd3f8bdf5d515b0c5f9fe9f0044afb8dc0aa1cd39a8c4&quot;,</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :         &quot;&quot;);</span>
+<span id="L226"><span class="lineNum">     226</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     TestBIP324PacketVector(</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 19 was not taken"> - </span>]
+<span id="L227"><span class="lineNum">     227</span>                 :             :         0,</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :         &quot;0286c41cd30913db0fdff7a64ebda5c8e3e7cef10f2aebc00a7650443cf4c60d&quot;,</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :         &quot;d1ee8a93a01130cbf299249a258f94feb5f469e7d0f2f28f69ee5e9aa8f9b54a60f2c3ff2d023634ec7f4127a96cc11662e402894cf1f694fb9a7eaa5f1d9244&quot;,</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :         &quot;ffffffffffffffffffffffffffffffffffffffffffffffffffffffff22d5e441524d571a52b3def126189d3f416890a99d4da6ede2b0cde1760ce2c3f98457ae&quot;,</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :         true,</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :         &quot;054290a6c6ba8d80478172e89d32bf690913ae9835de6dcf206ff1f4d652286fe0ddf74deba41d55de3edc77c42a32af79bbea2c00bae7492264c60866ae5a&quot;,</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :         1,</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :         &quot;84932a55aac22b51e7b128d31d9f0550da28e6a3f394224707d878603386b2f9d0c6bcd8046679bfed7b68c517e7431e75d9dd34605727d2ef1c2babbf680ecc8d68d2c4886e9953a4034abde6da4189cd47c6bb3192242cf714d502ca6103ee84e08bc2ca4fd370d5ad4e7d06c7fbf496c6c7cc7eb19c40c61fb33df2a9ba48497a96c98d7b10c1f91098a6b7b16b4bab9687f27585ade1491ae0dba6a79e1e2d85dd9d9d45c5135ca5fca3f0f99a60ea39edbc9efc7923111c937913f225d67788d5f7e8852b697e26b92ec7bfcaa334a1665511c2b4c0a42d06f7ab98a9719516c8fd17f73804555ee84ab3b7d1762f6096b778d3cb9c799cbd49a9e4a325197b4e6cc4a5c4651f8b41ff88a92ec428354531f970263b467c77ed11312e2617d0d53fe9a8707f51f9f57a77bfb49afe3d89d85ec05ee17b9186f360c94ab8bb2926b65ca99dae1d6ee1af96cad09de70b6767e949023e4b380e66669914a741ed0fa420a48dbc7bfae5ef2019af36d1022283dd90655f25eec7151d471265d22a6d3f91dc700ba749bb67c0fe4bc0888593fbaf59d3c6fff1bf756a125910a63b9682b597c20f560ecb99c11a92c8c8c3f7fbfaa103146083a0ccaecf7a5f5e735a784a8820155914a289d57d8141870ffcaf588882332e0bcd8779efa931aa108dab6c3cce76691e345df4a91a03b71074d66333fd3591bff071ea099360f787bbe43b7b3dff2a59c41c7642eb79870222ad1c6f2e5a191ed5acea51134679587c9cf71c7d8ee290be6bf465c4ee47897a125708704ad610d8d00252d01959209d7cd04d5ecbbb1419a7e84037a55fefa13dee464b48a35c96bcb9a53e7ed461c3a1607ee00c3c302fd47cd73fda7493e947c9834a92d63dcfbd65aa7c38c3e3a2748bb5d9a58e7495d243d6b741078c8f7ee9c8813e473a323375702702b0afae1550c8341eedf5247627343a95240cb02e3e17d5dca16f8d8d3b2228e19c06399f8ec5c5e9dbe4caef6a0ea3ffb1d3c7eac03ae030e791fa12e537c80d56b55b764cadf27a8701052df1282ba8b5e3eb62b5dc7973ac40160e00722fa958d95102fc25c549d8c0e84bed95b7acb61ba65700c4de4feebf78d13b9682c52e937d23026fb4c6193e6644e2d3c99f91f4f39a8b9fc6d013f89c3793ef703987954dc0412b550652c01d922f525704d32d70d6d4079bc3551b563fb29577b3aecdc9505011701dddfd94830431e7a4918927ee44fb3831ce8c4513839e2deea1287f3fa1ab9b61a256c09637dbc7b4f0f8fbb783840f9c24526da883b0df0c473cf231656bd7bc1aaba7f321fec0971c8c2c3444bff2f55e1df7fea66ec3e440a612db9aa87bb505163a59e06b96d46f50d8120b92814ac5ab146bc78dbbf91065af26107815678ce6e33812e6bf3285d4ef3b7b04b076f21e7820dcbfdb4ad5218cf4ff6a65812d8fcb98ecc1e95e2fa58e3efe4ce26cd0bd400d6036ab2ad4f6c713082b5e3f1e04eb9e3b6c8f63f57953894b9e220e0130308e1fd91f72d398c1e7962ca2c31be83f31d6157633581a0a6910496de8d55d3d07090b6aa087159e388b7e7dec60f5d8a60d93ca2ae91296bd484d916bfaaa17c8f45ea4b1a91b37c82821199a2b7596672c37156d8701e7352aa48671d3b1bbbd2bd5f0a2268894a25b0cb2514af39c8743f8cce8ab4b523053739fd8a522222a09acf51ac704489cf17e4b7125455cb8f125b4d31af1eba1f8cf7f81a5a100a141a7ee72e8083e065616649c241f233645c5fc865d17f0285f5c52d9f45312c979bfb3ce5f2a1b951deddf280ffb3f370410cffd1583bfa90077835aa201a0712d1dcd1293ee177738b14e6b5e2a496d05220c3253bb6578d6aff774be91946a614dd7e879fb3dcf7451e0b9adb6a8c44f53c2c464bcc0019e9fad89cac7791a0a3f2974f759a9856351d4d2d7c5612c17cfc50f8479945df57716767b120a590f4bf656f4645029a525694d8a238446c5f5c2c1c995c09c1405b8b1eb9e0352ffdf766cc964f8dcf9f8f043dfab6d102cf4b298021abd78f1d9025fa1f8e1d710b38d9d1652f2d88d1305874ec41609b6617b65c5adb19b6295dc5c5da5fdf69f28144ea12f17c3c6fcce6b9b5157b3dfc969d6725fa5b098a4d9b1d31547ed4c9187452d281d0a5d456008caf1aa251fac8f950ca561982dc2dc908d3691ee3b6ad3ae3d22d002577264ca8e49c523bd51c4846be0d198ad9407bf6f7b82c79893eb2c05fe9981f687a97a4f01fe45ff8c8b7ecc551135cd960a0d6001ad35020be07ffb53cb9e731522ca8ae9364628914b9b8e8cc2f37f03393263603cc2b45295767eb0aac29b0930390eb89587ab2779d2e3decb8042acece725ba42eda650863f418f8d0d50d104e44fbbe5aa7389a4a144a8cecf00f45fb14c39112f9bfb56c0acbd44fa3ff261f5ce4acaa5134c2c1d0cca447040820c81ab1bcdc16aa075b7c68b10d06bbb7ce08b5b805e0238f24402cf24a4b4e00701935a0c68add3de090903f9b85b153cb179a582f57113bfc21c2093803f0cfa4d9d4672c2b05a24f7e4c34a8e9101b70303a7378b9c50b6cddd46814ef7fd73ef6923feceab8fc5aa8b0d185f2e83c7a99dcb1077c0ab5c1f5d5f01ba2f0420443f75c4417db9ebf1665efbb33dca224989920a64b44dc26f682cc77b4632c8454d49135e52503da855bc0f6ff8edc1145451a9772c06891f41064036b66c3119a0fc6e80dffeb65dc456108b7ca0296f4175fff3ed2b0f842cd46bd7e86f4c62dfaf1ddbf836263c00b34803de164983d0811cebfac86e7720c726d3048934c36c23189b02386a722ca9f0fe00233ab50db928d3bccea355cc681144b8b7edcaae4884d5a8f04425c0890ae2c74326e138066d8c05f4c82b29df99b034ea727afde590a1f2177ace3af99cfb1729d6539ce7f7f7314b046aab74497e63dd399e1f7d5f16517c23bd830d1fdee810f3c3b77573dd69c4b97d80d71fb5a632e00acdfa4f8e829faf3580d6a72c40b28a82172f8dcd4627663ebf6069736f21735fd84a226f427cd06bb055f94e7c92f31c48075a2955d82a5b9d2d0198ce0d4e131a112570a8ee40fb80462a81436a58e7db4e34b6e2c422e82f934ecda9949893da5730fc5c23c7c920f363f85ab28cc6a4206713c3152669b47efa8238fa826735f17b4e78750276162024ec85458cd5808e06f40dd9fd43775a456a3ff6cae90550d76d8b2899e0762ad9a371482b3e38083b1274708301d6346c22fea9bb4b73db490ff3ab05b2f7f9e187adef139a7794454b7300b8cc64d3ad76c0e4bc54e08833a4419251550655380d675bc91855aeb82585220bb97f03e976579c08f321b5f8f70988d3061f41465517d53ac571dbf1b24b94443d2e9a8e8a79b392b3d6a4ecdd7f626925c365ef6221305105ce9b5f5b6ecc5bed3d702bd4b7f5008aa8eb8c7aa3ade8ecf6251516fbefeea4e1082aa0e1848eddb31ffe44b04792d296054402826e4bd054e671f223e5557e4c94f89ca01c25c44f1a2ff2c05a70b43408250705e1b858bf0670679fdcd379203e36be3500dd981b1a6422c3cf15224f7fefdef0a5f225c5a09d15767598ecd9e262460bb33a4b5d09a64591efabc57c923d3be406979032ae0bc0997b65336a06dd75b253332ad6a8b63ef043f780a1b3fb6d0b6cad98b1ef4a02535eb39e14a866cfc5fc3a9c5deb2261300d71280ebe66a0776a151469551c3c5fa308757f956655278ec6330ae9e3625468c5f87e02cd9a6489910d4143c1f4ee13aa21a6859d907b788e28572fecee273d44e4a900fa0aa668dd861a60fb6b6b12c2c5ef3c8df1bd7ef5d4b0d1cdb8c15fffbb365b9784bd94abd001c6966216b9b67554ad7cb7f958b70092514f7800fc40244003e0fd1133a9b850fb17f4fcafde07fc87b07fb510670654a5d2d6fc9876ac74728ea41593beef003d6858786a52d3a40af7529596767c17000bfaf8dc52e871359f4ad8bf6e7b2853e5229bdf39657e213580294a5317c5df172865e1e17fe37093b585e04613f5f078f761b2b1752eb32983afda24b523af8851df9a02b37e77f543f18888a782a994a50563334282bf9cdfccc183fdf4fcd75ad86ee0d94f91ee2300a5befbccd14e03a77fc031a8cfe4f01e4c5290f5ac1da0d58ea054bd4837cfd93e5e34fc0eb16e48044ba76131f228d16cde9b0bb978ca7cdcd10653c358bdb26fdb723a530232c32ae0a4cecc06082f46e1c1d596bfe60621ad1e354e01e07b040cc7347c016653f44d926d13ca74e6cbc9d4ab4c99f4491c95c76fff5076b3936eb9d0a286b97c035ca88a3c6309f5febfd4cdaac869e4f58ed409b1e9eb4192fb2f9c2f12176d460fd98286c9d6df84598f260119fd29c63f800c07d8df83d5cc95f8c2fea2812e7890e8a0718bb1e031ecbebc0436dcf3e3b9a58bcc06b4c17f711f80fe1dffc3326a6eb6e00283055c6dabe20d311bfd5019591b7954f8163c9afad9ef8390a38f3582e0a79cdf0353de8eeb6b5f9f27b16ffdef7dd62869b4840ee226ccdce95e02c4545eb981b60571cd83f03dc5eaf8c97a0829a4318a9b3dc06c0e003db700b2260ff1fa8fee66890e637b109abb03ec901b05ca599775f48af50154c0e67d82bf0f558d7d3e0778dc38bea1eb5f74dc8d7f90abdf5511a424be66bf8b6a3cacb477d2e7ef4db68d2eba4d5289122d851f9501ba7e9c4957d8eba3be3fc8e785c4265a1d65c46f2809b70846c693864b169c9dcb78be26ea14b8613f145b01887222979a9e67aee5f800caa6f5c4229bdeefc901232ace6143c9865e4d9c07f51aa200afaf7e48a7d1d8faf366023beab12906ffcb3eaf72c0eb68075e4daf3c080e0c31911befc16f0cc4a09908bb7c1e26abab38bd7b788e1a09c0edf1a35a38d2ff1d3ed47fcdaae2f0934224694f5b56705b9409b6d3d64f3833b686f7576ec64bbdd6ff174e56c2d1edac0011f904681a73face26573fbba4e34652f7ae84acfb2fa5a5b3046f98178cd0831df7477de70e06a4c00e305f31aafc026ef064dd68fd3e4252b1b91d617b26c6d09b6891a00df68f105b5962e7f9d82da101dd595d286da721443b72b2aba2377f6e7772e33b3a5e3753da9c2578c5d1daab80187f55518c72a64ee150a7cb5649823c08c9f62cd7d020b45ec2cba8310db1a7785a46ab24785b4d54ff1660b5ca78e05a9a55edba9c60bf044737bc468101c4e8bd1480d749be5024adefca1d998abe33eaeb6b11fbb39da5d905fdd3f611b2e51517ccee4b8af72c2d948573505590d61a6783ab7278fc43fe55b1fcc0e7216444d3c8039bb8145ef1ce01c50e95a3f3feab0aee883fdb94cc13ee4d21c542aa795e18932228981690f4d4c57ca4db6eb5c092e29d8a05139d509a8aeb48baa1eb97a76e597a32b280b5e9d6c36859064c98ff96ef5126130264fa8d2f49213870d9fb036cff95da51f270311d9976208554e48ffd486470d0ecdb4e619ccbd8226147204baf8e235f54d8b1cba8fa34a9a4d055de515cdf180d2bb6739a175183c472e30b5c914d09eeb1b7dafd6872b38b48c6afc146101200e6e6a44fe5684e220adc11f5c403ddb15df8051e6bdef09117a3a5349938513776286473a3cf1d2788bb875052a2e6459fa7926da33380149c7f98d7700528a60c954e6f5ecb65842fde69d614be69eaa2040a4819ae6e756accf936e14c1e894489744a79c1f2c1eb295d13e2d767c09964b61f9cfe497649f712&quot;,</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :         false,</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :         &quot;d4e3f18ac2e2095edb5c3b94236118ad&quot;,</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :         &quot;4faa6c4233d9fd53d170ede4172142a8&quot;,</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :         &quot;23f154ac43cfc59c4243e9fc68aeec8f19ad3942d74108e833b36f0dd3dcd357&quot;,</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :         &quot;8da7de6ea7bf2a81a396a42880ba1f5756734c4821309ac9aeffa2a26ce86873b9dc4935a772de6ec5162c6d075b14536800fb174841153511bfb597e992e2fe8a450c4bce102cc550bb37fd564c4d60bf884e&quot;,</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :         &quot;&quot;);</span>
+<span id="L241"><span class="lineNum">     241</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     TestBIP324PacketVector(</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 19 was not taken"> - </span>]
+<span id="L242"><span class="lineNum">     242</span>                 :             :         223,</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :         &quot;6c77432d1fda31e9f942f8af44607e10f3ad38a65f8a4bddae823e5eff90dc38&quot;,</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :         &quot;d2685070c1e6376e633e825296634fd461fa9e5bdf2109bcebd735e5a91f3e587c5cb782abb797fbf6bb5074fd1542a474f2a45b673763ec2db7fb99b737bbb9&quot;,</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :         &quot;56bd0c06f10352c3a1a9f4b4c92f6fa2b26df124b57878353c1fc691c51abea77c8817daeeb9fa546b77c8daf79d89b22b0e1b87574ece42371f00237aa9d83a&quot;,</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :         false,</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :         &quot;7e0e78eb6990b059e6cf0ded66ea93ef82e72aa2f18ac24f2fc6ebab561ae557420729da103f64cecfa20527e15f9fb669a49bbbf274ef0389b3e43c8c44e5f60bf2ac38e2b55e7ec4273dba15ba41d21f8f5b3ee1688b3c29951218caf847a97fb50d75a86515d445699497d968164bf740012679b8962de573be941c62b7ef&quot;,</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :         1,</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :         &quot;&quot;,</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :         true,</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :         &quot;cf2e25f23501399f30738d7eee652b90&quot;,</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :         &quot;225a477a28a54ea7671d2b217a9c29db&quot;,</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :         &quot;7ec02fea8c1484e3d0875f978c5f36d63545e2e4acf56311394422f4b66af612&quot;,</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :         &quot;&quot;,</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :         &quot;729847a3e9eba7a5bff454b5de3b393431ee360736b6c030d7a5bd01d1203d2e98f528543fd2bf886ccaa1ada5e215a730a36b3f4abfc4e252c89eb01d9512f94916dae8a76bf16e4da28986ffe159090fe5267ee3394300b7ccf4dfad389a26321b3a3423e4594a82ccfbad16d6561ecb8772b0cb040280ff999a29e3d9d4fd&quot;);</span>
+<span id="L256"><span class="lineNum">     256</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     TestBIP324PacketVector(</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 19 was not taken"> - </span>]
+<span id="L257"><span class="lineNum">     257</span>                 :             :         448,</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :         &quot;a6ec25127ca1aa4cf16b20084ba1e6516baae4d32422288e9b36d8bddd2de35a&quot;,</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :         &quot;ffffffffffffffffffffffffffffffffffffffffffffffffffffffff053d7ecca53e33e185a8b9be4e7699a97c6ff4c795522e5918ab7cd6b6884f67e683f3dc&quot;,</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :         &quot;ffffffffffffffffffffffffffffffffffffffffffffffffffffffffa7730be30000000000000000000000000000000000000000000000000000000000000000&quot;,</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :         true,</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :         &quot;00cf68f8f7ac49ffaa02c4864fdf6dfe7bbf2c740b88d98c50ebafe32c92f3427f57601ffcb21a3435979287db8fee6c302926741f9d5e464c647eeb9b7acaeda46e00abd7506fc9a719847e9a7328215801e96198dac141a15c7c2f68e0690dd1176292a0dded04d1f548aad88f1aebdc0a8f87da4bb22df32dd7c160c225b843e83f6525d6d484f502f16d923124fc538794e21da2eb689d18d87406ecced5b9f92137239ed1d37bcfa7836641a83cf5e0a1cf63f51b06f158e499a459ede41c&quot;,</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :         1,</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :         &quot;&quot;,</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :         false,</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :         &quot;fead69be77825a23daec377c362aa560&quot;,</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :         &quot;511d4980526c5e64aa7187462faeafdd&quot;,</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :         &quot;acb8f084ea763ddd1b92ac4ed23bf44de20b84ab677d4e4e6666a6090d40353d&quot;,</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :         &quot;&quot;,</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :         &quot;77b4656934a82de1a593d8481f020194ddafd8cac441f9d72aeb8721e6a14f49698ca6d9b2b6d59d07a01aa552fd4d5b68d0d1617574c77dea10bfadbaa31b83885b7ceac2fd45e3e4a331c51a74e7b1698d81b64c87c73c5b9258b4d83297f9debc2e9aa07f8572ff434dc792b83ecf07b3197de8dc9cf7be56acb59c66cff5&quot;);</span>
+<span id="L271"><span class="lineNum">     271</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     TestBIP324PacketVector(</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 19 was not taken"> - </span>]
+<span id="L272"><span class="lineNum">     272</span>                 :             :         673,</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :         &quot;0af952659ed76f80f585966b95ab6e6fd68654672827878684c8b547b1b94f5a&quot;,</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :         &quot;ffffffffffffffffffffffffffffffffffffffffffffffffffffffffc81017fd92fd31637c26c906b42092e11cc0d3afae8d9019d2578af22735ce7bc469c72d&quot;,</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :         &quot;9652d78baefc028cd37a6a92625b8b8f85fde1e4c944ad3f20e198bef8c02f19fffffffffffffffffffffffffffffffffffffffffffffffffffffffff2e91870&quot;,</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :         false,</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :         &quot;5c6272ee55da855bbbf7b1246d9885aa7aa601a715ab86fa46c50da533badf82b97597c968293ae04e&quot;,</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :         97561,</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :         &quot;&quot;,</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :         false,</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :         &quot;5e2375ac629b8df1e4ff3617c6255a70&quot;,</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :         &quot;70bcbffcb62e4d29d2605d30bceef137&quot;,</span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :         &quot;7332e92a3f9d2792c4d444fac5ed888c39a073043a65eefb626318fd649328f8&quot;,</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :         &quot;&quot;,</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :         &quot;657a4a19711ce593c3844cb391b224f60124aba7e04266233bc50cafb971e26c7716b76e98376448f7d214dd11e629ef9a974d60e3770a695810a61c4ba66d78b936ee7892b98f0b48ddae9fcd8b599dca1c9b43e9b95e0226cf8d4459b8a7c2c4e6db80f1d58c7b20dd7208fa5c1057fb78734223ee801dbd851db601fee61e&quot;);</span>
+<span id="L286"><span class="lineNum">     286</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     TestBIP324PacketVector(</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 19 was not taken"> - </span>]
+<span id="L287"><span class="lineNum">     287</span>                 :             :         1024,</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :         &quot;f90e080c64b05824c5a24b2501d5aeaf08af3872ee860aa80bdcd430f7b63494&quot;,</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :         &quot;ffffffffffffffffffffffffffffffffffffffffffffffffffffffff115173765dc202cf029ad3f15479735d57697af12b0131dd21430d5772e4ef11474d58b9&quot;,</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :         &quot;12a50f3fafea7c1eeada4cf8d33777704b77361453afc83bda91eef349ae044d20126c6200547ea5a6911776c05dee2a7f1a9ba7dfbabbbd273c3ef29ef46e46&quot;,</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :         true,</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :         &quot;5f67d15d22ca9b2804eeab0a66f7f8e3a10fa5de5809a046084348cbc5304e843ef96f59a59c7d7fdfe5946489f3ea297d941bac326225df316a25fc90f0e65b0d31a9c497e960fdbf8c482516bc8a9c1c77b7f6d0e1143810c737f76f9224e6f2c9af5186b4f7259c7e8d165b6e4fe3d38a60bdbdd4d06ecdcaaf62086070dbb68686b802d53dfd7db14b18743832605f5461ad81e2af4b7e8ff0eff0867a25b93cec7becf15c43131895fed09a83bf1ee4a87d44dd0f02a837bf5a1232e201cb882734eb9643dc2dc4d4e8b5690840766212c7ac8f38ad8a9ec47c7a9b3e022ae3eb6a32522128b518bd0d0085dd81c5&quot;,</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :         69615,</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :         &quot;&quot;,</span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :         true,</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :         &quot;b709dea25e0be287c50e3603482c2e98&quot;,</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :         &quot;1f677e9d7392ebe3633fd82c9efb0f16&quot;,</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :         &quot;889f339285564fd868401fac8380bb9887925122ec8f31c8ae51ce067def103b&quot;,</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :         &quot;&quot;,</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :         &quot;7c4b9e1e6c1ce69da7b01513cdc4588fd93b04dafefaf87f31561763d906c672bac3dfceb751ebd126728ac017d4d580e931b8e5c7d5dfe0123be4dc9b2d2238b655c8a7fadaf8082c31e310909b5b731efc12f0a56e849eae6bfeedcc86dd27ef9b91d159256aa8e8d2b71a311f73350863d70f18d0d7302cf551e4303c7733&quot;);</span>
+<span id="L301"><span class="lineNum">     301</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             : </span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : BOOST_AUTO_TEST_SUITE_END()</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/wallet/test/feebumper_tests.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/wallet/test">src/wallet/test</a> - feebumper_tests.cpp<span style="font-size: 80%;"> (source / <a href="feebumper_tests.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">22</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-10-28 14:00:11</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">50.9&nbsp;%</td>
+            <td class="headerCovTableEntry">106</td>
+            <td class="headerCovTableEntry">54</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or https://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;consensus/validation.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;script/script.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/strencodings.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;wallet/feebumper.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;wallet/test/util.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;wallet/test/wallet_test_fixture.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;boost/test/unit_test.hpp&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : namespace wallet {</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : namespace feebumper {</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : BOOST_FIXTURE_TEST_SUITE(feebumper_tests, WalletTestingSetup)</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>                 :<span class="tlaGNC tlaBgGNC">           4 : static void CheckMaxWeightComputation(const std::string&amp; script_str, const std::vector&lt;std::string&gt;&amp; witness_str_stack, const std::string&amp; prevout_script_str, int64_t expected_max_weight)</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : {</span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">           4 :     std::vector script_data(ParseHex(script_str));</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">           4 :     CScript script(script_data.begin(), script_data.end());</span></span>
+<span id="L24"><span class="lineNum">      24</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           4 :     CTxIn input(Txid{}, 0, script);</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">          11 :     for (const auto&amp; s : witness_str_stack) {</span></span>
+<span id="L27"><span class="lineNum">      27</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          14 :         input.scriptWitness.stack.push_back(ParseHex(s));</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     }</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : </span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           4 :     std::vector prevout_script_data(ParseHex(prevout_script_str));</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaGNC">           4 :     CScript prevout_script(prevout_script_data.begin(), prevout_script_data.end());</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">           4 :     int64_t weight = GetTransactionInputWeight(input);</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">           4 :     SignatureWeights weights;</span></span>
+<span id="L35"><span class="lineNum">      35</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           4 :     SignatureWeightChecker size_checker(weights, DUMMY_CHECKER);</span></span>
+<span id="L36"><span class="lineNum">      36</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           4 :     bool script_ok = VerifyScript(input.scriptSig, prevout_script, &amp;input.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, size_checker);</span></span>
+<span id="L37"><span class="lineNum">      37</span>   [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           8 :     BOOST_CHECK(script_ok);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L38"><span class="lineNum">      38</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           4 :     weight += weights.GetWeightDiffToMax();</span></span>
+<span id="L39"><span class="lineNum">      39</span>   [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           4 :     BOOST_CHECK_EQUAL(weight, expected_max_weight);</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">           8 : }</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : </span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           7 : BOOST_AUTO_TEST_CASE(external_max_weight_test)</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 34 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 35 was not taken"> - </span><span class="tlaGBC" title="Branch 36 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 37 was not taken"> - </span><span class="tlaGBC" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 39 was not taken"> - </span><span class="tlaGBC" title="Branch 40 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span><span class="tlaGBC" title="Branch 42 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 44 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 45 was not taken"> - </span><span class="tlaGBC" title="Branch 46 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 47 was not taken"> - </span><span class="tlaGBC" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 49 was not taken"> - </span><span class="tlaGBC" title="Branch 50 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 51 was not taken"> - </span><span class="tlaGBC" title="Branch 52 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 53 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 54 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 55 was not taken"> - </span><span class="tlaGBC" title="Branch 56 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 57 was not taken"> - </span><span class="tlaGBC" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 59 was not taken"> - </span>]
+<span id="L43"><span class="lineNum">      43</span>                 :             : {</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     // P2PKH</span>
+<span id="L45"><span class="lineNum">      45</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     CheckMaxWeightComputation(&quot;453042021f03c8957c5ce12940ee6e3333ecc3f633d9a1ac53a55b3ce0351c617fa96abe021f0dccdcce3ef45a63998be9ec748b561baf077b8e862941d0cd5ec08f5afe68012102fccfeb395f0ecd3a77e7bc31c3bc61dc987418b18e395d441057b42ca043f22c&quot;, {}, &quot;76a914f60dcfd3392b28adc7662669603641f578eed72d88ac&quot;, 593);</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     // P2SH-P2WPKH</span>
+<span id="L47"><span class="lineNum">      47</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     CheckMaxWeightComputation(&quot;160014001dca1b22c599b5a56a87c78417ad2ff39552f1&quot;, {&quot;3042021f5443c58eaf45f3e5ef46f8516f966b334a7d497cedda4edb2b9fad57c90c3b021f63a77cb56cde848e2e2dd20b487eec2f53101f634193786083f60b4d23a82301&quot;, &quot;026cfe86116f161057deb240201d6b82ebd4f161e0200d63dc9aca65a1d6b38bb7&quot;}, &quot;a9147c8ab5ad7708b97ccb6b483d57aba48ee85214df87&quot;, 364);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L48"><span class="lineNum">      48</span>                 :             :     // P2WPKH</span>
+<span id="L49"><span class="lineNum">      49</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     CheckMaxWeightComputation(&quot;&quot;, {&quot;3042021f0f8906f0394979d5b737134773e5b88bf036c7d63542301d600ab677ba5a59021f0e9fe07e62c113045fa1c1532e2914720e8854d189c4f5b8c88f57956b704401&quot;, &quot;0359edba11ed1a0568094a6296a16c4d5ee4c8cfe2f5e2e6826871b5ecf8188f79&quot;}, &quot;00149961a78658030cc824af4c54fbf5294bec0cabdd&quot;, 272);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L50"><span class="lineNum">      50</span>                 :             :     // P2WSH HTLC</span>
+<span id="L51"><span class="lineNum">      51</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     CheckMaxWeightComputation(&quot;&quot;, {&quot;3042021f5c4c29e6b686aae5b6d0751e90208592ea96d26bc81d78b0d3871a94a21fa8021f74dc2f971e438ccece8699c8fd15704c41df219ab37b63264f2147d15c34d801&quot;, &quot;01&quot;, &quot;6321024cf55e52ec8af7866617dc4e7ff8433758e98799906d80e066c6f32033f685f967029000b275210214827893e2dcbe4ad6c20bd743288edad21100404eb7f52ccd6062fd0e7808f268ac&quot;}, &quot;002089e84892873c679b1129edea246e484fd914c2601f776d4f2f4a001eb8059703&quot;, 318);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : BOOST_AUTO_TEST_SUITE_END()</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : } // namespace feebumper</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : } // namespace wallet</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/wallet/test/scriptpubkeyman_tests.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/wallet/test">src/wallet/test</a> - scriptpubkeyman_tests.cpp<span style="font-size: 80%;"> (source / <a href="scriptpubkeyman_tests.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">15</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-10-28 14:00:11</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">51.0&nbsp;%</td>
+            <td class="headerCovTableEntry">100</td>
+            <td class="headerCovTableEntry">51</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020-2021 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;key.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;test/util/setup_common.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;script/solver.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;wallet/scriptpubkeyman.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;wallet/wallet.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;wallet/test/util.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;boost/test/unit_test.hpp&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : namespace wallet {</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : BOOST_FIXTURE_TEST_SUITE(scriptpubkeyman_tests, BasicTestingSetup)</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : // Test LegacyScriptPubKeyMan::CanProvide behavior, making sure it returns true</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : // for recognized scripts even when keys may not be available for signing.</span>
+<span id="L19"><span class="lineNum">      19</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC tlaBgGNC">           7 : BOOST_AUTO_TEST_CASE(CanProvide)</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 34 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 35 was not taken"> - </span><span class="tlaGBC" title="Branch 36 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 37 was not taken"> - </span><span class="tlaGBC" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 39 was not taken"> - </span><span class="tlaGBC" title="Branch 40 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span><span class="tlaGBC" title="Branch 42 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 44 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 45 was not taken"> - </span><span class="tlaGBC" title="Branch 46 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 47 was not taken"> - </span><span class="tlaGBC" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 49 was not taken"> - </span><span class="tlaGBC" title="Branch 50 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 51 was not taken"> - </span><span class="tlaGBC" title="Branch 52 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 53 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 54 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 55 was not taken"> - </span><span class="tlaGBC" title="Branch 56 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 57 was not taken"> - </span><span class="tlaGBC" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 59 was not taken"> - </span>]
+<span id="L20"><span class="lineNum">      20</span>                 :             : {</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :     // Set up wallet and keyman variables.</span>
+<span id="L22"><span class="lineNum">      22</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     CWallet wallet(m_node.chain.get(), &quot;&quot;, CreateMockableWalletDatabase());</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L23"><span class="lineNum">      23</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :     LegacyScriptPubKeyMan&amp; keyman = *wallet.GetOrCreateLegacyScriptPubKeyMan();</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : </span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     // Make a 1 of 2 multisig script</span>
+<span id="L26"><span class="lineNum">      26</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :     std::vector&lt;CKey&gt; keys(2);</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">           1 :     std::vector&lt;CPubKey&gt; pubkeys;</span></span>
+<span id="L28"><span class="lineNum">      28</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :     for (CKey&amp; key : keys) {</span></span>
+<span id="L29"><span class="lineNum">      29</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 :         key.MakeNewKey(true);</span></span>
+<span id="L30"><span class="lineNum">      30</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :         pubkeys.emplace_back(key.GetPubKey());</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     }</span>
+<span id="L32"><span class="lineNum">      32</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :     CScript multisig_script = GetScriptForMultisig(1, pubkeys);</span></span>
+<span id="L33"><span class="lineNum">      33</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           1 :     CScript p2sh_script = GetScriptForDestination(ScriptHash(multisig_script));</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">           1 :     SignatureData data;</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     // Verify the p2sh(multisig) script is not recognized until the multisig</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     // script is added to the keystore to make it solvable</span>
+<span id="L38"><span class="lineNum">      38</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     BOOST_CHECK(!keyman.CanProvide(p2sh_script, data));</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :     keyman.AddCScript(multisig_script);</span></span>
+<span id="L40"><span class="lineNum">      40</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     BOOST_CHECK(keyman.CanProvide(p2sh_script, data));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : BOOST_AUTO_TEST_SUITE_END()</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : } // namespace wallet</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
