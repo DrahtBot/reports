@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/util/bip32.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/util">src/util</a> - bip32.cpp<span style="font-size: 80%;"> (source / <a href="bip32.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-11-22 13:43:01</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">32</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2019-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;tinyformat.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;util/bip32.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;util/strencodings.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;cstdio&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;sstream&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :<span class="tlaUNC tlaBgUNC">           0 : bool ParseHDKeypath(const std::string&amp; keypath_str, std::vector&lt;uint32_t&gt;&amp; keypath)</span></span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : {</span>
+<span id="L15"><span class="lineNum">      15</span>                 :<span class="tlaUNC">           0 :     std::stringstream ss(keypath_str);</span></span>
+<span id="L16"><span class="lineNum">      16</span>                 :<span class="tlaUNC">           0 :     std::string item;</span></span>
+<span id="L17"><span class="lineNum">      17</span>                 :<span class="tlaUNC">           0 :     bool first = true;</span></span>
+<span id="L18"><span class="lineNum">      18</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     while (std::getline(ss, item, '/')) {</span></span>
+<span id="L19"><span class="lineNum">      19</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (item.compare(&quot;m&quot;) == 0) {</span></span>
+<span id="L20"><span class="lineNum">      20</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (first) {</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaUNC">           0 :                 first = false;</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaUNC">           0 :                 continue;</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :             }</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :             return false;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :         }</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :         // Finds whether it is hardened</span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaUNC">           0 :         uint32_t path = 0;</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaUNC">           0 :         size_t pos = item.find('\'');</span></span>
+<span id="L29"><span class="lineNum">      29</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (pos != std::string::npos) {</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :             // The hardened tick can only be in the last index of the string</span>
+<span id="L31"><span class="lineNum">      31</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (pos != item.size() - 1) {</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :                 return false;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :             }</span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaUNC">           0 :             path |= 0x80000000;</span></span>
+<span id="L35"><span class="lineNum">      35</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             item = item.substr(0, item.size() - 1); // Drop the last character which is the hardened tick</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :         }</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :         // Ensure this is only numbers</span>
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (item.find_first_not_of( &quot;0123456789&quot; ) != std::string::npos) {</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :             return false;</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :         }</span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaUNC">           0 :         uint32_t number;</span></span>
+<span id="L43"><span class="lineNum">      43</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (!ParseUInt32(item, &amp;number)) {</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :             return false;</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :         }</span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaUNC">           0 :         path |= number;</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         keypath.push_back(path);</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :         first = false;</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     }</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     return true;</span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaUNC">           0 : std::string FormatHDKeypath(const std::vector&lt;uint32_t&gt;&amp; path, bool apostrophe)</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : {</span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaUNC">           0 :     std::string ret;</span></span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (auto i : path) {</span></span>
+<span id="L58"><span class="lineNum">      58</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         ret += strprintf(&quot;/%i&quot;, (i &lt;&lt; 1) &gt;&gt; 1);</span></span>
+<span id="L59"><span class="lineNum">      59</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (i &gt;&gt; 31) ret += apostrophe ? '\'' : 'h';</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     }</span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaUNC">           0 :     return ret;</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : </span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaUNC">           0 : std::string WriteHDKeypath(const std::vector&lt;uint32_t&gt;&amp; keypath, bool apostrophe)</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : {</span>
+<span id="L66"><span class="lineNum">      66</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return &quot;m&quot; + FormatHDKeypath(keypath, apostrophe);</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
