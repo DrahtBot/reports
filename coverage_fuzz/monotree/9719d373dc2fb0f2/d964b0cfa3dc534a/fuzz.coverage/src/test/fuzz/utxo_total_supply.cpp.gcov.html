@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/utxo_total_supply.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - utxo_total_supply.cpp<span style="font-size: 80%;"> (source / <a href="utxo_total_supply.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">1.1&nbsp;%</td>
+            <td class="headerCovTableEntry">92</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-11-22 13:24:32</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">10.0&nbsp;%</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.7&nbsp;%</td>
+            <td class="headerCovTableEntry">146</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;chainparams.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;consensus/consensus.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;consensus/merkle.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;kernel/coinstats.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;node/miner.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;script/interpreter.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;streams.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;test/util/mining.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;test/util/setup_common.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;util/chaintype.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;validation.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC tlaBgGNC">           4 : FUZZ_TARGET(utxo_total_supply)</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : {</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :     /** The testing setup that creates a chainman only (no chainstate) */</span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     ChainTestingSetup test_setup{</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :         ChainType::REGTEST,</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :         {</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :             .extra_args = {&quot;-testactivationheight=bip34@2&quot;},</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :         },</span>
+<span id="L28"><span class="lineNum">      28</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     };</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     // Create chainstate</span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     test_setup.LoadVerifyActivateChainstate();</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaUNC">           0 :     auto&amp; node{test_setup.m_node};</span></span>
+<span id="L32"><span class="lineNum">      32</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     auto&amp; chainman{*Assert(test_setup.m_node.chainman)};</span></span>
+<span id="L33"><span class="lineNum">      33</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : </span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaUNC">           0 :     const auto ActiveHeight = [&amp;]() {</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaUNC">           0 :         LOCK(chainman.GetMutex());</span></span>
+<span id="L37"><span class="lineNum">      37</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return chainman.ActiveHeight();</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaUNC">           0 :     };</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaUNC">           0 :     const auto PrepareNextBlock = [&amp;]() {</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :         // Use OP_FALSE to avoid BIP30 check from hitting early</span>
+<span id="L41"><span class="lineNum">      41</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         auto block = PrepareBlock(node, CScript{} &lt;&lt; OP_FALSE);</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :         // Replace OP_FALSE with OP_TRUE</span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaUNC">           0 :         {</span></span>
+<span id="L44"><span class="lineNum">      44</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             CMutableTransaction tx{*block-&gt;vtx.back()};</span></span>
+<span id="L45"><span class="lineNum">      45</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             tx.vout.at(0).scriptPubKey = CScript{} &lt;&lt; OP_TRUE;</span></span>
+<span id="L46"><span class="lineNum">      46</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             block-&gt;vtx.back() = MakeTransactionRef(tx);</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaUNC">           0 :         }</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaUNC">           0 :         return block;</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaUNC">           0 :     };</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : </span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     /** The block template this fuzzer is working on */</span>
+<span id="L52"><span class="lineNum">      52</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     auto current_block = PrepareNextBlock();</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     /** Append-only set of tx outpoints, entries are not removed when spent */</span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;std::pair&lt;COutPoint, CTxOut&gt;&gt; txos;</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     /** The utxo stats at the chain tip */</span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaUNC">           0 :     kernel::CCoinsStats utxo_stats;</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     /** The total amount of coins in the utxo set */</span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaUNC">           0 :     CAmount circulation{0};</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : </span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : </span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     // Store the tx out in the txo map</span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaUNC">           0 :     const auto StoreLastTxo = [&amp;]() {</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :         // get last tx</span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaUNC">           0 :         const CTransaction&amp; tx = *current_block-&gt;vtx.back();</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :         // get last out</span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaUNC">           0 :         const uint32_t i = tx.vout.size() - 1;</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :         // store it</span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaUNC">           0 :         txos.emplace_back(COutPoint{tx.GetHash(), i}, tx.vout.at(i));</span></span>
+<span id="L69"><span class="lineNum">      69</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         if (current_block-&gt;vtx.size() == 1 &amp;&amp; tx.vout.at(i).scriptPubKey[0] == OP_RETURN) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L70"><span class="lineNum">      70</span>                 :             :             // also store coinbase</span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaUNC">           0 :             const uint32_t i = tx.vout.size() - 2;</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaUNC">           0 :             txos.emplace_back(COutPoint{tx.GetHash(), i}, tx.vout.at(i));</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :         }</span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaUNC">           0 :     };</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaUNC">           0 :     const auto AppendRandomTxo = [&amp;](CMutableTransaction&amp; tx) {</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaUNC">           0 :         const auto&amp; txo = txos.at(fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, txos.size() - 1));</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaUNC">           0 :         tx.vin.emplace_back(txo.first);</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaUNC">           0 :         tx.vout.emplace_back(txo.second.nValue, txo.second.scriptPubKey); // &quot;Forward&quot; coin with no fee</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaUNC">           0 :     };</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaUNC">           0 :     const auto UpdateUtxoStats = [&amp;]() {</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaUNC">           0 :         LOCK(chainman.GetMutex());</span></span>
+<span id="L82"><span class="lineNum">      82</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         chainman.ActiveChainstate().ForceFlushStateToDisk();</span></span>
+<span id="L83"><span class="lineNum">      83</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         utxo_stats = std::move(</span></span>
+<span id="L84"><span class="lineNum">      84</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :             *Assert(kernel::ComputeUTXOStats(kernel::CoinStatsHashType::NONE, &amp;chainman.ActiveChainstate().CoinsDB(), chainman.m_blockman, {})));</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L85"><span class="lineNum">      85</span>                 :             :         // Check that miner can't print more money than they are allowed to</span>
+<span id="L86"><span class="lineNum">      86</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         assert(circulation == utxo_stats.total_amount);</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaUNC">           0 :     };</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : </span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     // Update internal state to chain tip</span>
+<span id="L91"><span class="lineNum">      91</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     StoreLastTxo();</span></span>
+<span id="L92"><span class="lineNum">      92</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     UpdateUtxoStats();</span></span>
+<span id="L93"><span class="lineNum">      93</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     assert(ActiveHeight() == 0);</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     // Get at which height we duplicate the coinbase</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     // Assuming that the fuzzer will mine relatively short chains (less than 200 blocks), we want the duplicate coinbase to be not too high.</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :     // Up to 300 seems reasonable.</span>
+<span id="L97"><span class="lineNum">      97</span>                 :<span class="tlaUNC">           0 :     int64_t duplicate_coinbase_height = fuzzed_data_provider.ConsumeIntegralInRange(0, 300);</span></span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     // Always pad with OP_0 at the end to avoid bad-cb-length error</span>
+<span id="L99"><span class="lineNum">      99</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     const CScript duplicate_coinbase_script = CScript() &lt;&lt; duplicate_coinbase_height &lt;&lt; OP_0;</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     // Mine the first block with this duplicate</span>
+<span id="L101"><span class="lineNum">     101</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     current_block = PrepareNextBlock();</span></span>
+<span id="L102"><span class="lineNum">     102</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     StoreLastTxo();</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaUNC">           0 :     {</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :         // Create duplicate (CScript should match exact format as in CreateNewBlock)</span>
+<span id="L106"><span class="lineNum">     106</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         CMutableTransaction tx{*current_block-&gt;vtx.front()};</span></span>
+<span id="L107"><span class="lineNum">     107</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         tx.vin.at(0).scriptSig = duplicate_coinbase_script;</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : </span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :         // Mine block and create next block template</span>
+<span id="L110"><span class="lineNum">     110</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         current_block-&gt;vtx.front() = MakeTransactionRef(tx);</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L112"><span class="lineNum">     112</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     current_block-&gt;hashMerkleRoot = BlockMerkleRoot(*current_block);</span></span>
+<span id="L113"><span class="lineNum">     113</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     assert(!MineBlock(node, current_block).IsNull());</span></span>
+<span id="L114"><span class="lineNum">     114</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     circulation += GetBlockSubsidy(ActiveHeight(), Params().GetConsensus());</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L115"><span class="lineNum">     115</span>                 :             : </span>
+<span id="L116"><span class="lineNum">     116</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     assert(ActiveHeight() == 1);</span></span>
+<span id="L117"><span class="lineNum">     117</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     UpdateUtxoStats();</span></span>
+<span id="L118"><span class="lineNum">     118</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     current_block = PrepareNextBlock();</span></span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     StoreLastTxo();</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : </span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :     // Limit to avoid timeout, but enough to cover duplicate_coinbase_height</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     // and CVE-2018-17144.</span>
+<span id="L123"><span class="lineNum">     123</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     LIMITED_WHILE(fuzzed_data_provider.remaining_bytes(), 2'00)</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     {</span>
+<span id="L125"><span class="lineNum">     125</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         CallOneOf(</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :             fuzzed_data_provider,</span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaUNC">           0 :             [&amp;] {</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :                 // Append an input-output pair to the last tx in the current block</span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaUNC">           0 :                 CMutableTransaction tx{*current_block-&gt;vtx.back()};</span></span>
+<span id="L130"><span class="lineNum">     130</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 AppendRandomTxo(tx);</span></span>
+<span id="L131"><span class="lineNum">     131</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 current_block-&gt;vtx.back() = MakeTransactionRef(tx);</span></span>
+<span id="L132"><span class="lineNum">     132</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 StoreLastTxo();</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaUNC">           0 :             },</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaUNC">           0 :             [&amp;] {</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :                 // Append a tx to the list of txs in the current block</span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaUNC">           0 :                 CMutableTransaction tx{};</span></span>
+<span id="L137"><span class="lineNum">     137</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 AppendRandomTxo(tx);</span></span>
+<span id="L138"><span class="lineNum">     138</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :                 current_block-&gt;vtx.push_back(MakeTransactionRef(tx));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L139"><span class="lineNum">     139</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 StoreLastTxo();</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaUNC">           0 :             },</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaUNC">           0 :             [&amp;] {</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :                 // Append the current block to the active chain</span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaUNC">           0 :                 node::RegenerateCommitments(*current_block, chainman);</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaUNC">           0 :                 const bool was_valid = !MineBlock(node, current_block).IsNull();</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : </span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaUNC">           0 :                 const auto prev_utxo_stats = utxo_stats;</span></span>
+<span id="L147"><span class="lineNum">     147</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (was_valid) {</span></span>
+<span id="L148"><span class="lineNum">     148</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                     if (duplicate_coinbase_height == ActiveHeight()) {</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :                         // we mined the duplicate coinbase</span>
+<span id="L150"><span class="lineNum">     150</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                         assert(current_block-&gt;vtx.at(0)-&gt;vin.at(0).scriptSig == duplicate_coinbase_script);</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :                     }</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : </span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaUNC">           0 :                     circulation += GetBlockSubsidy(ActiveHeight(), Params().GetConsensus());</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :                 }</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaUNC">           0 :                 UpdateUtxoStats();</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : </span>
+<span id="L158"><span class="lineNum">     158</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (!was_valid) {</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :                     // utxo stats must not change</span>
+<span id="L160"><span class="lineNum">     160</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                     assert(prev_utxo_stats.hashSerialized == utxo_stats.hashSerialized);</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :                 }</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             : </span>
+<span id="L163"><span class="lineNum">     163</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 current_block = PrepareNextBlock();</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaUNC">           0 :                 StoreLastTxo();</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaUNC">           0 :             });</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :     }</span>
+<span id="L167"><span class="lineNum">     167</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

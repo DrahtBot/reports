@@ -1,0 +1,636 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/protocol.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - protocol.h<span style="font-size: 80%;"> (source / <a href="protocol.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">44</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-11-22 13:24:32</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">132</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_PROTOCOL_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_PROTOCOL_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;kernel/messagestartchars.h&gt; // IWYU pragma: export</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;netaddress.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;serialize.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;streams.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;util/time.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;array&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;string&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : /** Message header.</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :  * (4) message start.</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :  * (12) command.</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :  * (4) size.</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :  * (4) checksum.</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :  */</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : class CMessageHeader</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : {</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : public:</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     static constexpr size_t COMMAND_SIZE = 12;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     static constexpr size_t MESSAGE_SIZE_SIZE = 4;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     static constexpr size_t CHECKSUM_SIZE = 4;</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     static constexpr size_t MESSAGE_SIZE_OFFSET = std::tuple_size_v&lt;MessageStartChars&gt; + COMMAND_SIZE;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     static constexpr size_t CHECKSUM_OFFSET = MESSAGE_SIZE_OFFSET + MESSAGE_SIZE_SIZE;</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     static constexpr size_t HEADER_SIZE = std::tuple_size_v&lt;MessageStartChars&gt; + COMMAND_SIZE + MESSAGE_SIZE_SIZE + CHECKSUM_SIZE;</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     explicit CMessageHeader() = default;</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     /** Construct a P2P message header from message-start characters, a command and the size of the message.</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :      * @note Passing in a `pszCommand` longer than COMMAND_SIZE will result in a run-time assertion error.</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :      */</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     CMessageHeader(const MessageStartChars&amp; pchMessageStartIn, const char* pszCommand, unsigned int nMessageSizeIn);</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     std::string GetCommand() const;</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     bool IsCommandValid() const;</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaUNC">           0 :     SERIALIZE_METHODS(CMessageHeader, obj) { READWRITE(obj.pchMessageStart, obj.pchCommand, obj.nMessageSize, obj.pchChecksum); }</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : </span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     MessageStartChars pchMessageStart{};</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     char pchCommand[COMMAND_SIZE]{};</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     uint32_t nMessageSize{std::numeric_limits&lt;uint32_t&gt;::max()};</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     uint8_t pchChecksum[CHECKSUM_SIZE]{};</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : };</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : </span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : /**</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :  * Bitcoin protocol message types. When adding new message types, don't forget</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :  * to update ALL_NET_MESSAGE_TYPES below.</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :  */</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : namespace NetMsgType {</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : /**</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :  * The version message provides information about the transmitting node to the</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :  * receiving node at the beginning of a connection.</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :  */</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : inline constexpr const char* VERSION{&quot;version&quot;};</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : /**</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :  * The verack message acknowledges a previously-received version message,</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :  * informing the connecting node that it can begin to send other messages.</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :  */</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : inline constexpr const char* VERACK{&quot;verack&quot;};</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : /**</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :  * The addr (IP address) message relays connection information for peers on the</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :  * network.</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  */</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : inline constexpr const char* ADDR{&quot;addr&quot;};</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : /**</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :  * The addrv2 message relays connection information for peers on the network just</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :  * like the addr message, but is extended to allow gossiping of longer node</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :  * addresses (see BIP155).</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :  */</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : inline constexpr const char* ADDRV2{&quot;addrv2&quot;};</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : /**</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :  * The sendaddrv2 message signals support for receiving ADDRV2 messages (BIP155).</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :  * It also implies that its sender can encode as ADDRV2 and would send ADDRV2</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :  * instead of ADDR to a peer that has signaled ADDRV2 support by sending SENDADDRV2.</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :  */</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : inline constexpr const char* SENDADDRV2{&quot;sendaddrv2&quot;};</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : /**</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :  * The inv message (inventory message) transmits one or more inventories of</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :  * objects known to the transmitting peer.</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :  */</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : inline constexpr const char* INV{&quot;inv&quot;};</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : /**</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :  * The getdata message requests one or more data objects from another node.</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :  */</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : inline constexpr const char* GETDATA{&quot;getdata&quot;};</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : /**</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :  * The merkleblock message is a reply to a getdata message which requested a</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :  * block using the inventory type MSG_MERKLEBLOCK.</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :  * @since protocol version 70001 as described by BIP37.</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :  */</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : inline constexpr const char* MERKLEBLOCK{&quot;merkleblock&quot;};</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : /**</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :  * The getblocks message requests an inv message that provides block header</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :  * hashes starting from a particular point in the block chain.</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :  */</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : inline constexpr const char* GETBLOCKS{&quot;getblocks&quot;};</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : /**</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :  * The getheaders message requests a headers message that provides block</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :  * headers starting from a particular point in the block chain.</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :  * @since protocol version 31800.</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :  */</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             : inline constexpr const char* GETHEADERS{&quot;getheaders&quot;};</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             : /**</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :  * The tx message transmits a single transaction.</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :  */</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : inline constexpr const char* TX{&quot;tx&quot;};</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : /**</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :  * The headers message sends one or more block headers to a node which</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :  * previously requested certain headers with a getheaders message.</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :  * @since protocol version 31800.</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :  */</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : inline constexpr const char* HEADERS{&quot;headers&quot;};</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             : /**</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :  * The block message transmits a single serialized block.</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :  */</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : inline constexpr const char* BLOCK{&quot;block&quot;};</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             : /**</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :  * The getaddr message requests an addr message from the receiving node,</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :  * preferably one with lots of IP addresses of other receiving nodes.</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :  */</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : inline constexpr const char* GETADDR{&quot;getaddr&quot;};</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : /**</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :  * The mempool message requests the TXIDs of transactions that the receiving</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :  * node has verified as valid but which have not yet appeared in a block.</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :  * @since protocol version 60002 as described by BIP35.</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :  *   Only available with service bit NODE_BLOOM, see also BIP111.</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :  */</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             : inline constexpr const char* MEMPOOL{&quot;mempool&quot;};</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : /**</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :  * The ping message is sent periodically to help confirm that the receiving</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :  * peer is still connected.</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :  */</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : inline constexpr const char* PING{&quot;ping&quot;};</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : /**</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :  * The pong message replies to a ping message, proving to the pinging node that</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :  * the ponging node is still alive.</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :  * @since protocol version 60001 as described by BIP31.</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :  */</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : inline constexpr const char* PONG{&quot;pong&quot;};</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : /**</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :  * The notfound message is a reply to a getdata message which requested an</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :  * object the receiving node does not have available for relay.</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :  * @since protocol version 70001.</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :  */</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             : inline constexpr const char* NOTFOUND{&quot;notfound&quot;};</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : /**</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :  * The filterload message tells the receiving peer to filter all relayed</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :  * transactions and requested merkle blocks through the provided filter.</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :  * @since protocol version 70001 as described by BIP37.</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :  *   Only available with service bit NODE_BLOOM since protocol version</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :  *   70011 as described by BIP111.</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :  */</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : inline constexpr const char* FILTERLOAD{&quot;filterload&quot;};</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             : /**</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :  * The filteradd message tells the receiving peer to add a single element to a</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :  * previously-set bloom filter, such as a new public key.</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :  * @since protocol version 70001 as described by BIP37.</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :  *   Only available with service bit NODE_BLOOM since protocol version</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :  *   70011 as described by BIP111.</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :  */</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             : inline constexpr const char* FILTERADD{&quot;filteradd&quot;};</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : /**</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :  * The filterclear message tells the receiving peer to remove a previously-set</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :  * bloom filter.</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :  * @since protocol version 70001 as described by BIP37.</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :  *   Only available with service bit NODE_BLOOM since protocol version</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :  *   70011 as described by BIP111.</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :  */</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             : inline constexpr const char* FILTERCLEAR{&quot;filterclear&quot;};</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : /**</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :  * Indicates that a node prefers to receive new block announcements via a</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :  * &quot;headers&quot; message rather than an &quot;inv&quot;.</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :  * @since protocol version 70012 as described by BIP130.</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :  */</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             : inline constexpr const char* SENDHEADERS{&quot;sendheaders&quot;};</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : /**</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :  * The feefilter message tells the receiving peer not to inv us any txs</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :  * which do not meet the specified min fee rate.</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :  * @since protocol version 70013 as described by BIP133</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :  */</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : inline constexpr const char* FEEFILTER{&quot;feefilter&quot;};</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             : /**</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :  * Contains a 1-byte bool and 8-byte LE version number.</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :  * Indicates that a node is willing to provide blocks via &quot;cmpctblock&quot; messages.</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :  * May indicate that a node prefers to receive new block announcements via a</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :  * &quot;cmpctblock&quot; message rather than an &quot;inv&quot;, depending on message contents.</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :  * @since protocol version 70014 as described by BIP 152</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :  */</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             : inline constexpr const char* SENDCMPCT{&quot;sendcmpct&quot;};</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             : /**</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :  * Contains a CBlockHeaderAndShortTxIDs object - providing a header and</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :  * list of &quot;short txids&quot;.</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :  * @since protocol version 70014 as described by BIP 152</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :  */</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : inline constexpr const char* CMPCTBLOCK{&quot;cmpctblock&quot;};</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : /**</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :  * Contains a BlockTransactionsRequest</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :  * Peer should respond with &quot;blocktxn&quot; message.</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :  * @since protocol version 70014 as described by BIP 152</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :  */</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             : inline constexpr const char* GETBLOCKTXN{&quot;getblocktxn&quot;};</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : /**</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :  * Contains a BlockTransactions.</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :  * Sent in response to a &quot;getblocktxn&quot; message.</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :  * @since protocol version 70014 as described by BIP 152</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :  */</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             : inline constexpr const char* BLOCKTXN{&quot;blocktxn&quot;};</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : /**</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :  * getcfilters requests compact filters for a range of blocks.</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :  * Only available with service bit NODE_COMPACT_FILTERS as described by</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :  * BIP 157 &amp; 158.</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :  */</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : inline constexpr const char* GETCFILTERS{&quot;getcfilters&quot;};</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             : /**</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :  * cfilter is a response to a getcfilters request containing a single compact</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :  * filter.</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :  */</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : inline constexpr const char* CFILTER{&quot;cfilter&quot;};</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             : /**</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :  * getcfheaders requests a compact filter header and the filter hashes for a</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :  * range of blocks, which can then be used to reconstruct the filter headers</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :  * for those blocks.</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :  * Only available with service bit NODE_COMPACT_FILTERS as described by</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :  * BIP 157 &amp; 158.</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :  */</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             : inline constexpr const char* GETCFHEADERS{&quot;getcfheaders&quot;};</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             : /**</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :  * cfheaders is a response to a getcfheaders request containing a filter header</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :  * and a vector of filter hashes for each subsequent block in the requested range.</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :  */</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             : inline constexpr const char* CFHEADERS{&quot;cfheaders&quot;};</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             : /**</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :  * getcfcheckpt requests evenly spaced compact filter headers, enabling</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :  * parallelized download and validation of the headers between them.</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :  * Only available with service bit NODE_COMPACT_FILTERS as described by</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :  * BIP 157 &amp; 158.</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :  */</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             : inline constexpr const char* GETCFCHECKPT{&quot;getcfcheckpt&quot;};</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             : /**</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :  * cfcheckpt is a response to a getcfcheckpt request containing a vector of</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :  * evenly spaced filter headers for blocks on the requested chain.</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :  */</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             : inline constexpr const char* CFCHECKPT{&quot;cfcheckpt&quot;};</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : /**</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :  * Indicates that a node prefers to relay transactions via wtxid, rather than</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :  * txid.</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :  * @since protocol version 70016 as described by BIP 339.</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :  */</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             : inline constexpr const char* WTXIDRELAY{&quot;wtxidrelay&quot;};</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             : /**</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :  * Contains a 4-byte version number and an 8-byte salt.</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :  * The salt is used to compute short txids needed for efficient</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :  * txreconciliation, as described by BIP 330.</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :  */</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             : inline constexpr const char* SENDTXRCNCL{&quot;sendtxrcncl&quot;};</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             : }; // namespace NetMsgType</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             : </span>
+<span id="L269"><span class="lineNum">     269</span>                 :             : /** All known message types (see above). Keep this in the same order as the list of messages above. */</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             : inline const std::array ALL_NET_MESSAGE_TYPES{std::to_array&lt;std::string&gt;({</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     NetMsgType::VERSION,</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :     NetMsgType::VERACK,</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :     NetMsgType::ADDR,</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :     NetMsgType::ADDRV2,</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :     NetMsgType::SENDADDRV2,</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :     NetMsgType::INV,</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :     NetMsgType::GETDATA,</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :     NetMsgType::MERKLEBLOCK,</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :     NetMsgType::GETBLOCKS,</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :     NetMsgType::GETHEADERS,</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :     NetMsgType::TX,</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :     NetMsgType::HEADERS,</span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :     NetMsgType::BLOCK,</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :     NetMsgType::GETADDR,</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :     NetMsgType::MEMPOOL,</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :     NetMsgType::PING,</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :     NetMsgType::PONG,</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :     NetMsgType::NOTFOUND,</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :     NetMsgType::FILTERLOAD,</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     NetMsgType::FILTERADD,</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :     NetMsgType::FILTERCLEAR,</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :     NetMsgType::SENDHEADERS,</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :     NetMsgType::FEEFILTER,</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :     NetMsgType::SENDCMPCT,</span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :     NetMsgType::CMPCTBLOCK,</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :     NetMsgType::GETBLOCKTXN,</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :     NetMsgType::BLOCKTXN,</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :     NetMsgType::GETCFILTERS,</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :     NetMsgType::CFILTER,</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :     NetMsgType::GETCFHEADERS,</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :     NetMsgType::CFHEADERS,</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     NetMsgType::GETCFCHECKPT,</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             :     NetMsgType::CFCHECKPT,</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :     NetMsgType::WTXIDRELAY,</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :     NetMsgType::SENDTXRCNCL,</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             : })};</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             : </span>
+<span id="L308"><span class="lineNum">     308</span>                 :             : /** nServices flags */</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             : enum ServiceFlags : uint64_t {</span>
+<span id="L310"><span class="lineNum">     310</span>                 :             :     // NOTE: When adding here, be sure to update serviceFlagToStr too</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :     // Nothing</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :     NODE_NONE = 0,</span>
+<span id="L313"><span class="lineNum">     313</span>                 :             :     // NODE_NETWORK means that the node is capable of serving the complete block chain. It is currently</span>
+<span id="L314"><span class="lineNum">     314</span>                 :             :     // set by all Bitcoin Core non pruned nodes, and is unset by SPV clients or other light clients.</span>
+<span id="L315"><span class="lineNum">     315</span>                 :             :     NODE_NETWORK = (1 &lt;&lt; 0),</span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :     // NODE_BLOOM means the node is capable and willing to handle bloom-filtered connections.</span>
+<span id="L317"><span class="lineNum">     317</span>                 :             :     NODE_BLOOM = (1 &lt;&lt; 2),</span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :     // NODE_WITNESS indicates that a node can be asked for blocks and transactions including</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :     // witness data.</span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :     NODE_WITNESS = (1 &lt;&lt; 3),</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :     // NODE_COMPACT_FILTERS means the node will service basic block filter requests.</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :     // See BIP157 and BIP158 for details on how this is implemented.</span>
+<span id="L323"><span class="lineNum">     323</span>                 :             :     NODE_COMPACT_FILTERS = (1 &lt;&lt; 6),</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :     // NODE_NETWORK_LIMITED means the same as NODE_NETWORK with the limitation of only</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             :     // serving the last 288 (2 day) blocks</span>
+<span id="L326"><span class="lineNum">     326</span>                 :             :     // See BIP159 for details on how this is implemented.</span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :     NODE_NETWORK_LIMITED = (1 &lt;&lt; 10),</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             : </span>
+<span id="L329"><span class="lineNum">     329</span>                 :             :     // NODE_P2P_V2 means the node supports BIP324 transport</span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     NODE_P2P_V2 = (1 &lt;&lt; 11),</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             : </span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :     // Bits 24-31 are reserved for temporary experiments. Just pick a bit that</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :     // isn't getting used, or one not being used much, and notify the</span>
+<span id="L334"><span class="lineNum">     334</span>                 :             :     // bitcoin-development mailing list. Remember that service bits are just</span>
+<span id="L335"><span class="lineNum">     335</span>                 :             :     // unauthenticated advertisements, so your code must be robust against</span>
+<span id="L336"><span class="lineNum">     336</span>                 :             :     // collisions and other cases where nodes may be advertising a service they</span>
+<span id="L337"><span class="lineNum">     337</span>                 :             :     // do not actually support. Other service bits should be allocated via the</span>
+<span id="L338"><span class="lineNum">     338</span>                 :             :     // BIP process.</span>
+<span id="L339"><span class="lineNum">     339</span>                 :             : };</span>
+<span id="L340"><span class="lineNum">     340</span>                 :             : </span>
+<span id="L341"><span class="lineNum">     341</span>                 :             : /**</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :  * Convert service flags (a bitmask of NODE_*) to human readable strings.</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :  * It supports unknown service flags which will be returned as &quot;UNKNOWN[...]&quot;.</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :  * @param[in] flags multiple NODE_* bitwise-OR-ed together</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             :  */</span>
+<span id="L346"><span class="lineNum">     346</span>                 :             : std::vector&lt;std::string&gt; serviceFlagsToStr(uint64_t flags);</span>
+<span id="L347"><span class="lineNum">     347</span>                 :             : </span>
+<span id="L348"><span class="lineNum">     348</span>                 :             : /**</span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :  * State independent service flags.</span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :  * If the return value is changed, contrib/seeds/makeseeds.py</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :  * should be updated appropriately to filter for nodes with</span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :  * desired service flags (compatible with our new flags).</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :  */</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             : constexpr ServiceFlags SeedsServiceFlags() { return ServiceFlags(NODE_NETWORK | NODE_WITNESS); }</span>
+<span id="L355"><span class="lineNum">     355</span>                 :             : </span>
+<span id="L356"><span class="lineNum">     356</span>                 :             : /**</span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :  * Checks if a peer with the given service flags may be capable of having a</span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :  * robust address-storage DB.</span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :  */</span>
+<span id="L360"><span class="lineNum">     360</span>                 :<span class="tlaUNC">           0 : static inline bool MayHaveUsefulAddressDB(ServiceFlags services)</span></span>
+<span id="L361"><span class="lineNum">     361</span>                 :             : {</span>
+<span id="L362"><span class="lineNum">     362</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return (services &amp; NODE_NETWORK) || (services &amp; NODE_NETWORK_LIMITED);</span></span>
+<span id="L363"><span class="lineNum">     363</span>                 :             : }</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             : </span>
+<span id="L365"><span class="lineNum">     365</span>                 :             : /** A CService with information about it as peer */</span>
+<span id="L366"><span class="lineNum">     366</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 : class CAddress : public CService</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 9 was not executed"> # </span>]
+<span id="L367"><span class="lineNum">     367</span>                 :             : {</span>
+<span id="L368"><span class="lineNum">     368</span>                 :             :     static constexpr std::chrono::seconds TIME_INIT{100000000};</span>
+<span id="L369"><span class="lineNum">     369</span>                 :             : </span>
+<span id="L370"><span class="lineNum">     370</span>                 :             :     /** Historically, CAddress disk serialization stored the CLIENT_VERSION, optionally OR'ed with</span>
+<span id="L371"><span class="lineNum">     371</span>                 :             :      *  the ADDRV2_FORMAT flag to indicate V2 serialization. The first field has since been</span>
+<span id="L372"><span class="lineNum">     372</span>                 :             :      *  disentangled from client versioning, and now instead:</span>
+<span id="L373"><span class="lineNum">     373</span>                 :             :      *  - The low bits (masked by DISK_VERSION_IGNORE_MASK) store the fixed value DISK_VERSION_INIT,</span>
+<span id="L374"><span class="lineNum">     374</span>                 :             :      *    (in case any code exists that treats it as a client version) but are ignored on</span>
+<span id="L375"><span class="lineNum">     375</span>                 :             :      *    deserialization.</span>
+<span id="L376"><span class="lineNum">     376</span>                 :             :      *  - The high bits (masked by ~DISK_VERSION_IGNORE_MASK) store actual serialization information.</span>
+<span id="L377"><span class="lineNum">     377</span>                 :             :      *    Only 0 or DISK_VERSION_ADDRV2 (equal to the historical ADDRV2_FORMAT) are valid now, and</span>
+<span id="L378"><span class="lineNum">     378</span>                 :             :      *    any other value triggers a deserialization failure. Other values can be added later if</span>
+<span id="L379"><span class="lineNum">     379</span>                 :             :      *    needed.</span>
+<span id="L380"><span class="lineNum">     380</span>                 :             :      *</span>
+<span id="L381"><span class="lineNum">     381</span>                 :             :      *  For disk deserialization, ADDRV2_FORMAT in the stream version signals that ADDRV2</span>
+<span id="L382"><span class="lineNum">     382</span>                 :             :      *  deserialization is permitted, but the actual format is determined by the high bits in the</span>
+<span id="L383"><span class="lineNum">     383</span>                 :             :      *  stored version field. For network serialization, the stream version having ADDRV2_FORMAT or</span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :      *  not determines the actual format used (as it has no embedded version number).</span>
+<span id="L385"><span class="lineNum">     385</span>                 :             :      */</span>
+<span id="L386"><span class="lineNum">     386</span>                 :             :     static constexpr uint32_t DISK_VERSION_INIT{220000};</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             :     static constexpr uint32_t DISK_VERSION_IGNORE_MASK{0b00000000'00000111'11111111'11111111};</span>
+<span id="L388"><span class="lineNum">     388</span>                 :             :     /** The version number written in disk serialized addresses to indicate V2 serializations.</span>
+<span id="L389"><span class="lineNum">     389</span>                 :             :      * It must be exactly 1&lt;&lt;29, as that is the value that historical versions used for this</span>
+<span id="L390"><span class="lineNum">     390</span>                 :             :      * (they used their internal ADDRV2_FORMAT flag here). */</span>
+<span id="L391"><span class="lineNum">     391</span>                 :             :     static constexpr uint32_t DISK_VERSION_ADDRV2{1 &lt;&lt; 29};</span>
+<span id="L392"><span class="lineNum">     392</span>                 :             :     static_assert((DISK_VERSION_INIT &amp; ~DISK_VERSION_IGNORE_MASK) == 0, &quot;DISK_VERSION_INIT must be covered by DISK_VERSION_IGNORE_MASK&quot;);</span>
+<span id="L393"><span class="lineNum">     393</span>                 :             :     static_assert((DISK_VERSION_ADDRV2 &amp; DISK_VERSION_IGNORE_MASK) == 0, &quot;DISK_VERSION_ADDRV2 must not be covered by DISK_VERSION_IGNORE_MASK&quot;);</span>
+<span id="L394"><span class="lineNum">     394</span>                 :             : </span>
+<span id="L395"><span class="lineNum">     395</span>                 :             : public:</span>
+<span id="L396"><span class="lineNum">     396</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     CAddress() : CService{} {};</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span class="lineNum">        </span> [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span><span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 22 was not executed"> # </span><span class="tlaUNC" title="Branch 23 was not executed"> # </span><span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span>]
+<span id="L397"><span class="lineNum">     397</span>                 :<span class="tlaUNC">           0 :     CAddress(CService ipIn, ServiceFlags nServicesIn) : CService{ipIn}, nServices{nServicesIn} {};</span></span>
+<span id="L398"><span class="lineNum">     398</span>                 :<span class="tlaUNC">           0 :     CAddress(CService ipIn, ServiceFlags nServicesIn, NodeSeconds time) : CService{ipIn}, nTime{time}, nServices{nServicesIn} {};</span></span>
+<span id="L399"><span class="lineNum">     399</span>                 :             : </span>
+<span id="L400"><span class="lineNum">     400</span>                 :             :     enum class Format {</span>
+<span id="L401"><span class="lineNum">     401</span>                 :             :         Disk,</span>
+<span id="L402"><span class="lineNum">     402</span>                 :             :         Network,</span>
+<span id="L403"><span class="lineNum">     403</span>                 :             :     };</span>
+<span id="L404"><span class="lineNum">     404</span>                 :             :     struct SerParams : CNetAddr::SerParams {</span>
+<span id="L405"><span class="lineNum">     405</span>                 :             :         const Format fmt;</span>
+<span id="L406"><span class="lineNum">     406</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         SER_PARAMS_OPFUNC</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span id="L407"><span class="lineNum">     407</span>                 :             :     };</span>
+<span id="L408"><span class="lineNum">     408</span>                 :             :     static constexpr SerParams V1_NETWORK{{CNetAddr::Encoding::V1}, Format::Network};</span>
+<span id="L409"><span class="lineNum">     409</span>                 :             :     static constexpr SerParams V2_NETWORK{{CNetAddr::Encoding::V2}, Format::Network};</span>
+<span id="L410"><span class="lineNum">     410</span>                 :             :     static constexpr SerParams V1_DISK{{CNetAddr::Encoding::V1}, Format::Disk};</span>
+<span id="L411"><span class="lineNum">     411</span>                 :             :     static constexpr SerParams V2_DISK{{CNetAddr::Encoding::V2}, Format::Disk};</span>
+<span id="L412"><span class="lineNum">     412</span>                 :             : </span>
+<span id="L413"><span class="lineNum">     413</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     SERIALIZE_METHODS(CAddress, obj)</span></span>
+<span id="L414"><span class="lineNum">     414</span>                 :             :     {</span>
+<span id="L415"><span class="lineNum">     415</span>                 :             :         bool use_v2;</span>
+<span id="L416"><span class="lineNum">     416</span>                 :<span class="tlaUNC">           0 :         auto&amp; params = SER_PARAMS(SerParams);</span></span>
+<span id="L417"><span class="lineNum">     417</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (params.fmt == Format::Disk) {</span></span>
+<span id="L418"><span class="lineNum">     418</span>                 :             :             // In the disk serialization format, the encoding (v1 or v2) is determined by a flag version</span>
+<span id="L419"><span class="lineNum">     419</span>                 :             :             // that's part of the serialization itself. ADDRV2_FORMAT in the stream version only determines</span>
+<span id="L420"><span class="lineNum">     420</span>                 :             :             // whether V2 is chosen/permitted at all.</span>
+<span id="L421"><span class="lineNum">     421</span>                 :<span class="tlaUNC">           0 :             uint32_t stored_format_version = DISK_VERSION_INIT;</span></span>
+<span id="L422"><span class="lineNum">     422</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (params.enc == Encoding::V2) stored_format_version |= DISK_VERSION_ADDRV2;</span></span>
+<span id="L423"><span class="lineNum">     423</span>                 :<span class="tlaUNC">           0 :             READWRITE(stored_format_version);</span></span>
+<span id="L424"><span class="lineNum">     424</span>                 :<span class="tlaUNC">           0 :             stored_format_version &amp;= ~DISK_VERSION_IGNORE_MASK; // ignore low bits</span></span>
+<span id="L425"><span class="lineNum">     425</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (stored_format_version == 0) {</span></span>
+<span id="L426"><span class="lineNum">     426</span>                 :             :                 use_v2 = false;</span>
+<span id="L427"><span class="lineNum">     427</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             } else if (stored_format_version == DISK_VERSION_ADDRV2 &amp;&amp; params.enc == Encoding::V2) {</span></span>
+<span id="L428"><span class="lineNum">     428</span>                 :             :                 // Only support v2 deserialization if V2 is set.</span>
+<span id="L429"><span class="lineNum">     429</span>                 :             :                 use_v2 = true;</span>
+<span id="L430"><span class="lineNum">     430</span>                 :             :             } else {</span>
+<span id="L431"><span class="lineNum">     431</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 throw std::ios_base::failure(&quot;Unsupported CAddress disk format version&quot;);</span></span>
+<span id="L432"><span class="lineNum">     432</span>                 :             :             }</span>
+<span id="L433"><span class="lineNum">     433</span>                 :             :         } else {</span>
+<span id="L434"><span class="lineNum">     434</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             assert(params.fmt == Format::Network);</span></span>
+<span id="L435"><span class="lineNum">     435</span>                 :             :             // In the network serialization format, the encoding (v1 or v2) is determined directly by</span>
+<span id="L436"><span class="lineNum">     436</span>                 :             :             // the value of enc in the stream params, as no explicitly encoded version</span>
+<span id="L437"><span class="lineNum">     437</span>                 :             :             // exists in the stream.</span>
+<span id="L438"><span class="lineNum">     438</span>                 :<span class="tlaUNC">           0 :             use_v2 = params.enc == Encoding::V2;</span></span>
+<span id="L439"><span class="lineNum">     439</span>                 :             :         }</span>
+<span id="L440"><span class="lineNum">     440</span>                 :             : </span>
+<span id="L441"><span class="lineNum">     441</span>                 :<span class="tlaUNC">           0 :         READWRITE(Using&lt;LossyChronoFormatter&lt;uint32_t&gt;&gt;(obj.nTime));</span></span>
+<span id="L442"><span class="lineNum">     442</span>                 :             :         // nServices is serialized as CompactSize in V2; as uint64_t in V1.</span>
+<span id="L443"><span class="lineNum">     443</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (use_v2) {</span></span>
+<span id="L444"><span class="lineNum">     444</span>                 :             :             uint64_t services_tmp;</span>
+<span id="L445"><span class="lineNum">     445</span>                 :<span class="tlaUNC">           0 :             SER_WRITE(obj, services_tmp = obj.nServices);</span></span>
+<span id="L446"><span class="lineNum">     446</span>                 :<span class="tlaUNC">           0 :             READWRITE(Using&lt;CompactSizeFormatter&lt;false&gt;&gt;(services_tmp));</span></span>
+<span id="L447"><span class="lineNum">     447</span>                 :<span class="tlaUNC">           0 :             SER_READ(obj, obj.nServices = static_cast&lt;ServiceFlags&gt;(services_tmp));</span></span>
+<span id="L448"><span class="lineNum">     448</span>                 :             :         } else {</span>
+<span id="L449"><span class="lineNum">     449</span>                 :<span class="tlaUNC">           0 :             READWRITE(Using&lt;CustomUintFormatter&lt;8&gt;&gt;(obj.nServices));</span></span>
+<span id="L450"><span class="lineNum">     450</span>                 :             :         }</span>
+<span id="L451"><span class="lineNum">     451</span>                 :             :         // Invoke V1/V2 serializer for CService parent object.</span>
+<span id="L452"><span class="lineNum">     452</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         const auto ser_params{use_v2 ? CNetAddr::V2 : CNetAddr::V1};</span></span>
+<span id="L453"><span class="lineNum">     453</span>                 :<span class="tlaUNC">           0 :         READWRITE(ser_params(AsBase&lt;CService&gt;(obj)));</span></span>
+<span id="L454"><span class="lineNum">     454</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L455"><span class="lineNum">     455</span>                 :             : </span>
+<span id="L456"><span class="lineNum">     456</span>                 :             :     //! Always included in serialization. The behavior is unspecified if the value is not representable as uint32_t.</span>
+<span id="L457"><span class="lineNum">     457</span>                 :             :     NodeSeconds nTime{TIME_INIT};</span>
+<span id="L458"><span class="lineNum">     458</span>                 :             :     //! Serialized as uint64_t in V1, and as CompactSize in V2.</span>
+<span id="L459"><span class="lineNum">     459</span>                 :             :     ServiceFlags nServices{NODE_NONE};</span>
+<span id="L460"><span class="lineNum">     460</span>                 :             : </span>
+<span id="L461"><span class="lineNum">     461</span>                 :<span class="tlaUNC">           0 :     friend bool operator==(const CAddress&amp; a, const CAddress&amp; b)</span></span>
+<span id="L462"><span class="lineNum">     462</span>                 :             :     {</span>
+<span id="L463"><span class="lineNum">     463</span>                 :<span class="tlaUNC">           0 :         return a.nTime == b.nTime &amp;&amp;</span></span>
+<span id="L464"><span class="lineNum">     464</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :                a.nServices == b.nServices &amp;&amp;</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L465"><span class="lineNum">     465</span>                 :<span class="tlaUNC">           0 :                static_cast&lt;const CService&amp;&gt;(a) == static_cast&lt;const CService&amp;&gt;(b);</span></span>
+<span id="L466"><span class="lineNum">     466</span>                 :             :     }</span>
+<span id="L467"><span class="lineNum">     467</span>                 :             : };</span>
+<span id="L468"><span class="lineNum">     468</span>                 :             : </span>
+<span id="L469"><span class="lineNum">     469</span>                 :             : /** getdata message type flags */</span>
+<span id="L470"><span class="lineNum">     470</span>                 :             : const uint32_t MSG_WITNESS_FLAG = 1 &lt;&lt; 30;</span>
+<span id="L471"><span class="lineNum">     471</span>                 :             : const uint32_t MSG_TYPE_MASK = 0xffffffff &gt;&gt; 2;</span>
+<span id="L472"><span class="lineNum">     472</span>                 :             : </span>
+<span id="L473"><span class="lineNum">     473</span>                 :             : /** getdata / inv message types.</span>
+<span id="L474"><span class="lineNum">     474</span>                 :             :  * These numbers are defined by the protocol. When adding a new value, be sure</span>
+<span id="L475"><span class="lineNum">     475</span>                 :             :  * to mention it in the respective BIP.</span>
+<span id="L476"><span class="lineNum">     476</span>                 :             :  */</span>
+<span id="L477"><span class="lineNum">     477</span>                 :             : enum GetDataMsg : uint32_t {</span>
+<span id="L478"><span class="lineNum">     478</span>                 :             :     UNDEFINED = 0,</span>
+<span id="L479"><span class="lineNum">     479</span>                 :             :     MSG_TX = 1,</span>
+<span id="L480"><span class="lineNum">     480</span>                 :             :     MSG_BLOCK = 2,</span>
+<span id="L481"><span class="lineNum">     481</span>                 :             :     MSG_WTX = 5,                                      //!&lt; Defined in BIP 339</span>
+<span id="L482"><span class="lineNum">     482</span>                 :             :     // The following can only occur in getdata. Invs always use TX/WTX or BLOCK.</span>
+<span id="L483"><span class="lineNum">     483</span>                 :             :     MSG_FILTERED_BLOCK = 3,                           //!&lt; Defined in BIP37</span>
+<span id="L484"><span class="lineNum">     484</span>                 :             :     MSG_CMPCT_BLOCK = 4,                              //!&lt; Defined in BIP152</span>
+<span id="L485"><span class="lineNum">     485</span>                 :             :     MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!&lt; Defined in BIP144</span>
+<span id="L486"><span class="lineNum">     486</span>                 :             :     MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!&lt; Defined in BIP144</span>
+<span id="L487"><span class="lineNum">     487</span>                 :             :     // MSG_FILTERED_WITNESS_BLOCK is defined in BIP144 as reserved for future</span>
+<span id="L488"><span class="lineNum">     488</span>                 :             :     // use and remains unused.</span>
+<span id="L489"><span class="lineNum">     489</span>                 :             :     // MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,</span>
+<span id="L490"><span class="lineNum">     490</span>                 :             : };</span>
+<span id="L491"><span class="lineNum">     491</span>                 :             : </span>
+<span id="L492"><span class="lineNum">     492</span>                 :             : /** inv message data */</span>
+<span id="L493"><span class="lineNum">     493</span>                 :             : class CInv</span>
+<span id="L494"><span class="lineNum">     494</span>                 :             : {</span>
+<span id="L495"><span class="lineNum">     495</span>                 :             : public:</span>
+<span id="L496"><span class="lineNum">     496</span>                 :             :     CInv();</span>
+<span id="L497"><span class="lineNum">     497</span>                 :             :     CInv(uint32_t typeIn, const uint256&amp; hashIn);</span>
+<span id="L498"><span class="lineNum">     498</span>                 :             : </span>
+<span id="L499"><span class="lineNum">     499</span>                 :<span class="tlaUNC">           0 :     SERIALIZE_METHODS(CInv, obj) { READWRITE(obj.type, obj.hash); }</span></span>
+<span id="L500"><span class="lineNum">     500</span>                 :             : </span>
+<span id="L501"><span class="lineNum">     501</span>                 :             :     friend bool operator&lt;(const CInv&amp; a, const CInv&amp; b);</span>
+<span id="L502"><span class="lineNum">     502</span>                 :             : </span>
+<span id="L503"><span class="lineNum">     503</span>                 :             :     std::string GetCommand() const;</span>
+<span id="L504"><span class="lineNum">     504</span>                 :             :     std::string ToString() const;</span>
+<span id="L505"><span class="lineNum">     505</span>                 :             : </span>
+<span id="L506"><span class="lineNum">     506</span>                 :             :     // Single-message helper methods</span>
+<span id="L507"><span class="lineNum">     507</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool IsMsgTx() const { return type == MSG_TX; }</span></span>
+<span id="L508"><span class="lineNum">     508</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool IsMsgBlk() const { return type == MSG_BLOCK; }</span></span>
+<span id="L509"><span class="lineNum">     509</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool IsMsgWtx() const { return type == MSG_WTX; }</span></span>
+<span id="L510"><span class="lineNum">     510</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool IsMsgFilteredBlk() const { return type == MSG_FILTERED_BLOCK; }</span></span>
+<span id="L511"><span class="lineNum">     511</span>                 :             :     bool IsMsgCmpctBlk() const { return type == MSG_CMPCT_BLOCK; }</span>
+<span id="L512"><span class="lineNum">     512</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool IsMsgWitnessBlk() const { return type == MSG_WITNESS_BLOCK; }</span></span>
+<span id="L513"><span class="lineNum">     513</span>                 :             : </span>
+<span id="L514"><span class="lineNum">     514</span>                 :             :     // Combined-message helper methods</span>
+<span id="L515"><span class="lineNum">     515</span>                 :<span class="tlaUNC">           0 :     bool IsGenTxMsg() const</span></span>
+<span id="L516"><span class="lineNum">     516</span>                 :             :     {</span>
+<span id="L517"><span class="lineNum">     517</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return type == MSG_TX || type == MSG_WTX || type == MSG_WITNESS_TX;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span>]
+<span id="L518"><span class="lineNum">     518</span>                 :             :     }</span>
+<span id="L519"><span class="lineNum">     519</span>                 :<span class="tlaUNC">           0 :     bool IsGenBlkMsg() const</span></span>
+<span id="L520"><span class="lineNum">     520</span>                 :             :     {</span>
+<span id="L521"><span class="lineNum">     521</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return type == MSG_BLOCK || type == MSG_FILTERED_BLOCK || type == MSG_CMPCT_BLOCK || type == MSG_WITNESS_BLOCK;</span></span>
+<span id="L522"><span class="lineNum">     522</span>                 :             :     }</span>
+<span id="L523"><span class="lineNum">     523</span>                 :             : </span>
+<span id="L524"><span class="lineNum">     524</span>                 :             :     uint32_t type;</span>
+<span id="L525"><span class="lineNum">     525</span>                 :             :     uint256 hash;</span>
+<span id="L526"><span class="lineNum">     526</span>                 :             : };</span>
+<span id="L527"><span class="lineNum">     527</span>                 :             : </span>
+<span id="L528"><span class="lineNum">     528</span>                 :             : /** Convert a TX/WITNESS_TX/WTX CInv to a GenTxid. */</span>
+<span id="L529"><span class="lineNum">     529</span>                 :             : GenTxid ToGenTxid(const CInv&amp; inv);</span>
+<span id="L530"><span class="lineNum">     530</span>                 :             : </span>
+<span id="L531"><span class="lineNum">     531</span>                 :             : #endif // BITCOIN_PROTOCOL_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
