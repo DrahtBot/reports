@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/asmap_direct.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - asmap_direct.cpp<span style="font-size: 80%;"> (source / <a href="asmap_direct.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntry">23</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-12-02 14:04:51</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">80.0&nbsp;%</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntry">32</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020-2021 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;netaddress.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;util/asmap.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;assert.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>         [<span class="tlaGBC" title="Branch 0 was taken 206 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC tlaBgGNC">         625 : FUZZ_TARGET(asmap_direct)</span></span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : {</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             :     // Encoding: [asmap using 1 bit / byte] 0xFF [addr using 1 bit / byte]</span>
+<span id="L18"><span class="lineNum">      18</span>                 :<span class="tlaGNC">         213 :     std::optional&lt;size_t&gt; sep_pos_opt;</span></span>
+<span id="L19"><span class="lineNum">      19</span>         [<span class="tlaGBC" title="Branch 0 was taken 83484 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 209 times"> + </span>]:<span class="tlaGNC">       83693 :     for (size_t pos = 0; pos &lt; buffer.size(); ++pos) {</span></span>
+<span id="L20"><span class="lineNum">      20</span>         [<span class="tlaGBC" title="Branch 0 was taken 83271 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 213 times"> + </span>]:<span class="tlaGNC">       83484 :         uint8_t x = buffer[pos];</span></span>
+<span id="L21"><span class="lineNum">      21</span>         [<span class="tlaGBC" title="Branch 0 was taken 83271 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 213 times"> + </span>]:<span class="tlaGNC">       83484 :         if ((x &amp; 0xFE) == 0) continue;</span></span>
+<span id="L22"><span class="lineNum">      22</span>         [<span class="tlaGBC" title="Branch 0 was taken 211 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">         213 :         if (x == 0xFF) {</span></span>
+<span id="L23"><span class="lineNum">      23</span>         [<span class="tlaGBC" title="Branch 0 was taken 209 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">         211 :             if (sep_pos_opt) return;</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">         209 :             sep_pos_opt = pos;</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :         } else {</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :             return;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :         }</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     }</span>
+<span id="L29"><span class="lineNum">      29</span>         [<span class="tlaGBC" title="Branch 0 was taken 207 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">         209 :     if (!sep_pos_opt) return; // Needs exactly 1 separator</span></span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="Branch 0 was taken 205 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">         207 :     const size_t sep_pos{sep_pos_opt.value()};</span></span>
+<span id="L31"><span class="lineNum">      31</span>         [<span class="tlaGBC" title="Branch 0 was taken 205 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">         207 :     if (buffer.size() - sep_pos - 1 &gt; 128) return; // At most 128 bits in IP address</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     // Checks on asmap</span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">         205 :     std::vector&lt;bool&gt; asmap(buffer.begin(), buffer.begin() + sep_pos);</span></span>
+<span id="L35"><span class="lineNum">      35</span>   [<span class="tlaGBC" title="Branch 0 was taken 205 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 135 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 70 times"> + </span>]:<span class="tlaGNC">         205 :     if (SanityCheckASMap(asmap, buffer.size() - 1 - sep_pos)) {</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :         // Verify that for valid asmaps, no prefix (except up to 7 zero padding bits) is valid.</span>
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaGBC" title="Branch 0 was taken 135 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         135 :         std::vector&lt;bool&gt; asmap_prefix = asmap;</span></span>
+<span id="L38"><span class="lineNum">      38</span>   [<span class="tlaGBC" title="Branch 0 was taken 594 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 565 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 29 times"> + </span> :<span class="tlaGNC">         594 :         while (!asmap_prefix.empty() &amp;&amp; asmap_prefix.size() + 7 &gt; asmap.size() &amp;&amp; asmap_prefix.back() == false) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 459 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 106 times"> + </span>]
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">         459 :             asmap_prefix.pop_back();</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :         }</span>
+<span id="L41"><span class="lineNum">      41</span>         [<span class="tlaGBC" title="Branch 0 was taken 51892 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 135 times"> + </span>]:<span class="tlaGNC">       52027 :         while (!asmap_prefix.empty()) {</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">       51892 :             asmap_prefix.pop_back();</span></span>
+<span id="L43"><span class="lineNum">      43</span>   [<span class="tlaGBC" title="Branch 0 was taken 51892 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 51892 times"> + </span>]:<span class="tlaGNC">       51892 :             assert(!SanityCheckASMap(asmap_prefix, buffer.size() - 1 - sep_pos));</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :         }</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :         // No address input should trigger assertions in interpreter</span>
+<span id="L46"><span class="lineNum">      46</span>         [<span class="tlaGBC" title="Branch 0 was taken 135 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         135 :         std::vector&lt;bool&gt; addr(buffer.begin() + sep_pos + 1, buffer.end());</span></span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 135 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         135 :         (void)Interpret(asmap, addr);</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">         135 :     }</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">         205 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
