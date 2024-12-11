@@ -1,0 +1,641 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/primitives/transaction.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/primitives">src/primitives</a> - transaction.h<span style="font-size: 80%;"> (source / <a href="transaction.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">98.3&nbsp;%</td>
+            <td class="headerCovTableEntry">116</td>
+            <td class="headerCovTableEntry">114</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-12-11 17:51:26</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">97.1&nbsp;%</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntry">33</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">52.6&nbsp;%</td>
+            <td class="headerCovTableEntry">610</td>
+            <td class="headerCovTableEntry">321</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_PRIMITIVES_TRANSACTION_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_PRIMITIVES_TRANSACTION_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;attributes.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;consensus/amount.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;script/script.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;serialize.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;util/transaction_identifier.h&gt; // IWYU pragma: export</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;cstddef&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;ios&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;numeric&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;string&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;tuple&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : /** An outpoint - a combination of a transaction hash and an index n into its vout */</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : class COutPoint</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : {</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : public:</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     Txid hash;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     uint32_t n;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     static constexpr uint32_t NULL_INDEX = std::numeric_limits&lt;uint32_t&gt;::max();</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>   [<span class="tlaGBC" title="Branch 0 was taken 1355516 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 120918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC tlaBgGNC">    49508155 :     COutPoint(): n(NULL_INDEX) { }</span></span>
+<span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 63171 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 73481 times"> + </span>]
+<span id="L37"><span class="lineNum">      37</span> [<span class="tlaGBC" title="Branch 0 was taken 9380655 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 64001 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 16552091 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> :<span class="tlaGNC">    46324714 :     COutPoint(const Txid&amp; hashIn, uint32_t nIn): hash(hashIn), n(nIn) { }</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 765862 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 6 was taken 10 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 10 times"> + </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L38"><span class="lineNum">      38</span>                 :             : </span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">   351966083 :     SERIALIZE_METHODS(COutPoint, obj) { READWRITE(obj.hash, obj.n); }</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>         [<span class="tlaGBC" title="Branch 0 was taken 158034 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      316068 :     void SetNull() { hash.SetNull(); n = NULL_INDEX; }</span></span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaGBC" title="Branch 0 was taken 4199316 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 18879341 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 603276 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3596040 times"> + </span>]:<span class="tlaGNC">    23078657 :     bool IsNull() const { return (hash.IsNull() &amp;&amp; n == NULL_INDEX); }</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : </span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">  1081776032 :     friend bool operator&lt;(const COutPoint&amp; a, const COutPoint&amp; b)</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     {</span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">  1081776032 :         return std::tie(a.hash, a.n) &lt; std::tie(b.hash, b.n);</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     }</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">   119826974 :     friend bool operator==(const COutPoint&amp; a, const COutPoint&amp; b)</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     {</span>
+<span id="L51"><span class="lineNum">      51</span>   [<span class="tlaGBC" title="Branch 0 was taken 76408301 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 43418673 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 12283885 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 64124416 times"> + </span>]:<span class="tlaGNC">   119826974 :         return (a.hash == b.hash &amp;&amp; a.n == b.n);</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     }</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     friend bool operator!=(const COutPoint&amp; a, const COutPoint&amp; b)</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     {</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :         return !(a == b);</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     }</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : </span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     std::string ToString() const;</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : };</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : /** An input of a transaction.  It contains the location of the previous</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :  * transaction's output that it claims and a signature that matches the</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :  * output's public key.</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :  */</span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">   114735722 : class CTxIn</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : {</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : public:</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     COutPoint prevout;</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     CScript scriptSig;</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     uint32_t nSequence;</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     CScriptWitness scriptWitness; //!&lt; Only serialized through CTransaction</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     /**</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :      * Setting nSequence to this value for every input in a transaction</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :      * disables nLockTime/IsFinalTx().</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :      * It fails OP_CHECKLOCKTIMEVERIFY/CheckLockTime() for any input that has</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :      * it set (BIP 65).</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :      * It has SEQUENCE_LOCKTIME_DISABLE_FLAG set (BIP 68/112).</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :      */</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     static const uint32_t SEQUENCE_FINAL = 0xffffffff;</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     /**</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :      * This is the maximum sequence number that enables both nLockTime and</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :      * OP_CHECKLOCKTIMEVERIFY (BIP 65).</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :      * It has SEQUENCE_LOCKTIME_DISABLE_FLAG set (BIP 68/112).</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :      */</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     static const uint32_t MAX_SEQUENCE_NONFINAL{SEQUENCE_FINAL - 1};</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     // Below flags apply in the context of BIP 68. BIP 68 requires the tx</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     // version to be set to 2, or higher.</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :     /**</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :      * If this flag is set, CTxIn::nSequence is NOT interpreted as a</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :      * relative lock-time.</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :      * It skips SequenceLocks() for any input that has it set (BIP 68).</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :      * It fails OP_CHECKSEQUENCEVERIFY/CheckSequence() for any input that has</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :      * it set (BIP 112).</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :      */</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     static const uint32_t SEQUENCE_LOCKTIME_DISABLE_FLAG = (1U &lt;&lt; 31);</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             : </span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     /**</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :      * If CTxIn::nSequence encodes a relative lock-time and this flag</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :      * is set, the relative lock-time has units of 512 seconds,</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :      * otherwise it specifies blocks with a granularity of 1. */</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :     static const uint32_t SEQUENCE_LOCKTIME_TYPE_FLAG = (1 &lt;&lt; 22);</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : </span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     /**</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :      * If CTxIn::nSequence encodes a relative lock-time, this mask is</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :      * applied to extract that lock-time from the sequence field. */</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     static const uint32_t SEQUENCE_LOCKTIME_MASK = 0x0000ffff;</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : </span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     /**</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :      * In order to use the same number of bits to encode roughly the</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :      * same wall-clock duration, and because blocks are naturally</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :      * limited to occur every 600s on average, the minimum granularity</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :      * for time-based relative lock-time is fixed at 512 seconds.</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :      * Converting from CTxIn::nSequence to seconds is performed by</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :      * multiplying by 512 = 2^9, or equivalently shifting up by</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :      * 9 bits. */</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :     static const int SEQUENCE_LOCKTIME_GRANULARITY = 9;</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : </span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">    33234731 :     CTxIn()</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">    33234731 :     {</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">    33234731 :         nSequence = SEQUENCE_FINAL;</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">    33234731 :     }</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     CTxIn(Txid hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             : </span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">   329662202 :     SERIALIZE_METHODS(CTxIn, obj) { READWRITE(obj.prevout, obj.scriptSig, obj.nSequence); }</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : </span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">     7489208 :     friend bool operator==(const CTxIn&amp; a, const CTxIn&amp; b)</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     {</span>
+<span id="L133"><span class="lineNum">     133</span>         [<span class="tlaGBC" title="Branch 0 was taken 354037 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      354037 :         return (a.prevout   == b.prevout &amp;&amp;</span></span>
+<span id="L134"><span class="lineNum">     134</span>         [<span class="tlaGBC" title="Branch 0 was taken 354037 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7135171 times"> + </span>]:<span class="tlaGNC">     7489208 :                 a.scriptSig == b.scriptSig &amp;&amp;</span></span>
+<span id="L135"><span class="lineNum">     135</span>         [<span class="tlaGBC" title="Branch 0 was taken 713 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 353324 times"> + </span>]:<span class="tlaGNC">      354037 :                 a.nSequence == b.nSequence);</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :     }</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     friend bool operator!=(const CTxIn&amp; a, const CTxIn&amp; b)</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     {</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :         return !(a == b);</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     }</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : </span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     std::string ToString() const;</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : };</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : </span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : /** An output of a transaction.  It contains the public key that the next input</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :  * must be able to sign with to claim it.</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :  */</span>
+<span id="L149"><span class="lineNum">     149</span>   [<span class="tlaGBC" title="Branch 0 was taken 1351869 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 76077 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">   457082727 : class CTxOut</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 2372618 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1894072 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 4331566 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 358618 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 23367029 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 96621 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 61600 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 113294 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 7975543 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 215800 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 267494 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 9 was not taken"> - </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L150"><span class="lineNum">     150</span>                 :             : {</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : public:</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :     CAmount nValue;</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :     CScript scriptPubKey;</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : </span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">    57096308 :     CTxOut()</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">    57096308 :     {</span></span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaGBC" title="Branch 0 was taken 235428 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3581 times"> + </span>]:<span class="tlaGNC">    16978079 :         SetNull();</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 223785 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 28921 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 144778 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 39308 times"> + </span>]
+<span id="L158"><span class="lineNum">     158</span>                 :             :     }</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     CTxOut(const CAmount&amp; nValueIn, CScript scriptPubKeyIn);</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             : </span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaGNC">   355864231 :     SERIALIZE_METHODS(CTxOut, obj) { READWRITE(obj.nValue, obj.scriptPubKey); }</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : </span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">    57528764 :     void SetNull()</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :     {</span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">    57528764 :         nValue = -1;</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">    57528764 :         scriptPubKey.clear();</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     }</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             : </span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">    63890426 :     bool IsNull() const</span></span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     {</span>
+<span id="L172"><span class="lineNum">     172</span>   [<span class="tlaGBC" title="Branch 0 was taken 5813 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 270322 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 305790 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 84151 times"> + </span>]:<span class="tlaGNC">    63670699 :         return (nValue == -1);</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 355295 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 318411 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 149810 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 4437 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 134832 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 23691 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 424 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 90293 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 19653 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 2591 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 9 was taken 30474 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 2015 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 30927 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 16963 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 18575 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 4819 times"> + </span><span class="tlaGBC" title="Branch 15 was taken 2242082 times"> + </span><span class="tlaGBC" title="Branch 16 was taken 1250 times"> + </span><span class="tlaGBC" title="Branch 17 was taken 9877504 times"> + </span><span class="tlaUNC" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 19 was taken 3707104 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 43577 times"> + </span><span class="tlaGBC" title="Branch 21 was taken 3013104 times"> + </span><span class="tlaGBC" title="Branch 22 was taken 21908022 times"> + </span><span class="tlaGBC" title="Branch 23 was taken 9143 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 24 was taken 3776 times"> + </span><span class="tlaGBC" title="Branch 25 was taken 5777397 times"> + </span><span class="tlaGBC" title="Branch 26 was taken 17832 times"> + </span><span class="tlaGBC" title="Branch 27 was taken 153297 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 1734 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 905 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 23847 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 28650 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 946 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 3468 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 2238 times"> + </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span><span class="tlaUNC" title="Branch 23 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span><span class="tlaUNC" title="Branch 26 was not executed"> # </span><span class="tlaUNC" title="Branch 27 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 461 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 95 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 17672 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 11249 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 23211 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 15031 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 13177 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 10555 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 91 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 9 was taken 13086 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 2985 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 5023 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 28677 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 13 was taken 18968 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4156606 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 776 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 3 was taken 4159221 times"> + </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 3995830 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 281727 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 205645 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 145448 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span>]
+<span id="L173"><span class="lineNum">     173</span>                 :             :     }</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             : </span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaGNC">      326613 :     friend bool operator==(const CTxOut&amp; a, const CTxOut&amp; b)</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     {</span>
+<span id="L177"><span class="lineNum">     177</span>   [<span class="tlaGBC" title="Branch 0 was taken 326176 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 437 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 129 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 326047 times"> + </span>]:<span class="tlaGNC">      652789 :         return (a.nValue       == b.nValue &amp;&amp;</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaGNC">      326176 :                 a.scriptPubKey == b.scriptPubKey);</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     }</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             : </span>
+<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     friend bool operator!=(const CTxOut&amp; a, const CTxOut&amp; b)</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :     {</span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaUNC">           0 :         return !(a == b);</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :     }</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             : </span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     std::string ToString() const;</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : };</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             : </span>
+<span id="L189"><span class="lineNum">     189</span>                 :             : struct CMutableTransaction;</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : struct TransactionSerParams {</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     const bool allow_witness;</span>
+<span id="L193"><span class="lineNum">     193</span>   [<span class="tlaGBC" title="Branch 0 was taken 9823 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 302 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 73964 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 205 times"> + </span> :<span class="tlaGNC tlaBgGNC">    22608230 :     SER_PARAMS_OPFUNC</span></span>
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 4 was taken 10574 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 167 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 543856 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 41755 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 910 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 599 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 78396 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 298 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 153 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 107 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 147 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 95 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 5190 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 3119 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 8597 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 744265 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1006 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 741 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 6421 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 2987 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 10845 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 521 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 3353 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaUNC" title="Branch 12 was not taken"> - </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 14 was taken 869 times"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 179 times"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span>]
+<span id="L194"><span class="lineNum">     194</span>                 :             : };</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             : static constexpr TransactionSerParams TX_WITH_WITNESS{.allow_witness = true};</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             : static constexpr TransactionSerParams TX_NO_WITNESS{.allow_witness = false};</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             : </span>
+<span id="L198"><span class="lineNum">     198</span>                 :             : /**</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :  * Basic transaction serialization format:</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :  * - uint32_t version</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :  * - std::vector&lt;CTxIn&gt; vin</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :  * - std::vector&lt;CTxOut&gt; vout</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :  * - uint32_t nLockTime</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :  *</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :  * Extended transaction serialization format:</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :  * - uint32_t version</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :  * - unsigned char dummy = 0x00</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :  * - unsigned char flags (!= 0)</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :  * - std::vector&lt;CTxIn&gt; vin</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :  * - std::vector&lt;CTxOut&gt; vout</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :  * - if (flags &amp; 1):</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :  *   - CScriptWitness scriptWitness; (deserialized into CTxIn)</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :  * - uint32_t nLockTime</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :  */</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             : template&lt;typename Stream, typename TxType&gt;</span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">     5252865 : void UnserializeTransaction(TxType&amp; tx, Stream&amp; s, const TransactionSerParams&amp; params)</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : {</span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">     5252865 :     const bool fAllowWitness = params.allow_witness;</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : </span>
+<span id="L220"><span class="lineNum">     220</span>                 :<span class="tlaGNC">     5252865 :     s &gt;&gt; tx.version;</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaGNC">     5250095 :     unsigned char flags = 0;</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaGNC">     5250095 :     tx.vin.clear();</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaGNC">     5250095 :     tx.vout.clear();</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */</span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaGNC">     5250095 :     s &gt;&gt; tx.vin;</span></span>
+<span id="L226"><span class="lineNum">     226</span>   [<span class="tlaGBC" title="Branch 0 was taken 4071679 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1151399 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 4033556 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 38123 times"> + </span>]:<span class="tlaGNC">     5223078 :     if (tx.vin.size() == 0 &amp;&amp; fAllowWitness) {</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :         /* We read a dummy or an empty vin. */</span>
+<span id="L228"><span class="lineNum">     228</span>                 :<span class="tlaGNC">     4033488 :         s &gt;&gt; flags;</span></span>
+<span id="L229"><span class="lineNum">     229</span>         [<span class="tlaGBC" title="Branch 0 was taken 100158 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3933330 times"> + </span>]:<span class="tlaGNC">     4033488 :         if (flags != 0) {</span></span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaGNC">      100158 :             s &gt;&gt; tx.vin;</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaGNC">       97157 :             s &gt;&gt; tx.vout;</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :         }</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :     } else {</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :         /* We read a non-empty vin. Assume a normal vout follows. */</span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaGNC">     1189522 :         s &gt;&gt; tx.vout;</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :     }</span>
+<span id="L237"><span class="lineNum">     237</span>         [<span class="tlaGBC" title="Branch 0 was taken 93148 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1022 times"> + </span>]:<span class="tlaGNC">       94170 :     if ((flags &amp; 1) &amp;&amp; fAllowWitness) {</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :         /* The witness flag is present, and we support witnesses. */</span>
+<span id="L239"><span class="lineNum">     239</span>                 :<span class="tlaGNC">       93148 :         flags ^= 1;</span></span>
+<span id="L240"><span class="lineNum">     240</span>         [<span class="tlaGBC" title="Branch 0 was taken 1276596 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 90209 times"> + </span>]:<span class="tlaGNC">     1366805 :         for (size_t i = 0; i &lt; tx.vin.size(); i++) {</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaGNC">     1276596 :             s &gt;&gt; tx.vin[i].scriptWitness.stack;</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :         }</span>
+<span id="L243"><span class="lineNum">     243</span>         [<span class="tlaGBC" title="Branch 0 was taken 2258 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 87951 times"> + </span>]:<span class="tlaGNC">       90209 :         if (!tx.HasWitness()) {</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :             /* It's illegal to encode witnesses when all witness stacks are empty. */</span>
+<span id="L245"><span class="lineNum">     245</span>         [<span class="tlaGBC" title="Branch 0 was taken 2258 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2258 :             throw std::ios_base::failure(&quot;Superfluous witness record&quot;);</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :         }</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :     }</span>
+<span id="L248"><span class="lineNum">     248</span>         [<span class="tlaGBC" title="Branch 0 was taken 1455 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5207519 times"> + </span>]:<span class="tlaGNC">     5208974 :     if (flags) {</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :         /* Unknown flag in the serialization */</span>
+<span id="L250"><span class="lineNum">     250</span>         [<span class="tlaGBC" title="Branch 0 was taken 1455 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1455 :         throw std::ios_base::failure(&quot;Unknown transaction optional data&quot;);</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :     }</span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaGNC">     5207519 :     s &gt;&gt; tx.nLockTime;</span></span>
+<span id="L253"><span class="lineNum">     253</span>                 :<span class="tlaGNC">     5207387 : }</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :             : </span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : template&lt;typename Stream, typename TxType&gt;</span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">    31655420 : void SerializeTransaction(const TxType&amp; tx, Stream&amp; s, const TransactionSerParams&amp; params)</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :             : {</span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">    31655420 :     const bool fAllowWitness = params.allow_witness;</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :             : </span>
+<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaGNC">    31655420 :     s &lt;&lt; tx.version;</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">    31655420 :     unsigned char flags = 0;</span></span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :     // Consistency check</span>
+<span id="L263"><span class="lineNum">     263</span>         [<span class="tlaGBC" title="Branch 0 was taken 9618964 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 22036456 times"> + </span>]:<span class="tlaGNC">    31655420 :     if (fAllowWitness) {</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :         /* Check whether witnesses need to be serialized. */</span>
+<span id="L265"><span class="lineNum">     265</span>         [<span class="tlaGBC" title="Branch 0 was taken 407 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1564 times"> + </span>]:<span class="tlaGNC">     9618964 :         if (tx.HasWitness()) {</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :             flags |= 1;</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :         }</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     }</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :     if (flags) {</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :         /* Use extended format in case witnesses are to be serialized. */</span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaGBC" title="Branch 0 was taken 2226122 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     5171434 :         std::vector&lt;CTxIn&gt; vinDummy;</span></span>
+<span id="L272"><span class="lineNum">     272</span>         [<span class="tlaGBC" title="Branch 0 was taken 2226122 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     5171434 :         s &lt;&lt; vinDummy;</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC">     5171434 :         s &lt;&lt; flags;</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaGNC">     5171434 :     }</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">    31655420 :     s &lt;&lt; tx.vin;</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">    31655420 :     s &lt;&lt; tx.vout;</span></span>
+<span id="L277"><span class="lineNum">     277</span>         [<span class="tlaGBC" title="Branch 0 was taken 5171434 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 26483986 times"> + </span>]:<span class="tlaGNC">    31655420 :     if (flags &amp; 1) {</span></span>
+<span id="L278"><span class="lineNum">     278</span>         [<span class="tlaGBC" title="Branch 0 was taken 52653022 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5171434 times"> + </span>]:<span class="tlaGNC">    57824456 :         for (size_t i = 0; i &lt; tx.vin.size(); i++) {</span></span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">    52653022 :             s &lt;&lt; tx.vin[i].scriptWitness.stack;</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :         }</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :     }</span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaGNC">    31655420 :     s &lt;&lt; tx.nLockTime;</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">    31655420 : }</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :             : </span>
+<span id="L285"><span class="lineNum">     285</span>                 :             : template&lt;typename TxType&gt;</span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaGNC">       42964 : inline CAmount CalculateOutputValue(const TxType&amp; tx)</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :             : {</span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">      228513 :     return std::accumulate(tx.vout.cbegin(), tx.vout.cend(), CAmount{0}, [](CAmount sum, const auto&amp; txout) { return sum + txout.nValue; });</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : }</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             : </span>
+<span id="L291"><span class="lineNum">     291</span>                 :             : </span>
+<span id="L292"><span class="lineNum">     292</span>                 :             : /** The basic transaction that is broadcasted on the network and contained in</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :  * blocks.  A transaction can contain multiple inputs and outputs.</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :  */</span>
+<span id="L295"><span class="lineNum">     295</span>         [<span class="tlaGBC" title="Branch 0 was taken 66133 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 26146 times"> + </span>]:<span class="tlaGNC">    10609800 : class CTransaction</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 16294 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 344538 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]
+<span id="L296"><span class="lineNum">     296</span>                 :             : {</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             : public:</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :     // Default transaction version.</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :     static const uint32_t CURRENT_VERSION{2};</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             : </span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :     // The local variables are made const to prevent unintended modification</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     // without updating the cached hash value. However, CTransaction is not</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             :     // actually immutable; deserialization and assignment are implemented,</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :     // and bypass the constness. This is safe, as they update the entire</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :     // structure, including the hash.</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :     const std::vector&lt;CTxIn&gt; vin;</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :     const std::vector&lt;CTxOut&gt; vout;</span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :     const uint32_t version;</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             :     const uint32_t nLockTime;</span>
+<span id="L310"><span class="lineNum">     310</span>                 :             : </span>
+<span id="L311"><span class="lineNum">     311</span>                 :             : private:</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :     /** Memory only. */</span>
+<span id="L313"><span class="lineNum">     313</span>                 :             :     const bool m_has_witness;</span>
+<span id="L314"><span class="lineNum">     314</span>                 :             :     const Txid hash;</span>
+<span id="L315"><span class="lineNum">     315</span>                 :             :     const Wtxid m_witness_hash;</span>
+<span id="L316"><span class="lineNum">     316</span>                 :             : </span>
+<span id="L317"><span class="lineNum">     317</span>                 :             :     Txid ComputeHash() const;</span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :     Wtxid ComputeWitnessHash() const;</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             : </span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :     bool ComputeHasWitness() const;</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             : </span>
+<span id="L322"><span class="lineNum">     322</span>                 :             : public:</span>
+<span id="L323"><span class="lineNum">     323</span>                 :             :     /** Convert a CMutableTransaction into a CTransaction. */</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :     explicit CTransaction(const CMutableTransaction&amp; tx);</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             :     explicit CTransaction(CMutableTransaction&amp;&amp; tx);</span>
+<span id="L326"><span class="lineNum">     326</span>                 :             : </span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L328"><span class="lineNum">     328</span>                 :<span class="tlaGNC">    30451609 :     inline void Serialize(Stream&amp; s) const {</span></span>
+<span id="L329"><span class="lineNum">     329</span>                 :<span class="tlaGNC">    30451609 :         SerializeTransaction(*this, s, s.template GetParams&lt;TransactionSerParams&gt;());</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     }</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             : </span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :     /** This deserializing constructor is provided instead of an Unserialize method.</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :      *  Unserialize is not possible, since it would require overwriting const fields. */</span>
+<span id="L334"><span class="lineNum">     334</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L335"><span class="lineNum">     335</span>         [<span class="tlaGBC" title="Branch 0 was taken 4091 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4174 :     CTransaction(deserialize_type, const TransactionSerParams&amp; params, Stream&amp; s) : CTransaction(CMutableTransaction(deserialize, params, s)) {}</span></span>
+<span id="L336"><span class="lineNum">     336</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L337"><span class="lineNum">     337</span>         [<span class="tlaGBC" title="Branch 0 was taken 4671466 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     4711890 :     CTransaction(deserialize_type, Stream&amp; s) : CTransaction(CMutableTransaction(deserialize, s)) {}</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :             : </span>
+<span id="L339"><span class="lineNum">     339</span>                 :<span class="tlaGNC">         896 :     bool IsNull() const {</span></span>
+<span id="L340"><span class="lineNum">     340</span>   [<span class="tlaGBC" title="Branch 0 was taken 163 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 733 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 163 times"> + </span>]:<span class="tlaGNC">         896 :         return vin.empty() &amp;&amp; vout.empty();</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :             :     }</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             : </span>
+<span id="L343"><span class="lineNum">     343</span>   [<span class="tlaGBC" title="Branch 0 was taken 1452973 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 209452 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaGNC">  1582020552 :     const Txid&amp; GetHash() const LIFETIMEBOUND { return hash; }</span></span>
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 101428 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 2 was taken 3271109 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 459593 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 256395 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 39406 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 634190 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1099099 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 90569 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 9 was taken 60197 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 15674061 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 381505 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 1358504 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 9801 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 12556 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 1352517 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2962713 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 54945 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 42607 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 837 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 70237 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 141757 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 59098 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1586289 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 39746 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 82744 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 6 was taken 39746 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 116079 times"> + </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 3163 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaUNC" title="Branch 12 was not taken"> - </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span>]
+<span id="L344"><span class="lineNum">     344</span>   [<span class="tlaGBC" title="Branch 0 was taken 8690 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaGNC">     4898095 :     const Wtxid&amp; GetWitnessHash() const LIFETIMEBOUND { return m_witness_hash; };</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7225 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 166503 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 163188 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 161690 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 5 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 54 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 8 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 28815 times"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 14 was not taken"> - </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1395 times"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 4000 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 5318 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 3359 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 1536668 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span>]
+<span id="L345"><span class="lineNum">     345</span>                 :             : </span>
+<span id="L346"><span class="lineNum">     346</span>                 :             :     // Return sum of txouts.</span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :     CAmount GetValueOut() const;</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             : </span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :     /**</span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :      * Get the total transaction size in bytes, including witness data.</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :      * &quot;Total Size&quot; defined in BIP141 and BIP144.</span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :      * @return Total transaction size in bytes</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :      */</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             :     unsigned int GetTotalSize() const;</span>
+<span id="L355"><span class="lineNum">     355</span>                 :             : </span>
+<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaGNC">    12407670 :     bool IsCoinBase() const</span></span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :     {</span>
+<span id="L358"><span class="lineNum">     358</span>   [<span class="tlaGBC" title="Branch 0 was taken 8305754 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4101916 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 4767922 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3537832 times"> + </span>]:<span class="tlaGNC">    12407670 :         return (vin.size() == 1 &amp;&amp; vin[0].prevout.IsNull());</span></span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :     }</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             : </span>
+<span id="L361"><span class="lineNum">     361</span>                 :<span class="tlaGNC">         278 :     friend bool operator==(const CTransaction&amp; a, const CTransaction&amp; b)</span></span>
+<span id="L362"><span class="lineNum">     362</span>                 :             :     {</span>
+<span id="L363"><span class="lineNum">     363</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 278 times"> + </span>]:<span class="tlaGNC">         278 :         return a.hash == b.hash;</span></span>
+<span id="L364"><span class="lineNum">     364</span>                 :             :     }</span>
+<span id="L365"><span class="lineNum">     365</span>                 :             : </span>
+<span id="L366"><span class="lineNum">     366</span>                 :<span class="tlaGNC">         278 :     friend bool operator!=(const CTransaction&amp; a, const CTransaction&amp; b)</span></span>
+<span id="L367"><span class="lineNum">     367</span>                 :             :     {</span>
+<span id="L368"><span class="lineNum">     368</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 278 times"> + </span>]:<span class="tlaGNC">         278 :         return a.hash != b.hash;</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :             :     }</span>
+<span id="L370"><span class="lineNum">     370</span>                 :             : </span>
+<span id="L371"><span class="lineNum">     371</span>                 :             :     std::string ToString() const;</span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : </span>
+<span id="L373"><span class="lineNum">     373</span>         [<span class="tlaGBC" title="Branch 0 was taken 2945312 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4115539 times"> + </span>]:<span class="tlaGNC">    19334769 :     bool HasWitness() const { return m_has_witness; }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 130261 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 320584 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 129763 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 9843 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 157634 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 144952 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 6042 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 12308 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 10077 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 475522 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 9 was taken 14802 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 35286 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6272 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 2095274 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 3 was taken 16 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 6629777 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 2095502 times"> + </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span>]
+<span id="L374"><span class="lineNum">     374</span>                 :             : };</span>
+<span id="L375"><span class="lineNum">     375</span>                 :             : </span>
+<span id="L376"><span class="lineNum">     376</span>                 :             : /** A mutable version of CTransaction. */</span>
+<span id="L377"><span class="lineNum">     377</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">    10057864 : struct CMutableTransaction</span></span>
+<span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 209464 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 504 times"> + </span>]
+<span id="L378"><span class="lineNum">     378</span>                 :             : {</span>
+<span id="L379"><span class="lineNum">     379</span>                 :             :     std::vector&lt;CTxIn&gt; vin;</span>
+<span id="L380"><span class="lineNum">     380</span>                 :             :     std::vector&lt;CTxOut&gt; vout;</span>
+<span id="L381"><span class="lineNum">     381</span>                 :             :     uint32_t version;</span>
+<span id="L382"><span class="lineNum">     382</span>                 :             :     uint32_t nLockTime;</span>
+<span id="L383"><span class="lineNum">     383</span>                 :             : </span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :     explicit CMutableTransaction();</span>
+<span id="L385"><span class="lineNum">     385</span>                 :             :     explicit CMutableTransaction(const CTransaction&amp; tx);</span>
+<span id="L386"><span class="lineNum">     386</span>                 :             : </span>
+<span id="L387"><span class="lineNum">     387</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L388"><span class="lineNum">     388</span>                 :<span class="tlaGNC">     1203811 :     inline void Serialize(Stream&amp; s) const {</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaGNC">     1203811 :         SerializeTransaction(*this, s, s.template GetParams&lt;TransactionSerParams&gt;());</span></span>
+<span id="L390"><span class="lineNum">     390</span>                 :             :     }</span>
+<span id="L391"><span class="lineNum">     391</span>                 :             : </span>
+<span id="L392"><span class="lineNum">     392</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L393"><span class="lineNum">     393</span>         [<span class="tlaGBC" title="Branch 0 was taken 4671466 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 40424 times"> + </span>]:<span class="tlaGNC">     5248691 :     inline void Unserialize(Stream&amp; s) {</span></span>
+<span id="L394"><span class="lineNum">     394</span>         [<span class="tlaGBC" title="Branch 0 was taken 4671466 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 40424 times"> + </span>]:<span class="tlaGNC">     5248691 :         UnserializeTransaction(*this, s, s.template GetParams&lt;TransactionSerParams&gt;());</span></span>
+<span id="L395"><span class="lineNum">     395</span>                 :<span class="tlaGNC">     4671466 :     }</span></span>
+<span id="L396"><span class="lineNum">     396</span>                 :             : </span>
+<span id="L397"><span class="lineNum">     397</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L398"><span class="lineNum">     398</span>         [<span class="tlaGBC" title="Branch 0 was taken 4091 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 83 times"> + </span>]:<span class="tlaGNC">        4174 :     CMutableTransaction(deserialize_type, const TransactionSerParams&amp; params, Stream&amp; s) {</span></span>
+<span id="L399"><span class="lineNum">     399</span>         [<span class="tlaGBC" title="Branch 0 was taken 4091 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 83 times"> + </span>]:<span class="tlaGNC">        4174 :         UnserializeTransaction(*this, s, params);</span></span>
+<span id="L400"><span class="lineNum">     400</span>                 :<span class="tlaGNC">        4257 :     }</span></span>
+<span id="L401"><span class="lineNum">     401</span>                 :             : </span>
+<span id="L402"><span class="lineNum">     402</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L403"><span class="lineNum">     403</span>         [<span class="tlaGBC" title="Branch 0 was taken 4671466 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 40424 times"> + </span>]:<span class="tlaGNC">     4711890 :     CMutableTransaction(deserialize_type, Stream&amp; s) {</span></span>
+<span id="L404"><span class="lineNum">     404</span>                 :<span class="tlaGNC">     4671466 :         Unserialize(s);</span></span>
+<span id="L405"><span class="lineNum">     405</span>                 :<span class="tlaGNC">     4752314 :     }</span></span>
+<span id="L406"><span class="lineNum">     406</span>                 :             : </span>
+<span id="L407"><span class="lineNum">     407</span>                 :             :     /** Compute the hash of this CMutableTransaction. This is computed on the</span>
+<span id="L408"><span class="lineNum">     408</span>                 :             :      * fly, as opposed to GetHash() in CTransaction, which uses a cached result.</span>
+<span id="L409"><span class="lineNum">     409</span>                 :             :      */</span>
+<span id="L410"><span class="lineNum">     410</span>                 :             :     Txid GetHash() const;</span>
+<span id="L411"><span class="lineNum">     411</span>                 :             : </span>
+<span id="L412"><span class="lineNum">     412</span>                 :<span class="tlaGNC">       92502 :     bool HasWitness() const</span></span>
+<span id="L413"><span class="lineNum">     413</span>                 :             :     {</span>
+<span id="L414"><span class="lineNum">     414</span>         [<span class="tlaGBC" title="Branch 0 was taken 393422 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4144 times"> + </span>]:<span class="tlaGNC">      397566 :         for (size_t i = 0; i &lt; vin.size(); i++) {</span></span>
+<span id="L415"><span class="lineNum">     415</span>         [<span class="tlaGBC" title="Branch 0 was taken 305064 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 88358 times"> + </span>]:<span class="tlaGNC">      393422 :             if (!vin[i].scriptWitness.IsNull()) {</span></span>
+<span id="L416"><span class="lineNum">     416</span>                 :             :                 return true;</span>
+<span id="L417"><span class="lineNum">     417</span>                 :             :             }</span>
+<span id="L418"><span class="lineNum">     418</span>                 :             :         }</span>
+<span id="L419"><span class="lineNum">     419</span>                 :             :         return false;</span>
+<span id="L420"><span class="lineNum">     420</span>                 :             :     }</span>
+<span id="L421"><span class="lineNum">     421</span>                 :             : };</span>
+<span id="L422"><span class="lineNum">     422</span>                 :             : </span>
+<span id="L423"><span class="lineNum">     423</span>                 :             : typedef std::shared_ptr&lt;const CTransaction&gt; CTransactionRef;</span>
+<span id="L424"><span class="lineNum">     424</span>   [<span class="tlaGBC" title="Branch 0 was taken 788118 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 641947 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2299 times"> + </span>]:<span class="tlaGNC">     3757207 : template &lt;typename Tx&gt; static inline CTransactionRef MakeTransactionRef(Tx&amp;&amp; txIn) { return std::make_shared&lt;const CTransaction&gt;(std::forward&lt;Tx&gt;(txIn)); }</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 80185 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 1569 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 24351 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 24351 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 17693 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 149659 times"> + </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 795839 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 715156 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 80683 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 213547 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 6 was taken 149480 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 64067 times"> + </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 157634 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 2 was taken 144952 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 144952 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 579 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 579 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1771 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1771 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 126 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 126 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span>]
+<span id="L425"><span class="lineNum">     425</span>                 :             : </span>
+<span id="L426"><span class="lineNum">     426</span>                 :             : /** A generic txid reference (txid or wtxid). */</span>
+<span id="L427"><span class="lineNum">     427</span>                 :             : class GenTxid</span>
+<span id="L428"><span class="lineNum">     428</span>                 :             : {</span>
+<span id="L429"><span class="lineNum">     429</span>                 :             :     bool m_is_wtxid;</span>
+<span id="L430"><span class="lineNum">     430</span>                 :             :     uint256 m_hash;</span>
+<span id="L431"><span class="lineNum">     431</span>                 :<span class="tlaGNC">     9372257 :     GenTxid(bool is_wtxid, const uint256&amp; hash) : m_is_wtxid(is_wtxid), m_hash(hash) {}</span></span>
+<span id="L432"><span class="lineNum">     432</span>                 :             : </span>
+<span id="L433"><span class="lineNum">     433</span>                 :             : public:</span>
+<span id="L434"><span class="lineNum">     434</span>         [<span class="tlaGBC" title="Branch 0 was taken 3320568 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     7036849 :     static GenTxid Txid(const uint256&amp; hash) { return GenTxid{false, hash}; }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 581062 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 28387 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 162865 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 25351 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 36468 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 765536 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 9 was not taken"> - </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 190 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L435"><span class="lineNum">     435</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 15670 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">     2335408 :     static GenTxid Wtxid(const uint256&amp; hash) { return GenTxid{true, hash}; }</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 138083 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 166503 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 21692 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 1395 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 807349 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L436"><span class="lineNum">     436</span> [<span class="tlaGBC" title="Branch 0 was taken 1193688 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5873162 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> :<span class="tlaGNC">     9698783 :     bool IsWtxid() const { return m_is_wtxid; }</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 179923 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1865 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 60788 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 7 was taken 315116 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 7705 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 1 was taken 53449 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 7375 times"> + </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L437"><span class="lineNum">     437</span>   [<span class="tlaGBC" title="Branch 0 was taken 1193688 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 5543464 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">    11681112 :     const uint256&amp; GetHash() const LIFETIMEBOUND { return m_hash; }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 133943 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 60788 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 315116 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 9 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 132418 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1502 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 2005712 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 11 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 7705 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 53449 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 7375 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span>]
+<span id="L438"><span class="lineNum">     438</span>   [<span class="tlaGBC" title="Branch 0 was taken 80751 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 80751 times"> + </span>]:<span class="tlaGNC">       80751 :     friend bool operator==(const GenTxid&amp; a, const GenTxid&amp; b) { return a.m_is_wtxid == b.m_is_wtxid &amp;&amp; a.m_hash == b.m_hash; }</span></span>
+<span id="L439"><span class="lineNum">     439</span>                 :<span class="tlaGNC">       64086 :     friend bool operator&lt;(const GenTxid&amp; a, const GenTxid&amp; b) { return std::tie(a.m_is_wtxid, a.m_hash) &lt; std::tie(b.m_is_wtxid, b.m_hash); }</span></span>
+<span id="L440"><span class="lineNum">     440</span>                 :             : };</span>
+<span id="L441"><span class="lineNum">     441</span>                 :             : </span>
+<span id="L442"><span class="lineNum">     442</span>                 :             : #endif // BITCOIN_PRIMITIVES_TRANSACTION_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
