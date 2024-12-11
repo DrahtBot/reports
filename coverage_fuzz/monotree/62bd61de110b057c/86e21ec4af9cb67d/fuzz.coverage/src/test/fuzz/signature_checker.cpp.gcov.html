@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/signature_checker.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - signature_checker.cpp<span style="font-size: 80%;"> (source / <a href="signature_checker.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">90.9&nbsp;%</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">20</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2024-12-11 18:56:11</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">62.5&nbsp;%</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">58.3&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">7</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;pubkey.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;script/interpreter.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;test/util/script.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;string&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : namespace {</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : class FuzzedSignatureChecker : public BaseSignatureChecker</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : {</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :     FuzzedDataProvider&amp; m_fuzzed_data_provider;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : public:</span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC tlaBgGNC">        2394 :     explicit FuzzedSignatureChecker(FuzzedDataProvider&amp; fuzzed_data_provider) : m_fuzzed_data_provider(fuzzed_data_provider)</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     {</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     }</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">       13761 :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     {</span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">       13761 :         return m_fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     }</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     bool CheckSchnorrSignature(Span&lt;const unsigned char&gt; sig, Span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const override</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     {</span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaUNC">           0 :         return m_fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     }</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : </span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC tlaBgGNC">         474 :     bool CheckLockTime(const CScriptNum&amp; nLockTime) const override</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     {</span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">         474 :         return m_fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     }</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : </span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">         327 :     bool CheckSequence(const CScriptNum&amp; nSequence) const override</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     {</span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">         327 :         return m_fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     }</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 1285 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2394 :     virtual ~FuzzedSignatureChecker() = default;</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : };</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : } // namespace</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : </span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaGBC" title="Branch 0 was taken 206 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1697 : FUZZ_TARGET(signature_checker)</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : {</span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">        1285 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">        1285 :     const unsigned int flags = fuzzed_data_provider.ConsumeIntegral&lt;unsigned int&gt;();</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">        1285 :     const SigVersion sig_version = fuzzed_data_provider.PickValueInArray({SigVersion::BASE, SigVersion::WITNESS_V0});</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">        1285 :     const auto script_1{ConsumeScript(fuzzed_data_provider)};</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">        1285 :     const auto script_2{ConsumeScript(fuzzed_data_provider)};</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">        1285 :     std::vector&lt;std::vector&lt;unsigned char&gt;&gt; stack;</span></span>
+<span id="L59"><span class="lineNum">      59</span>         [<span class="tlaGBC" title="Branch 0 was taken 1285 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1285 :     (void)EvalScript(stack, script_1, flags, FuzzedSignatureChecker(fuzzed_data_provider), sig_version, nullptr);</span></span>
+<span id="L60"><span class="lineNum">      60</span>   [<span class="tlaGBC" title="Branch 0 was taken 1285 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 176 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1109 times"> + </span>]:<span class="tlaGNC">        1285 :     if (!IsValidFlagCombination(flags)) {</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">         176 :         return;</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     }</span>
+<span id="L63"><span class="lineNum">      63</span>         [<span class="tlaGBC" title="Branch 0 was taken 1109 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1109 :     (void)VerifyScript(script_1, script_2, nullptr, flags, FuzzedSignatureChecker(fuzzed_data_provider), nullptr);</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">        1285 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
