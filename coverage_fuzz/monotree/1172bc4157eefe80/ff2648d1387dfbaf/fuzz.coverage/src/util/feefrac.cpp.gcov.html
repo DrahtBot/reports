@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/util/feefrac.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/util">src/util</a> - feefrac.cpp<span style="font-size: 80%;"> (source / <a href="feefrac.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntry">31</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-02-04 13:36:50</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">22</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;util/feefrac.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;array&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : </span>
+<span id="L10"><span class="lineNum">      10</span>                 :<span class="tlaGNC">       10716 : std::partial_ordering CompareChunks(Span&lt;const FeeFrac&gt; chunks0, Span&lt;const FeeFrac&gt; chunks1)</span></span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : {</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             :     /** Array to allow indexed access to input diagrams. */</span>
+<span id="L13"><span class="lineNum">      13</span>                 :<span class="tlaGNC">       10716 :     const std::array&lt;Span&lt;const FeeFrac&gt;, 2&gt; chunk = {chunks0, chunks1};</span></span>
+<span id="L14"><span class="lineNum">      14</span>                 :             :     /** How many elements we have processed in each input. */</span>
+<span id="L15"><span class="lineNum">      15</span>                 :<span class="tlaGNC">       10716 :     size_t next_index[2] = {0, 0};</span></span>
+<span id="L16"><span class="lineNum">      16</span>                 :             :     /** Accumulated fee/sizes in diagrams, up to next_index[i] - 1. */</span>
+<span id="L17"><span class="lineNum">      17</span>                 :<span class="tlaGNC">       10716 :     FeeFrac accum[2];</span></span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :     /** Whether the corresponding input is strictly better than the other at least in one place. */</span>
+<span id="L19"><span class="lineNum">      19</span>                 :<span class="tlaGNC">       10716 :     bool better_somewhere[2] = {false, false};</span></span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :     /** Get the first unprocessed point in diagram number dia. */</span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">      638574 :     const auto next_point = [&amp;](int dia) { return chunk[dia][next_index[dia]] + accum[dia]; };</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :     /** Get the last processed point in diagram number dia. */</span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">      331083 :     const auto prev_point = [&amp;](int dia) { return accum[dia]; };</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     /** Move to the next point in diagram number dia. */</span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">       10716 :     const auto advance = [&amp;](int dia) { accum[dia] += chunk[dia][next_index[dia]++]; };</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">      326950 :     do {</span></span>
+<span id="L28"><span class="lineNum">      28</span>         [<span class="tlaGBC" title="Branch 0 was taken 320367 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6583 times"> + </span>]:<span class="tlaGNC">      326950 :         bool done_0 = next_index[0] == chunk[0].size();</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">      326950 :         bool done_1 = next_index[1] == chunk[1].size();</span></span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="Branch 0 was taken 320367 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6583 times"> + </span>]:<span class="tlaGNC">      326950 :         if (done_0 &amp;&amp; done_1) break;</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :         // Determine which diagram has the first unprocessed point. If a single side is finished, use the</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :         // other one. Only up to one can be done due to check above.</span>
+<span id="L34"><span class="lineNum">      34</span>         [<span class="tlaGBC" title="Branch 0 was taken 217870 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 102497 times"> + </span>]:<span class="tlaGNC">      320367 :         const int unproc_side = (done_0 || done_1) ? done_0 : next_point(0).size &gt; next_point(1).size;</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :         // Let `P` be the next point on diagram unproc_side, and `A` and `B` the previous and next points</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :         // on the other diagram. We want to know if P lies above or below the line AB. To determine this, we</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :         // compute the slopes of line AB and of line AP, and compare them. These slopes are fee per size,</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :         // and can thus be expressed as FeeFracs.</span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">      320367 :         const FeeFrac&amp; point_p = next_point(unproc_side);</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">      320367 :         const FeeFrac&amp; point_a = prev_point(!unproc_side);</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">      320367 :         const auto slope_ap = point_p - point_a;</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">      320367 :         Assume(slope_ap.size &gt; 0);</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">      320367 :         std::weak_ordering cmp = std::weak_ordering::equivalent;</span></span>
+<span id="L46"><span class="lineNum">      46</span>         [<span class="tlaGBC" title="Branch 0 was taken 217870 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 102497 times"> + </span>]:<span class="tlaGNC">      320367 :         if (done_0 || done_1) {</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :             // If a single side has no points left, act as if AB has slope tail_feerate(of 0).</span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">      217870 :             Assume(!(done_0 &amp;&amp; done_1));</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">      217870 :             cmp = FeeRateCompare(slope_ap, FeeFrac(0, 1));</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :         } else {</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :             // If both sides have points left, compute B, and the slope of AB explicitly.</span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">      102497 :             const FeeFrac&amp; point_b = next_point(!unproc_side);</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">      102497 :             const auto slope_ab = point_b - point_a;</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">      102497 :             Assume(slope_ab.size &gt;= slope_ap.size);</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">      102497 :             cmp = FeeRateCompare(slope_ap, slope_ab);</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : </span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :             // If B and P have the same size, B can be marked as processed (in addition to P, see</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :             // below), as we've already performed a comparison at this size.</span>
+<span id="L59"><span class="lineNum">      59</span>         [<span class="tlaGBC" title="Branch 0 was taken 25848 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 76649 times"> + </span>]:<span class="tlaGNC">      102497 :             if (point_b.size == point_p.size) advance(!unproc_side);</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :         }</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :         // If P lies above AB, unproc_side is better in P. If P lies below AB, then !unproc_side is</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :         // better in P.</span>
+<span id="L63"><span class="lineNum">      63</span>         [<span class="tlaGBC" title="Branch 0 was taken 270013 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 50354 times"> + </span>]:<span class="tlaGNC">      320367 :         if (std::is_gt(cmp)) better_somewhere[unproc_side] = true;</span></span>
+<span id="L64"><span class="lineNum">      64</span>         [<span class="tlaGBC" title="Branch 0 was taken 22187 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 298180 times"> + </span>]:<span class="tlaGNC">      320367 :         if (std::is_lt(cmp)) better_somewhere[!unproc_side] = true;</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">      320367 :         advance(unproc_side);</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : </span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :         // If both diagrams are better somewhere, they are incomparable.</span>
+<span id="L68"><span class="lineNum">      68</span>   [<span class="tlaGBC" title="Branch 0 was taken 281456 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 38911 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 34778 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4133 times"> + </span>]:<span class="tlaGNC">      320367 :         if (better_somewhere[0] &amp;&amp; better_somewhere[1]) return std::partial_ordering::unordered;</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     } while(true);</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : </span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     // Otherwise compare the better_somewhere values.</span>
+<span id="L72"><span class="lineNum">      72</span>   [<span class="tlaGBC" title="Branch 0 was taken 3949 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2634 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 151 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3798 times"> + </span>]:<span class="tlaGNC">        6583 :     return better_somewhere[0] &lt;=&gt; better_somewhere[1];</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
