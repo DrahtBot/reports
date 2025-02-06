@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/wallet/test/fuzz/crypter.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/wallet/test/fuzz">src/wallet/test/fuzz</a> - crypter.cpp<span style="font-size: 80%;"> (source / <a href="crypter.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">55</td>
+            <td class="headerCovTableEntry">55</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-02-06 08:46:09</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">10</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">65.8&nbsp;%</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntry">25</td>
+          </tr>
+                  <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;test/util/setup_common.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;wallet/crypter.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : namespace wallet {</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : namespace {</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : const TestingSetup* g_setup;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :<span class="tlaGNC">           1 : void initialize_crypter()</span></span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : {</span>
+<span id="L17"><span class="lineNum">      17</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     static const auto testing_setup = MakeNoLogFileContext&lt;const TestingSetup&gt;();</span></span>
+<span id="L18"><span class="lineNum">      18</span>                 :<span class="tlaGNC">           1 :     g_setup = testing_setup.get();</span></span>
+<span id="L19"><span class="lineNum">      19</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 : }</span></span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>         [<span class="tlaGBC" title="Branch 0 was taken 209 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1099 : FUZZ_TARGET(crypter, .init = initialize_crypter)</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : {</span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">         681 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">         681 :     bool good_data{true};</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">         681 :     CCrypter crypt;</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     // These values are regularly updated within `CallOneOf`</span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">         681 :     std::vector&lt;unsigned char&gt; cipher_text_ed;</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         681 :     CKeyingMaterial plain_text_ed;</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">         681 :     const std::vector&lt;unsigned char&gt; random_key = ConsumeFixedLengthByteVector(fuzzed_data_provider, WALLET_CRYPTO_KEY_SIZE);</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>         [<span class="tlaGBC" title="Branch 0 was taken 625 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 56 times"> + </span>]:<span class="tlaGNC">         681 :     if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L33"><span class="lineNum">      33</span>         [<span class="tlaGBC" title="Branch 0 was taken 625 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         625 :         const std::string random_string = fuzzed_data_provider.ConsumeRandomLengthString(100);</span></span>
+<span id="L34"><span class="lineNum">      34</span>         [<span class="tlaGBC" title="Branch 0 was taken 625 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         625 :         SecureString secure_string(random_string.begin(), random_string.end());</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>         [<span class="tlaGBC" title="Branch 0 was taken 60 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 565 times"> + </span>]:<span class="tlaGNC">         625 :         const unsigned int derivation_method = fuzzed_data_provider.ConsumeBool() ? 0 : fuzzed_data_provider.ConsumeIntegral&lt;unsigned int&gt;();</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :         // Limiting the value of rounds since it is otherwise uselessly expensive and causes a timeout when fuzzing.</span>
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaGBC" title="Branch 0 was taken 625 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1250 :         crypt.SetKeyFromPassphrase(/*key_data=*/secure_string,</span></span>
+<span id="L40"><span class="lineNum">      40</span>         [<span class="tlaGBC" title="Branch 0 was taken 625 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1250 :                                    /*salt=*/ConsumeFixedLengthByteVector(fuzzed_data_provider, WALLET_CRYPTO_SALT_SIZE),</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :                                    /*rounds=*/fuzzed_data_provider.ConsumeIntegralInRange&lt;unsigned int&gt;(0, 25000),</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :                                    /*derivation_method=*/derivation_method);</span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">         625 :     }</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>   [<span class="tlaGBC" title="Branch 0 was taken 25969 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 135 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 25449 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 520 times"> + </span> :<span class="tlaGNC">       52073 :     LIMITED_WHILE(good_data &amp;&amp; fuzzed_data_provider.ConsumeBool(), 100)</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 25423 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 26 times"> + </span>]
+<span id="L46"><span class="lineNum">      46</span>                 :             :     {</span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 25423 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       25423 :         CallOneOf(</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :             fuzzed_data_provider,</span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">         989 :             [&amp;] {</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">         989 :                 const std::vector&lt;unsigned char&gt; random_vector = ConsumeFixedLengthByteVector(fuzzed_data_provider, WALLET_CRYPTO_KEY_SIZE);</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaGBC" title="Branch 0 was taken 989 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         989 :                 plain_text_ed = CKeyingMaterial(random_vector.begin(), random_vector.end());</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">         989 :             },</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">        2475 :             [&amp;] {</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">        2475 :                 cipher_text_ed = ConsumeRandomLengthByteVector(fuzzed_data_provider, 64);</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">        2475 :             },</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">        5611 :             [&amp;] {</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">        5611 :                 (void)crypt.Encrypt(plain_text_ed, cipher_text_ed);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">        5611 :             },</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">        5888 :             [&amp;] {</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">        5888 :                 (void)crypt.Decrypt(cipher_text_ed, plain_text_ed);</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">        5888 :             },</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">        2713 :             [&amp;] {</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">        2713 :                 const CKeyingMaterial master_key(random_key.begin(), random_key.end());</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">        2713 :                 const uint256 iv = ConsumeUInt256(fuzzed_data_provider);</span></span>
+<span id="L65"><span class="lineNum">      65</span>         [<span class="tlaGBC" title="Branch 0 was taken 2713 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2713 :                 (void)EncryptSecret(master_key, plain_text_ed, iv, cipher_text_ed);</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">        2713 :             },</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">        3204 :             [&amp;] {</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">        3204 :                 const CKeyingMaterial master_key(random_key.begin(), random_key.end());</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">        3204 :                 const uint256 iv = ConsumeUInt256(fuzzed_data_provider);</span></span>
+<span id="L70"><span class="lineNum">      70</span>         [<span class="tlaGBC" title="Branch 0 was taken 3204 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3204 :                 (void)DecryptSecret(master_key, cipher_text_ed, iv, plain_text_ed);</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">        3204 :             },</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">        4543 :             [&amp;] {</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">        4543 :                 std::optional&lt;CPubKey&gt; random_pub_key = ConsumeDeserializable&lt;CPubKey&gt;(fuzzed_data_provider);</span></span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaGBC" title="Branch 0 was taken 135 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4408 times"> + </span>]:<span class="tlaGNC">        4543 :                 if (!random_pub_key) {</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">         135 :                     good_data = false;</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">         135 :                     return;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :                 }</span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">        4408 :                 const CPubKey pub_key = *random_pub_key;</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">        4408 :                 const CKeyingMaterial master_key(random_key.begin(), random_key.end());</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">        4408 :                 const std::vector&lt;unsigned char&gt; crypted_secret = ConsumeRandomLengthByteVector(fuzzed_data_provider, 64);</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">        4408 :                 CKey key;</span></span>
+<span id="L82"><span class="lineNum">      82</span>         [<span class="tlaGBC" title="Branch 0 was taken 4408 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4408 :                 (void)DecryptKey(master_key, crypted_secret, pub_key, key);</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">        4408 :             });</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     }</span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">         681 : }</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : } // namespace</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : } // namespace wallet</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/tx_pool.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - tx_pool.cpp<span style="font-size: 80%;"> (source / <a href="tx_pool.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">96.9&nbsp;%</td>
+            <td class="headerCovTableEntry">262</td>
+            <td class="headerCovTableEntry">254</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-02-06 08:46:09</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntry">24</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">59.9&nbsp;%</td>
+            <td class="headerCovTableEntry">347</td>
+            <td class="headerCovTableEntry">208</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;consensus/validation.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;node/context.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;node/mempool_args.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;node/miner.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;policy/truc_policy.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;test/fuzz/util/mempool.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;test/util/mining.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;test/util/script.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;test/util/setup_common.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;test/util/txmempool.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;util/rbf.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;util/translation.h&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;validation.h&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;validationinterface.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : using node::BlockAssembler;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : using node::NodeContext;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : using util::ToString;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : </span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : namespace {</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : </span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : const TestingSetup* g_setup;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : std::vector&lt;COutPoint&gt; g_outpoints_coinbase_init_mature;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : std::vector&lt;COutPoint&gt; g_outpoints_coinbase_init_immature;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : struct MockedTxPool : public CTxMemPool {</span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">      313070 :     void RollingFeeUpdate() EXCLUSIVE_LOCKS_REQUIRED(!cs)</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     {</span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">      313070 :         LOCK(cs);</span></span>
+<span id="L38"><span class="lineNum">      38</span>         [<span class="tlaGBC" title="Branch 0 was taken 313070 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      313070 :         lastRollingFeeUpdate = GetTime();</span></span>
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaGBC" title="Branch 0 was taken 313070 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      313070 :         blockSinceLastRollingFeeBump = true;</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">      313070 :     }</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : };</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">           2 : void initialize_tx_pool()</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : {</span>
+<span id="L45"><span class="lineNum">      45</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           4 :     static const auto testing_setup = MakeNoLogFileContext&lt;const TestingSetup&gt;();</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">           2 :     g_setup = testing_setup.get();</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">           2 :     BlockAssembler::Options options;</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">           2 :     options.coinbase_output_script = P2WSH_OP_TRUE;</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : </span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaGBC" title="Branch 0 was taken 400 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">         402 :     for (int i = 0; i &lt; 2 * COINBASE_MATURITY; ++i) {</span></span>
+<span id="L52"><span class="lineNum">      52</span>         [<span class="tlaGBC" title="Branch 0 was taken 400 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         400 :         COutPoint prevout{MineBlock(g_setup-&gt;m_node, options)};</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :         // Remember the txids to avoid expensive disk access later on</span>
+<span id="L54"><span class="lineNum">      54</span>         [<span class="tlaGBC" title="Branch 0 was taken 200 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 200 times"> + </span>]:<span class="tlaGNC">         400 :         auto&amp; outpoints = i &lt; COINBASE_MATURITY ?</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :                               g_outpoints_coinbase_init_mature :</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :                               g_outpoints_coinbase_init_immature;</span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaGBC" title="Branch 0 was taken 400 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         400 :         outpoints.push_back(prevout);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     }</span>
+<span id="L59"><span class="lineNum">      59</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 :     g_setup-&gt;m_node.validation_signals-&gt;SyncWithValidationInterfaceQueue();</span></span>
+<span id="L60"><span class="lineNum">      60</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           4 : }</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : struct TransactionsDelta final : public CValidationInterface {</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     std::set&lt;CTransactionRef&gt;&amp; m_removed;</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     std::set&lt;CTransactionRef&gt;&amp; m_added;</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : </span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">      155093 :     explicit TransactionsDelta(std::set&lt;CTransactionRef&gt;&amp; r, std::set&lt;CTransactionRef&gt;&amp; a)</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">      155093 :         : m_removed{r}, m_added{a} {}</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : </span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">       40025 :     void TransactionAddedToMempool(const NewMempoolTransactionInfo&amp; tx, uint64_t /* mempool_sequence */) override</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     {</span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">       40025 :         Assert(m_added.insert(tx.info.m_tx).second);</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">       40025 :     }</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">       32729 :     void TransactionRemovedFromMempool(const CTransactionRef&amp; tx, MemPoolRemovalReason reason, uint64_t /* mempool_sequence */) override</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     {</span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">       32729 :         Assert(m_removed.insert(tx).second);</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">       32729 :     }</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : };</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">        6550 : void SetMempoolConstraints(ArgsManager&amp; args, FuzzedDataProvider&amp; fuzzed_data_provider)</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : {</span>
+<span id="L82"><span class="lineNum">      82</span>   [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       13100 :     args.ForceSetArg(&quot;-limitancestorcount&quot;,</span></span>
+<span id="L83"><span class="lineNum">      83</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :                      ToString(fuzzed_data_provider.ConsumeIntegralInRange&lt;unsigned&gt;(0, 50)));</span></span>
+<span id="L84"><span class="lineNum">      84</span>   [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       13100 :     args.ForceSetArg(&quot;-limitancestorsize&quot;,</span></span>
+<span id="L85"><span class="lineNum">      85</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :                      ToString(fuzzed_data_provider.ConsumeIntegralInRange&lt;unsigned&gt;(0, 202)));</span></span>
+<span id="L86"><span class="lineNum">      86</span>   [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       13100 :     args.ForceSetArg(&quot;-limitdescendantcount&quot;,</span></span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :                      ToString(fuzzed_data_provider.ConsumeIntegralInRange&lt;unsigned&gt;(0, 50)));</span></span>
+<span id="L88"><span class="lineNum">      88</span>   [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       13100 :     args.ForceSetArg(&quot;-limitdescendantsize&quot;,</span></span>
+<span id="L89"><span class="lineNum">      89</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :                      ToString(fuzzed_data_provider.ConsumeIntegralInRange&lt;unsigned&gt;(0, 202)));</span></span>
+<span id="L90"><span class="lineNum">      90</span>   [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       13100 :     args.ForceSetArg(&quot;-maxmempool&quot;,</span></span>
+<span id="L91"><span class="lineNum">      91</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :                      ToString(fuzzed_data_provider.ConsumeIntegralInRange&lt;unsigned&gt;(0, 200)));</span></span>
+<span id="L92"><span class="lineNum">      92</span>   [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       13100 :     args.ForceSetArg(&quot;-mempoolexpiry&quot;,</span></span>
+<span id="L93"><span class="lineNum">      93</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :                      ToString(fuzzed_data_provider.ConsumeIntegralInRange&lt;unsigned&gt;(0, 999)));</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">        6550 : }</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : </span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">        6550 : void Finish(FuzzedDataProvider&amp; fuzzed_data_provider, MockedTxPool&amp; tx_pool, Chainstate&amp; chainstate)</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : {</span>
+<span id="L98"><span class="lineNum">      98</span>   [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       19650 :     WITH_LOCK(::cs_main, tx_pool.check(chainstate.CoinsTip(), chainstate.m_chain.Height() + 1));</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC">        6550 :     {</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">        6550 :         BlockAssembler::Options options;</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">        6550 :         options.nBlockMaxWeight = fuzzed_data_provider.ConsumeIntegralInRange(0U, MAX_BLOCK_WEIGHT);</span></span>
+<span id="L102"><span class="lineNum">     102</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :         options.blockMinFeeRate = CFeeRate{ConsumeMoney(fuzzed_data_provider, /*max=*/COIN)};</span></span>
+<span id="L103"><span class="lineNum">     103</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :         auto assembler = BlockAssembler{chainstate, &amp;tx_pool, options};</span></span>
+<span id="L104"><span class="lineNum">     104</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :         auto block_template = assembler.CreateNewBlock();</span></span>
+<span id="L105"><span class="lineNum">     105</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :         Assert(block_template-&gt;block.vtx.size() &gt;= 1);</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">        6550 :     }</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">        6550 :     const auto info_all = tx_pool.infoAll();</span></span>
+<span id="L108"><span class="lineNum">     108</span>         [<span class="tlaGBC" title="Branch 0 was taken 3586 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2964 times"> + </span>]:<span class="tlaGNC">        6550 :     if (!info_all.empty()) {</span></span>
+<span id="L109"><span class="lineNum">     109</span>         [<span class="tlaGBC" title="Branch 0 was taken 3586 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3586 :         const auto&amp; tx_to_remove = *PickValue(fuzzed_data_provider, info_all).tx;</span></span>
+<span id="L110"><span class="lineNum">     110</span>   [<span class="tlaGBC" title="Branch 0 was taken 3586 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3586 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       10758 :         WITH_LOCK(tx_pool.cs, tx_pool.removeRecursive(tx_to_remove, MemPoolRemovalReason::BLOCK /* dummy */));</span></span>
+<span id="L111"><span class="lineNum">     111</span>   [<span class="tlaGBC" title="Branch 0 was taken 3586 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 3586 times"> + </span>]:<span class="tlaGNC">        3586 :         assert(tx_pool.size() &lt; info_all.size());</span></span>
+<span id="L112"><span class="lineNum">     112</span>   [<span class="tlaGBC" title="Branch 0 was taken 3586 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3586 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       10758 :         WITH_LOCK(::cs_main, tx_pool.check(chainstate.CoinsTip(), chainstate.m_chain.Height() + 1));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 3586 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L113"><span class="lineNum">     113</span>                 :             :     }</span>
+<span id="L114"><span class="lineNum">     114</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :     g_setup-&gt;m_node.validation_signals-&gt;SyncWithValidationInterfaceQueue();</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :<span class="tlaGNC">        6550 : }</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :             : </span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">      297521 : void MockTime(FuzzedDataProvider&amp; fuzzed_data_provider, const Chainstate&amp; chainstate)</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : {</span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">      297521 :     const auto time = ConsumeTime(fuzzed_data_provider,</span></span>
+<span id="L120"><span class="lineNum">     120</span>         [<span class="tlaGBC" title="Branch 0 was taken 297521 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      595042 :                                   chainstate.m_chain.Tip()-&gt;GetMedianTimePast() + 1,</span></span>
+<span id="L121"><span class="lineNum">     121</span>         [<span class="tlaGBC" title="Branch 0 was taken 297521 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      297521 :                                   std::numeric_limits&lt;decltype(chainstate.m_chain.Tip()-&gt;nTime)&gt;::max());</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">      297521 :     SetMockTime(time);</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">      297521 : }</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             : </span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">        6550 : std::unique_ptr&lt;CTxMemPool&gt; MakeMempool(FuzzedDataProvider&amp; fuzzed_data_provider, const NodeContext&amp; node)</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : {</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     // Take the default options for tests...</span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">        6550 :     CTxMemPool::Options mempool_opts{MemPoolOptionsForTest(node)};</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :     // ...override specific options for this specific fuzz suite</span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">        6550 :     mempool_opts.check_ratio = 1;</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">        6550 :     mempool_opts.require_standard = fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : </span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     // ...and construct a CTxMemPool from it</span>
+<span id="L135"><span class="lineNum">     135</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :     bilingual_str error;</span></span>
+<span id="L136"><span class="lineNum">     136</span>         [<span class="tlaGBC" title="Branch 0 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6550 :     auto mempool{std::make_unique&lt;CTxMemPool&gt;(std::move(mempool_opts), error)};</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :     // ... ignore the error since it might be beneficial to fuzz even when the</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     // mempool size is unreasonably small</span>
+<span id="L139"><span class="lineNum">     139</span>   [<span class="tlaGBC" title="Branch 0 was taken 876 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5674 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 876 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        8302 :     Assert(error.empty() || error.original.starts_with(&quot;-maxmempool must be at least &quot;));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 6550 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">        6550 :     return mempool;</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">        6550 : }</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : </span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">      155093 : void CheckATMPInvariants(const MempoolAcceptResult&amp; res, bool txid_in_mempool, bool wtxid_in_mempool)</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : {</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : </span>
+<span id="L146"><span class="lineNum">     146</span>   [<span class="tlaGBC" title="Branch 0 was taken 40025 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 115068 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      155093 :     switch (res.m_result_type) {</span></span>
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 4 was not taken"> - </span>]
+<span id="L147"><span class="lineNum">     147</span>                 :<span class="tlaGNC">       40025 :     case MempoolAcceptResult::ResultType::VALID:</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :<span class="tlaGNC">       40025 :     {</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">       40025 :         Assert(txid_in_mempool);</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaGNC">       40025 :         Assert(wtxid_in_mempool);</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">       40025 :         Assert(res.m_state.IsValid());</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">       40025 :         Assert(!res.m_state.IsInvalid());</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaGNC">       40025 :         Assert(res.m_vsize);</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">       40025 :         Assert(res.m_base_fees);</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">       40025 :         Assert(res.m_effective_feerate);</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">       40025 :         Assert(res.m_wtxids_fee_calculations);</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">       40025 :         Assert(!res.m_other_wtxid);</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">       40025 :         break;</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :     }</span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">      115068 :     case MempoolAcceptResult::ResultType::INVALID:</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">      115068 :     {</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :         // It may be already in the mempool since in ATMP cases we don't set MEMPOOL_ENTRY or DIFFERENT_WITNESS</span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">      115068 :         Assert(!res.m_state.IsValid());</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">      115068 :         Assert(res.m_state.IsInvalid());</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             : </span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">      115068 :         const bool is_reconsiderable{res.m_state.GetResult() == TxValidationResult::TX_RECONSIDERABLE};</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">      115068 :         Assert(!res.m_vsize);</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">      115068 :         Assert(!res.m_base_fees);</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :         // Fee information is provided if the failure is TX_RECONSIDERABLE.</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :         // In other cases, validation may be unable or unwilling to calculate the fees.</span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaGNC">      115068 :         Assert(res.m_effective_feerate.has_value() == is_reconsiderable);</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">      115068 :         Assert(res.m_wtxids_fee_calculations.has_value() == is_reconsiderable);</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaGNC">      115068 :         Assert(!res.m_other_wtxid);</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">      115068 :         break;</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     }</span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaUNC">           0 :     case MempoolAcceptResult::ResultType::MEMPOOL_ENTRY:</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :<span class="tlaUNC">           0 :     {</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :         // ATMP never sets this; only set in package settings</span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaUNC">           0 :         Assert(false);</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaUNC">           0 :         break;</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :     }</span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaUNC">           0 :     case MempoolAcceptResult::ResultType::DIFFERENT_WITNESS:</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaUNC">           0 :     {</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :         // ATMP never sets this; only set in package settings</span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaUNC">           0 :         Assert(false);</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaUNC">           0 :         break;</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :     }</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :     }</span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">      155093 : }</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
+<span id="L191"><span class="lineNum">     191</span>         [<span class="tlaGBC" title="Branch 0 was taken 209 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2316 : FUZZ_TARGET(tx_pool_standard, .init = initialize_tx_pool)</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : {</span>
+<span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaGNC">        1898 :     SeedRandomStateForTest(SeedRand::ZEROS);</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">        1898 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">        1898 :     const auto&amp; node = g_setup-&gt;m_node;</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaGNC">        1898 :     auto&amp; chainstate{static_cast&lt;DummyChainState&amp;&gt;(node.chainman-&gt;ActiveChainstate())};</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :             : </span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">        1898 :     MockTime(fuzzed_data_provider, chainstate);</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : </span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     // All RBF-spendable outpoints</span>
+<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">        1898 :     std::set&lt;COutPoint&gt; outpoints_rbf;</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     // All outpoints counting toward the total supply (subset of outpoints_rbf)</span>
+<span id="L203"><span class="lineNum">     203</span>                 :<span class="tlaGNC">        1898 :     std::set&lt;COutPoint&gt; outpoints_supply;</span></span>
+<span id="L204"><span class="lineNum">     204</span>         [<span class="tlaGBC" title="Branch 0 was taken 189800 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1898 times"> + </span>]:<span class="tlaGNC">      191698 :     for (const auto&amp; outpoint : g_outpoints_coinbase_init_mature) {</span></span>
+<span id="L205"><span class="lineNum">     205</span>   [<span class="tlaGBC" title="Branch 0 was taken 189800 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 189800 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      189800 :         Assert(outpoints_supply.insert(outpoint).second);</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :     }</span>
+<span id="L207"><span class="lineNum">     207</span>         [<span class="tlaGBC" title="Branch 0 was taken 1898 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1898 :     outpoints_rbf = outpoints_supply;</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : </span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     // The sum of the values of all spendable outpoints</span>
+<span id="L210"><span class="lineNum">     210</span>                 :<span class="tlaGNC">        1898 :     constexpr CAmount SUPPLY_TOTAL{COINBASE_MATURITY * 50 * COIN};</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :             : </span>
+<span id="L212"><span class="lineNum">     212</span>         [<span class="tlaGBC" title="Branch 0 was taken 1898 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1898 :     SetMempoolConstraints(*node.args, fuzzed_data_provider);</span></span>
+<span id="L213"><span class="lineNum">     213</span>         [<span class="tlaGBC" title="Branch 0 was taken 1898 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1898 :     auto tx_pool_{MakeMempool(fuzzed_data_provider, node)};</span></span>
+<span id="L214"><span class="lineNum">     214</span>         [<span class="tlaGBC" title="Branch 0 was taken 1898 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1898 :     MockedTxPool&amp; tx_pool = *static_cast&lt;MockedTxPool*&gt;(tx_pool_.get());</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :             : </span>
+<span id="L216"><span class="lineNum">     216</span>         [<span class="tlaGBC" title="Branch 0 was taken 1898 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1898 :     chainstate.SetMempool(&amp;tx_pool);</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : </span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :     // Helper to query an amount</span>
+<span id="L219"><span class="lineNum">     219</span>   [<span class="tlaGBC" title="Branch 0 was taken 3796 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3796 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        5694 :     const CCoinsViewMemPool amount_view{WITH_LOCK(::cs_main, return &amp;chainstate.CoinsTip()), tx_pool};</span></span>
+<span id="L220"><span class="lineNum">     220</span>                 :<span class="tlaGNC">    31972378 :     const auto GetAmount = [&amp;](const COutPoint&amp; outpoint) {</span></span>
+<span id="L221"><span class="lineNum">     221</span>         [<span class="tlaGBC" title="Branch 0 was taken 31970480 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    31970480 :         auto coin{amount_view.GetCoin(outpoint).value()};</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaGNC">    31970480 :         return coin.out.nValue;</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaGNC">    31972378 :     };</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : </span>
+<span id="L225"><span class="lineNum">     225</span>   [<span class="tlaGBC" title="Branch 0 was taken 155177 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1814 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 155093 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 84 times"> + </span>]:<span class="tlaGNC">      156991 :     LIMITED_WHILE(fuzzed_data_provider.ConsumeBool(), 300)</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     {</span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">      155093 :         {</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :             // Total supply is the mempool fee + all outpoints</span>
+<span id="L229"><span class="lineNum">     229</span>         [<span class="tlaGBC" title="Branch 0 was taken 310186 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      310186 :             CAmount supply_now{WITH_LOCK(tx_pool.cs, return tx_pool.GetTotalFee())};</span></span>
+<span id="L230"><span class="lineNum">     230</span>         [<span class="tlaGBC" title="Branch 0 was taken 26969700 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 155093 times"> + </span>]:<span class="tlaGNC">    27124793 :             for (const auto&amp; op : outpoints_supply) {</span></span>
+<span id="L231"><span class="lineNum">     231</span>         [<span class="tlaGBC" title="Branch 0 was taken 26969700 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    26969700 :                 supply_now += GetAmount(op);</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :             }</span>
+<span id="L233"><span class="lineNum">     233</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :             Assert(supply_now == SUPPLY_TOTAL);</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :         }</span>
+<span id="L235"><span class="lineNum">     235</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         Assert(!outpoints_supply.empty());</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :             : </span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :         // Create transaction to add to the mempool</span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">      310186 :         const CTransactionRef tx = [&amp;] {</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :<span class="tlaGNC">      155093 :             CMutableTransaction tx_mut;</span></span>
+<span id="L240"><span class="lineNum">     240</span>         [<span class="tlaGBC" title="Branch 0 was taken 33425 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 121668 times"> + </span>]:<span class="tlaGNC">      155093 :             tx_mut.version = fuzzed_data_provider.ConsumeBool() ? TRUC_VERSION : CTransaction::CURRENT_VERSION;</span></span>
+<span id="L241"><span class="lineNum">     241</span>         [<span class="tlaGBC" title="Branch 0 was taken 30667 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 124426 times"> + </span>]:<span class="tlaGNC">      155093 :             tx_mut.nLockTime = fuzzed_data_provider.ConsumeBool() ? 0 : fuzzed_data_provider.ConsumeIntegral&lt;uint32_t&gt;();</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaGNC">      155093 :             const auto num_in = fuzzed_data_provider.ConsumeIntegralInRange&lt;int&gt;(1, outpoints_rbf.size());</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaGNC">      155093 :             const auto num_out = fuzzed_data_provider.ConsumeIntegralInRange&lt;int&gt;(1, outpoints_rbf.size() * 2);</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : </span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">      155093 :             CAmount amount_in{0};</span></span>
+<span id="L246"><span class="lineNum">     246</span>         [<span class="tlaGBC" title="Branch 0 was taken 5000780 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 155093 times"> + </span>]:<span class="tlaGNC">     5155873 :             for (int i = 0; i &lt; num_in; ++i) {</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :                 // Pop random outpoint</span>
+<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaGNC">     5000780 :                 auto pop = outpoints_rbf.begin();</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :<span class="tlaGNC">     5000780 :                 std::advance(pop, fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, outpoints_rbf.size() - 1));</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">     5000780 :                 const auto outpoint = *pop;</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :<span class="tlaGNC">     5000780 :                 outpoints_rbf.erase(pop);</span></span>
+<span id="L252"><span class="lineNum">     252</span>         [<span class="tlaGBC" title="Branch 0 was taken 5000780 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     5000780 :                 amount_in += GetAmount(outpoint);</span></span>
+<span id="L253"><span class="lineNum">     253</span>                 :             : </span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :                 // Create input</span>
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaGNC">     5000780 :                 const auto sequence = ConsumeSequence(fuzzed_data_provider);</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">     5000780 :                 const auto script_sig = CScript{};</span></span>
+<span id="L257"><span class="lineNum">     257</span>   [<span class="tlaGBC" title="Branch 0 was taken 5000780 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 5000780 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 5000780 times"> + </span> :<span class="tlaGNC">    15002340 :                 const auto script_wit_stack = std::vector&lt;std::vector&lt;uint8_t&gt;&gt;{WITNESS_STACK_ELEM_OP_TRUE};</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">     5000780 :                 CTxIn in;</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">     5000780 :                 in.prevout = outpoint;</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaGNC">     5000780 :                 in.nSequence = sequence;</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">     5000780 :                 in.scriptSig = script_sig;</span></span>
+<span id="L262"><span class="lineNum">     262</span>         [<span class="tlaGBC" title="Branch 0 was taken 5000780 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     5000780 :                 in.scriptWitness.stack = script_wit_stack;</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :             : </span>
+<span id="L264"><span class="lineNum">     264</span>         [<span class="tlaGBC" title="Branch 0 was taken 5000780 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     5000780 :                 tx_mut.vin.push_back(in);</span></span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">     5000780 :             }</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">      155093 :             const auto amount_fee = fuzzed_data_provider.ConsumeIntegralInRange&lt;CAmount&gt;(-1000, amount_in);</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">      155093 :             const auto amount_out = (amount_in - amount_fee) / num_out;</span></span>
+<span id="L268"><span class="lineNum">     268</span>         [<span class="tlaGBC" title="Branch 0 was taken 12516304 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 155093 times"> + </span>]:<span class="tlaGNC">    12671397 :             for (int i = 0; i &lt; num_out; ++i) {</span></span>
+<span id="L269"><span class="lineNum">     269</span>         [<span class="tlaGBC" title="Branch 0 was taken 12516304 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    12516304 :                 tx_mut.vout.emplace_back(amount_out, P2WSH_OP_TRUE);</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :             }</span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :             auto tx = MakeTransactionRef(tx_mut);</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :             // Restore previously removed outpoints</span>
+<span id="L273"><span class="lineNum">     273</span>         [<span class="tlaGBC" title="Branch 0 was taken 5000780 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 155093 times"> + </span>]:<span class="tlaGNC">     5155873 :             for (const auto&amp; in : tx-&gt;vin) {</span></span>
+<span id="L274"><span class="lineNum">     274</span>   [<span class="tlaGBC" title="Branch 0 was taken 5000780 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 5000780 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">     5000780 :                 Assert(outpoints_rbf.insert(in.prevout).second);</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :             }</span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">      155093 :             return tx;</span></span>
+<span id="L277"><span class="lineNum">     277</span>         [<span class="tlaGBC" title="Branch 0 was taken 5155873 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     5310966 :         }();</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>         [<span class="tlaGBC" title="Branch 0 was taken 139092 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 16001 times"> + </span>]:<span class="tlaGNC">      155093 :         if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L280"><span class="lineNum">     280</span>         [<span class="tlaGBC" title="Branch 0 was taken 139092 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      139092 :             MockTime(fuzzed_data_provider, chainstate);</span></span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :         }</span>
+<span id="L282"><span class="lineNum">     282</span>         [<span class="tlaGBC" title="Branch 0 was taken 106415 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 48678 times"> + </span>]:<span class="tlaGNC">      155093 :         if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L283"><span class="lineNum">     283</span>         [<span class="tlaGBC" title="Branch 0 was taken 106415 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      106415 :             tx_pool.RollingFeeUpdate();</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :         }</span>
+<span id="L285"><span class="lineNum">     285</span>         [<span class="tlaGBC" title="Branch 0 was taken 114643 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 40450 times"> + </span>]:<span class="tlaGNC">      155093 :         if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L286"><span class="lineNum">     286</span>         [<span class="tlaGBC" title="Branch 0 was taken 107725 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6918 times"> + </span>]:<span class="tlaGNC">      121561 :             const auto&amp; txid = fuzzed_data_provider.ConsumeBool() ?</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaGNC">      107725 :                                    tx-&gt;GetHash() :</span></span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">        6918 :                                    PickValue(fuzzed_data_provider, outpoints_rbf).hash;</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :<span class="tlaGNC">      114643 :             const auto delta = fuzzed_data_provider.ConsumeIntegralInRange&lt;CAmount&gt;(-50 * COIN, +50 * COIN);</span></span>
+<span id="L290"><span class="lineNum">     290</span>         [<span class="tlaGBC" title="Branch 0 was taken 114643 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      114643 :             tx_pool.PrioritiseTransaction(txid.ToUint256(), delta);</span></span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :         }</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             : </span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :         // Remember all removed and added transactions</span>
+<span id="L294"><span class="lineNum">     294</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         std::set&lt;CTransactionRef&gt; removed;</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :<span class="tlaGNC">      155093 :         std::set&lt;CTransactionRef&gt; added;</span></span>
+<span id="L296"><span class="lineNum">     296</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         auto txr = std::make_shared&lt;TransactionsDelta&gt;(removed, added);</span></span>
+<span id="L297"><span class="lineNum">     297</span>   [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      310186 :         node.validation_signals-&gt;RegisterSharedValidationInterface(txr);</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :<span class="tlaGNC">      155093 :         const bool bypass_limits = fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L299"><span class="lineNum">     299</span>                 :             : </span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :         // Make sure ProcessNewPackage on one transaction works.</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :         // The result is not guaranteed to be the same as what is returned by ATMP.</span>
+<span id="L302"><span class="lineNum">     302</span>   [<span class="tlaGBC" title="Branch 0 was taken 310186 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      775465 :         const auto result_package = WITH_LOCK(::cs_main,</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 155093 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 155093 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 155093 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaUNC" title="Branch 12 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 13 was not taken"> - </span>]
+<span id="L303"><span class="lineNum">     303</span>                 :             :                                     return ProcessNewPackage(chainstate, tx_pool, {tx}, true, /*client_maxfeerate=*/{}));</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :         // If something went wrong due to a package-specific policy, it might not return a</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :         // validation result for the transaction.</span>
+<span id="L306"><span class="lineNum">     306</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         if (result_package.m_state.GetResult() != PackageValidationResult::PCKG_POLICY) {</span></span>
+<span id="L307"><span class="lineNum">     307</span>                 :<span class="tlaGNC">      155093 :             auto it = result_package.m_tx_results.find(tx-&gt;GetWitnessHash());</span></span>
+<span id="L308"><span class="lineNum">     308</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :             Assert(it != result_package.m_tx_results.end());</span></span>
+<span id="L309"><span class="lineNum">     309</span>   [<span class="tlaGBC" title="Branch 0 was taken 133071 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 22022 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 133071 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      288164 :             Assert(it-&gt;second.m_result_type == MempoolAcceptResult::ResultType::VALID ||</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L310"><span class="lineNum">     310</span>                 :             :                    it-&gt;second.m_result_type == MempoolAcceptResult::ResultType::INVALID);</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :         }</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             : </span>
+<span id="L313"><span class="lineNum">     313</span>   [<span class="tlaGBC" title="Branch 0 was taken 310186 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      465279 :         const auto res = WITH_LOCK(::cs_main, return AcceptToMemoryPool(chainstate, tx, GetTime(), bypass_limits, /*test_accept=*/false));</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaGNC">      155093 :         const bool accepted = res.m_result_type == MempoolAcceptResult::ResultType::VALID;</span></span>
+<span id="L315"><span class="lineNum">     315</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         node.validation_signals-&gt;SyncWithValidationInterfaceQueue();</span></span>
+<span id="L316"><span class="lineNum">     316</span>   [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      310186 :         node.validation_signals-&gt;UnregisterSharedValidationInterface(txr);</span></span>
+<span id="L317"><span class="lineNum">     317</span>                 :             : </span>
+<span id="L318"><span class="lineNum">     318</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         bool txid_in_mempool = tx_pool.exists(GenTxid::Txid(tx-&gt;GetHash()));</span></span>
+<span id="L319"><span class="lineNum">     319</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         bool wtxid_in_mempool = tx_pool.exists(GenTxid::Wtxid(tx-&gt;GetWitnessHash()));</span></span>
+<span id="L320"><span class="lineNum">     320</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         CheckATMPInvariants(res, txid_in_mempool, wtxid_in_mempool);</span></span>
+<span id="L321"><span class="lineNum">     321</span>                 :             : </span>
+<span id="L322"><span class="lineNum">     322</span>         [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      155093 :         Assert(accepted != added.empty());</span></span>
+<span id="L323"><span class="lineNum">     323</span>         [<span class="tlaGBC" title="Branch 0 was taken 40025 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 115068 times"> + </span>]:<span class="tlaGNC">      155093 :         if (accepted) {</span></span>
+<span id="L324"><span class="lineNum">     324</span>         [<span class="tlaGBC" title="Branch 0 was taken 40025 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       40025 :             Assert(added.size() == 1); // For now, no package acceptance</span></span>
+<span id="L325"><span class="lineNum">     325</span>         [<span class="tlaGBC" title="Branch 0 was taken 40025 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       40025 :             Assert(tx == *added.begin());</span></span>
+<span id="L326"><span class="lineNum">     326</span>         [<span class="tlaGBC" title="Branch 0 was taken 40025 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       40025 :             CheckMempoolTRUCInvariants(tx_pool);</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :         } else {</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             :             // Do not consider rejected transaction removed</span>
+<span id="L329"><span class="lineNum">     329</span>                 :<span class="tlaGNC">      115068 :             removed.erase(tx);</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :         }</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             : </span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :         // Helper to insert spent and created outpoints of a tx into collections</span>
+<span id="L333"><span class="lineNum">     333</span>                 :<span class="tlaGNC">      155093 :         using Sets = std::vector&lt;std::reference_wrapper&lt;std::set&lt;COutPoint&gt;&gt;&gt;;</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">      223756 :         const auto insert_tx = [](Sets created_by_tx, Sets consumed_by_tx, const auto&amp; tx) {</span></span>
+<span id="L335"><span class="lineNum">     335</span>         [<span class="tlaGBC" title="Branch 0 was taken 729683 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 68663 times"> + </span>]:<span class="tlaGNC">      798346 :             for (size_t i{0}; i &lt; tx.vout.size(); ++i) {</span></span>
+<span id="L336"><span class="lineNum">     336</span>         [<span class="tlaGBC" title="Branch 0 was taken 1362969 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 729683 times"> + </span>]:<span class="tlaGNC">     2092652 :                 for (auto&amp; set : created_by_tx) {</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaGNC">     1362969 :                     Assert(set.get().emplace(tx.GetHash(), i).second);</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :             :                 }</span>
+<span id="L339"><span class="lineNum">     339</span>                 :             :             }</span>
+<span id="L340"><span class="lineNum">     340</span>         [<span class="tlaGBC" title="Branch 0 was taken 118914 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 68663 times"> + </span>]:<span class="tlaGNC">      187577 :             for (const auto&amp; in : tx.vin) {</span></span>
+<span id="L341"><span class="lineNum">     341</span>         [<span class="tlaGBC" title="Branch 0 was taken 118914 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 118914 times"> + </span>]:<span class="tlaGNC">      237828 :                 for (auto&amp; set : consumed_by_tx) {</span></span>
+<span id="L342"><span class="lineNum">     342</span>                 :<span class="tlaGNC">      118914 :                     Assert(set.get().insert(in.prevout).second);</span></span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :                 }</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :             }</span>
+<span id="L345"><span class="lineNum">     345</span>                 :<span class="tlaGNC">       68663 :         };</span></span>
+<span id="L346"><span class="lineNum">     346</span>                 :             :         // Add created outpoints, remove spent outpoints</span>
+<span id="L347"><span class="lineNum">     347</span>                 :<span class="tlaGNC">      155093 :         {</span></span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :             // Outpoints that no longer exist at all</span>
+<span id="L349"><span class="lineNum">     349</span>                 :<span class="tlaGNC">      155093 :             std::set&lt;COutPoint&gt; consumed_erased;</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :             // Outpoints that no longer count toward the total supply</span>
+<span id="L351"><span class="lineNum">     351</span>                 :<span class="tlaGNC">      155093 :             std::set&lt;COutPoint&gt; consumed_supply;</span></span>
+<span id="L352"><span class="lineNum">     352</span>         [<span class="tlaGBC" title="Branch 0 was taken 28638 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 155093 times"> + </span>]:<span class="tlaGNC">      183731 :             for (const auto&amp; removed_tx : removed) {</span></span>
+<span id="L353"><span class="lineNum">     353</span>   [<span class="tlaGBC" title="Branch 0 was taken 28638 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 28638 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       57276 :                 insert_tx(/*created_by_tx=*/{consumed_erased}, /*consumed_by_tx=*/{outpoints_supply}, /*tx=*/*removed_tx);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 28638 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L354"><span class="lineNum">     354</span>                 :             :             }</span>
+<span id="L355"><span class="lineNum">     355</span>         [<span class="tlaGBC" title="Branch 0 was taken 40025 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 155093 times"> + </span>]:<span class="tlaGNC">      195118 :             for (const auto&amp; added_tx : added) {</span></span>
+<span id="L356"><span class="lineNum">     356</span>   [<span class="tlaGBC" title="Branch 0 was taken 40025 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 40025 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       80050 :                 insert_tx(/*created_by_tx=*/{outpoints_supply, outpoints_rbf}, /*consumed_by_tx=*/{consumed_supply}, /*tx=*/*added_tx);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 40025 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L357"><span class="lineNum">     357</span>                 :             :             }</span>
+<span id="L358"><span class="lineNum">     358</span>         [<span class="tlaGBC" title="Branch 0 was taken 96397 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 155093 times"> + </span>]:<span class="tlaGNC">      251490 :             for (const auto&amp; p : consumed_erased) {</span></span>
+<span id="L359"><span class="lineNum">     359</span>         [<span class="tlaGBC" title="Branch 0 was taken 96397 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       96397 :                 Assert(outpoints_supply.erase(p) == 1);</span></span>
+<span id="L360"><span class="lineNum">     360</span>         [<span class="tlaGBC" title="Branch 0 was taken 96397 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       96397 :                 Assert(outpoints_rbf.erase(p) == 1);</span></span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :             }</span>
+<span id="L362"><span class="lineNum">     362</span>         [<span class="tlaGBC" title="Branch 0 was taken 73547 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 155093 times"> + </span>]:<span class="tlaGNC">      228640 :             for (const auto&amp; p : consumed_supply) {</span></span>
+<span id="L363"><span class="lineNum">     363</span>         [<span class="tlaGBC" title="Branch 0 was taken 73547 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       73547 :                 Assert(outpoints_supply.erase(p) == 1);</span></span>
+<span id="L364"><span class="lineNum">     364</span>                 :             :             }</span>
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">      155093 :         }</span></span>
+<span id="L366"><span class="lineNum">     366</span>   [<span class="tlaGBC" title="Branch 0 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 155093 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      465279 :     }</span></span>
+<span id="L367"><span class="lineNum">     367</span>         [<span class="tlaGBC" title="Branch 0 was taken 1898 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1898 :     Finish(fuzzed_data_provider, tx_pool, chainstate);</span></span>
+<span id="L368"><span class="lineNum">     368</span>                 :<span class="tlaGNC">        1898 : }</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :             : </span>
+<span id="L370"><span class="lineNum">     370</span>         [<span class="tlaGBC" title="Branch 0 was taken 209 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        5070 : FUZZ_TARGET(tx_pool, .init = initialize_tx_pool)</span></span>
+<span id="L371"><span class="lineNum">     371</span>                 :             : {</span>
+<span id="L372"><span class="lineNum">     372</span>                 :<span class="tlaGNC">        4652 :     SeedRandomStateForTest(SeedRand::ZEROS);</span></span>
+<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaGNC">        4652 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L374"><span class="lineNum">     374</span>                 :<span class="tlaGNC">        4652 :     const auto&amp; node = g_setup-&gt;m_node;</span></span>
+<span id="L375"><span class="lineNum">     375</span>                 :<span class="tlaGNC">        4652 :     auto&amp; chainstate{static_cast&lt;DummyChainState&amp;&gt;(node.chainman-&gt;ActiveChainstate())};</span></span>
+<span id="L376"><span class="lineNum">     376</span>                 :             : </span>
+<span id="L377"><span class="lineNum">     377</span>                 :<span class="tlaGNC">        4652 :     MockTime(fuzzed_data_provider, chainstate);</span></span>
+<span id="L378"><span class="lineNum">     378</span>                 :             : </span>
+<span id="L379"><span class="lineNum">     379</span>                 :<span class="tlaGNC">        4652 :     std::vector&lt;Txid&gt; txids;</span></span>
+<span id="L380"><span class="lineNum">     380</span>         [<span class="tlaGBC" title="Branch 0 was taken 4652 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4652 :     txids.reserve(g_outpoints_coinbase_init_mature.size());</span></span>
+<span id="L381"><span class="lineNum">     381</span>         [<span class="tlaGBC" title="Branch 0 was taken 465200 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4652 times"> + </span>]:<span class="tlaGNC">      469852 :     for (const auto&amp; outpoint : g_outpoints_coinbase_init_mature) {</span></span>
+<span id="L382"><span class="lineNum">     382</span>         [<span class="tlaGBC" title="Branch 0 was taken 465200 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      465200 :         txids.push_back(outpoint.hash);</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :             :     }</span>
+<span id="L384"><span class="lineNum">     384</span>         [<span class="tlaGBC" title="Branch 0 was taken 18608 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4652 times"> + </span>]:<span class="tlaGNC">       23260 :     for (int i{0}; i &lt;= 3; ++i) {</span></span>
+<span id="L385"><span class="lineNum">     385</span>                 :             :         // Add some immature and non-existent outpoints</span>
+<span id="L386"><span class="lineNum">     386</span>   [<span class="tlaGBC" title="Branch 0 was taken 18608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 18608 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       18608 :         txids.push_back(g_outpoints_coinbase_init_immature.at(i).hash);</span></span>
+<span id="L387"><span class="lineNum">     387</span>         [<span class="tlaGBC" title="Branch 0 was taken 18608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       18608 :         txids.push_back(Txid::FromUint256(ConsumeUInt256(fuzzed_data_provider)));</span></span>
+<span id="L388"><span class="lineNum">     388</span>                 :             :     }</span>
+<span id="L389"><span class="lineNum">     389</span>                 :             : </span>
+<span id="L390"><span class="lineNum">     390</span>         [<span class="tlaGBC" title="Branch 0 was taken 4652 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4652 :     SetMempoolConstraints(*node.args, fuzzed_data_provider);</span></span>
+<span id="L391"><span class="lineNum">     391</span>         [<span class="tlaGBC" title="Branch 0 was taken 4652 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4652 :     auto tx_pool_{MakeMempool(fuzzed_data_provider, node)};</span></span>
+<span id="L392"><span class="lineNum">     392</span>                 :<span class="tlaGNC">        4652 :     MockedTxPool&amp; tx_pool = *static_cast&lt;MockedTxPool*&gt;(tx_pool_.get());</span></span>
+<span id="L393"><span class="lineNum">     393</span>                 :             : </span>
+<span id="L394"><span class="lineNum">     394</span>                 :<span class="tlaGNC">        4652 :     chainstate.SetMempool(&amp;tx_pool);</span></span>
+<span id="L395"><span class="lineNum">     395</span>                 :             : </span>
+<span id="L396"><span class="lineNum">     396</span>   [<span class="tlaGBC" title="Branch 0 was taken 299219 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4512 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 299079 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 140 times"> + </span>]:<span class="tlaGNC">      303731 :     LIMITED_WHILE(fuzzed_data_provider.ConsumeBool(), 300)</span></span>
+<span id="L397"><span class="lineNum">     397</span>                 :             :     {</span>
+<span id="L398"><span class="lineNum">     398</span>         [<span class="tlaGBC" title="Branch 0 was taken 299079 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      299079 :         const auto mut_tx = ConsumeTransaction(fuzzed_data_provider, txids);</span></span>
+<span id="L399"><span class="lineNum">     399</span>                 :             : </span>
+<span id="L400"><span class="lineNum">     400</span>         [<span class="tlaGBC" title="Branch 0 was taken 151879 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 147200 times"> + </span>]:<span class="tlaGNC">      299079 :         if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L401"><span class="lineNum">     401</span>         [<span class="tlaGBC" title="Branch 0 was taken 151879 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      151879 :             MockTime(fuzzed_data_provider, chainstate);</span></span>
+<span id="L402"><span class="lineNum">     402</span>                 :             :         }</span>
+<span id="L403"><span class="lineNum">     403</span>         [<span class="tlaGBC" title="Branch 0 was taken 206655 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 92424 times"> + </span>]:<span class="tlaGNC">      299079 :         if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L404"><span class="lineNum">     404</span>         [<span class="tlaGBC" title="Branch 0 was taken 206655 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      206655 :             tx_pool.RollingFeeUpdate();</span></span>
+<span id="L405"><span class="lineNum">     405</span>                 :             :         }</span>
+<span id="L406"><span class="lineNum">     406</span>         [<span class="tlaGBC" title="Branch 0 was taken 180565 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 118514 times"> + </span>]:<span class="tlaGNC">      299079 :         if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L407"><span class="lineNum">     407</span>         [<span class="tlaGBC" title="Branch 0 was taken 136089 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 44476 times"> + </span>]:<span class="tlaGNC">      180565 :             const auto txid = fuzzed_data_provider.ConsumeBool() ?</span></span>
+<span id="L408"><span class="lineNum">     408</span>         [<span class="tlaGBC" title="Branch 0 was taken 136089 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      136089 :                                    mut_tx.GetHash() :</span></span>
+<span id="L409"><span class="lineNum">     409</span>                 :<span class="tlaGNC">       44476 :                                    PickValue(fuzzed_data_provider, txids);</span></span>
+<span id="L410"><span class="lineNum">     410</span>                 :<span class="tlaGNC">      180565 :             const auto delta = fuzzed_data_provider.ConsumeIntegralInRange&lt;CAmount&gt;(-50 * COIN, +50 * COIN);</span></span>
+<span id="L411"><span class="lineNum">     411</span>         [<span class="tlaGBC" title="Branch 0 was taken 180565 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      180565 :             tx_pool.PrioritiseTransaction(txid.ToUint256(), delta);</span></span>
+<span id="L412"><span class="lineNum">     412</span>                 :             :         }</span>
+<span id="L413"><span class="lineNum">     413</span>                 :             : </span>
+<span id="L414"><span class="lineNum">     414</span>         [<span class="tlaGBC" title="Branch 0 was taken 299079 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      299079 :         const auto tx = MakeTransactionRef(mut_tx);</span></span>
+<span id="L415"><span class="lineNum">     415</span>                 :<span class="tlaGNC">      299079 :         const bool bypass_limits = fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L416"><span class="lineNum">     416</span>   [<span class="tlaGBC" title="Branch 0 was taken 598158 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 299079 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      897237 :         const auto res = WITH_LOCK(::cs_main, return AcceptToMemoryPool(chainstate, tx, GetTime(), bypass_limits, /*test_accept=*/false));</span></span>
+<span id="L417"><span class="lineNum">     417</span>                 :<span class="tlaGNC">      299079 :         const bool accepted = res.m_result_type == MempoolAcceptResult::ResultType::VALID;</span></span>
+<span id="L418"><span class="lineNum">     418</span>         [<span class="tlaGBC" title="Branch 0 was taken 59616 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 239463 times"> + </span>]:<span class="tlaGNC">      299079 :         if (accepted) {</span></span>
+<span id="L419"><span class="lineNum">     419</span>         [<span class="tlaGBC" title="Branch 0 was taken 59616 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       59616 :             txids.push_back(tx-&gt;GetHash());</span></span>
+<span id="L420"><span class="lineNum">     420</span>         [<span class="tlaGBC" title="Branch 0 was taken 59616 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       59616 :             CheckMempoolTRUCInvariants(tx_pool);</span></span>
+<span id="L421"><span class="lineNum">     421</span>                 :             :         }</span>
+<span id="L422"><span class="lineNum">     422</span>         [<span class="tlaGBC" title="Branch 0 was taken 299079 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      897237 :     }</span></span>
+<span id="L423"><span class="lineNum">     423</span>         [<span class="tlaGBC" title="Branch 0 was taken 4652 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4652 :     Finish(fuzzed_data_provider, tx_pool, chainstate);</span></span>
+<span id="L424"><span class="lineNum">     424</span>                 :<span class="tlaGNC">        4652 : }</span></span>
+<span id="L425"><span class="lineNum">     425</span>                 :             : } // namespace</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

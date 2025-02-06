@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/node/miner.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/node">src/node</a> - miner.h<span style="font-size: 80%;"> (source / <a href="miner.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntry">26</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-02-06 08:46:09</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">65.2&nbsp;%</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntry">30</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_NODE_MINER_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_NODE_MINER_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;node/types.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;primitives/block.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;txmempool.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/feefrac.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;stdint.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;boost/multi_index/identity.hpp&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;boost/multi_index/indexed_by.hpp&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;boost/multi_index/ordered_index.hpp&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;boost/multi_index/tag.hpp&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;boost/multi_index_container.hpp&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : </span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : class ArgsManager;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : class CBlockIndex;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : class CChainParams;</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : class CScript;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : class Chainstate;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : class ChainstateManager;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : namespace Consensus { struct Params; };</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : namespace node {</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : static const bool DEFAULT_PRINT_MODIFIED_FEE = false;</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : </span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : struct CBlockTemplate</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : {</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     CBlock block;</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     std::vector&lt;CAmount&gt; vTxFees;</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     std::vector&lt;int64_t&gt; vTxSigOpsCost;</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     std::vector&lt;unsigned char&gt; vchCoinbaseCommitment;</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     /* A vector of package fee rates, ordered by the sequence in which</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :      * packages are selected for inclusion in the block template.*/</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     std::vector&lt;FeeFrac&gt; m_package_feerates;</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : };</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : // Container for tracking updates to ancestor feerate as we include (parent)</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : // transactions in a block</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : struct CTxMemPoolModifiedEntry {</span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">       32012 :     explicit CTxMemPoolModifiedEntry(CTxMemPool::txiter entry)</span></span>
+<span id="L52"><span class="lineNum">      52</span>   [<span class="tlaGBC" title="Branch 0 was taken 10419 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 21593 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       32012 :     {</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">       32012 :         iter = entry;</span></span>
+<span id="L54"><span class="lineNum">      54</span>   [<span class="tlaGBC" title="Branch 0 was taken 10419 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 21593 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       32012 :         nSizeWithAncestors = entry-&gt;GetSizeWithAncestors();</span></span>
+<span id="L55"><span class="lineNum">      55</span>   [<span class="tlaGBC" title="Branch 0 was taken 10419 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 21593 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       32012 :         nModFeesWithAncestors = entry-&gt;GetModFeesWithAncestors();</span></span>
+<span id="L56"><span class="lineNum">      56</span>   [<span class="tlaGBC" title="Branch 0 was taken 10419 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 21593 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       32012 :         nSigOpCostWithAncestors = entry-&gt;GetSigOpCostWithAncestors();</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     }</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : </span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">     2906186 :     CAmount GetModifiedFee() const { return iter-&gt;GetModifiedFee(); }</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">     1071346 :     uint64_t GetSizeWithAncestors() const { return nSizeWithAncestors; }</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">     3060112 :     CAmount GetModFeesWithAncestors() const { return nModFeesWithAncestors; }</span></span>
+<span id="L62"><span class="lineNum">      62</span>         [<span class="tlaGBC" title="Branch 0 was taken 1071346 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 917420 times"> + </span>]:<span class="tlaGNC">     1988766 :     size_t GetTxSize() const { return iter-&gt;GetTxSize(); }</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">      323181 :     const CTransaction&amp; GetTx() const { return iter-&gt;GetTx(); }</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     CTxMemPool::txiter iter;</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     uint64_t nSizeWithAncestors;</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :     CAmount nModFeesWithAncestors;</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     int64_t nSigOpCostWithAncestors;</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : };</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : </span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : /** Comparator for CTxMemPool::txiter objects.</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :  *  It simply compares the internal memory address of the CTxMemPoolEntry object</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :  *  pointed to. This means it has no meaning, and is only useful for using them</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  *  as key in other indexes.</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :  */</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : struct CompareCTxMemPoolIter {</span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">     3064949 :     bool operator()(const CTxMemPool::txiter&amp; a, const CTxMemPool::txiter&amp; b) const</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     {</span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">     3064949 :         return &amp;(*a) &lt; &amp;(*b);</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     }</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : };</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : </span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : struct modifiedentry_iter {</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     typedef CTxMemPool::txiter result_type;</span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">     3086542 :     result_type operator() (const CTxMemPoolModifiedEntry &amp;entry) const</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     {</span>
+<span id="L87"><span class="lineNum">      87</span>   [<span class="tlaGBC" title="Branch 0 was taken 28763 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 28786 times"> + </span> :<span class="tlaGNC">     2956998 :         return entry.iter;</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 40545 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 40847 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 17660 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 296310 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 295388 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 82246 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 129544 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 92554 times"> + </span><span class="tlaGBC" title="Branch 15 was taken 36990 times"> + </span><span class="tlaGBC" title="Branch 16 was taken 844716 times"> + </span><span class="tlaGBC" title="Branch 17 was taken 819333 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 17593 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 19 was taken 293674 times"> + </span>]
+<span id="L88"><span class="lineNum">      88</span>                 :             :     }</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : };</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : </span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : // A comparator that sorts transactions based on number of ancestors.</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : // This is sufficient to sort an ancestor package in an order that is valid</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : // to appear in a block.</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : struct CompareTxIterByAncestorCount {</span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">      119335 :     bool operator()(const CTxMemPool::txiter&amp; a, const CTxMemPool::txiter&amp; b) const</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :     {</span>
+<span id="L97"><span class="lineNum">      97</span>         [<span class="tlaGBC" title="Branch 0 was taken 118671 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 664 times"> + </span>]:<span class="tlaGNC">      119335 :         if (a-&gt;GetCountWithAncestors() != b-&gt;GetCountWithAncestors()) {</span></span>
+<span id="L98"><span class="lineNum">      98</span>                 :<span class="tlaGNC">      118671 :             return a-&gt;GetCountWithAncestors() &lt; b-&gt;GetCountWithAncestors();</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :         }</span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">         664 :         return CompareIteratorByHash()(a, b);</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :     }</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : };</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : </span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : struct CTxMemPoolModifiedEntry_Indices final : boost::multi_index::indexed_by&lt;</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     boost::multi_index::ordered_unique&lt;</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :         modifiedentry_iter,</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :         CompareCTxMemPoolIter</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     &gt;,</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     // sorted by modified ancestor fee rate</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     boost::multi_index::ordered_non_unique&lt;</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :         // Reuse same tag from CTxMemPool's similar index</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :         boost::multi_index::tag&lt;ancestor_score&gt;,</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :         boost::multi_index::identity&lt;CTxMemPoolModifiedEntry&gt;,</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :         CompareTxMemPoolEntryByAncestorFee</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     &gt;</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : &gt;</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : {};</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : </span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : typedef boost::multi_index_container&lt;</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :     CTxMemPoolModifiedEntry,</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     CTxMemPoolModifiedEntry_Indices</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : &gt; indexed_modified_transaction_set;</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             : </span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : typedef indexed_modified_transaction_set::nth_index&lt;0&gt;::type::iterator modtxiter;</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : typedef indexed_modified_transaction_set::index&lt;ancestor_score&gt;::type::iterator modtxscoreiter;</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : </span>
+<span id="L128"><span class="lineNum">     128</span>                 :             : struct update_for_parent_inclusion</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : {</span>
+<span id="L130"><span class="lineNum">     130</span>         [<span class="tlaGBC" title="Branch 0 was taken 315267 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      315267 :     explicit update_for_parent_inclusion(CTxMemPool::txiter it) : iter(it) {}</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : </span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">      315267 :     void operator() (CTxMemPoolModifiedEntry &amp;e)</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :     {</span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">      315267 :         e.nModFeesWithAncestors -= iter-&gt;GetModifiedFee();</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">      315267 :         e.nSizeWithAncestors -= iter-&gt;GetTxSize();</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">      315267 :         e.nSigOpCostWithAncestors -= iter-&gt;GetSigOpCost();</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaGNC">      315267 :     }</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :             : </span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     CTxMemPool::txiter iter;</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : };</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : </span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : /** Generate a new block, without valid proof-of-work */</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : class BlockAssembler</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : {</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : private:</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :     // The constructed block template</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :     std::unique_ptr&lt;CBlockTemplate&gt; pblocktemplate;</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     // Information on the current status of the block</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :     uint64_t nBlockWeight;</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :     uint64_t nBlockTx;</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :     uint64_t nBlockSigOpsCost;</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :     CAmount nFees;</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :     std::unordered_set&lt;Txid, SaltedTxidHasher&gt; inBlock;</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     // Chain context for the block</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :     int nHeight;</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :     int64_t m_lock_time_cutoff;</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     const CChainParams&amp; chainparams;</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :     const CTxMemPool* const m_mempool;</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :     Chainstate&amp; m_chainstate;</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : </span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : public:</span>
+<span id="L165"><span class="lineNum">     165</span>   [<span class="tlaGBC" title="Branch 0 was taken 3096 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3096 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      211085 :     struct Options : BlockCreateOptions {</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :         // Configuration parameters for the block size</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :         size_t nBlockMaxWeight{DEFAULT_BLOCK_MAX_WEIGHT};</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :         CFeeRate blockMinFeeRate{DEFAULT_BLOCK_MIN_TX_FEE};</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :         // Whether to call TestBlockValidity() at the end of CreateNewBlock().</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :         bool test_block_validity{true};</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :         bool print_modified_fee{DEFAULT_PRINT_MODIFIED_FEE};</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :     };</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : </span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     explicit BlockAssembler(Chainstate&amp; chainstate, const CTxMemPool* mempool, const Options&amp; options);</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             : </span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     /** Construct a new block template */</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     std::unique_ptr&lt;CBlockTemplate&gt; CreateNewBlock();</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : </span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     inline static std::optional&lt;int64_t&gt; m_last_block_num_txs{};</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     inline static std::optional&lt;int64_t&gt; m_last_block_weight{};</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : </span>
+<span id="L182"><span class="lineNum">     182</span>                 :             : private:</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     const Options m_options;</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             : </span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :     // utility functions</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     /** Clear the block's state and prepare for assembling a new block */</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :     void resetBlock();</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :     /** Add a tx to the block */</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :     void AddToBlock(CTxMemPool::txiter iter);</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :     // Methods for how to add transactions to a block.</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     /** Add transactions based on feerate including unconfirmed ancestors</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :       * Increments nPackagesSelected / nDescendantsUpdated with corresponding</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :       * statistics from the package selection (for logging statistics).</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :       *</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :       * @pre BlockAssembler::m_mempool must not be nullptr</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :     */</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     void addPackageTxs(int&amp; nPackagesSelected, int&amp; nDescendantsUpdated) EXCLUSIVE_LOCKS_REQUIRED(!m_mempool-&gt;cs);</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : </span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     // helper functions for addPackageTxs()</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     /** Remove confirmed (inBlock) entries from given set */</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     void onlyUnconfirmed(CTxMemPool::setEntries&amp; testSet);</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     /** Test if a new package would &quot;fit&quot; in the block */</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :     bool TestPackage(uint64_t packageSize, int64_t packageSigOpsCost) const;</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :     /** Perform checks on each transaction in a package:</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :       * locktime, premature-witness, serialized size (if necessary)</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :       * These checks should always succeed, and they're here</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :       * only as an extra check in case of suboptimal node configuration */</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     bool TestPackageTransactions(const CTxMemPool::setEntries&amp; package) const;</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :     /** Sort the package in an order that is valid to appear in a block */</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :     void SortForBlock(const CTxMemPool::setEntries&amp; package, std::vector&lt;CTxMemPool::txiter&gt;&amp; sortedEntries);</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             : };</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : /**</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :  * Get the minimum time a miner should use in the next block. This always</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :  * accounts for the BIP94 timewarp rule, so does not necessarily reflect the</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :  * consensus limit.</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :  */</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : int64_t GetMinimumTime(const CBlockIndex* pindexPrev, const int64_t difficulty_adjustment_interval);</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             : </span>
+<span id="L221"><span class="lineNum">     221</span>                 :             : int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params&amp; consensusParams, const CBlockIndex* pindexPrev);</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : </span>
+<span id="L223"><span class="lineNum">     223</span>                 :             : /** Update an old GenerateCoinbaseCommitment from CreateNewBlock after the block txs have changed */</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : void RegenerateCommitments(CBlock&amp; block, ChainstateManager&amp; chainman);</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             : </span>
+<span id="L226"><span class="lineNum">     226</span>                 :             : /** Apply -blockmintxfee and -blockmaxweight options from ArgsManager to BlockAssembler options. */</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : void ApplyArgsManOptions(const ArgsManager&amp; gArgs, BlockAssembler::Options&amp; options);</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             : } // namespace node</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : </span>
+<span id="L230"><span class="lineNum">     230</span>                 :             : #endif // BITCOIN_NODE_MINER_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

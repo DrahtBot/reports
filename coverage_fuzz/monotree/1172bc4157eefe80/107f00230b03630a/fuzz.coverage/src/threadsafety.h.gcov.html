@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/threadsafety.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - threadsafety.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-02-06 08:46:09</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">42.9&nbsp;%</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">6</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2020 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_THREADSAFETY_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_THREADSAFETY_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;mutex&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #ifdef __clang__</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : // TL;DR Add GUARDED_BY(mutex) to member variables. The others are</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : // rarely necessary. Ex: int nFoo GUARDED_BY(cs_foo);</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : //</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : // See https://clang.llvm.org/docs/ThreadSafetyAnalysis.html</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : // for documentation.  The clang compiler can do advanced static analysis</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : // of locking when given the -Wthread-safety option.</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #define LOCKABLE __attribute__((lockable))</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #define SCOPED_LOCKABLE __attribute__((scoped_lockable))</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #define GUARDED_BY(x) __attribute__((guarded_by(x)))</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #define PT_GUARDED_BY(x) __attribute__((pt_guarded_by(x)))</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #define ACQUIRED_AFTER(...) __attribute__((acquired_after(__VA_ARGS__)))</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #define ACQUIRED_BEFORE(...) __attribute__((acquired_before(__VA_ARGS__)))</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #define EXCLUSIVE_LOCK_FUNCTION(...) __attribute__((exclusive_lock_function(__VA_ARGS__)))</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #define SHARED_LOCK_FUNCTION(...) __attribute__((shared_lock_function(__VA_ARGS__)))</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #define EXCLUSIVE_TRYLOCK_FUNCTION(...) __attribute__((exclusive_trylock_function(__VA_ARGS__)))</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #define SHARED_TRYLOCK_FUNCTION(...) __attribute__((shared_trylock_function(__VA_ARGS__)))</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : #define UNLOCK_FUNCTION(...) __attribute__((unlock_function(__VA_ARGS__)))</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #define LOCK_RETURNED(x) __attribute__((lock_returned(x)))</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : #define LOCKS_EXCLUDED(...) __attribute__((locks_excluded(__VA_ARGS__)))</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : #define EXCLUSIVE_LOCKS_REQUIRED(...) __attribute__((exclusive_locks_required(__VA_ARGS__)))</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : #define SHARED_LOCKS_REQUIRED(...) __attribute__((shared_locks_required(__VA_ARGS__)))</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : #define NO_THREAD_SAFETY_ANALYSIS __attribute__((no_thread_safety_analysis))</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : #define ASSERT_EXCLUSIVE_LOCK(...) __attribute__((assert_exclusive_lock(__VA_ARGS__)))</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : #else</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : #define LOCKABLE</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : #define SCOPED_LOCKABLE</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : #define GUARDED_BY(x)</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : #define PT_GUARDED_BY(x)</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : #define ACQUIRED_AFTER(...)</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : #define ACQUIRED_BEFORE(...)</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : #define EXCLUSIVE_LOCK_FUNCTION(...)</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : #define SHARED_LOCK_FUNCTION(...)</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : #define EXCLUSIVE_TRYLOCK_FUNCTION(...)</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : #define SHARED_TRYLOCK_FUNCTION(...)</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : #define UNLOCK_FUNCTION(...)</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : #define LOCK_RETURNED(x)</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : #define LOCKS_EXCLUDED(...)</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : #define EXCLUSIVE_LOCKS_REQUIRED(...)</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : #define SHARED_LOCKS_REQUIRED(...)</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : #define NO_THREAD_SAFETY_ANALYSIS</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : #define ASSERT_EXCLUSIVE_LOCK(...)</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : #endif // __GNUC__</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : // StdMutex provides an annotated version of std::mutex for us,</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : // and should only be used when sync.h Mutex/LOCK/etc are not usable.</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : class LOCKABLE StdMutex : public std::mutex</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : {</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : public:</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : #ifdef __clang__</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     //! For negative capabilities in the Clang Thread Safety Analysis.</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     //! A negative requirement uses the EXCLUSIVE_LOCKS_REQUIRED attribute, in conjunction</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     //! with the ! operator, to indicate that a mutex should not be held.</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     const StdMutex&amp; operator!() const { return *this; }</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : #endif // __clang__</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : };</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : </span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : // StdLockGuard provides an annotated version of std::lock_guard for us,</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : // and should only be used when sync.h Mutex/LOCK/etc are not usable.</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : class SCOPED_LOCKABLE StdLockGuard : public std::lock_guard&lt;StdMutex&gt;</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : {</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : public:</span>
+<span id="L73"><span class="lineNum">      73</span> [<span class="tlaGBC" title="Branch 0 was taken 9291380 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 17565 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> :<span class="tlaGNC">    21543005 :     explicit StdLockGuard(StdMutex&amp; cs) EXCLUSIVE_LOCK_FUNCTION(cs) : std::lock_guard&lt;StdMutex&gt;(cs) {}</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 6361579 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1942 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 7 was taken 84 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaGBC" title="Branch 9 was taken 2026 times"> + </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 11 was not taken"> - </span>]
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">    21543005 :     ~StdLockGuard() UNLOCK_FUNCTION() = default;</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : };</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : </span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : #endif // BITCOIN_THREADSAFETY_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

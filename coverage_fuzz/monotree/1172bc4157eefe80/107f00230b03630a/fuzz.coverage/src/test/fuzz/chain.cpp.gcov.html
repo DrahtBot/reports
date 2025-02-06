@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/chain.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - chain.cpp<span style="font-size: 80%;"> (source / <a href="chain.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">30</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-02-06 08:46:09</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">72.2&nbsp;%</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">13</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;chain.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : </span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>         [<span class="tlaGBC" title="Branch 0 was taken 209 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         732 : FUZZ_TARGET(chain)</span></span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : {</span>
+<span id="L16"><span class="lineNum">      16</span>                 :<span class="tlaGNC">         314 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L17"><span class="lineNum">      17</span>                 :<span class="tlaGNC">         314 :     std::optional&lt;CDiskBlockIndex&gt; disk_block_index = ConsumeDeserializable&lt;CDiskBlockIndex&gt;(fuzzed_data_provider);</span></span>
+<span id="L18"><span class="lineNum">      18</span>         [<span class="tlaGBC" title="Branch 0 was taken 271 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 43 times"> + </span>]:<span class="tlaGNC">         314 :     if (!disk_block_index) {</span></span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :         return;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :     }</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">         271 :     const uint256 zero{};</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">         271 :     disk_block_index-&gt;phashBlock = &amp;zero;</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">         271 :     {</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">         271 :         LOCK(::cs_main);</span></span>
+<span id="L26"><span class="lineNum">      26</span>         [<span class="tlaGBC" title="Branch 0 was taken 271 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         271 :         (void)disk_block_index-&gt;ConstructBlockHash();</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">         271 :         (void)disk_block_index-&gt;GetBlockPos();</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">         271 :         (void)disk_block_index-&gt;GetBlockTime();</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         271 :         (void)disk_block_index-&gt;GetBlockTimeMax();</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">         271 :         (void)disk_block_index-&gt;GetMedianTimePast();</span></span>
+<span id="L31"><span class="lineNum">      31</span>         [<span class="tlaGBC" title="Branch 0 was taken 271 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         271 :         (void)disk_block_index-&gt;GetUndoPos();</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">         271 :         (void)disk_block_index-&gt;HaveNumChainTxs();</span></span>
+<span id="L33"><span class="lineNum">      33</span>         [<span class="tlaGBC" title="Branch 0 was taken 271 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         271 :         (void)disk_block_index-&gt;IsValid();</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">         271 :     }</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">         271 :     const CBlockHeader block_header = disk_block_index-&gt;GetBlockHeader();</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">         271 :     (void)CDiskBlockIndex{*disk_block_index};</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">         271 :     (void)disk_block_index-&gt;BuildSkip();</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>   [<span class="tlaGBC" title="Branch 0 was taken 20487 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 270 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 20486 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1 time"> + </span>]:<span class="tlaGNC">       20757 :     LIMITED_WHILE(fuzzed_data_provider.ConsumeBool(), 10000) {</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">       20486 :         const BlockStatus block_status = fuzzed_data_provider.PickValueInArray({</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :             BlockStatus::BLOCK_VALID_UNKNOWN,</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :             BlockStatus::BLOCK_VALID_RESERVED,</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :             BlockStatus::BLOCK_VALID_TREE,</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :             BlockStatus::BLOCK_VALID_TRANSACTIONS,</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :             BlockStatus::BLOCK_VALID_CHAIN,</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :             BlockStatus::BLOCK_VALID_SCRIPTS,</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :             BlockStatus::BLOCK_VALID_MASK,</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :             BlockStatus::BLOCK_HAVE_DATA,</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :             BlockStatus::BLOCK_HAVE_UNDO,</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :             BlockStatus::BLOCK_HAVE_MASK,</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :             BlockStatus::BLOCK_FAILED_VALID,</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :             BlockStatus::BLOCK_FAILED_CHILD,</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :             BlockStatus::BLOCK_FAILED_MASK,</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :             BlockStatus::BLOCK_OPT_WITNESS,</span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">       20486 :         });</span></span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaGBC" title="Branch 0 was taken 18170 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2316 times"> + </span>]:<span class="tlaGNC">       20486 :         if (block_status &amp; ~BLOCK_VALID_MASK) {</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">       18170 :             continue;</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :         }</span>
+<span id="L60"><span class="lineNum">      60</span>         [<span class="tlaGBC" title="Branch 0 was taken 2316 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4632 :         WITH_LOCK(::cs_main, (void)disk_block_index-&gt;RaiseValidity(block_status));</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     }</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">         271 :     CBlockIndex block_index{block_header};</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">         271 :     block_index.phashBlock = &amp;zero;</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">         271 :     (void)block_index.GetBlockHash();</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">         271 :     (void)block_index.ToString();</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

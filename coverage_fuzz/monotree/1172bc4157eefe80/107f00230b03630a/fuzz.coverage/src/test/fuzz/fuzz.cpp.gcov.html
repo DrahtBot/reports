@@ -1,0 +1,377 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/fuzz.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - fuzz.cpp<span style="font-size: 80%;"> (source / <a href="fuzz.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">65.0&nbsp;%</td>
+            <td class="headerCovTableEntry">120</td>
+            <td class="headerCovTableEntry">78</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-02-06 08:46:09</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">58.3&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">7</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">41.5&nbsp;%</td>
+            <td class="headerCovTableEntry">130</td>
+            <td class="headerCovTableEntry">54</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;netaddress.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;netbase.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;test/fuzz/util/check_globals.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;test/util/random.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;test/util/setup_common.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/fs.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;util/sock.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;util/time.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;csignal&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;cstdio&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;cstdlib&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;cstring&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;exception&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;fstream&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #include &lt;iostream&gt;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #include &lt;map&gt;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : #include &lt;string&gt;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #include &lt;tuple&gt;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : #if defined(PROVIDE_FUZZ_MAIN_FUNCTION) &amp;&amp; defined(__AFL_FUZZ_INIT)</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : __AFL_FUZZ_INIT();</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : #endif</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : </span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : const std::function&lt;void(const std::string&amp;)&gt; G_TEST_LOG_FUN{};</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : </span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : /**</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :  * A copy of the command line arguments that start with `--`.</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :  * First `LLVMFuzzerInitialize()` is called, which saves the arguments to `g_args`.</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :  * Later, depending on the fuzz test, `G_TEST_COMMAND_LINE_ARGUMENTS()` may be</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :  * called by `BasicTestingSetup` constructor to fetch those arguments and store</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :  * them in `BasicTestingSetup::m_node::args`.</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :  */</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : static std::vector&lt;const char*&gt; g_args;</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaUNC">           0 : static void SetArgs(int argc, char** argv) {</span></span>
+<span id="L49"><span class="lineNum">      49</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (int i = 1; i &lt; argc; ++i) {</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :         // Only take into account arguments that start with `--`. The others are for the fuzz engine:</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :         // `fuzz -runs=1 fuzz_corpora/address_deserialize_v2 --checkaddrman=5`</span>
+<span id="L52"><span class="lineNum">      52</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         if (strlen(argv[i]) &gt; 2 &amp;&amp; argv[i][0] == '-' &amp;&amp; argv[i][1] == '-') {</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaUNC">           0 :             g_args.push_back(argv[i]);</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :         }</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     }</span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : </span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">        2026 : const std::function&lt;std::vector&lt;const char*&gt;()&gt; G_TEST_COMMAND_LINE_ARGUMENTS = []() {</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">        2026 :     return g_args;</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : };</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">       87362 : struct FuzzTarget {</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     const TypeTestOneInput test_one_input;</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     const FuzzTargetOptions opts;</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : };</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : </span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">       44098 : auto&amp; FuzzTargets()</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : {</span>
+<span id="L69"><span class="lineNum">      69</span>   [<span class="tlaGBC" title="Branch 0 was taken 209 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 43889 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 209 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       44306 :     static std::map&lt;std::string_view, FuzzTarget&gt; g_fuzz_targets;</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">       44098 :     return g_fuzz_targets;</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : }</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">       43681 : void FuzzFrameworkRegisterTarget(std::string_view name, TypeTestOneInput target, FuzzTargetOptions opts)</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : {</span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaGBC" title="Branch 0 was taken 43681 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       87362 :     const auto [it, ins]{FuzzTargets().try_emplace(name, FuzzTarget /* temporary can be dropped after Apple-Clang-16 ? */ {std::move(target), std::move(opts)})};</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">       43681 :     Assert(ins);</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">       43681 : }</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : static std::string_view g_fuzz_target;</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : static const TypeTestOneInput* g_test_one_input{nullptr};</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : </span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      199232 : static void test_one_input(FuzzBufferType buffer)</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : {</span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">      199232 :     CheckGlobals check{};</span></span>
+<span id="L85"><span class="lineNum">      85</span>   [<span class="tlaGBC" title="Branch 0 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      199232 :     (*Assert(g_test_one_input))(buffer);</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :<span class="tlaGNC">      199232 : }</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : </span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">        2026 : const std::function&lt;std::string()&gt; G_TEST_GET_FULL_NAME{[]{</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">        2026 :     return std::string{g_fuzz_target};</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : }};</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : #if defined(__clang__) &amp;&amp; defined(__linux__)</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : extern &quot;C&quot; void __llvm_profile_reset_counters(void) __attribute__((weak));</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : extern &quot;C&quot; void __gcov_reset(void) __attribute__((weak));</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : </span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : void ResetCoverageCounters()</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : {</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     if (__llvm_profile_reset_counters) {</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :         __llvm_profile_reset_counters();</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     }</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : </span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :     if (__gcov_reset) {</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :         __gcov_reset();</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :     }</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : }</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : #else</span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">         208 : void ResetCoverageCounters() {}</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : #endif</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             : </span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : </span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">         209 : static void initialize()</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : {</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     // By default, make the RNG deterministic with a fixed seed. This will affect all</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     // randomness during the fuzz test, except:</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     // - GetStrongRandBytes(), which is used for the creation of private key material.</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     // - Randomness obtained before this call in g_rng_temp_path_init</span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">         209 :     SeedRandomStateForTest(SeedRand::ZEROS);</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : </span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :     // Set time to the genesis block timestamp for deterministic initialization.</span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">         209 :     SetMockTime(1231006505);</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :             : </span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     // Terminate immediately if a fuzzing harness ever tries to create a socket.</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :     // Individual tests can override this by pointing CreateSock to a mocked alternative.</span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">         209 :     CreateSock = [](int, int, int) -&gt; std::unique_ptr&lt;Sock&gt; { std::terminate(); };</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     // Terminate immediately if a fuzzing harness ever tries to perform a DNS lookup.</span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaGNC">     1244211 :     g_dns_lookup = [](const std::string&amp; name, bool allow_lookup) {</span></span>
+<span id="L128"><span class="lineNum">     128</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1244002 times"> + </span>]:<span class="tlaGNC">     1244002 :         if (allow_lookup) {</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaUNC">           0 :             std::terminate();</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :         }</span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">     1244002 :         return WrappedGetAddrInfo(name, false);</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">         209 :     };</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : </span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">         209 :     bool should_exit{false};</span></span>
+<span id="L135"><span class="lineNum">     135</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 208 times"> + </span>]:<span class="tlaGNC">         209 :     if (std::getenv(&quot;PRINT_ALL_FUZZ_TARGETS_AND_ABORT&quot;)) {</span></span>
+<span id="L136"><span class="lineNum">     136</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 208 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 209 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1 time"> + </span>]:<span class="tlaGNC">         210 :         for (const auto&amp; [name, t] : FuzzTargets()) {</span></span>
+<span id="L137"><span class="lineNum">     137</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 208 times"> + </span>]:<span class="tlaGNC">         209 :             if (t.opts.hidden) continue;</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">         208 :             std::cout &lt;&lt; name &lt;&lt; std::endl;</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :         }</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :         should_exit = true;</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     }</span>
+<span id="L142"><span class="lineNum">     142</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 209 times"> + </span>]:<span class="tlaGNC">         209 :     if (const char* out_path = std::getenv(&quot;WRITE_ALL_FUZZ_TARGETS_AND_ABORT&quot;)) {</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaUNC">           0 :         std::cout &lt;&lt; &quot;Writing all fuzz target names to '&quot; &lt;&lt; out_path &lt;&lt; &quot;'.&quot; &lt;&lt; std::endl;</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaUNC">           0 :         std::ofstream out_stream{out_path, std::ios::binary};</span></span>
+<span id="L145"><span class="lineNum">     145</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         for (const auto&amp; [name, t] : FuzzTargets()) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L146"><span class="lineNum">     146</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (t.opts.hidden) continue;</span></span>
+<span id="L147"><span class="lineNum">     147</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             out_stream &lt;&lt; name &lt;&lt; std::endl;</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :         }</span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaUNC">           0 :         should_exit = true;</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L151"><span class="lineNum">     151</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 208 times"> + </span>]:<span class="tlaGNC">         209 :     if (should_exit) {</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">           1 :         std::exit(EXIT_SUCCESS);</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :     }</span>
+<span id="L154"><span class="lineNum">     154</span>         [<span class="tlaGBC" title="Branch 0 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         208 :     if (const auto* env_fuzz{std::getenv(&quot;FUZZ&quot;)}) {</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :         // To allow for easier fuzz executable binary modification,</span>
+<span id="L156"><span class="lineNum">     156</span>   [<span class="tlaGBC" title="Branch 0 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         416 :         static std::string g_copy{env_fuzz}; // create copy to avoid compiler optimizations, and</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">         208 :         g_fuzz_target = g_copy.c_str();      // strip string after the first null-char.</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :     } else {</span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaUNC">           0 :         std::cerr &lt;&lt; &quot;Must select fuzz target with the FUZZ env var.&quot; &lt;&lt; std::endl;</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaUNC">           0 :         std::cerr &lt;&lt; &quot;Hint: Set the PRINT_ALL_FUZZ_TARGETS_AND_ABORT=1 env var to see all compiled targets.&quot; &lt;&lt; std::endl;</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaUNC">           0 :         std::exit(EXIT_FAILURE);</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :     }</span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">         208 :     const auto it = FuzzTargets().find(g_fuzz_target);</span></span>
+<span id="L164"><span class="lineNum">     164</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 208 times"> + </span>]:<span class="tlaGNC">         208 :     if (it == FuzzTargets().end()) {</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaUNC">           0 :         std::cerr &lt;&lt; &quot;No fuzz target compiled for &quot; &lt;&lt; g_fuzz_target &lt;&lt; &quot;.&quot; &lt;&lt; std::endl;</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaUNC">           0 :         std::exit(EXIT_FAILURE);</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :     }</span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">         208 :     if constexpr (!G_FUZZING) {</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :         std::cerr &lt;&lt; &quot;Must compile with -DBUILD_FOR_FUZZING=ON to execute a fuzz target.&quot; &lt;&lt; std::endl;</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :         std::exit(EXIT_FAILURE);</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     }</span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">         208 :     Assert(!g_test_one_input);</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaGNC">         208 :     g_test_one_input = &amp;it-&gt;second.test_one_input;</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">         208 :     it-&gt;second.opts.init();</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :             : </span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">         208 :     ResetCoverageCounters();</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :<span class="tlaGNC">         208 : }</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : </span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : #if defined(PROVIDE_FUZZ_MAIN_FUNCTION)</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaUNC">           0 : static bool read_stdin(std::vector&lt;uint8_t&gt;&amp; data)</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : {</span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaUNC">           0 :     std::istream::char_type buffer[1024];</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaUNC">           0 :     std::streamsize length;</span></span>
+<span id="L184"><span class="lineNum">     184</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     while ((std::cin.read(buffer, 1024), length = std::cin.gcount()) &gt; 0) {</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaUNC">           0 :         data.insert(data.end(), buffer, buffer + length);</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     }</span>
+<span id="L187"><span class="lineNum">     187</span>                 :<span class="tlaUNC">           0 :     return length == 0;</span></span>
+<span id="L188"><span class="lineNum">     188</span>                 :             : }</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             : #endif</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : #if defined(PROVIDE_FUZZ_MAIN_FUNCTION) &amp;&amp; !defined(__AFL_LOOP)</span>
+<span id="L192"><span class="lineNum">     192</span>                 :<span class="tlaGNC">      199232 : static bool read_file(fs::path p, std::vector&lt;uint8_t&gt;&amp; data)</span></span>
+<span id="L193"><span class="lineNum">     193</span>                 :             : {</span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">      199232 :     uint8_t buffer[1024];</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">      199232 :     FILE* f = fsbridge::fopen(p, &quot;rb&quot;);</span></span>
+<span id="L196"><span class="lineNum">     196</span>         [<span class="tlaGBC" title="Branch 0 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      199232 :     if (f == nullptr) return false;</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :<span class="tlaGNC">     4750465 :     do {</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">     4750465 :         const size_t length = fread(buffer, sizeof(uint8_t), sizeof(buffer), f);</span></span>
+<span id="L199"><span class="lineNum">     199</span>         [<span class="tlaGBC" title="Branch 0 was taken 4750465 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     4750465 :         if (ferror(f)) return false;</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">     4750465 :         data.insert(data.end(), buffer, buffer + length);</span></span>
+<span id="L201"><span class="lineNum">     201</span>         [<span class="tlaGBC" title="Branch 0 was taken 4551233 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 199232 times"> + </span>]:<span class="tlaGNC">     4750465 :     } while (!feof(f));</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :<span class="tlaGNC">      199232 :     fclose(f);</span></span>
+<span id="L203"><span class="lineNum">     203</span>                 :<span class="tlaGNC">      199232 :     return true;</span></span>
+<span id="L204"><span class="lineNum">     204</span>                 :             : }</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             : #endif</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : </span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : #if defined(PROVIDE_FUZZ_MAIN_FUNCTION) &amp;&amp; !defined(__AFL_LOOP)</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : static fs::path g_input_path;</span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaUNC">           0 : void signal_handler(int signal)</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : {</span>
+<span id="L211"><span class="lineNum">     211</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (signal == SIGABRT) {</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaUNC">           0 :         std::cerr &lt;&lt; &quot;Error processing input &quot; &lt;&lt; g_input_path &lt;&lt; std::endl;</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :     } else {</span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaUNC">           0 :         std::cerr &lt;&lt; &quot;Unexpected signal &quot; &lt;&lt; signal &lt;&lt; &quot; received\n&quot;;</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :     }</span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaUNC">           0 :     std::_Exit(EXIT_FAILURE);</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : }</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             : #endif</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : </span>
+<span id="L220"><span class="lineNum">     220</span>                 :             : // This function is used by libFuzzer</span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaUNC">           0 : extern &quot;C&quot; int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : {</span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaUNC">           0 :     test_one_input({data, size});</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :<span class="tlaUNC">           0 :     return 0;</span></span>
+<span id="L225"><span class="lineNum">     225</span>                 :             : }</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             : </span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : // This function is used by libFuzzer</span>
+<span id="L228"><span class="lineNum">     228</span>                 :<span class="tlaUNC">           0 : extern &quot;C&quot; int LLVMFuzzerInitialize(int* argc, char*** argv)</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : {</span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaUNC">           0 :     SetArgs(*argc, *argv);</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaUNC">           0 :     initialize();</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :<span class="tlaUNC">           0 :     return 0;</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :             : }</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             : </span>
+<span id="L235"><span class="lineNum">     235</span>                 :             : #if defined(PROVIDE_FUZZ_MAIN_FUNCTION)</span>
+<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaGNC">         209 : int main(int argc, char** argv)</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :             : {</span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">         209 :     initialize();</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : #ifdef __AFL_LOOP</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     // Enable AFL persistent mode. Requires compilation using afl-clang-fast++.</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :     // See fuzzing.md for details.</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :     const uint8_t* buffer = __AFL_FUZZ_TESTCASE_BUF;</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :     while (__AFL_LOOP(100000)) {</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :         size_t buffer_len = __AFL_FUZZ_TESTCASE_LEN;</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :         test_one_input({buffer, buffer_len});</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :     }</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             : #else</span>
+<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaGNC">         208 :     std::vector&lt;uint8_t&gt; buffer;</span></span>
+<span id="L249"><span class="lineNum">     249</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 208 times"> + </span>]:<span class="tlaGNC">         208 :     if (argc &lt;= 1) {</span></span>
+<span id="L250"><span class="lineNum">     250</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (!read_stdin(buffer)) {</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :             return 0;</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :         }</span>
+<span id="L253"><span class="lineNum">     253</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         test_one_input(buffer);</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :         return 0;</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :     }</span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">         208 :     std::signal(SIGABRT, signal_handler);</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">         208 :     const auto start_time{Now&lt;SteadySeconds&gt;()};</span></span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">         208 :     int tested = 0;</span></span>
+<span id="L259"><span class="lineNum">     259</span>         [<span class="tlaGBC" title="Branch 0 was taken 208 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 208 times"> + </span>]:<span class="tlaGNC">         416 :     for (int i = 1; i &lt; argc; ++i) {</span></span>
+<span id="L260"><span class="lineNum">     260</span>         [<span class="tlaGBC" title="Branch 0 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         208 :         fs::path input_path(*(argv + i));</span></span>
+<span id="L261"><span class="lineNum">     261</span>   [<span class="tlaGBC" title="Branch 0 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         208 :         if (fs::is_directory(input_path)) {</span></span>
+<span id="L262"><span class="lineNum">     262</span>   [<span class="tlaGBC" title="Branch 0 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 208 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 199232 times"> + </span> :<span class="tlaGNC">      199648 :             for (fs::directory_iterator it(input_path); it != fs::directory_iterator(); ++it) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 199232 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 208 times"> + </span>]
+<span id="L263"><span class="lineNum">     263</span>   [<span class="tlaGBC" title="Branch 0 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 199232 times"> + </span>]:<span class="tlaGNC">      199232 :                 if (!fs::is_regular_file(it-&gt;path())) continue;</span></span>
+<span id="L264"><span class="lineNum">     264</span>         [<span class="tlaGBC" title="Branch 0 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      398464 :                 g_input_path = it-&gt;path();</span></span>
+<span id="L265"><span class="lineNum">     265</span>   [<span class="tlaGBC" title="Branch 0 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      597696 :                 Assert(read_file(it-&gt;path(), buffer));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L266"><span class="lineNum">     266</span>         [<span class="tlaGBC" title="Branch 0 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      199232 :                 test_one_input(buffer);</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">      199232 :                 ++tested;</span></span>
+<span id="L268"><span class="lineNum">     268</span>   [<span class="tlaGBC" title="Branch 0 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 199232 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      398464 :                 buffer.clear();</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">         208 :             }</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :         } else {</span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             g_input_path = input_path;</span></span>
+<span id="L272"><span class="lineNum">     272</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :             Assert(read_file(input_path, buffer));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L273"><span class="lineNum">     273</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             test_one_input(buffer);</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaUNC">           0 :             ++tested;</span></span>
+<span id="L275"><span class="lineNum">     275</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         208 :             buffer.clear();</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :         }</span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">         208 :     }</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :<span class="tlaGNC">         208 :     const auto end_time{Now&lt;SteadySeconds&gt;()};</span></span>
+<span id="L279"><span class="lineNum">     279</span>   [<span class="tlaGBC" title="Branch 0 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         208 :     std::cout &lt;&lt; g_fuzz_target &lt;&lt; &quot;: succeeded against &quot; &lt;&lt; tested &lt;&lt; &quot; files in &quot; &lt;&lt; count_seconds(end_time - start_time) &lt;&lt; &quot;s.&quot; &lt;&lt; std::endl;</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 208 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 208 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 208 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 13 was not taken"> - </span>]
+<span id="L280"><span class="lineNum">     280</span>                 :             : #endif</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :     return 0;</span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaGNC">         208 : }</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :             : #endif</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
