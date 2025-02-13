@@ -1,0 +1,513 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/interfaces/chain.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/interfaces">src/interfaces</a> - chain.h<span style="font-size: 80%;"> (source / <a href="chain.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">21.7&nbsp;%</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-02-13 10:46:28</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">11.1&nbsp;%</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2018-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_INTERFACES_CHAIN_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_INTERFACES_CHAIN_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;blockfilter.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;common/settings.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;primitives/transaction.h&gt; // For CTransactionRef</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;util/result.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;stddef.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;stdint.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;string&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : class ArgsManager;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : class CBlock;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : class CBlockUndo;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : class CFeeRate;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : class CRPCCommand;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : class CScheduler;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : class Coin;</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : class uint256;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : enum class MemPoolRemovalReason;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : enum class RBFTransactionState;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : enum class ChainstateRole;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : struct bilingual_str;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : struct CBlockLocator;</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : struct FeeCalculation;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : namespace node {</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : struct NodeContext;</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : } // namespace node</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : </span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : namespace interfaces {</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : class Handler;</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : class Wallet;</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : </span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : //! Helper for findBlock to selectively return pieces of block data. If block is</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : //! found, data will be returned by setting specified output variables. If block</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : //! is not found, output variables will keep their previous values.</span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">       46527 : class FoundBlock</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : {</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : public:</span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     FoundBlock&amp; hash(uint256&amp; hash) { m_hash = &amp;hash; return *this; }</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     FoundBlock&amp; height(int&amp; height) { m_height = &amp;height; return *this; }</span></span>
+<span id="L52"><span class="lineNum">      52</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     FoundBlock&amp; time(int64_t&amp; time) { m_time = &amp;time; return *this; }</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">       46527 :     FoundBlock&amp; maxTime(int64_t&amp; max_time) { m_max_time = &amp;max_time; return *this; }</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaUNC">           0 :     FoundBlock&amp; mtpTime(int64_t&amp; mtp_time) { m_mtp_time = &amp;mtp_time; return *this; }</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     //! Return whether block is in the active (most-work) chain.</span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaUNC">           0 :     FoundBlock&amp; inActiveChain(bool&amp; in_active_chain) { m_in_active_chain = &amp;in_active_chain; return *this; }</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     //! Return locator if block is in the active chain.</span>
+<span id="L58"><span class="lineNum">      58</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     FoundBlock&amp; locator(CBlockLocator&amp; locator) { m_locator = &amp;locator; return *this; }</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     //! Return next block in the active chain if current block is in the active chain.</span>
+<span id="L60"><span class="lineNum">      60</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     FoundBlock&amp; nextBlock(const FoundBlock&amp; next_block) { m_next_block = &amp;next_block; return *this; }</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     //! Read block data from disk. If the block exists but doesn't have data</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     //! (for example due to pruning), the CBlock variable will be set to null.</span>
+<span id="L63"><span class="lineNum">      63</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     FoundBlock&amp; data(CBlock&amp; data) { m_data = &amp;data; return *this; }</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     uint256* m_hash = nullptr;</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     int* m_height = nullptr;</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :     int64_t* m_time = nullptr;</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     int64_t* m_max_time = nullptr;</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     int64_t* m_mtp_time = nullptr;</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     bool* m_in_active_chain = nullptr;</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     CBlockLocator* m_locator = nullptr;</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     const FoundBlock* m_next_block = nullptr;</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :     CBlock* m_data = nullptr;</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     mutable bool found = false;</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : };</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : </span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : //! Block data sent with blockConnected, blockDisconnected notifications.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : struct BlockInfo {</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :     const uint256&amp; hash;</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     const uint256* prev_hash = nullptr;</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     int height = -1;</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     int file_number = -1;</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     unsigned data_pos = 0;</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     const CBlock* data = nullptr;</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     const CBlockUndo* undo_data = nullptr;</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     // The maximum time in the chain up to and including this block.</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     // A timestamp that can only move forward.</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     unsigned int chain_time_max{0};</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : </span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 6616 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6616 :     BlockInfo(const uint256&amp; hash LIFETIMEBOUND) : hash(hash) {}</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : };</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : </span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : //! The action to be taken after updating a settings value.</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : //! WRITE indicates that the updated value must be written to disk,</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : //! while SKIP_WRITE indicates that the change will be kept in memory-only</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : //! without persisting it.</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : enum class SettingsAction {</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     WRITE,</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     SKIP_WRITE</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : };</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : </span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : using SettingsUpdate = std::function&lt;std::optional&lt;interfaces::SettingsAction&gt;(common::SettingsValue&amp;)&gt;;</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : //! Interface giving clients (wallet processes, maybe other analysis tools in</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : //! the future) ability to access to the chain state, receive notifications,</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : //! estimate fees, and submit transactions.</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : //!</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : //! TODO: Current chain methods are too low level, exposing too much of the</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             : //! internal workings of the bitcoin node, and not being very convenient to use.</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : //! Chain methods should be cleaned up and simplified over time. Examples:</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : //!</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : //! * The initMessages() and showProgress() methods which the wallet uses to send</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             : //!   notifications to the GUI should go away when GUI and wallet can directly</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             : //!   communicate with each other without going through the node</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : //!   (https://github.com/bitcoin/bitcoin/pull/15288#discussion_r253321096).</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             : //!</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : //! * The handleRpc, registerRpcs, rpcEnableDeprecated methods and other RPC</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : //!   methods can go away if wallets listen for HTTP requests on their own</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : //!   ports instead of registering to handle requests on the node HTTP port.</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : //!</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             : //! * Move fee estimation queries to an asynchronous interface and let the</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             : //!   wallet cache it, fee estimation being driven by node mempool, wallet</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : //!   should be the consumer.</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             : //!</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : //! * `guessVerificationProgress` and similar methods can go away if rescan</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : //!   logic moves out of the wallet, and the wallet just requests scans from the</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : //!   node (https://github.com/bitcoin/bitcoin/issues/11756)</span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">        2026 : class Chain</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : {</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : public:</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :     virtual ~Chain() = default;</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : </span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :     //! Get current chain height, not including genesis block (returns 0 if</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     //! chain only contains genesis block, nullopt if chain does not contain</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :     //! any blocks)</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :     virtual std::optional&lt;int&gt; getHeight() = 0;</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     //! Get block hash. Height must be valid or this function will abort.</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     virtual uint256 getBlockHash(int height) = 0;</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : </span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     //! Check that the block is available on disk (i.e. has not been</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     //! pruned), and contains transactions.</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     virtual bool haveBlockOnDisk(int height) = 0;</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     //! Get locator for the current chain tip.</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :     virtual CBlockLocator getTipLocator() = 0;</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     //! Return a locator that refers to a block in the active chain.</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     //! If specified block is not in the active chain, return locator for the latest ancestor that is in the chain.</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :     virtual CBlockLocator getActiveChainLocator(const uint256&amp; block_hash) = 0;</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : </span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :     //! Return height of the highest block on chain in common with the locator,</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :     //! which will either be the original block used to create the locator,</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :     //! or one of its ancestors.</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :     virtual std::optional&lt;int&gt; findLocatorFork(const CBlockLocator&amp; locator) = 0;</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             : </span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :     //! Returns whether a block filter index is available.</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :     virtual bool hasBlockFilterIndex(BlockFilterType filter_type) = 0;</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     //! Returns whether any of the elements match the block via a BIP 157 block filter</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :     //! or std::nullopt if the block filter for this block couldn't be found.</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :     virtual std::optional&lt;bool&gt; blockFilterMatchesAny(BlockFilterType filter_type, const uint256&amp; block_hash, const GCSFilter::ElementSet&amp; filter_set) = 0;</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : </span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :     //! Return whether node has the block and optionally return block metadata</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :     //! or contents.</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :     virtual bool findBlock(const uint256&amp; hash, const FoundBlock&amp; block={}) = 0;</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : </span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     //! Find first block in the chain with timestamp &gt;= the given time</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :     //! and height &gt;= than the given height, return false if there is no block</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :     //! with a high enough timestamp and height. Optionally return block</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     //! information.</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :     virtual bool findFirstBlockWithTimeAndHeight(int64_t min_time, int min_height, const FoundBlock&amp; block={}) = 0;</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : </span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     //! Find ancestor of block at specified height and optionally return</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     //! ancestor information.</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     virtual bool findAncestorByHeight(const uint256&amp; block_hash, int ancestor_height, const FoundBlock&amp; ancestor_out={}) = 0;</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : </span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     //! Return whether block descends from a specified ancestor, and</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     //! optionally return ancestor information.</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     virtual bool findAncestorByHash(const uint256&amp; block_hash,</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :         const uint256&amp; ancestor_hash,</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :         const FoundBlock&amp; ancestor_out={}) = 0;</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             : </span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :     //! Find most recent common ancestor between two blocks and optionally</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :     //! return block information.</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     virtual bool findCommonAncestor(const uint256&amp; block_hash1,</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :         const uint256&amp; block_hash2,</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :         const FoundBlock&amp; ancestor_out={},</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :         const FoundBlock&amp; block1_out={},</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :         const FoundBlock&amp; block2_out={}) = 0;</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : </span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     //! Look up unspent output information. Returns coins in the mempool and in</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     //! the current chain UTXO set. Iterates through all the keys in the map and</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :     //! populates the values.</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :     virtual void findCoins(std::map&lt;COutPoint, Coin&gt;&amp; coins) = 0;</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             : </span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :     //! Estimate fraction of total transactions verified if blocks up to</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     //! the specified block hash are verified.</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :     virtual double guessVerificationProgress(const uint256&amp; block_hash) = 0;</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             : </span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     //! Return true if data is available for all blocks in the specified range</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     //! of blocks. This checks all blocks that are ancestors of block_hash in</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     //! the height range from min_height to max_height, inclusive.</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :     virtual bool hasBlocks(const uint256&amp; block_hash, int min_height = 0, std::optional&lt;int&gt; max_height = {}) = 0;</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             : </span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :     //! Check if transaction is RBF opt in.</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :     virtual RBFTransactionState isRBFOptIn(const CTransaction&amp; tx) = 0;</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : </span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     //! Check if transaction is in mempool.</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :     virtual bool isInMempool(const uint256&amp; txid) = 0;</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             : </span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :     //! Check if transaction has descendants in mempool.</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :     virtual bool hasDescendantsInMempool(const uint256&amp; txid) = 0;</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : </span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :     //! Transaction is added to memory pool, if the transaction fee is below the</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :     //! amount specified by max_tx_fee, and broadcast to all peers if relay is set to true.</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :     //! Return false if the transaction could not be added due to the fee or for another reason.</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :     virtual bool broadcastTransaction(const CTransactionRef&amp; tx,</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :         const CAmount&amp; max_tx_fee,</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :         bool relay,</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :         std::string&amp; err_string) = 0;</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : </span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :     //! Calculate mempool ancestor and descendant counts for the given transaction.</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :     virtual void getTransactionAncestry(const uint256&amp; txid, size_t&amp; ancestors, size_t&amp; descendants, size_t* ancestorsize = nullptr, CAmount* ancestorfees = nullptr) = 0;</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             : </span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     //! For each outpoint, calculate the fee-bumping cost to spend this outpoint at the specified</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :     //  feerate, including bumping its ancestors. For example, if the target feerate is 10sat/vbyte</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     //  and this outpoint refers to a mempool transaction at 3sat/vbyte, the bump fee includes the</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     //  cost to bump the mempool transaction to 10sat/vbyte (i.e. 7 * mempooltx.vsize). If that</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     //  transaction also has, say, an unconfirmed parent with a feerate of 1sat/vbyte, the bump fee</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :     //  includes the cost to bump the parent (i.e. 9 * parentmempooltx.vsize).</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :     //</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :     //  If the outpoint comes from an unconfirmed transaction that is already above the target</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :     //  feerate or bumped by its descendant(s) already, it does not need to be bumped. Its bump fee</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :     //  is 0. Likewise, if any of the transaction's ancestors are already bumped by a transaction</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :     //  in our mempool, they are not included in the transaction's bump fee.</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :     //</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :     //  Also supported is bump-fee calculation in the case of replacements. If an outpoint</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :     //  conflicts with another transaction in the mempool, it is assumed that the goal is to replace</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     //  that transaction. As such, the calculation will exclude the to-be-replaced transaction, but</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :     //  will include the fee-bumping cost. If bump fees of descendants of the to-be-replaced</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :     //  transaction are requested, the value will be 0. Fee-related RBF rules are not included as</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :     //  they are logically distinct.</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :     //</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :     //  Any outpoints that are otherwise unavailable from the mempool (e.g. UTXOs from confirmed</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :     //  transactions or transactions not yet broadcast by the wallet) are given a bump fee of 0.</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :     //</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :     //  If multiple outpoints come from the same transaction (which would be very rare because</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     //  it means that one transaction has multiple change outputs or paid the same wallet using multiple</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :     //  outputs in the same transaction) or have shared ancestry, the bump fees are calculated</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :     //  independently, i.e. as if only one of them is spent. This may result in double-fee-bumping. This</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :     //  caveat can be rectified per use of the sister-function CalculateCombinedBumpFee(…).</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     virtual std::map&lt;COutPoint, CAmount&gt; calculateIndividualBumpFees(const std::vector&lt;COutPoint&gt;&amp; outpoints, const CFeeRate&amp; target_feerate) = 0;</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             : </span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :     //! Calculate the combined bump fee for an input set per the same strategy</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :     //  as in CalculateIndividualBumpFees(…).</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :     //  Unlike CalculateIndividualBumpFees(…), this does not return individual</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :     //  bump fees per outpoint, but a single bump fee for the shared ancestry.</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :     //  The combined bump fee may be used to correct overestimation due to</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :     //  shared ancestry by multiple UTXOs after coin selection.</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :     virtual std::optional&lt;CAmount&gt; calculateCombinedBumpFee(const std::vector&lt;COutPoint&gt;&amp; outpoints, const CFeeRate&amp; target_feerate) = 0;</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             : </span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :     //! Get the node's package limits.</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :     //! Currently only returns the ancestor and descendant count limits, but could be enhanced to</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :     //! return more policy settings.</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :     virtual void getPackageLimits(unsigned int&amp; limit_ancestor_count, unsigned int&amp; limit_descendant_count) = 0;</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             : </span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     //! Check if transaction will pass the mempool's chain limits.</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :     virtual util::Result&lt;void&gt; checkChainLimits(const CTransactionRef&amp; tx) = 0;</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             : </span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     //! Estimate smart fee.</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :     virtual CFeeRate estimateSmartFee(int num_blocks, bool conservative, FeeCalculation* calc = nullptr) = 0;</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             : </span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :     //! Fee estimator max target.</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :     virtual unsigned int estimateMaxBlocks() = 0;</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             : </span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :     //! Mempool minimum fee.</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :     virtual CFeeRate mempoolMinFee() = 0;</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             : </span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :     //! Relay current minimum fee (from -minrelaytxfee and -incrementalrelayfee settings).</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :     virtual CFeeRate relayMinFee() = 0;</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             : </span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :     //! Relay incremental fee setting (-incrementalrelayfee), reflecting cost of relay.</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :     virtual CFeeRate relayIncrementalFee() = 0;</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             : </span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :     //! Relay dust fee setting (-dustrelayfee), reflecting lowest rate it's economical to spend.</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :     virtual CFeeRate relayDustFee() = 0;</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             : </span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :     //! Check if any block has been pruned.</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     virtual bool havePruned() = 0;</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             : </span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :     //! Get the current prune height.</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :     virtual std::optional&lt;int&gt; getPruneHeight() = 0;</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             : </span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :     //! Check if the node is ready to broadcast transactions.</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :     virtual bool isReadyToBroadcast() = 0;</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             : </span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :     //! Check if in IBD.</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :     virtual bool isInitialBlockDownload() = 0;</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             : </span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :     //! Check if shutdown requested.</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     virtual bool shutdownRequested() = 0;</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : </span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :     //! Send init message.</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :     virtual void initMessage(const std::string&amp; message) = 0;</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             : </span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :     //! Send init warning.</span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :     virtual void initWarning(const bilingual_str&amp; message) = 0;</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             : </span>
+<span id="L310"><span class="lineNum">     310</span>                 :             :     //! Send init error.</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :     virtual void initError(const bilingual_str&amp; message) = 0;</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             : </span>
+<span id="L313"><span class="lineNum">     313</span>                 :             :     //! Send progress indicator.</span>
+<span id="L314"><span class="lineNum">     314</span>                 :             :     virtual void showProgress(const std::string&amp; title, int progress, bool resume_possible) = 0;</span>
+<span id="L315"><span class="lineNum">     315</span>                 :             : </span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :     //! Chain notifications.</span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaGBC" title="Branch 0 was taken 16495 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       16495 :     class Notifications</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :     {</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :     public:</span>
+<span id="L320"><span class="lineNum">     320</span>                 :<span class="tlaUNC">           0 :         virtual ~Notifications() = default;</span></span>
+<span id="L321"><span class="lineNum">     321</span>                 :<span class="tlaUNC">           0 :         virtual void transactionAddedToMempool(const CTransactionRef&amp; tx) {}</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :<span class="tlaUNC">           0 :         virtual void transactionRemovedFromMempool(const CTransactionRef&amp; tx, MemPoolRemovalReason reason) {}</span></span>
+<span id="L323"><span class="lineNum">     323</span>                 :<span class="tlaUNC">           0 :         virtual void blockConnected(ChainstateRole role, const BlockInfo&amp; block) {}</span></span>
+<span id="L324"><span class="lineNum">     324</span>                 :<span class="tlaUNC">           0 :         virtual void blockDisconnected(const BlockInfo&amp; block) {}</span></span>
+<span id="L325"><span class="lineNum">     325</span>                 :<span class="tlaUNC">           0 :         virtual void updatedBlockTip() {}</span></span>
+<span id="L326"><span class="lineNum">     326</span>                 :<span class="tlaUNC">           0 :         virtual void chainStateFlushed(ChainstateRole role, const CBlockLocator&amp; locator) {}</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :     };</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             : </span>
+<span id="L329"><span class="lineNum">     329</span>                 :             :     //! Register handler for notifications.</span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     virtual std::unique_ptr&lt;Handler&gt; handleNotifications(std::shared_ptr&lt;Notifications&gt; notifications) = 0;</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             : </span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :     //! Wait for pending notifications to be processed unless block hash points to the current</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :     //! chain tip.</span>
+<span id="L334"><span class="lineNum">     334</span>                 :             :     virtual void waitForNotificationsIfTipChanged(const uint256&amp; old_tip) = 0;</span>
+<span id="L335"><span class="lineNum">     335</span>                 :             : </span>
+<span id="L336"><span class="lineNum">     336</span>                 :             :     //! Register handler for RPC. Command is not copied, so reference</span>
+<span id="L337"><span class="lineNum">     337</span>                 :             :     //! needs to remain valid until Handler is disconnected.</span>
+<span id="L338"><span class="lineNum">     338</span>                 :             :     virtual std::unique_ptr&lt;Handler&gt; handleRpc(const CRPCCommand&amp; command) = 0;</span>
+<span id="L339"><span class="lineNum">     339</span>                 :             : </span>
+<span id="L340"><span class="lineNum">     340</span>                 :             :     //! Check if deprecated RPC is enabled.</span>
+<span id="L341"><span class="lineNum">     341</span>                 :             :     virtual bool rpcEnableDeprecated(const std::string&amp; method) = 0;</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             : </span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :     //! Run function after given number of seconds. Cancel any previous calls with same name.</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :     virtual void rpcRunLater(const std::string&amp; name, std::function&lt;void()&gt; fn, int64_t seconds) = 0;</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             : </span>
+<span id="L346"><span class="lineNum">     346</span>                 :             :     //! Get settings value.</span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :     virtual common::SettingsValue getSetting(const std::string&amp; arg) = 0;</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             : </span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :     //! Get list of settings values.</span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :     virtual std::vector&lt;common::SettingsValue&gt; getSettingsList(const std::string&amp; arg) = 0;</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             : </span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :     //! Return &lt;datadir&gt;/settings.json setting value.</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :     virtual common::SettingsValue getRwSetting(const std::string&amp; name) = 0;</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             : </span>
+<span id="L355"><span class="lineNum">     355</span>                 :             :     //! Updates a setting in &lt;datadir&gt;/settings.json.</span>
+<span id="L356"><span class="lineNum">     356</span>                 :             :     //! Null can be passed to erase the setting. There is intentionally no</span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :     //! support for writing null values to settings.json.</span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :     //! Depending on the action returned by the update function, this will either</span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :     //! update the setting in memory or write the updated settings to disk.</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :     virtual bool updateRwSetting(const std::string&amp; name, const SettingsUpdate&amp; update_function) = 0;</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             : </span>
+<span id="L362"><span class="lineNum">     362</span>                 :             :     //! Replace a setting in &lt;datadir&gt;/settings.json with a new value.</span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     //! Null can be passed to erase the setting.</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             :     //! This method provides a simpler alternative to updateRwSetting when</span>
+<span id="L365"><span class="lineNum">     365</span>                 :             :     //! atomically reading and updating the setting is not required.</span>
+<span id="L366"><span class="lineNum">     366</span>                 :             :     virtual bool overwriteRwSetting(const std::string&amp; name, common::SettingsValue value, SettingsAction action = SettingsAction::WRITE) = 0;</span>
+<span id="L367"><span class="lineNum">     367</span>                 :             : </span>
+<span id="L368"><span class="lineNum">     368</span>                 :             :     //! Delete a given setting in &lt;datadir&gt;/settings.json.</span>
+<span id="L369"><span class="lineNum">     369</span>                 :             :     //! This method provides a simpler alternative to overwriteRwSetting when</span>
+<span id="L370"><span class="lineNum">     370</span>                 :             :     //! erasing a setting, for ease of use and readability.</span>
+<span id="L371"><span class="lineNum">     371</span>                 :             :     virtual bool deleteRwSettings(const std::string&amp; name, SettingsAction action = SettingsAction::WRITE) = 0;</span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : </span>
+<span id="L373"><span class="lineNum">     373</span>                 :             :     //! Synchronously send transactionAddedToMempool notifications about all</span>
+<span id="L374"><span class="lineNum">     374</span>                 :             :     //! current mempool transactions to the specified handler and return after</span>
+<span id="L375"><span class="lineNum">     375</span>                 :             :     //! the last one is sent. These notifications aren't coordinated with async</span>
+<span id="L376"><span class="lineNum">     376</span>                 :             :     //! notifications sent by handleNotifications, so out of date async</span>
+<span id="L377"><span class="lineNum">     377</span>                 :             :     //! notifications from handleNotifications can arrive during and after</span>
+<span id="L378"><span class="lineNum">     378</span>                 :             :     //! synchronous notifications from requestMempoolTransactions. Clients need</span>
+<span id="L379"><span class="lineNum">     379</span>                 :             :     //! to be prepared to handle this by ignoring notifications about unknown</span>
+<span id="L380"><span class="lineNum">     380</span>                 :             :     //! removed transactions and already added new transactions.</span>
+<span id="L381"><span class="lineNum">     381</span>                 :             :     virtual void requestMempoolTransactions(Notifications&amp; notifications) = 0;</span>
+<span id="L382"><span class="lineNum">     382</span>                 :             : </span>
+<span id="L383"><span class="lineNum">     383</span>                 :             :     //! Return true if an assumed-valid chain is in use.</span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :     virtual bool hasAssumedValidChain() = 0;</span>
+<span id="L385"><span class="lineNum">     385</span>                 :             : </span>
+<span id="L386"><span class="lineNum">     386</span>                 :             :     //! Get internal node context. Useful for testing, but not</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             :     //! accessible across processes.</span>
+<span id="L388"><span class="lineNum">     388</span>                 :<span class="tlaUNC">           0 :     virtual node::NodeContext* context() { return nullptr; }</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :             : };</span>
+<span id="L390"><span class="lineNum">     390</span>                 :             : </span>
+<span id="L391"><span class="lineNum">     391</span>                 :             : //! Interface to let node manage chain clients (wallets, or maybe tools for</span>
+<span id="L392"><span class="lineNum">     392</span>                 :             : //! monitoring and analysis in the future).</span>
+<span id="L393"><span class="lineNum">     393</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 : class ChainClient</span></span>
+<span id="L394"><span class="lineNum">     394</span>                 :             : {</span>
+<span id="L395"><span class="lineNum">     395</span>                 :             : public:</span>
+<span id="L396"><span class="lineNum">     396</span>                 :<span class="tlaUNC">           0 :     virtual ~ChainClient() = default;</span></span>
+<span id="L397"><span class="lineNum">     397</span>                 :             : </span>
+<span id="L398"><span class="lineNum">     398</span>                 :             :     //! Register rpcs.</span>
+<span id="L399"><span class="lineNum">     399</span>                 :             :     virtual void registerRpcs() = 0;</span>
+<span id="L400"><span class="lineNum">     400</span>                 :             : </span>
+<span id="L401"><span class="lineNum">     401</span>                 :             :     //! Check for errors before loading.</span>
+<span id="L402"><span class="lineNum">     402</span>                 :             :     virtual bool verify() = 0;</span>
+<span id="L403"><span class="lineNum">     403</span>                 :             : </span>
+<span id="L404"><span class="lineNum">     404</span>                 :             :     //! Load saved state.</span>
+<span id="L405"><span class="lineNum">     405</span>                 :             :     virtual bool load() = 0;</span>
+<span id="L406"><span class="lineNum">     406</span>                 :             : </span>
+<span id="L407"><span class="lineNum">     407</span>                 :             :     //! Start client execution and provide a scheduler.</span>
+<span id="L408"><span class="lineNum">     408</span>                 :             :     virtual void start(CScheduler&amp; scheduler) = 0;</span>
+<span id="L409"><span class="lineNum">     409</span>                 :             : </span>
+<span id="L410"><span class="lineNum">     410</span>                 :             :     //! Save state to disk.</span>
+<span id="L411"><span class="lineNum">     411</span>                 :             :     virtual void flush() = 0;</span>
+<span id="L412"><span class="lineNum">     412</span>                 :             : </span>
+<span id="L413"><span class="lineNum">     413</span>                 :             :     //! Shut down client.</span>
+<span id="L414"><span class="lineNum">     414</span>                 :             :     virtual void stop() = 0;</span>
+<span id="L415"><span class="lineNum">     415</span>                 :             : </span>
+<span id="L416"><span class="lineNum">     416</span>                 :             :     //! Set mock time.</span>
+<span id="L417"><span class="lineNum">     417</span>                 :             :     virtual void setMockTime(int64_t time) = 0;</span>
+<span id="L418"><span class="lineNum">     418</span>                 :             : </span>
+<span id="L419"><span class="lineNum">     419</span>                 :             :     //! Mock the scheduler to fast forward in time.</span>
+<span id="L420"><span class="lineNum">     420</span>                 :             :     virtual void schedulerMockForward(std::chrono::seconds delta_seconds) = 0;</span>
+<span id="L421"><span class="lineNum">     421</span>                 :             : };</span>
+<span id="L422"><span class="lineNum">     422</span>                 :             : </span>
+<span id="L423"><span class="lineNum">     423</span>                 :             : //! Return implementation of Chain interface.</span>
+<span id="L424"><span class="lineNum">     424</span>                 :             : std::unique_ptr&lt;Chain&gt; MakeChain(node::NodeContext&amp; node);</span>
+<span id="L425"><span class="lineNum">     425</span>                 :             : </span>
+<span id="L426"><span class="lineNum">     426</span>                 :             : } // namespace interfaces</span>
+<span id="L427"><span class="lineNum">     427</span>                 :             : </span>
+<span id="L428"><span class="lineNum">     428</span>                 :             : #endif // BITCOIN_INTERFACES_CHAIN_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
