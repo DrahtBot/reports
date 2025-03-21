@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/util/overflow.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/util">src/util</a> - overflow.h<span style="font-size: 80%;"> (source / <a href="overflow.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">22</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-21 14:25:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">95.1&nbsp;%</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntry">39</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntry">34</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_UTIL_OVERFLOW_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_UTIL_OVERFLOW_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;climits&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;concepts&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;type_traits&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : template &lt;class T&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :<span class="tlaGNC">   563182310 : [[nodiscard]] bool AdditionOverflow(const T i, const T j) noexcept</span></span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : {</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             :     static_assert(std::is_integral_v&lt;T&gt;, &quot;Integral required.&quot;);</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :     if constexpr (std::numeric_limits&lt;T&gt;::is_signed) {</span>
+<span id="L19"><span class="lineNum">      19</span>   [<span class="tlaGBC" title="Branch 0 was taken 8980807 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 191547 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 8980585 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 222 times"> + </span> :<span class="tlaGNC">     9172354 :         return (i &gt; 0 &amp;&amp; j &gt; std::numeric_limits&lt;T&gt;::max() - i) ||</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 2860 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 188780 times"> + </span>]
+<span id="L20"><span class="lineNum">      20</span>         [<span class="tlaGBC" title="Branch 0 was taken 714 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2146 times"> + </span>]:<span class="tlaGNC">        2860 :                (i &lt; 0 &amp;&amp; j &lt; std::numeric_limits&lt;T&gt;::min() - i);</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :     }</span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">   554009956 :     return std::numeric_limits&lt;T&gt;::max() - i &lt; j;</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : }</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : </span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : template &lt;class T&gt;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">   563039760 : [[nodiscard]] std::optional&lt;T&gt; CheckedAdd(const T i, const T j) noexcept</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : {</span>
+<span id="L28"><span class="lineNum">      28</span>         [<span class="tlaGBC" title="Branch 0 was taken 1467 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 563038293 times"> + </span>]:<span class="tlaGNC">   563039760 :     if (AdditionOverflow(i, j)) {</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">        1467 :         return std::nullopt;</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     }</span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaGNC">   563038293 :     return i + j;</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : }</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : template &lt;class T&gt;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">    24802928 : [[nodiscard]] T SaturatingAdd(const T i, const T j) noexcept</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : {</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     if constexpr (std::numeric_limits&lt;T&gt;::is_signed) {</span>
+<span id="L38"><span class="lineNum">      38</span>   [<span class="tlaGBC" title="Branch 0 was taken 23260452 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1541086 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 23136175 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 124277 times"> + </span>]:<span class="tlaGNC">    24801538 :         if (i &gt; 0 &amp;&amp; j &gt; std::numeric_limits&lt;T&gt;::max() - i) {</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :             return std::numeric_limits&lt;T&gt;::max();</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :         }</span>
+<span id="L41"><span class="lineNum">      41</span>   [<span class="tlaGBC" title="Branch 0 was taken 246800 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1294345 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 244300 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2500 times"> + </span>]:<span class="tlaGNC">     1541145 :         if (i &lt; 0 &amp;&amp; j &lt; std::numeric_limits&lt;T&gt;::min() - i) {</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :             return std::numeric_limits&lt;T&gt;::min();</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :         }</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     } else {</span>
+<span id="L45"><span class="lineNum">      45</span>         [<span class="tlaGBC" title="Branch 0 was taken 1162 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 228 times"> + </span>]:<span class="tlaGNC">        1390 :         if (std::numeric_limits&lt;T&gt;::max() - i &lt; j) {</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :             return std::numeric_limits&lt;T&gt;::max();</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :         }</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     }</span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">    24675923 :     return i + j;</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : }</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : /**</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :  * @brief Left bit shift with overflow checking.</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :  * @param input The input value to be left shifted.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :  * @param shift The number of bits to left shift.</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :  * @return (input * 2^shift) or nullopt if it would not fit in the return type.</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :  */</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : template &lt;std::integral T&gt;</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">         792 : constexpr std::optional&lt;T&gt; CheckedLeftShift(T input, unsigned shift) noexcept</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : {</span>
+<span id="L61"><span class="lineNum">      61</span>   [<span class="tlaGBC" title="Branch 0 was taken 332 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 460 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 34 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 298 times"> + </span>]:<span class="tlaGNC">         792 :     if (shift == 0 || input == 0) return input;</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     // Avoid undefined c++ behaviour if shift is &gt;= number of bits in T.</span>
+<span id="L63"><span class="lineNum">      63</span>         [<span class="tlaGBC" title="Branch 0 was taken 152 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 146 times"> + </span>]:<span class="tlaGNC">         298 :     if (shift &gt;= sizeof(T) * CHAR_BIT) return std::nullopt;</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     // If input &lt;&lt; shift is too big to fit in T, return nullopt.</span>
+<span id="L65"><span class="lineNum">      65</span>         [<span class="tlaGBC" title="Branch 0 was taken 62 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 84 times"> + </span>]:<span class="tlaGNC">         146 :     if (input &gt; (std::numeric_limits&lt;T&gt;::max() &gt;&gt; shift)) return std::nullopt;</span></span>
+<span id="L66"><span class="lineNum">      66</span>         [<span class="tlaGBC" title="Branch 0 was taken 50 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 22 times"> + </span>]:<span class="tlaGNC">          72 :     if (input &lt; (std::numeric_limits&lt;T&gt;::min() &gt;&gt; shift)) return std::nullopt;</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">          34 :     return input &lt;&lt; shift;</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : }</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : </span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : /**</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :  * @brief Left bit shift with safe minimum and maximum values.</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :  * @param input The input value to be left shifted.</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :  * @param shift The number of bits to left shift.</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  * @return (input * 2^shift) clamped to fit between the lowest and highest</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :  *         representable values of the type T.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :  */</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : template &lt;std::integral T&gt;</span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">         396 : constexpr T SaturatingLeftShift(T input, unsigned shift) noexcept</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : {</span>
+<span id="L80"><span class="lineNum">      80</span>         [<span class="tlaGBC" title="Branch 0 was taken 264 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 132 times"> + </span>]:<span class="tlaGNC">         396 :     if (auto result{CheckedLeftShift(input, shift)}) return *result;</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     // If input &lt;&lt; shift is too big to fit in T, return biggest positive or negative</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     // number that fits.</span>
+<span id="L83"><span class="lineNum">      83</span>         [<span class="tlaGBC" title="Branch 0 was taken 50 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 51 times"> + </span>]:<span class="tlaGNC">         101 :     return input &lt; 0 ? std::numeric_limits&lt;T&gt;::min() : std::numeric_limits&lt;T&gt;::max();</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : }</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : </span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : #endif // BITCOIN_UTIL_OVERFLOW_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

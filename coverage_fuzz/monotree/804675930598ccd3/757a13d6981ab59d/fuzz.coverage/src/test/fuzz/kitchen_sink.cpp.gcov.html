@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/kitchen_sink.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - kitchen_sink.cpp<span style="font-size: 80%;"> (source / <a href="kitchen_sink.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">18</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-21 14:25:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">50.0&nbsp;%</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntry">8</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020-2021 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;common/messages.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;merkleblock.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;node/types.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;policy/fees.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;rpc/util.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/translation.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;array&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : using common::TransactionErrorString;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : using node::TransactionError;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : namespace {</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : constexpr TransactionError ALL_TRANSACTION_ERROR[] = {</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     TransactionError::MISSING_INPUTS,</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     TransactionError::ALREADY_IN_UTXO_SET,</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     TransactionError::MEMPOOL_REJECTED,</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     TransactionError::MEMPOOL_ERROR,</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     TransactionError::MAX_FEE_EXCEEDED,</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : };</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : }; // namespace</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : // The fuzzing kitchen sink: Fuzzing harness for functions that need to be</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : // fuzzed but a.) don't belong in any existing fuzzing harness file, and</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : // b.) are not important enough to warrant their own fuzzing harness file.</span>
+<span id="L36"><span class="lineNum">      36</span>         [<span class="tlaGBC" title="Branch 0 was taken 218 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         515 : FUZZ_TARGET(kitchen_sink)</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : {</span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">          79 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">          79 :     const TransactionError transaction_error = fuzzed_data_provider.PickValueInArray(ALL_TRANSACTION_ERROR);</span></span>
+<span id="L41"><span class="lineNum">      41</span>         [<span class="tlaGBC" title="Branch 0 was taken 79 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          79 :     (void)JSONRPCTransactionError(transaction_error);</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">          79 :     (void)RPCErrorFromTransactionError(transaction_error);</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">          79 :     (void)TransactionErrorString(transaction_error);</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">          79 :     (void)StringForFeeEstimateHorizon(fuzzed_data_provider.PickValueInArray(ALL_FEE_ESTIMATE_HORIZONS));</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">          79 :     const OutputType output_type = fuzzed_data_provider.PickValueInArray(OUTPUT_TYPES);</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">          79 :     const std::string&amp; output_type_string = FormatOutputType(output_type);</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">          79 :     const std::optional&lt;OutputType&gt; parsed = ParseOutputType(output_type_string);</span></span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 79 times"> + </span>]:<span class="tlaGNC">          79 :     assert(parsed);</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 79 times"> + </span>]:<span class="tlaGNC">          79 :     assert(output_type == parsed.value());</span></span>
+<span id="L52"><span class="lineNum">      52</span>         [<span class="tlaGBC" title="Branch 0 was taken 79 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          79 :     (void)ParseOutputType(fuzzed_data_provider.ConsumeRandomLengthString(64));</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">          79 :     const std::vector&lt;uint8_t&gt; bytes = ConsumeRandomLengthByteVector(fuzzed_data_provider);</span></span>
+<span id="L55"><span class="lineNum">      55</span>         [<span class="tlaGBC" title="Branch 0 was taken 79 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          79 :     const std::vector&lt;bool&gt; bits = BytesToBits(bytes);</span></span>
+<span id="L56"><span class="lineNum">      56</span>         [<span class="tlaGBC" title="Branch 0 was taken 79 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          79 :     const std::vector&lt;uint8_t&gt; bytes_decoded = BitsToBytes(bits);</span></span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 79 times"> + </span>]:<span class="tlaGNC">          79 :     assert(bytes == bytes_decoded);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">          79 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

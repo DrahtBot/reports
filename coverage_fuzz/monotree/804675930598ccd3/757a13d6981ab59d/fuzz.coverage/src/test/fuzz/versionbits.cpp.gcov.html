@@ -1,0 +1,455 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/versionbits.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - versionbits.cpp<span style="font-size: 80%;"> (source / <a href="versionbits.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">98.3&nbsp;%</td>
+            <td class="headerCovTableEntry">180</td>
+            <td class="headerCovTableEntry">177</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-21 14:25:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">12</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">65.7&nbsp;%</td>
+            <td class="headerCovTableEntry">254</td>
+            <td class="headerCovTableEntry">167</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020-2021 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;chain.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;chainparams.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;common/args.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;consensus/params.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;primitives/block.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;util/chaintype.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;versionbits.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : namespace {</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : class TestConditionChecker : public AbstractThresholdConditionChecker</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : {</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : private:</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     mutable ThresholdConditionCache m_cache;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     const Consensus::Params dummy_params{};</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : </span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : public:</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     const int64_t m_begin;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     const int64_t m_end;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     const int m_period;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     const int m_threshold;</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     const int m_min_activation_height;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     const int m_bit;</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : </span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">         316 :     TestConditionChecker(int64_t begin, int64_t end, int period, int threshold, int min_activation_height, int bit)</span></span>
+<span id="L38"><span class="lineNum">      38</span>   [<span class="tlaGBC" title="Branch 0 was taken 316 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 316 times"> + </span>]:<span class="tlaGNC">         632 :         : m_begin{begin}, m_end{end}, m_period{period}, m_threshold{threshold}, m_min_activation_height{min_activation_height}, m_bit{bit}</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     {</span>
+<span id="L40"><span class="lineNum">      40</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :         assert(m_period &gt; 0);</span></span>
+<span id="L41"><span class="lineNum">      41</span>   [<span class="tlaGBC" title="Branch 0 was taken 316 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :         assert(0 &lt;= m_threshold &amp;&amp; m_threshold &lt;= m_period);</span></span>
+<span id="L42"><span class="lineNum">      42</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :         assert(0 &lt;= m_bit &amp;&amp; m_bit &lt; 32 &amp;&amp; m_bit &lt; VERSIONBITS_NUM_BITS);</span></span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :         assert(0 &lt;= m_min_activation_height);</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">         316 :     }</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : </span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">      591808 :     bool Condition(const CBlockIndex* pindex, const Consensus::Params&amp; params) const override { return Condition(pindex-&gt;nVersion); }</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">      107305 :     int64_t BeginTime(const Consensus::Params&amp; params) const override { return m_begin; }</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">       98296 :     int64_t EndTime(const Consensus::Params&amp; params) const override { return m_end; }</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">      122569 :     int Period(const Consensus::Params&amp; params) const override { return m_period; }</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">      115495 :     int Threshold(const Consensus::Params&amp; params) const override { return m_threshold; }</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">       98296 :     int MinActivationHeight(const Consensus::Params&amp; params) const override { return m_min_activation_height; }</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">        9009 :     ThresholdState GetStateFor(const CBlockIndex* pindexPrev) const { return AbstractThresholdConditionChecker::GetStateFor(pindexPrev, dummy_params, m_cache); }</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">        9009 :     int GetStateSinceHeightFor(const CBlockIndex* pindexPrev) const { return AbstractThresholdConditionChecker::GetStateSinceHeightFor(pindexPrev, dummy_params, m_cache); }</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">       17199 :     BIP9Stats GetStateStatisticsFor(const CBlockIndex* pindex, std::vector&lt;bool&gt;* signals=nullptr) const { return AbstractThresholdConditionChecker::GetStateStatisticsFor(pindex, dummy_params, signals); }</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : </span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">      305239 :     bool Condition(int32_t version) const</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     {</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">      305239 :         uint32_t mask = (uint32_t{1}) &lt;&lt; m_bit;</span></span>
+<span id="L60"><span class="lineNum">      60</span>   [<span class="tlaGBC" title="Branch 0 was taken 283 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 41 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3 times"> + </span> :<span class="tlaGNC">      300675 :         return (((version &amp; VERSIONBITS_TOP_MASK) == VERSIONBITS_TOP_BITS) &amp;&amp; (version &amp; mask) != 0);</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 723 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 3568 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 25 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 124 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 147269 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="Branch 9 was taken 148635 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 24199 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 123070 times"> + </span>]
+<span id="L61"><span class="lineNum">      61</span>                 :             :     }</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">       17472 :     bool Condition(const CBlockIndex* pindex) const { return Condition(pindex-&gt;nVersion); }</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : };</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : </span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : /** Track blocks mined for test */</span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaUNC">           0 : class Blocks</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : {</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : private:</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     std::vector&lt;std::unique_ptr&lt;CBlockIndex&gt;&gt; m_blocks;</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     const uint32_t m_start_time;</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     const uint32_t m_interval;</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :     const int32_t m_signal;</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     const int32_t m_no_signal;</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : </span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : public:</span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">         273 :     Blocks(uint32_t start_time, uint32_t interval, int32_t signal, int32_t no_signal)</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">         273 :         : m_start_time{start_time}, m_interval{interval}, m_signal{signal}, m_no_signal{no_signal} {}</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">        4042 :     size_t size() const { return m_blocks.size(); }</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : </span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      129617 :     CBlockIndex* tip() const</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     {</span>
+<span id="L84"><span class="lineNum">      84</span>         [<span class="tlaGBC" title="Branch 0 was taken 129312 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 305 times"> + </span>]:<span class="tlaGNC">      129617 :         return m_blocks.empty() ? nullptr : m_blocks.back().get();</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     }</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : </span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaGNC">      129344 :     CBlockIndex* mine_block(bool signal)</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     {</span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">      129344 :         CBlockHeader header;</span></span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 62220 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 67124 times"> + </span>]:<span class="tlaGNC">      129344 :         header.nVersion = signal ? m_signal : m_no_signal;</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">      129344 :         header.nTime = m_start_time + m_blocks.size() * m_interval;</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">      129344 :         header.nBits = 0x1d00ffff;</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : </span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">      129344 :         auto current_block = std::make_unique&lt;CBlockIndex&gt;(header);</span></span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaGBC" title="Branch 0 was taken 129344 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      129344 :         current_block-&gt;pprev = tip();</span></span>
+<span id="L96"><span class="lineNum">      96</span>         [<span class="tlaGBC" title="Branch 0 was taken 129344 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      129344 :         current_block-&gt;nHeight = m_blocks.size();</span></span>
+<span id="L97"><span class="lineNum">      97</span>         [<span class="tlaGBC" title="Branch 0 was taken 129344 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      129344 :         current_block-&gt;BuildSkip();</span></span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : </span>
+<span id="L99"><span class="lineNum">      99</span>         [<span class="tlaGBC" title="Branch 0 was taken 129344 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      129344 :         return m_blocks.emplace_back(std::move(current_block)).get();</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">      129344 :     }</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : };</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : </span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : std::unique_ptr&lt;const CChainParams&gt; g_params;</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : </span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">           1 : void initialize()</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : {</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     // this is actually comparatively slow, so only do it once</span>
+<span id="L108"><span class="lineNum">     108</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 :     g_params = CreateChainParams(ArgsManager{}, ChainType::MAIN);</span></span>
+<span id="L109"><span class="lineNum">     109</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :     assert(g_params != nullptr);</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : </span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : constexpr uint32_t MAX_START_TIME = 4102444800; // 2100-01-01</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             : </span>
+<span id="L114"><span class="lineNum">     114</span>         [<span class="tlaGBC" title="Branch 0 was taken 218 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         752 : FUZZ_TARGET(versionbits, .init = initialize)</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : {</span>
+<span id="L116"><span class="lineNum">     116</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :     const CChainParams&amp; params = *g_params;</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">         316 :     const int64_t interval = params.GetConsensus().nPowTargetSpacing;</span></span>
+<span id="L118"><span class="lineNum">     118</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :     assert(interval &gt; 1); // need to be able to halve it</span></span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :     assert(interval &lt; std::numeric_limits&lt;int32_t&gt;::max());</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : </span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">         316 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :             : </span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :     // making period/max_periods larger slows these tests down significantly</span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">         316 :     const int period = 32;</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">         316 :     const size_t max_periods = 16;</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaGNC">         316 :     const size_t max_blocks = 2 * period * max_periods;</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : </span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">         316 :     const int threshold = fuzzed_data_provider.ConsumeIntegralInRange(1, period);</span></span>
+<span id="L129"><span class="lineNum">     129</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :     assert(0 &lt; threshold &amp;&amp; threshold &lt;= period); // must be able to both pass and fail threshold!</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : </span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :     // too many blocks at 10min each might cause uint32_t time to overflow if</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     // block_start_time is at the end of the range above</span>
+<span id="L133"><span class="lineNum">     133</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 316 times"> + </span>]:<span class="tlaGNC">         316 :     assert(std::numeric_limits&lt;uint32_t&gt;::max() - MAX_START_TIME &gt; interval * max_blocks);</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : </span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">         316 :     const int64_t block_start_time = fuzzed_data_provider.ConsumeIntegralInRange&lt;uint32_t&gt;(params.GenesisBlock().nTime, MAX_START_TIME);</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :             : </span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :     // what values for version will we use to signal / not signal?</span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">         316 :     const int32_t ver_signal = fuzzed_data_provider.ConsumeIntegral&lt;int32_t&gt;();</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">         316 :     const int32_t ver_nosignal = fuzzed_data_provider.ConsumeIntegral&lt;int32_t&gt;();</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : </span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     // select deployment parameters: bit, start time, timeout</span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">         316 :     const int bit = fuzzed_data_provider.ConsumeIntegralInRange&lt;int&gt;(0, VERSIONBITS_NUM_BITS - 1);</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : </span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">         316 :     bool always_active_test = false;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">         316 :     bool never_active_test = false;</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">         316 :     int64_t start_time;</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :<span class="tlaGNC">         316 :     int64_t timeout;</span></span>
+<span id="L148"><span class="lineNum">     148</span>         [<span class="tlaGBC" title="Branch 0 was taken 250 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 66 times"> + </span>]:<span class="tlaGNC">         316 :     if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :         // pick the timestamp to switch based on a block</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :         // note states will change *after* these blocks because mediantime lags</span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">         250 :         int start_block = fuzzed_data_provider.ConsumeIntegralInRange&lt;int&gt;(0, period * (max_periods - 3));</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">         250 :         int end_block = fuzzed_data_provider.ConsumeIntegralInRange&lt;int&gt;(0, period * (max_periods - 3));</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">         250 :         start_time = block_start_time + start_block * interval;</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">         250 :         timeout = block_start_time + end_block * interval;</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :             : </span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :         // allow for times to not exactly match a block</span>
+<span id="L158"><span class="lineNum">     158</span>         [<span class="tlaGBC" title="Branch 0 was taken 118 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 132 times"> + </span>]:<span class="tlaGNC">         250 :         if (fuzzed_data_provider.ConsumeBool()) start_time += interval / 2;</span></span>
+<span id="L159"><span class="lineNum">     159</span>         [<span class="tlaGBC" title="Branch 0 was taken 120 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 130 times"> + </span>]:<span class="tlaGNC">         250 :         if (fuzzed_data_provider.ConsumeBool()) timeout += interval / 2;</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     } else {</span>
+<span id="L161"><span class="lineNum">     161</span>         [<span class="tlaGBC" title="Branch 0 was taken 56 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          66 :         if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :             start_time = Consensus::BIP9Deployment::ALWAYS_ACTIVE;</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :             always_active_test = true;</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :         } else {</span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaGNC">          56 :             start_time = Consensus::BIP9Deployment::NEVER_ACTIVE;</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">          56 :             never_active_test = true;</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :         }</span>
+<span id="L168"><span class="lineNum">     168</span>         [<span class="tlaGBC" title="Branch 0 was taken 51 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 15 times"> + </span>]:<span class="tlaGNC">          66 :         timeout = fuzzed_data_provider.ConsumeBool() ? Consensus::BIP9Deployment::NO_TIMEOUT : fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;();</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :     }</span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">         316 :     int min_activation = fuzzed_data_provider.ConsumeIntegralInRange&lt;int&gt;(0, period * max_periods);</span></span>
+<span id="L171"><span class="lineNum">     171</span>                 :             : </span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">         316 :     TestConditionChecker checker(start_time, timeout, period, threshold, min_activation, bit);</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : </span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     // Early exit if the versions don't signal sensibly for the deployment</span>
+<span id="L175"><span class="lineNum">     175</span>         [<span class="tlaGBC" title="Branch 0 was taken 287 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 29 times"> + </span>]:<span class="tlaGNC">         316 :     if (!checker.Condition(ver_signal)) return;</span></span>
+<span id="L176"><span class="lineNum">     176</span>         [<span class="tlaGBC" title="Branch 0 was taken 44 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 239 times"> + </span>]:<span class="tlaGNC">         283 :     if (checker.Condition(ver_nosignal)) return;</span></span>
+<span id="L177"><span class="lineNum">     177</span>         [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">         280 :     if (ver_nosignal &lt; 0) return;</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : </span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     // TOP_BITS should ensure version will be positive and meet min</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     // version requirement</span>
+<span id="L181"><span class="lineNum">     181</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(ver_signal &gt; 0);</span></span>
+<span id="L182"><span class="lineNum">     182</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(ver_signal &gt;= VERSIONBITS_LAST_OLD_BLOCK_VERSION);</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :             : </span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :     // Now that we have chosen time and versions, setup to mine blocks</span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaGNC">         273 :     Blocks blocks(block_start_time, interval, ver_signal, ver_nosignal);</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :             : </span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :     /* Strategy:</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :      *  * we will mine a final period worth of blocks, with</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :      *    randomised signalling according to a mask</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :      *  * but before we mine those blocks, we will mine some</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :      *    randomised number of prior periods; with either all</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :      *    or no blocks in the period signalling</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :      *</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :      * We establish the mask first, then consume &quot;bools&quot; until</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :      * we run out of fuzz data to work out how many prior periods</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :      * there are and which ones will signal.</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :      */</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             : </span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :     // establish the mask</span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">         273 :     const uint32_t signalling_mask = fuzzed_data_provider.ConsumeIntegral&lt;uint32_t&gt;();</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :             : </span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     // mine prior periods</span>
+<span id="L203"><span class="lineNum">     203</span>         [<span class="tlaGBC" title="Branch 0 was taken 3769 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 221 times"> + </span>]:<span class="tlaGNC">        4263 :     while (fuzzed_data_provider.remaining_bytes() &gt; 0) { // early exit; no need for LIMITED_WHILE</span></span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :         // all blocks in these periods either do or don't signal</span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">        3769 :         bool signal = fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L206"><span class="lineNum">     206</span>         [<span class="tlaGBC" title="Branch 0 was taken 120608 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3769 times"> + </span>]:<span class="tlaGNC">      124377 :         for (int b = 0; b &lt; period; ++b) {</span></span>
+<span id="L207"><span class="lineNum">     207</span>         [<span class="tlaGBC" title="Branch 0 was taken 120608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      120608 :             blocks.mine_block(signal);</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :         }</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             : </span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :         // don't risk exceeding max_blocks or times may wrap around</span>
+<span id="L211"><span class="lineNum">     211</span>         [<span class="tlaGBC" title="Branch 0 was taken 3717 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 52 times"> + </span>]:<span class="tlaGNC">        3769 :         if (blocks.size() + 2 * period &gt; max_blocks) break;</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :     }</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :     // NOTE: fuzzed_data_provider may be fully consumed at this point and should not be used further</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : </span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :     // now we mine the final period and check that everything looks sane</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             : </span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :     // count the number of signalling blocks</span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">         273 :     int blocks_sig = 0;</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : </span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     // get the info for the first block of the period</span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaGNC">         273 :     CBlockIndex* prev = blocks.tip();</span></span>
+<span id="L222"><span class="lineNum">     222</span>         [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         273 :     const int exp_since = checker.GetStateSinceHeightFor(prev);</span></span>
+<span id="L223"><span class="lineNum">     223</span>         [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         273 :     const ThresholdState exp_state = checker.GetStateFor(prev);</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : </span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :     // get statistics from end of previous period, then reset</span>
+<span id="L226"><span class="lineNum">     226</span>                 :<span class="tlaGNC">         273 :     BIP9Stats last_stats;</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">         273 :     last_stats.period = period;</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :<span class="tlaGNC">         273 :     last_stats.threshold = threshold;</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :<span class="tlaGNC">         273 :     last_stats.count = last_stats.elapsed = 0;</span></span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaGNC">         273 :     last_stats.possible = (period &gt;= threshold);</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaGNC">         273 :     std::vector&lt;bool&gt; last_signals{};</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :             : </span>
+<span id="L233"><span class="lineNum">     233</span>         [<span class="tlaGBC" title="Branch 0 was taken 241 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 32 times"> + </span>]:<span class="tlaGNC">         273 :     int prev_next_height = (prev == nullptr ? 0 : prev-&gt;nHeight + 1);</span></span>
+<span id="L234"><span class="lineNum">     234</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(exp_since &lt;= prev_next_height);</span></span>
+<span id="L235"><span class="lineNum">     235</span>                 :             : </span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :     // mine (period-1) blocks and check state</span>
+<span id="L237"><span class="lineNum">     237</span>         [<span class="tlaGBC" title="Branch 0 was taken 8463 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">        8736 :     for (int b = 1; b &lt; period; ++b) {</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">        8463 :         const bool signal = (signalling_mask &gt;&gt; (b % 32)) &amp; 1;</span></span>
+<span id="L239"><span class="lineNum">     239</span>         [<span class="tlaGBC" title="Branch 0 was taken 3568 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4895 times"> + </span>]:<span class="tlaGNC">        8463 :         if (signal) ++blocks_sig;</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :             : </span>
+<span id="L241"><span class="lineNum">     241</span>         [<span class="tlaGBC" title="Branch 0 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8463 :         CBlockIndex* current_block = blocks.mine_block(signal);</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :             : </span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :         // verify that signalling attempt was interpreted correctly</span>
+<span id="L244"><span class="lineNum">     244</span>   [<span class="tlaGBC" title="Branch 0 was taken 4291 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4172 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 8463 times"> + </span>]:<span class="tlaGNC">       16926 :         assert(checker.Condition(current_block) == signal);</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :             : </span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :         // state and since don't change within the period</span>
+<span id="L247"><span class="lineNum">     247</span>         [<span class="tlaGBC" title="Branch 0 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8463 :         const ThresholdState state = checker.GetStateFor(current_block);</span></span>
+<span id="L248"><span class="lineNum">     248</span>         [<span class="tlaGBC" title="Branch 0 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8463 :         const int since = checker.GetStateSinceHeightFor(current_block);</span></span>
+<span id="L249"><span class="lineNum">     249</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(state == exp_state);</span></span>
+<span id="L250"><span class="lineNum">     250</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(since == exp_since);</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :         // check that after mining this block stats change as expected</span>
+<span id="L253"><span class="lineNum">     253</span>                 :<span class="tlaGNC">        8463 :         std::vector&lt;bool&gt; signals;</span></span>
+<span id="L254"><span class="lineNum">     254</span>         [<span class="tlaGBC" title="Branch 0 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8463 :         const BIP9Stats stats = checker.GetStateStatisticsFor(current_block, &amp;signals);</span></span>
+<span id="L255"><span class="lineNum">     255</span>         [<span class="tlaGBC" title="Branch 0 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8463 :         const BIP9Stats stats_no_signals = checker.GetStateStatisticsFor(current_block);</span></span>
+<span id="L256"><span class="lineNum">     256</span>   [<span class="tlaGBC" title="Branch 0 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        8463 :         assert(stats.period == stats_no_signals.period &amp;&amp; stats.threshold == stats_no_signals.threshold</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 9 was taken 8463 times"> + </span>]
+<span id="L257"><span class="lineNum">     257</span>                 :             :                &amp;&amp; stats.elapsed == stats_no_signals.elapsed &amp;&amp; stats.count == stats_no_signals.count</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :                &amp;&amp; stats.possible == stats_no_signals.possible);</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             : </span>
+<span id="L260"><span class="lineNum">     260</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(stats.period == period);</span></span>
+<span id="L261"><span class="lineNum">     261</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(stats.threshold == threshold);</span></span>
+<span id="L262"><span class="lineNum">     262</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(stats.elapsed == b);</span></span>
+<span id="L263"><span class="lineNum">     263</span>   [<span class="tlaGBC" title="Branch 0 was taken 4895 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3568 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 8463 times"> + </span>]:<span class="tlaGNC">       13358 :         assert(stats.count == last_stats.count + (signal ? 1 : 0));</span></span>
+<span id="L264"><span class="lineNum">     264</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(stats.possible == (stats.count + period &gt;= stats.elapsed + threshold));</span></span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">        8463 :         last_stats = stats;</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :             : </span>
+<span id="L267"><span class="lineNum">     267</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(signals.size() == last_signals.size() + 1);</span></span>
+<span id="L268"><span class="lineNum">     268</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(signals.back() == signal);</span></span>
+<span id="L269"><span class="lineNum">     269</span>         [<span class="tlaGBC" title="Branch 0 was taken 8463 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8463 :         last_signals.push_back(signal);</span></span>
+<span id="L270"><span class="lineNum">     270</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8463 times"> + </span>]:<span class="tlaGNC">        8463 :         assert(signals == last_signals);</span></span>
+<span id="L271"><span class="lineNum">     271</span>                 :<span class="tlaGNC">        8463 :     }</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : </span>
+<span id="L273"><span class="lineNum">     273</span>         [<span class="tlaGBC" title="Branch 0 was taken 45 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 228 times"> + </span>]:<span class="tlaGNC">         273 :     if (exp_state == ThresholdState::STARTED) {</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :         // double check that stats.possible is sane</span>
+<span id="L275"><span class="lineNum">     275</span>   [<span class="tlaGBC" title="Branch 0 was taken 12 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 33 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 12 times"> + </span>]:<span class="tlaGNC">          45 :         if (blocks_sig &gt;= threshold - 1) assert(last_stats.possible);</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :     }</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             : </span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :     // mine the final block</span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">         273 :     bool signal = (signalling_mask &gt;&gt; (period % 32)) &amp; 1;</span></span>
+<span id="L280"><span class="lineNum">     280</span>         [<span class="tlaGBC" title="Branch 0 was taken 124 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 149 times"> + </span>]:<span class="tlaGNC">         273 :     if (signal) ++blocks_sig;</span></span>
+<span id="L281"><span class="lineNum">     281</span>         [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         273 :     CBlockIndex* current_block = blocks.mine_block(signal);</span></span>
+<span id="L282"><span class="lineNum">     282</span>   [<span class="tlaGBC" title="Branch 0 was taken 149 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 124 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 273 times"> + </span>]:<span class="tlaGNC">         546 :     assert(checker.Condition(current_block) == signal);</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :             : </span>
+<span id="L284"><span class="lineNum">     284</span>         [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         273 :     const BIP9Stats stats = checker.GetStateStatisticsFor(current_block);</span></span>
+<span id="L285"><span class="lineNum">     285</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(stats.period == period);</span></span>
+<span id="L286"><span class="lineNum">     286</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(stats.threshold == threshold);</span></span>
+<span id="L287"><span class="lineNum">     287</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(stats.elapsed == period);</span></span>
+<span id="L288"><span class="lineNum">     288</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(stats.count == blocks_sig);</span></span>
+<span id="L289"><span class="lineNum">     289</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(stats.possible == (stats.count + period &gt;= stats.elapsed + threshold));</span></span>
+<span id="L290"><span class="lineNum">     290</span>                 :             : </span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :     // More interesting is whether the state changed.</span>
+<span id="L292"><span class="lineNum">     292</span>         [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         273 :     const ThresholdState state = checker.GetStateFor(current_block);</span></span>
+<span id="L293"><span class="lineNum">     293</span>         [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         273 :     const int since = checker.GetStateSinceHeightFor(current_block);</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :             : </span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :     // since is straightforward:</span>
+<span id="L296"><span class="lineNum">     296</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(since % period == 0);</span></span>
+<span id="L297"><span class="lineNum">     297</span>   [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 273 times"> + </span>]:<span class="tlaGNC">         273 :     assert(0 &lt;= since &amp;&amp; since &lt;= current_block-&gt;nHeight + 1);</span></span>
+<span id="L298"><span class="lineNum">     298</span>         [<span class="tlaGBC" title="Branch 0 was taken 222 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 51 times"> + </span>]:<span class="tlaGNC">         273 :     if (state == exp_state) {</span></span>
+<span id="L299"><span class="lineNum">     299</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 222 times"> + </span>]:<span class="tlaGNC">         222 :         assert(since == exp_since);</span></span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :     } else {</span>
+<span id="L301"><span class="lineNum">     301</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 51 times"> + </span>]:<span class="tlaGNC">          51 :         assert(since == current_block-&gt;nHeight + 1);</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     }</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : </span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :     // state is where everything interesting is</span>
+<span id="L305"><span class="lineNum">     305</span>   [<span class="tlaGBC" title="Branch 0 was taken 21 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 31 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 20 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 120 times"> + </span> :<span class="tlaGNC">         273 :     switch (state) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 81 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">          21 :     case ThresholdState::DEFINED:</span></span>
+<span id="L307"><span class="lineNum">     307</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span>]:<span class="tlaGNC">          21 :         assert(since == 0);</span></span>
+<span id="L308"><span class="lineNum">     308</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span>]:<span class="tlaGNC">          21 :         assert(exp_state == ThresholdState::DEFINED);</span></span>
+<span id="L309"><span class="lineNum">     309</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span>]:<span class="tlaGNC">          21 :         assert(current_block-&gt;GetMedianTimePast() &lt; checker.m_begin);</span></span>
+<span id="L310"><span class="lineNum">     310</span>                 :             :         break;</span>
+<span id="L311"><span class="lineNum">     311</span>                 :<span class="tlaGNC">          31 :     case ThresholdState::STARTED:</span></span>
+<span id="L312"><span class="lineNum">     312</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 31 times"> + </span>]:<span class="tlaGNC">          31 :         assert(current_block-&gt;GetMedianTimePast() &gt;= checker.m_begin);</span></span>
+<span id="L313"><span class="lineNum">     313</span>         [<span class="tlaGBC" title="Branch 0 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">          31 :         if (exp_state == ThresholdState::STARTED) {</span></span>
+<span id="L314"><span class="lineNum">     314</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          19 :             assert(blocks_sig &lt; threshold);</span></span>
+<span id="L315"><span class="lineNum">     315</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          19 :             assert(current_block-&gt;GetMedianTimePast() &lt; checker.m_end);</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :         } else {</span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">          12 :             assert(exp_state == ThresholdState::DEFINED);</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :         }</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :         break;</span>
+<span id="L320"><span class="lineNum">     320</span>                 :<span class="tlaGNC">          20 :     case ThresholdState::LOCKED_IN:</span></span>
+<span id="L321"><span class="lineNum">     321</span>         [<span class="tlaGBC" title="Branch 0 was taken 10 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          20 :         if (exp_state == ThresholdState::LOCKED_IN) {</span></span>
+<span id="L322"><span class="lineNum">     322</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          10 :             assert(current_block-&gt;nHeight + 1 &lt; min_activation);</span></span>
+<span id="L323"><span class="lineNum">     323</span>                 :             :         } else {</span>
+<span id="L324"><span class="lineNum">     324</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          10 :             assert(exp_state == ThresholdState::STARTED);</span></span>
+<span id="L325"><span class="lineNum">     325</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          10 :             assert(blocks_sig &gt;= threshold);</span></span>
+<span id="L326"><span class="lineNum">     326</span>                 :             :         }</span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :         break;</span>
+<span id="L328"><span class="lineNum">     328</span>                 :<span class="tlaGNC">         120 :     case ThresholdState::ACTIVE:</span></span>
+<span id="L329"><span class="lineNum">     329</span>   [<span class="tlaGBC" title="Branch 0 was taken 113 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 113 times"> + </span>]:<span class="tlaGNC">         120 :         assert(always_active_test || min_activation &lt;= current_block-&gt;nHeight + 1);</span></span>
+<span id="L330"><span class="lineNum">     330</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 120 times"> + </span>]:<span class="tlaGNC">         120 :         assert(exp_state == ThresholdState::ACTIVE || exp_state == ThresholdState::LOCKED_IN);</span></span>
+<span id="L331"><span class="lineNum">     331</span>                 :             :         break;</span>
+<span id="L332"><span class="lineNum">     332</span>                 :<span class="tlaGNC">          81 :     case ThresholdState::FAILED:</span></span>
+<span id="L333"><span class="lineNum">     333</span>   [<span class="tlaGBC" title="Branch 0 was taken 62 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 62 times"> + </span>]:<span class="tlaGNC">          81 :         assert(never_active_test || current_block-&gt;GetMedianTimePast() &gt;= checker.m_end);</span></span>
+<span id="L334"><span class="lineNum">     334</span>         [<span class="tlaGBC" title="Branch 0 was taken 16 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 65 times"> + </span>]:<span class="tlaGNC">          81 :         if (exp_state == ThresholdState::STARTED) {</span></span>
+<span id="L335"><span class="lineNum">     335</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 16 times"> + </span>]:<span class="tlaGNC">          16 :             assert(blocks_sig &lt; threshold);</span></span>
+<span id="L336"><span class="lineNum">     336</span>                 :             :         } else {</span>
+<span id="L337"><span class="lineNum">     337</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 65 times"> + </span>]:<span class="tlaGNC">          65 :             assert(exp_state == ThresholdState::FAILED);</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :             :         }</span>
+<span id="L339"><span class="lineNum">     339</span>                 :             :         break;</span>
+<span id="L340"><span class="lineNum">     340</span>                 :<span class="tlaUNC">           0 :     default:</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :<span class="tlaUNC">           0 :         assert(false);</span></span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :     }</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             : </span>
+<span id="L344"><span class="lineNum">     344</span>         [<span class="tlaGBC" title="Branch 0 was taken 120 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 153 times"> + </span>]:<span class="tlaGNC">         273 :     if (blocks.size() &gt;= period * max_periods) {</span></span>
+<span id="L345"><span class="lineNum">     345</span>                 :             :         // we chose the timeout (and block times) so that by the time we have this many blocks it's all over</span>
+<span id="L346"><span class="lineNum">     346</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 120 times"> + </span>]:<span class="tlaGNC">         120 :         assert(state == ThresholdState::ACTIVE || state == ThresholdState::FAILED);</span></span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :     }</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             : </span>
+<span id="L349"><span class="lineNum">     349</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 266 times"> + </span>]:<span class="tlaGNC">         273 :     if (always_active_test) {</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :         // &quot;always active&quot; has additional restrictions</span>
+<span id="L351"><span class="lineNum">     351</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           7 :         assert(state == ThresholdState::ACTIVE);</span></span>
+<span id="L352"><span class="lineNum">     352</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           7 :         assert(exp_state == ThresholdState::ACTIVE);</span></span>
+<span id="L353"><span class="lineNum">     353</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           7 :         assert(since == 0);</span></span>
+<span id="L354"><span class="lineNum">     354</span>         [<span class="tlaGBC" title="Branch 0 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 247 times"> + </span>]:<span class="tlaGNC">         266 :     } else if (never_active_test) {</span></span>
+<span id="L355"><span class="lineNum">     355</span>                 :             :         // &quot;never active&quot; does too</span>
+<span id="L356"><span class="lineNum">     356</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          19 :         assert(state == ThresholdState::FAILED);</span></span>
+<span id="L357"><span class="lineNum">     357</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          19 :         assert(exp_state == ThresholdState::FAILED);</span></span>
+<span id="L358"><span class="lineNum">     358</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          19 :         assert(since == 0);</span></span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :     } else {</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :         // for signalled deployments, the initial state is always DEFINED</span>
+<span id="L361"><span class="lineNum">     361</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 247 times"> + </span>]:<span class="tlaGNC">         247 :         assert(since &gt; 0 || state == ThresholdState::DEFINED);</span></span>
+<span id="L362"><span class="lineNum">     362</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 247 times"> + </span>]:<span class="tlaGNC">         247 :         assert(exp_since &gt; 0 || exp_state == ThresholdState::DEFINED);</span></span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     }</span>
+<span id="L364"><span class="lineNum">     364</span>                 :<span class="tlaGNC">         316 : }</span></span>
+<span id="L365"><span class="lineNum">     365</span>                 :             : } // namespace</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
