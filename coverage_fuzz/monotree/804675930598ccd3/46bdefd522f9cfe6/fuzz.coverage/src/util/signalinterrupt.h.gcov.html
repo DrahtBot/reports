@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/util/signalinterrupt.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/util">src/util</a> - signalinterrupt.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-21 16:22:48</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : // Copyright (c) 2023 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>              : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>              : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>              : </span>
+<span id="L5"><span class="lineNum">       5</span>              : #ifndef BITCOIN_UTIL_SIGNALINTERRUPT_H</span>
+<span id="L6"><span class="lineNum">       6</span>              : #define BITCOIN_UTIL_SIGNALINTERRUPT_H</span>
+<span id="L7"><span class="lineNum">       7</span>              : </span>
+<span id="L8"><span class="lineNum">       8</span>              : #ifdef WIN32</span>
+<span id="L9"><span class="lineNum">       9</span>              : #include &lt;condition_variable&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>              : #include &lt;mutex&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>              : #else</span>
+<span id="L12"><span class="lineNum">      12</span>              : #include &lt;util/tokenpipe.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>              : #endif</span>
+<span id="L14"><span class="lineNum">      14</span>              : </span>
+<span id="L15"><span class="lineNum">      15</span>              : #include &lt;atomic&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>              : #include &lt;cstdlib&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>              : </span>
+<span id="L18"><span class="lineNum">      18</span>              : namespace util {</span>
+<span id="L19"><span class="lineNum">      19</span>              : /**</span>
+<span id="L20"><span class="lineNum">      20</span>              :  * Helper class that manages an interrupt flag, and allows a thread or</span>
+<span id="L21"><span class="lineNum">      21</span>              :  * signal to interrupt another thread.</span>
+<span id="L22"><span class="lineNum">      22</span>              :  *</span>
+<span id="L23"><span class="lineNum">      23</span>              :  * This class is safe to be used in a signal handler. If sending an interrupt</span>
+<span id="L24"><span class="lineNum">      24</span>              :  * from a signal handler is not necessary, the more lightweight \ref</span>
+<span id="L25"><span class="lineNum">      25</span>              :  * CThreadInterrupt class can be used instead.</span>
+<span id="L26"><span class="lineNum">      26</span>              :  */</span>
+<span id="L27"><span class="lineNum">      27</span>              : </span>
+<span id="L28"><span class="lineNum">      28</span> <span class="tlaGNC">        2280 : class SignalInterrupt</span></span>
+<span id="L29"><span class="lineNum">      29</span>              : {</span>
+<span id="L30"><span class="lineNum">      30</span>              : public:</span>
+<span id="L31"><span class="lineNum">      31</span>              :     SignalInterrupt();</span>
+<span id="L32"><span class="lineNum">      32</span>              :     explicit operator bool() const;</span>
+<span id="L33"><span class="lineNum">      33</span>              :     [[nodiscard]] bool operator()();</span>
+<span id="L34"><span class="lineNum">      34</span>              :     [[nodiscard]] bool reset();</span>
+<span id="L35"><span class="lineNum">      35</span>              :     [[nodiscard]] bool wait();</span>
+<span id="L36"><span class="lineNum">      36</span>              : </span>
+<span id="L37"><span class="lineNum">      37</span>              : private:</span>
+<span id="L38"><span class="lineNum">      38</span>              :     std::atomic&lt;bool&gt; m_flag;</span>
+<span id="L39"><span class="lineNum">      39</span>              : </span>
+<span id="L40"><span class="lineNum">      40</span>              : #ifndef WIN32</span>
+<span id="L41"><span class="lineNum">      41</span>              :     // On UNIX-like operating systems use the self-pipe trick.</span>
+<span id="L42"><span class="lineNum">      42</span>              :     TokenPipeEnd m_pipe_r;</span>
+<span id="L43"><span class="lineNum">      43</span>              :     TokenPipeEnd m_pipe_w;</span>
+<span id="L44"><span class="lineNum">      44</span>              : #else</span>
+<span id="L45"><span class="lineNum">      45</span>              :     // On windows use a condition variable, since we don't have any signals there</span>
+<span id="L46"><span class="lineNum">      46</span>              :     std::mutex m_mutex;</span>
+<span id="L47"><span class="lineNum">      47</span>              :     std::condition_variable m_cv;</span>
+<span id="L48"><span class="lineNum">      48</span>              : #endif</span>
+<span id="L49"><span class="lineNum">      49</span>              : };</span>
+<span id="L50"><span class="lineNum">      50</span>              : } // namespace util</span>
+<span id="L51"><span class="lineNum">      51</span>              : </span>
+<span id="L52"><span class="lineNum">      52</span>              : #endif // BITCOIN_UTIL_SIGNALINTERRUPT_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

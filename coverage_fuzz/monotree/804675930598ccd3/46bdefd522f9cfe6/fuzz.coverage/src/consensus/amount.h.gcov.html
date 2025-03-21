@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/consensus/amount.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/consensus">src/consensus</a> - amount.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-21 16:22:48</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">64.0&nbsp;%</td>
+            <td class="headerCovTableEntry">50</td>
+            <td class="headerCovTableEntry">32</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2021 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_CONSENSUS_AMOUNT_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_CONSENSUS_AMOUNT_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : /** Amount in satoshis (Can be negative) */</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : typedef int64_t CAmount;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : /** The amount of satoshis in one BTC. */</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : static constexpr CAmount COIN = 100000000;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : /** No amount larger than this (in satoshi) is valid.</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :  *</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :  * Note that this constant is *not* the total money supply, which in Bitcoin</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :  * currently happens to be less than 21,000,000 BTC for various reasons, but</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :  * rather a sanity check. As this sanity check is used by consensus-critical</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :  * validation code, the exact value of the MAX_MONEY constant is consensus</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :  * critical; in unusual circumstances like a(nother) overflow bug that allowed</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :  * for the creation of coins out of thin air modification could lead to a fork.</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :  * */</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : static constexpr CAmount MAX_MONEY = 21000000 * COIN;</span>
+<span id="L27"><span class="lineNum">      27</span> [<span class="tlaGBC" title="Branch 0 was taken 104969 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 39199448 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 22561884 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1366 times"> + </span> :<span class="tlaGNC">    66167450 : inline bool MoneyRange(const CAmount&amp; nValue) { return (nValue &gt;= 0 &amp;&amp; nValue &lt;= MAX_MONEY); }</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 2 was taken 5086922 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 17474962 times"> + </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 2243469 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 38 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 22 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 33 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 481 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 692 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 462 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 4259 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7319 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3290 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 969 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 3284 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 7142 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 934 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 4 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 9 was taken 7138 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 975 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 2801 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 16 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 1 was taken 120701 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 228082 times"> + </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 11 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 841426 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaGBC" title="Branch 9 was taken 841426 times"> + </span>]
+<span id="L28"><span class="lineNum">      28</span>                 :             : </span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #endif // BITCOIN_CONSENSUS_AMOUNT_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

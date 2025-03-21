@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/kernel/chain.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/kernel">src/kernel</a> - chain.cpp<span style="font-size: 80%;"> (source / <a href="chain.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-21 16:22:48</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;chain.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;interfaces/chain.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;kernel/chain.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;sync.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : class CBlock;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : namespace kernel {</span>
+<span id="L14"><span class="lineNum">      14</span>                 :<span class="tlaUNC">           0 : interfaces::BlockInfo MakeBlockInfo(const CBlockIndex* index, const CBlock* data)</span></span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : {</span>
+<span id="L16"><span class="lineNum">      16</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     interfaces::BlockInfo info{index ? *index-&gt;phashBlock : uint256::ZERO};</span></span>
+<span id="L17"><span class="lineNum">      17</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (index) {</span></span>
+<span id="L18"><span class="lineNum">      18</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         info.prev_hash = index-&gt;pprev ? index-&gt;pprev-&gt;phashBlock : nullptr;</span></span>
+<span id="L19"><span class="lineNum">      19</span>                 :<span class="tlaUNC">           0 :         info.height = index-&gt;nHeight;</span></span>
+<span id="L20"><span class="lineNum">      20</span>                 :<span class="tlaUNC">           0 :         info.chain_time_max = index-&gt;GetBlockTimeMax();</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaUNC">           0 :         LOCK(::cs_main);</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaUNC">           0 :         info.file_number = index-&gt;nFile;</span></span>
+<span id="L23"><span class="lineNum">      23</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         info.data_pos = index-&gt;nDataPos;</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaUNC">           0 :     info.data = data;</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaUNC">           0 :     return info;</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : }</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : } // namespace kernel</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : </span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaUNC">           0 : std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const ChainstateRole&amp; role) {</span></span>
+<span id="L31"><span class="lineNum">      31</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     switch(role) {</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaUNC">           0 :         case ChainstateRole::NORMAL: os &lt;&lt; &quot;normal&quot;; break;</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaUNC">           0 :         case ChainstateRole::ASSUMEDVALID: os &lt;&lt; &quot;assumedvalid&quot;; break;</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaUNC">           0 :         case ChainstateRole::BACKGROUND: os &lt;&lt; &quot;background&quot;; break;</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaUNC">           0 :         default: os.setstate(std::ios_base::failbit);</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     }</span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaUNC">           0 :     return os;</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
