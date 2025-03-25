@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/policy/packages.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/policy">src/policy</a> - packages.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-25 16:45:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">48.7&nbsp;%</td>
+            <td class="headerCovTableEntry">76</td>
+            <td class="headerCovTableEntry">37</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_POLICY_PACKAGES_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_POLICY_PACKAGES_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;consensus/consensus.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;consensus/validation.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/hasher.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;unordered_set&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : /** Default maximum number of transactions in a package. */</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : static constexpr uint32_t MAX_PACKAGE_COUNT{25};</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : /** Default maximum total weight of transactions in a package in weight</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :     to allow for context-less checks. This must allow a superset of sigops</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :     weighted vsize limited transactions to not disallow transactions we would</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     have otherwise accepted individually. */</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : static constexpr uint32_t MAX_PACKAGE_WEIGHT = 404'000;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : static_assert(MAX_PACKAGE_WEIGHT &gt;= MAX_STANDARD_TX_WEIGHT);</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : // If a package is to be evaluated, it must be at least as large as the mempool's ancestor/descendant limits,</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : // otherwise transactions that would be individually accepted may be rejected in a package erroneously.</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : // Since a submitted package must be child-with-unconfirmed-parents (all of the transactions are an ancestor</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : // of the child), package limits are ultimately bounded by mempool package limits. Ensure that the</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : // defaults reflect this constraint.</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : static_assert(DEFAULT_DESCENDANT_LIMIT &gt;= MAX_PACKAGE_COUNT);</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : static_assert(DEFAULT_ANCESTOR_LIMIT &gt;= MAX_PACKAGE_COUNT);</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : static_assert(MAX_PACKAGE_WEIGHT &gt;= DEFAULT_ANCESTOR_SIZE_LIMIT_KVB * WITNESS_SCALE_FACTOR * 1000);</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : static_assert(MAX_PACKAGE_WEIGHT &gt;= DEFAULT_DESCENDANT_SIZE_LIMIT_KVB * WITNESS_SCALE_FACTOR * 1000);</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : </span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : /** A &quot;reason&quot; why a package was invalid. It may be that one or more of the included</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :  * transactions is invalid or the package itself violates our rules.</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :  * We don't distinguish between consensus and policy violations right now.</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :  */</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : enum class PackageValidationResult {</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     PCKG_RESULT_UNSET = 0,        //!&lt; Initial value. The package has not yet been rejected.</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     PCKG_POLICY,                  //!&lt; The package itself is invalid (e.g. too many transactions).</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     PCKG_TX,                      //!&lt; At least one tx is invalid.</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     PCKG_MEMPOOL_ERROR,           //!&lt; Mempool logic error.</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : };</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : /** A package is an ordered list of transactions. The transactions cannot conflict with (spend the</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :  * same inputs as) one another. */</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : using Package = std::vector&lt;CTransactionRef&gt;;</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span> [<span class="tlaGBC" title="Branch 0 was taken 74 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 293463 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> :<span class="tlaGNC">     5774246 : class PackageValidationState : public ValidationState&lt;PackageValidationResult&gt; {};</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 97654 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 97654 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 3386 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 3386 times"> + </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 20565 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 12 was taken 20565 times"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span><span class="tlaGBC" title="Branch 14 was taken 134040 times"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 134040 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 171858 times"> + </span><span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 171858 times"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 22 was taken 277301 times"> + </span><span class="tlaGBC" title="Branch 23 was taken 37165 times"> + </span><span class="tlaGBC" title="Branch 24 was taken 314466 times"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 314466 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 287413 times"> + </span><span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 190 times"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 32 was taken 190 times"> + </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span><span class="tlaGBC" title="Branch 34 was taken 218807 times"> + </span><span class="tlaUNC" title="Branch 35 was not taken"> - </span><span class="tlaGBC" title="Branch 36 was taken 218807 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 37 was not taken"> - </span><span class="tlaGBC" title="Branch 38 was taken 51 times"> + </span><span class="tlaUNC" title="Branch 39 was not taken"> - </span><span class="tlaGBC" title="Branch 40 was taken 51 times"> + </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 42 was taken 272 times"> + </span><span class="tlaUNC" title="Branch 43 was not taken"> - </span><span class="tlaGBC" title="Branch 44 was taken 272 times"> + </span><span class="tlaUNC" title="Branch 45 was not taken"> - </span><span class="tlaGBC" title="Branch 46 was taken 241 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 47 was not taken"> - </span><span class="tlaGBC" title="Branch 48 was taken 241 times"> + </span><span class="tlaUNC" title="Branch 49 was not taken"> - </span><span class="tlaGBC" title="Branch 50 was taken 25123 times"> + </span><span class="tlaUNC" title="Branch 51 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 52 was taken 25123 times"> + </span><span class="tlaUNC" title="Branch 53 was not taken"> - </span><span class="tlaGBC" title="Branch 54 was taken 882 times"> + </span><span class="tlaUNC" title="Branch 55 was not taken"> - </span><span class="tlaGBC" title="Branch 56 was taken 882 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 57 was not taken"> - </span><span class="tlaGBC" title="Branch 58 was taken 57 times"> + </span><span class="tlaUNC" title="Branch 59 was not taken"> - </span><span class="tlaGBC" title="Branch 60 was taken 57 times"> + </span><span class="tlaUNC" title="Branch 61 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 62 was taken 40596 times"> + </span><span class="tlaUNC" title="Branch 63 was not taken"> - </span><span class="tlaGBC" title="Branch 64 was taken 40596 times"> + </span><span class="tlaUNC" title="Branch 65 was not taken"> - </span><span class="tlaUNC" title="Branch 66 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 67 was not taken"> - </span><span class="tlaUNC" title="Branch 68 was not taken"> - </span><span class="tlaUNC" title="Branch 69 was not taken"> - </span><span class="tlaGBC" title="Branch 70 was taken 1194 times"> + </span><span class="tlaUNC" title="Branch 71 was not taken"> - </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 72 was taken 1194 times"> + </span><span class="tlaUNC" title="Branch 73 was not taken"> - </span>]
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : /** If any direct dependencies exist between transactions (i.e. a child spending the output of a</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :  * parent), checks that all parents appear somewhere in the list before their respective children.</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :  * No other ordering is enforced. This function cannot detect indirect dependencies (e.g. a</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :  * transaction's grandparent if its parent is not present).</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :  * @returns true if sorted. False if any tx spends the output of a tx that appears later in txns.</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :  */</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : bool IsTopoSortedPackage(const Package&amp; txns);</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : /** Checks that these transactions don't conflict, i.e., spend the same prevout. This includes</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :  * checking that there are no duplicate transactions. Since these checks require looking at the inputs</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :  * of a transaction, returns false immediately if any transactions have empty vin.</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :  *</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :  * Does not check consistency of a transaction with oneself; does not check if a transaction spends</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :  * the same prevout multiple times (see bad-txns-inputs-duplicate in CheckTransaction()).</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :  *</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :  * @returns true if there are no conflicts. False if any two transactions spend the same prevout.</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :  * */</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : bool IsConsistentPackage(const Package&amp; txns);</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : /** Context-free package policy checks:</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  * 1. The number of transactions cannot exceed MAX_PACKAGE_COUNT.</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :  * 2. The total weight cannot exceed MAX_PACKAGE_WEIGHT.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :  * 3. If any dependencies exist between transactions, parents must appear before children.</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :  * 4. Transactions cannot conflict, i.e., spend the same inputs.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :  */</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : bool IsWellFormedPackage(const Package&amp; txns, PackageValidationState&amp; state, bool require_sorted);</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : </span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : /** Context-free check that a package is exactly one child and its parents; not all parents need to</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :  * be present, but the package must not contain any transactions that are not the child's parents.</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :  * It is expected to be sorted, which means the last transaction must be the child.</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :  */</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : bool IsChildWithParents(const Package&amp; package);</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : </span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : /** Context-free check that a package IsChildWithParents() and none of the parents depend on each</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :  * other (the package is a &quot;tree&quot;).</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :  */</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : bool IsChildWithParentsTree(const Package&amp; package);</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : /** Get the hash of the concatenated wtxids of transactions, with wtxids</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :  * treated as a little-endian numbers and sorted in ascending numeric order.</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :  */</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : uint256 GetPackageHash(const std::vector&lt;CTransactionRef&gt;&amp; transactions);</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : #endif // BITCOIN_POLICY_PACKAGES_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

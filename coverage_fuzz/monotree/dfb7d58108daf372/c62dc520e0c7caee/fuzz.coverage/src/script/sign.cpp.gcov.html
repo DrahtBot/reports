@@ -1,0 +1,971 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/script/sign.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/script">src/script</a> - sign.cpp<span style="font-size: 80%;"> (source / <a href="sign.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryMed">81.9&nbsp;%</td>
+            <td class="headerCovTableEntry">447</td>
+            <td class="headerCovTableEntry">366</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-25 16:45:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">65.0&nbsp;%</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntry">26</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">50.3&nbsp;%</td>
+            <td class="headerCovTableEntry">766</td>
+            <td class="headerCovTableEntry">385</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;script/sign.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;consensus/amount.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;key.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;script/keyorigin.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;script/miniscript.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;script/script.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;script/signingprovider.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;script/solver.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;util/translation.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;util/vector.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : typedef std::vector&lt;unsigned char&gt; valtype;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">        4160 : MutableTransactionSignatureCreator::MutableTransactionSignatureCreator(const CMutableTransaction&amp; tx, unsigned int input_idx, const CAmount&amp; amount, int hash_type)</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">        4160 :     : m_txto{tx}, nIn{input_idx}, nHashType{hash_type}, amount{amount}, checker{&amp;m_txto, nIn, amount, MissingDataBehavior::FAIL},</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">        4160 :       m_txdata(nullptr)</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : {</span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">        4160 : }</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : </span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">      614878 : MutableTransactionSignatureCreator::MutableTransactionSignatureCreator(const CMutableTransaction&amp; tx, unsigned int input_idx, const CAmount&amp; amount, const PrecomputedTransactionData* txdata, int hash_type)</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">      614878 :     : m_txto{tx}, nIn{input_idx}, nHashType{hash_type}, amount{amount},</span></span>
+<span id="L31"><span class="lineNum">      31</span>         [<span class="tlaGBC" title="Branch 0 was taken 614878 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      614878 :       checker{txdata ? MutableTransactionSignatureChecker{&amp;m_txto, nIn, amount, *txdata, MissingDataBehavior::FAIL} :</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :                        MutableTransactionSignatureChecker{&amp;m_txto, nIn, amount, MissingDataBehavior::FAIL}},</span>
+<span id="L33"><span class="lineNum">      33</span>         [<span class="tlaGBC" title="Branch 0 was taken 614878 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      614878 :       m_txdata(txdata)</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : {</span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">      614878 : }</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : </span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">       90765 : bool MutableTransactionSignatureCreator::CreateSig(const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; vchSig, const CKeyID&amp; address, const CScript&amp; scriptCode, SigVersion sigversion) const</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : {</span>
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 90765 times"> + </span>]:<span class="tlaGNC">       90765 :     assert(sigversion == SigVersion::BASE || sigversion == SigVersion::WITNESS_V0);</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">       90765 :     CKey key;</span></span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaGBC" title="Branch 0 was taken 90765 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 80105 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 10660 times"> + </span>]:<span class="tlaGNC">       90765 :     if (!provider.GetKey(address, key))</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :         return false;</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     // Signing with uncompressed keys is disabled in witness scripts</span>
+<span id="L46"><span class="lineNum">      46</span>   [<span class="tlaGBC" title="Branch 0 was taken 35820 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 44285 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 35268 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 552 times"> + </span>]:<span class="tlaGNC">       80105 :     if (sigversion == SigVersion::WITNESS_V0 &amp;&amp; !key.IsCompressed())</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :         return false;</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     // Signing without known amount does not work in witness scripts.</span>
+<span id="L50"><span class="lineNum">      50</span>   [<span class="tlaGBC" title="Branch 0 was taken 35268 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 44285 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 34478 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 790 times"> + </span>]:<span class="tlaGNC">       79553 :     if (sigversion == SigVersion::WITNESS_V0 &amp;&amp; !MoneyRange(amount)) return false;</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     // BASE/WITNESS_V0 signatures don't support explicit SIGHASH_DEFAULT, use SIGHASH_ALL instead.</span>
+<span id="L53"><span class="lineNum">      53</span>         [<span class="tlaGBC" title="Branch 0 was taken 69959 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 8804 times"> + </span>]:<span class="tlaGNC">       78763 :     const int hashtype = nHashType == SIGHASH_DEFAULT ? SIGHASH_ALL : nHashType;</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>         [<span class="tlaGBC" title="Branch 0 was taken 78763 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       78763 :     uint256 hash = SignatureHash(scriptCode, m_txto, nIn, hashtype, amount, sigversion, m_txdata);</span></span>
+<span id="L56"><span class="lineNum">      56</span>   [<span class="tlaGBC" title="Branch 0 was taken 78763 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 78763 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       78763 :     if (!key.Sign(hash, vchSig))</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :         return false;</span>
+<span id="L58"><span class="lineNum">      58</span>         [<span class="tlaGBC" title="Branch 0 was taken 78763 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       90765 :     vchSig.push_back((unsigned char)hashtype);</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     return true;</span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">       90765 : }</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">      519299 : bool MutableTransactionSignatureCreator::CreateSchnorrSig(const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; sig, const XOnlyPubKey&amp; pubkey, const uint256* leaf_hash, const uint256* merkle_root, SigVersion sigversion) const</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : {</span>
+<span id="L64"><span class="lineNum">      64</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 519299 times"> + </span>]:<span class="tlaGNC">      519299 :     assert(sigversion == SigVersion::TAPROOT || sigversion == SigVersion::TAPSCRIPT);</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : </span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">      519299 :     CKey key;</span></span>
+<span id="L67"><span class="lineNum">      67</span>   [<span class="tlaGBC" title="Branch 0 was taken 519299 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 472624 times"> + </span>]:<span class="tlaGNC">      519299 :     if (!provider.GetKeyByXOnly(pubkey, key)) return false;</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : </span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     // BIP341/BIP342 signing needs lots of precomputed transaction data. While some</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     // (non-SIGHASH_DEFAULT) sighash modes exist that can work with just some subset</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     // of data present, for now, only support signing when everything is provided.</span>
+<span id="L72"><span class="lineNum">      72</span>   [<span class="tlaGBC" title="Branch 0 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       46675 :     if (!m_txdata || !m_txdata-&gt;m_bip341_taproot_ready || !m_txdata-&gt;m_spent_outputs_ready) return false;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 46675 times"> + </span>]:<span class="tlaGNC">       46675 :     ScriptExecutionData execdata;</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">       46675 :     execdata.m_annex_init = true;</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">       46675 :     execdata.m_annex_present = false; // Only support annex-less signing for now.</span></span>
+<span id="L77"><span class="lineNum">      77</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 46675 times"> + </span>]:<span class="tlaGNC">       46675 :     if (sigversion == SigVersion::TAPSCRIPT) {</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaUNC">           0 :         execdata.m_codeseparator_pos_init = true;</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaUNC">           0 :         execdata.m_codeseparator_pos = 0xFFFFFFFF; // Only support non-OP_CODESEPARATOR BIP342 signing for now.</span></span>
+<span id="L80"><span class="lineNum">      80</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (!leaf_hash) return false; // BIP342 signing needs leaf hash.</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaUNC">           0 :         execdata.m_tapleaf_hash_init = true;</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaUNC">           0 :         execdata.m_tapleaf_hash = *leaf_hash;</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     }</span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">       46675 :     uint256 hash;</span></span>
+<span id="L85"><span class="lineNum">      85</span>   [<span class="tlaGBC" title="Branch 0 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       46675 :     if (!SignatureHashSchnorr(hash, execdata, m_txto, nIn, nHashType, sigversion, *m_txdata, MissingDataBehavior::FAIL)) return false;</span></span>
+<span id="L86"><span class="lineNum">      86</span>         [<span class="tlaGBC" title="Branch 0 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       46675 :     sig.resize(64);</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     // Use uint256{} as aux_rnd for now.</span>
+<span id="L88"><span class="lineNum">      88</span>   [<span class="tlaGBC" title="Branch 0 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       46675 :     if (!key.SignSchnorr(hash, sig, merkle_root, {})) return false;</span></span>
+<span id="L89"><span class="lineNum">      89</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      519299 :     if (nHashType) sig.push_back(nHashType);</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     return true;</span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">      519299 : }</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : </span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">       75853 : static bool GetCScript(const SigningProvider&amp; provider, const SignatureData&amp; sigdata, const CScriptID&amp; scriptid, CScript&amp; script)</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : {</span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaGBC" title="Branch 0 was taken 41295 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 34558 times"> + </span>]:<span class="tlaGNC">       75853 :     if (provider.GetCScript(scriptid, script)) {</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :         return true;</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :     }</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     // Look for scripts in SignatureData</span>
+<span id="L99"><span class="lineNum">      99</span>         [<span class="tlaGBC" title="Branch 0 was taken 5061 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 36234 times"> + </span>]:<span class="tlaGNC">       41295 :     if (CScriptID(sigdata.redeem_script) == scriptid) {</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">        5061 :         script = sigdata.redeem_script;</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">        5061 :         return true;</span></span>
+<span id="L102"><span class="lineNum">     102</span>         [<span class="tlaGBC" title="Branch 0 was taken 5203 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 31031 times"> + </span>]:<span class="tlaGNC">       36234 :     } else if (CScriptID(sigdata.witness_script) == scriptid) {</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">        5203 :         script = sigdata.witness_script;</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">        5203 :         return true;</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :     }</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     return false;</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : }</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : </span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">       92237 : static bool GetPubKey(const SigningProvider&amp; provider, const SignatureData&amp; sigdata, const CKeyID&amp; address, CPubKey&amp; pubkey)</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : {</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     // Look for pubkey in all partial sigs</span>
+<span id="L112"><span class="lineNum">     112</span>                 :<span class="tlaGNC">       92237 :     const auto it = sigdata.signatures.find(address);</span></span>
+<span id="L113"><span class="lineNum">     113</span>         [<span class="tlaGBC" title="Branch 0 was taken 941 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 91296 times"> + </span>]:<span class="tlaGNC">       92237 :     if (it != sigdata.signatures.end()) {</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">         941 :         pubkey = it-&gt;second.first;</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :<span class="tlaGNC">         941 :         return true;</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     }</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     // Look for pubkey in pubkey lists</span>
+<span id="L118"><span class="lineNum">     118</span>                 :<span class="tlaGNC">       91296 :     const auto&amp; pk_it = sigdata.misc_pubkeys.find(address);</span></span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaGBC" title="Branch 0 was taken 2972 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 88324 times"> + </span>]:<span class="tlaGNC">       91296 :     if (pk_it != sigdata.misc_pubkeys.end()) {</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">        2972 :         pubkey = pk_it-&gt;second.first;</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">        2972 :         return true;</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     }</span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">       88324 :     const auto&amp; tap_pk_it = sigdata.tap_pubkeys.find(address);</span></span>
+<span id="L124"><span class="lineNum">     124</span>         [<span class="tlaGBC" title="Branch 0 was taken 34 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 88290 times"> + </span>]:<span class="tlaGNC">       88324 :     if (tap_pk_it != sigdata.tap_pubkeys.end()) {</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">          34 :         pubkey = tap_pk_it-&gt;second.GetEvenCorrespondingCPubKey();</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaGNC">          34 :         return true;</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     }</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :     // Query the underlying provider</span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">       88290 :     return provider.GetPubKey(address, pubkey);</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : }</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : </span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">       98496 : static bool CreateSig(const BaseSignatureCreator&amp; creator, SignatureData&amp; sigdata, const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; sig_out, const CPubKey&amp; pubkey, const CScript&amp; scriptcode, SigVersion sigversion)</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : {</span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">       98496 :     CKeyID keyid = pubkey.GetID();</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">       98496 :     const auto it = sigdata.signatures.find(keyid);</span></span>
+<span id="L136"><span class="lineNum">     136</span>         [<span class="tlaGBC" title="Branch 0 was taken 6007 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 92489 times"> + </span>]:<span class="tlaGNC">       98496 :     if (it != sigdata.signatures.end()) {</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaGNC">        6007 :         sig_out = it-&gt;second.second;</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">        6007 :         return true;</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     }</span>
+<span id="L140"><span class="lineNum">     140</span>         [<span class="tlaGBC" title="Branch 0 was taken 92489 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       92489 :     KeyOriginInfo info;</span></span>
+<span id="L141"><span class="lineNum">     141</span>   [<span class="tlaGBC" title="Branch 0 was taken 92489 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6763 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 85726 times"> + </span>]:<span class="tlaGNC">       92489 :     if (provider.GetKeyOrigin(keyid, info)) {</span></span>
+<span id="L142"><span class="lineNum">     142</span>         [<span class="tlaGBC" title="Branch 0 was taken 6763 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       13526 :         sigdata.misc_pubkeys.emplace(keyid, std::make_pair(pubkey, std::move(info)));</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     }</span>
+<span id="L144"><span class="lineNum">     144</span>   [<span class="tlaGBC" title="Branch 0 was taken 92489 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 80822 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 11667 times"> + </span>]:<span class="tlaGNC">       92489 :     if (creator.CreateSig(provider, sig_out, keyid, scriptcode, sigversion)) {</span></span>
+<span id="L145"><span class="lineNum">     145</span>   [<span class="tlaGBC" title="Branch 0 was taken 80822 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 80822 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      161644 :         auto i = sigdata.signatures.emplace(keyid, SigPair(pubkey, sig_out));</span></span>
+<span id="L146"><span class="lineNum">     146</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 80822 times"> + </span>]:<span class="tlaGNC">       80822 :         assert(i.second);</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :         return true;</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     }</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     // Could not make signature or signature not found, add keyid to missing</span>
+<span id="L150"><span class="lineNum">     150</span>         [<span class="tlaGBC" title="Branch 0 was taken 11667 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       11667 :     sigdata.missing_sigs.push_back(keyid);</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :     return false;</span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">       92489 : }</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaUNC">           0 : static bool CreateTaprootScriptSig(const BaseSignatureCreator&amp; creator, SignatureData&amp; sigdata, const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; sig_out, const XOnlyPubKey&amp; pubkey, const uint256&amp; leaf_hash, SigVersion sigversion)</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : {</span>
+<span id="L156"><span class="lineNum">     156</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     KeyOriginInfo info;</span></span>
+<span id="L157"><span class="lineNum">     157</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (provider.GetKeyOriginByXOnly(pubkey, info)) {</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaUNC">           0 :         auto it = sigdata.taproot_misc_pubkeys.find(pubkey);</span></span>
+<span id="L159"><span class="lineNum">     159</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (it == sigdata.taproot_misc_pubkeys.end()) {</span></span>
+<span id="L160"><span class="lineNum">     160</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             sigdata.taproot_misc_pubkeys.emplace(pubkey, std::make_pair(std::set&lt;uint256&gt;({leaf_hash}), info));</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :         } else {</span>
+<span id="L162"><span class="lineNum">     162</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             it-&gt;second.first.insert(leaf_hash);</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :         }</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :     }</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             : </span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaUNC">           0 :     auto lookup_key = std::make_pair(pubkey, leaf_hash);</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaUNC">           0 :     auto it = sigdata.taproot_script_sigs.find(lookup_key);</span></span>
+<span id="L168"><span class="lineNum">     168</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (it != sigdata.taproot_script_sigs.end()) {</span></span>
+<span id="L169"><span class="lineNum">     169</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         sig_out = it-&gt;second;</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :         return true;</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     }</span>
+<span id="L172"><span class="lineNum">     172</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (creator.CreateSchnorrSig(provider, sig_out, pubkey, &amp;leaf_hash, nullptr, sigversion)) {</span></span>
+<span id="L173"><span class="lineNum">     173</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         sigdata.taproot_script_sigs[lookup_key] = sig_out;</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :         return true;</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     }</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     return false;</span>
+<span id="L177"><span class="lineNum">     177</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : </span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : template&lt;typename M, typename K, typename V&gt;</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaUNC">           0 : miniscript::Availability MsLookupHelper(const M&amp; map, const K&amp; key, V&amp; value)</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : {</span>
+<span id="L182"><span class="lineNum">     182</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     auto it = map.find(key);</span></span>
+<span id="L183"><span class="lineNum">     183</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (it != map.end()) {</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaUNC">           0 :         value = it-&gt;second;</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaUNC">           0 :         return miniscript::Availability::YES;</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     }</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :     return miniscript::Availability::NO;</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             : }</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             : </span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : /**</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :  * Context for solving a Miniscript.</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :  * If enough material (access to keys, hash preimages, ..) is given, produces a valid satisfaction.</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :  */</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             : template&lt;typename Pk&gt;</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             : struct Satisfier {</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :     using Key = Pk;</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             : </span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     const SigningProvider&amp; m_provider;</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :     SignatureData&amp; m_sig_data;</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     const BaseSignatureCreator&amp; m_creator;</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     const CScript&amp; m_witness_script;</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     //! The context of the script we are satisfying (either P2WSH or Tapscript).</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     const miniscript::MiniscriptContext m_script_ctx;</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             : </span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">        3901 :     explicit Satisfier(const SigningProvider&amp; provider LIFETIMEBOUND, SignatureData&amp; sig_data LIFETIMEBOUND,</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :                        const BaseSignatureCreator&amp; creator LIFETIMEBOUND,</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :                        const CScript&amp; witscript LIFETIMEBOUND,</span>
+<span id="L208"><span class="lineNum">     208</span>                 :<span class="tlaGNC">        3901 :                        miniscript::MiniscriptContext script_ctx) : m_provider(provider),</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">        3901 :                                                                    m_sig_data(sig_data),</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :<span class="tlaGNC">        3901 :                                                                    m_creator(creator),</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">        3901 :                                                                    m_witness_script(witscript),</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">        3901 :                                                                    m_script_ctx(script_ctx) {}</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           7 :     static bool KeyCompare(const Key&amp; a, const Key&amp; b) {</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 13 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 15 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 17 was taken 1 time"> + </span>]
+<span id="L215"><span class="lineNum">     215</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           7 :         return a &lt; b;</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaUNC" title="Branch 12 was not taken"> - </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not taken"> - </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaUNC" title="Branch 16 was not taken"> - </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaUNC" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaUNC" title="Branch 20 was not taken"> - </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaUNC" title="Branch 22 was not taken"> - </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 24 was not taken"> - </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaUNC" title="Branch 26 was not taken"> - </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaUNC" title="Branch 28 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 31 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 32 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 33 was taken 2 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 34 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 35 was taken 1 time"> + </span>]
+<span id="L216"><span class="lineNum">     216</span>                 :             :     }</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : </span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :     //! Get a CPubKey from a key hash. Note the key hash may be of an xonly pubkey.</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :     template&lt;typename I&gt;</span>
+<span id="L220"><span class="lineNum">     220</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::optional&lt;CPubKey&gt; CPubFromPKHBytes(I first, I last) const {</span></span>
+<span id="L221"><span class="lineNum">     221</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         assert(last - first == 20);</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaUNC">           0 :         CPubKey pubkey;</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaUNC">           0 :         CKeyID key_id;</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :<span class="tlaUNC">           0 :         std::copy(first, last, key_id.begin());</span></span>
+<span id="L225"><span class="lineNum">     225</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (GetPubKey(m_provider, m_sig_data, key_id, pubkey)) return pubkey;</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :<span class="tlaUNC">           0 :         m_sig_data.missing_pubkeys.push_back(key_id);</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaUNC">           0 :         return {};</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     }</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : </span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     //! Conversion to raw public key.</span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;unsigned char&gt; ToPKBytes(const Key&amp; key) const { return {key.begin(), key.end()}; }</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :             : </span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :     //! Time lock satisfactions.</span>
+<span id="L234"><span class="lineNum">     234</span>                 :<span class="tlaUNC">           0 :     bool CheckAfter(uint32_t value) const { return m_creator.Checker().CheckLockTime(CScriptNum(value)); }</span></span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaUNC">           0 :     bool CheckOlder(uint32_t value) const { return m_creator.Checker().CheckSequence(CScriptNum(value)); }</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :             : </span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :     //! Hash preimage satisfactions.</span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaUNC">           0 :     miniscript::Availability SatSHA256(const std::vector&lt;unsigned char&gt;&amp; hash, std::vector&lt;unsigned char&gt;&amp; preimage) const {</span></span>
+<span id="L239"><span class="lineNum">     239</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return MsLookupHelper(m_sig_data.sha256_preimages, hash, preimage);</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     }</span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaUNC">           0 :     miniscript::Availability SatRIPEMD160(const std::vector&lt;unsigned char&gt;&amp; hash, std::vector&lt;unsigned char&gt;&amp; preimage) const {</span></span>
+<span id="L242"><span class="lineNum">     242</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return MsLookupHelper(m_sig_data.ripemd160_preimages, hash, preimage);</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :     }</span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaUNC">           0 :     miniscript::Availability SatHASH256(const std::vector&lt;unsigned char&gt;&amp; hash, std::vector&lt;unsigned char&gt;&amp; preimage) const {</span></span>
+<span id="L245"><span class="lineNum">     245</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return MsLookupHelper(m_sig_data.hash256_preimages, hash, preimage);</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :     }</span>
+<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaUNC">           0 :     miniscript::Availability SatHASH160(const std::vector&lt;unsigned char&gt;&amp; hash, std::vector&lt;unsigned char&gt;&amp; preimage) const {</span></span>
+<span id="L248"><span class="lineNum">     248</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return MsLookupHelper(m_sig_data.hash160_preimages, hash, preimage);</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     }</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             : </span>
+<span id="L251"><span class="lineNum">     251</span>                 :<span class="tlaGNC">       12527 :     miniscript::MiniscriptContext MsContext() const {</span></span>
+<span id="L252"><span class="lineNum">     252</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 966 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       12527 :         return m_script_ctx;</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaUNC" title="Branch 12 was not taken"> - </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not taken"> - </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaUNC" title="Branch 16 was not taken"> - </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaUNC" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaUNC" title="Branch 20 was not taken"> - </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaUNC" title="Branch 22 was not taken"> - </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 24 was not taken"> - </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaUNC" title="Branch 26 was not taken"> - </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaUNC" title="Branch 28 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaUNC" title="Branch 30 was not taken"> - </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaUNC" title="Branch 32 was not taken"> - </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 34 was not taken"> - </span><span class="tlaUNC" title="Branch 35 was not taken"> - </span><span class="tlaUNC" title="Branch 36 was not taken"> - </span><span class="tlaUNC" title="Branch 37 was not taken"> - </span><span class="tlaGBC" title="Branch 38 was taken 38 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 39 was not taken"> - </span><span class="tlaUNC" title="Branch 40 was not taken"> - </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span><span class="tlaUNC" title="Branch 42 was not taken"> - </span><span class="tlaUNC" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 44 was not taken"> - </span><span class="tlaUNC" title="Branch 45 was not taken"> - </span><span class="tlaUNC" title="Branch 46 was not taken"> - </span><span class="tlaUNC" title="Branch 47 was not taken"> - </span><span class="tlaUNC" title="Branch 48 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 49 was not taken"> - </span><span class="tlaUNC" title="Branch 50 was not taken"> - </span><span class="tlaUNC" title="Branch 51 was not taken"> - </span><span class="tlaUNC" title="Branch 52 was not taken"> - </span><span class="tlaUNC" title="Branch 53 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 54 was taken 222 times"> + </span><span class="tlaUNC" title="Branch 55 was not taken"> - </span><span class="tlaGBC" title="Branch 56 was taken 4910 times"> + </span><span class="tlaUNC" title="Branch 57 was not taken"> - </span><span class="tlaGBC" title="Branch 58 was taken 81 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 59 was not taken"> - </span><span class="tlaUNC" title="Branch 60 was not taken"> - </span><span class="tlaUNC" title="Branch 61 was not taken"> - </span><span class="tlaGBC" title="Branch 62 was taken 38 times"> + </span><span class="tlaUNC" title="Branch 63 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 64 was taken 50 times"> + </span><span class="tlaUNC" title="Branch 65 was not taken"> - </span><span class="tlaUNC" title="Branch 66 was not taken"> - </span><span class="tlaUNC" title="Branch 67 was not taken"> - </span><span class="tlaUNC" title="Branch 68 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 69 was not taken"> - </span><span class="tlaUNC" title="Branch 70 was not taken"> - </span><span class="tlaUNC" title="Branch 71 was not taken"> - </span><span class="tlaUNC" title="Branch 72 was not taken"> - </span><span class="tlaUNC" title="Branch 73 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 74 was not taken"> - </span><span class="tlaUNC" title="Branch 75 was not taken"> - </span><span class="tlaUNC" title="Branch 76 was not taken"> - </span><span class="tlaUNC" title="Branch 77 was not taken"> - </span><span class="tlaGBC" title="Branch 78 was taken 7 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 79 was not taken"> - </span><span class="tlaGBC" title="Branch 80 was taken 341 times"> + </span><span class="tlaUNC" title="Branch 81 was not taken"> - </span><span class="tlaGBC" title="Branch 82 was taken 58 times"> + </span><span class="tlaUNC" title="Branch 83 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 84 was not taken"> - </span><span class="tlaUNC" title="Branch 85 was not taken"> - </span><span class="tlaGBC" title="Branch 86 was taken 276 times"> + </span><span class="tlaUNC" title="Branch 87 was not taken"> - </span><span class="tlaGBC" title="Branch 88 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 89 was not taken"> - </span><span class="tlaGBC" title="Branch 90 was taken 999 times"> + </span><span class="tlaUNC" title="Branch 91 was not taken"> - </span><span class="tlaGBC" title="Branch 92 was taken 205 times"> + </span><span class="tlaUNC" title="Branch 93 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 94 was taken 102 times"> + </span><span class="tlaUNC" title="Branch 95 was not taken"> - </span><span class="tlaGBC" title="Branch 96 was taken 61 times"> + </span><span class="tlaUNC" title="Branch 97 was not taken"> - </span><span class="tlaGBC" title="Branch 98 was taken 12 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 99 was not taken"> - </span><span class="tlaGBC" title="Branch 100 was taken 29 times"> + </span><span class="tlaUNC" title="Branch 101 was not taken"> - </span><span class="tlaGBC" title="Branch 102 was taken 8 times"> + </span><span class="tlaUNC" title="Branch 103 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 104 was taken 158 times"> + </span><span class="tlaUNC" title="Branch 105 was not taken"> - </span><span class="tlaGBC" title="Branch 106 was taken 19 times"> + </span><span class="tlaUNC" title="Branch 107 was not taken"> - </span>]
+<span id="L253"><span class="lineNum">     253</span>                 :             :     }</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             : };</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : </span>
+<span id="L256"><span class="lineNum">     256</span>                 :             : /** Miniscript satisfier specific to P2WSH context. */</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             : struct WshSatisfier: Satisfier&lt;CPubKey&gt; {</span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">        3175 :     explicit WshSatisfier(const SigningProvider&amp; provider LIFETIMEBOUND, SignatureData&amp; sig_data LIFETIMEBOUND,</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :                           const BaseSignatureCreator&amp; creator LIFETIMEBOUND, const CScript&amp; witscript LIFETIMEBOUND)</span>
+<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaGNC">        3175 :                           : Satisfier(provider, sig_data, creator, witscript, miniscript::MiniscriptContext::P2WSH) {}</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :             : </span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :     //! Conversion from a raw compressed public key.</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :     template &lt;typename I&gt;</span>
+<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">           5 :     std::optional&lt;CPubKey&gt; FromPKBytes(I first, I last) const {</span></span>
+<span id="L265"><span class="lineNum">     265</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           5 :         CPubKey pubkey{first, last};</span></span>
+<span id="L266"><span class="lineNum">     266</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           5 :         if (pubkey.IsValid()) return pubkey;</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">           5 :         return {};</span></span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     }</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             : </span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :     //! Conversion from a raw compressed public key hash.</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     template&lt;typename I&gt;</span>
+<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaUNC">           0 :     std::optional&lt;CPubKey&gt; FromPKHBytes(I first, I last) const {</span></span>
+<span id="L273"><span class="lineNum">     273</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return Satisfier::CPubFromPKHBytes(first, last);</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :     }</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             : </span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :     //! Satisfy an ECDSA signature check.</span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaUNC">           0 :     miniscript::Availability Sign(const CPubKey&amp; key, std::vector&lt;unsigned char&gt;&amp; sig) const {</span></span>
+<span id="L278"><span class="lineNum">     278</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (CreateSig(m_creator, m_sig_data, m_provider, sig, key, m_witness_script, SigVersion::WITNESS_V0)) {</span></span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaUNC">           0 :             return miniscript::Availability::YES;</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :         }</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :         return miniscript::Availability::NO;</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :     }</span>
+<span id="L283"><span class="lineNum">     283</span>                 :             : };</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             : </span>
+<span id="L285"><span class="lineNum">     285</span>                 :             : /** Miniscript satisfier specific to Tapscript context. */</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             : struct TapSatisfier: Satisfier&lt;XOnlyPubKey&gt; {</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :     const uint256&amp; m_leaf_hash;</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             : </span>
+<span id="L289"><span class="lineNum">     289</span>                 :<span class="tlaGNC">         726 :     explicit TapSatisfier(const SigningProvider&amp; provider LIFETIMEBOUND, SignatureData&amp; sig_data LIFETIMEBOUND,</span></span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :                           const BaseSignatureCreator&amp; creator LIFETIMEBOUND, const CScript&amp; script LIFETIMEBOUND,</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :                           const uint256&amp; leaf_hash LIFETIMEBOUND)</span>
+<span id="L292"><span class="lineNum">     292</span>                 :<span class="tlaGNC">         726 :                           : Satisfier(provider, sig_data, creator, script, miniscript::MiniscriptContext::TAPSCRIPT),</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :<span class="tlaGNC">         726 :                             m_leaf_hash(leaf_hash) {}</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :             : </span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :     //! Conversion from a raw xonly public key.</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :     template &lt;typename I&gt;</span>
+<span id="L297"><span class="lineNum">     297</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 81 times"> + </span>]:<span class="tlaGNC">          86 :     std::optional&lt;XOnlyPubKey&gt; FromPKBytes(I first, I last) const {</span></span>
+<span id="L298"><span class="lineNum">     298</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 81 times"> + </span>]:<span class="tlaGNC">          86 :         if (last - first != 32) return {};</span></span>
+<span id="L299"><span class="lineNum">     299</span>                 :<span class="tlaGNC">          81 :         XOnlyPubKey pubkey;</span></span>
+<span id="L300"><span class="lineNum">     300</span>                 :<span class="tlaGNC">          81 :         std::copy(first, last, pubkey.begin());</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :<span class="tlaGNC">          81 :         return pubkey;</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     }</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : </span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :     //! Conversion from a raw xonly public key hash.</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :     template&lt;typename I&gt;</span>
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaUNC">           0 :     std::optional&lt;XOnlyPubKey&gt; FromPKHBytes(I first, I last) const {</span></span>
+<span id="L307"><span class="lineNum">     307</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (auto pubkey = Satisfier::CPubFromPKHBytes(first, last)) return XOnlyPubKey{*pubkey};</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaUNC">           0 :         return {};</span></span>
+<span id="L309"><span class="lineNum">     309</span>                 :             :     }</span>
+<span id="L310"><span class="lineNum">     310</span>                 :             : </span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :     //! Satisfy a BIP340 signature check.</span>
+<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaUNC">           0 :     miniscript::Availability Sign(const XOnlyPubKey&amp; key, std::vector&lt;unsigned char&gt;&amp; sig) const {</span></span>
+<span id="L313"><span class="lineNum">     313</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (CreateTaprootScriptSig(m_creator, m_sig_data, m_provider, sig, key, m_leaf_hash, SigVersion::TAPSCRIPT)) {</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaUNC">           0 :             return miniscript::Availability::YES;</span></span>
+<span id="L315"><span class="lineNum">     315</span>                 :             :         }</span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :         return miniscript::Availability::NO;</span>
+<span id="L317"><span class="lineNum">     317</span>                 :             :     }</span>
+<span id="L318"><span class="lineNum">     318</span>                 :             : };</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             : </span>
+<span id="L320"><span class="lineNum">     320</span>                 :<span class="tlaGNC">         953 : static bool SignTaprootScript(const SigningProvider&amp; provider, const BaseSignatureCreator&amp; creator, SignatureData&amp; sigdata, int leaf_version, std::span&lt;const unsigned char&gt; script_bytes, std::vector&lt;valtype&gt;&amp; result)</span></span>
+<span id="L321"><span class="lineNum">     321</span>                 :             : {</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :     // Only BIP342 tapscript signing is supported for now.</span>
+<span id="L323"><span class="lineNum">     323</span>         [<span class="tlaGBC" title="Branch 0 was taken 726 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 227 times"> + </span>]:<span class="tlaGNC">         953 :     if (leaf_version != TAPROOT_LEAF_TAPSCRIPT) return false;</span></span>
+<span id="L324"><span class="lineNum">     324</span>                 :             : </span>
+<span id="L325"><span class="lineNum">     325</span>                 :<span class="tlaGNC">         726 :     uint256 leaf_hash = ComputeTapleafHash(leaf_version, script_bytes);</span></span>
+<span id="L326"><span class="lineNum">     326</span>                 :<span class="tlaGNC">         726 :     CScript script = CScript(script_bytes.begin(), script_bytes.end());</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :             : </span>
+<span id="L328"><span class="lineNum">     328</span>                 :<span class="tlaGNC">         726 :     TapSatisfier ms_satisfier{provider, sigdata, creator, script, leaf_hash};</span></span>
+<span id="L329"><span class="lineNum">     329</span>         [<span class="tlaGBC" title="Branch 0 was taken 726 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         726 :     const auto ms = miniscript::FromScript(script, ms_satisfier);</span></span>
+<span id="L330"><span class="lineNum">     330</span>   [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 723 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         726 :     return ms &amp;&amp; ms-&gt;Satisfy(ms_satisfier, result) == miniscript::Availability::YES;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L331"><span class="lineNum">     331</span>                 :<span class="tlaGNC">         726 : }</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :             : </span>
+<span id="L333"><span class="lineNum">     333</span>                 :<span class="tlaGNC">      283152 : static bool SignTaproot(const SigningProvider&amp; provider, const BaseSignatureCreator&amp; creator, const WitnessV1Taproot&amp; output, SignatureData&amp; sigdata, std::vector&lt;valtype&gt;&amp; result)</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :             : {</span>
+<span id="L335"><span class="lineNum">     335</span>         [<span class="tlaGBC" title="Branch 0 was taken 283152 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      283152 :     TaprootSpendData spenddata;</span></span>
+<span id="L336"><span class="lineNum">     336</span>         [<span class="tlaGBC" title="Branch 0 was taken 283152 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      283152 :     TaprootBuilder builder;</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :             : </span>
+<span id="L338"><span class="lineNum">     338</span>                 :             :     // Gather information about this output.</span>
+<span id="L339"><span class="lineNum">     339</span>   [<span class="tlaGBC" title="Branch 0 was taken 283152 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 236477 times"> + </span>]:<span class="tlaGNC">      283152 :     if (provider.GetTaprootSpendData(output, spenddata)) {</span></span>
+<span id="L340"><span class="lineNum">     340</span>   [<span class="tlaGBC" title="Branch 0 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       93350 :         sigdata.tr_spenddata.Merge(spenddata);</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :             :     }</span>
+<span id="L342"><span class="lineNum">     342</span>   [<span class="tlaGBC" title="Branch 0 was taken 283152 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 236477 times"> + </span>]:<span class="tlaGNC">      283152 :     if (provider.GetTaprootBuilder(output, builder)) {</span></span>
+<span id="L343"><span class="lineNum">     343</span>         [<span class="tlaGBC" title="Branch 0 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       46675 :         sigdata.tr_builder = builder;</span></span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :     }</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             : </span>
+<span id="L346"><span class="lineNum">     346</span>                 :             :     // Try key path spending.</span>
+<span id="L347"><span class="lineNum">     347</span>                 :<span class="tlaGNC">      283152 :     {</span></span>
+<span id="L348"><span class="lineNum">     348</span>         [<span class="tlaGBC" title="Branch 0 was taken 283152 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      283152 :         KeyOriginInfo info;</span></span>
+<span id="L349"><span class="lineNum">     349</span>   [<span class="tlaGBC" title="Branch 0 was taken 283152 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 236477 times"> + </span>]:<span class="tlaGNC">      283152 :         if (provider.GetKeyOriginByXOnly(sigdata.tr_spenddata.internal_key, info)) {</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :<span class="tlaGNC">       46675 :             auto it = sigdata.taproot_misc_pubkeys.find(sigdata.tr_spenddata.internal_key);</span></span>
+<span id="L351"><span class="lineNum">     351</span>         [<span class="tlaGBC" title="Branch 0 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       46675 :             if (it == sigdata.taproot_misc_pubkeys.end()) {</span></span>
+<span id="L352"><span class="lineNum">     352</span>   [<span class="tlaGBC" title="Branch 0 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46675 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       46675 :                 sigdata.taproot_misc_pubkeys.emplace(sigdata.tr_spenddata.internal_key, std::make_pair(std::set&lt;uint256&gt;(), info));</span></span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :             }</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             :         }</span>
+<span id="L355"><span class="lineNum">     355</span>                 :             : </span>
+<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaGNC">      283152 :         std::vector&lt;unsigned char&gt; sig;</span></span>
+<span id="L357"><span class="lineNum">     357</span>         [<span class="tlaGBC" title="Branch 0 was taken 283080 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 72 times"> + </span>]:<span class="tlaGNC">      283152 :         if (sigdata.taproot_key_path_sig.size() == 0) {</span></span>
+<span id="L358"><span class="lineNum">     358</span>   [<span class="tlaGBC" title="Branch 0 was taken 283080 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 46768 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 236312 times"> + </span>]:<span class="tlaGNC">      283080 :             if (creator.CreateSchnorrSig(provider, sig, sigdata.tr_spenddata.internal_key, nullptr, &amp;sigdata.tr_spenddata.merkle_root, SigVersion::TAPROOT)) {</span></span>
+<span id="L359"><span class="lineNum">     359</span>         [<span class="tlaGBC" title="Branch 0 was taken 46768 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       46768 :                 sigdata.taproot_key_path_sig = sig;</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :             }</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :         }</span>
+<span id="L362"><span class="lineNum">     362</span>         [<span class="tlaGBC" title="Branch 0 was taken 236312 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 46840 times"> + </span>]:<span class="tlaGNC">      283152 :         if (sigdata.taproot_key_path_sig.size() == 0) {</span></span>
+<span id="L363"><span class="lineNum">     363</span>   [<span class="tlaGBC" title="Branch 0 was taken 236312 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 236312 times"> + </span>]:<span class="tlaGNC">      236312 :             if (creator.CreateSchnorrSig(provider, sig, output, nullptr, nullptr, SigVersion::TAPROOT)) {</span></span>
+<span id="L364"><span class="lineNum">     364</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 sigdata.taproot_key_path_sig = sig;</span></span>
+<span id="L365"><span class="lineNum">     365</span>                 :             :             }</span>
+<span id="L366"><span class="lineNum">     366</span>                 :             :         }</span>
+<span id="L367"><span class="lineNum">     367</span>         [<span class="tlaGBC" title="Branch 0 was taken 46840 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 236312 times"> + </span>]:<span class="tlaGNC">      283152 :         if (sigdata.taproot_key_path_sig.size()) {</span></span>
+<span id="L368"><span class="lineNum">     368</span>         [<span class="tlaGBC" title="Branch 0 was taken 46840 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       93680 :             result = Vector(sigdata.taproot_key_path_sig);</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :<span class="tlaGNC">       46840 :             return true;</span></span>
+<span id="L370"><span class="lineNum">     370</span>                 :             :         }</span>
+<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaGNC">      283152 :     }</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : </span>
+<span id="L373"><span class="lineNum">     373</span>                 :             :     // Try script path spending.</span>
+<span id="L374"><span class="lineNum">     374</span>                 :<span class="tlaGNC">      236312 :     std::vector&lt;std::vector&lt;unsigned char&gt;&gt; smallest_result_stack;</span></span>
+<span id="L375"><span class="lineNum">     375</span>   [<span class="tlaGBC" title="Branch 0 was taken 953 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 953 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 236312 times"> + </span>]:<span class="tlaGNC">      237265 :     for (const auto&amp; [key, control_blocks] : sigdata.tr_spenddata.scripts) {</span></span>
+<span id="L376"><span class="lineNum">     376</span>                 :<span class="tlaGNC">         953 :         const auto&amp; [script, leaf_ver] = key;</span></span>
+<span id="L377"><span class="lineNum">     377</span>                 :<span class="tlaGNC">         953 :         std::vector&lt;std::vector&lt;unsigned char&gt;&gt; result_stack;</span></span>
+<span id="L378"><span class="lineNum">     378</span>   [<span class="tlaGBC" title="Branch 0 was taken 953 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 953 times"> + </span>]:<span class="tlaGNC">         953 :         if (SignTaprootScript(provider, creator, sigdata, leaf_ver, script, result_stack)) {</span></span>
+<span id="L379"><span class="lineNum">     379</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             result_stack.emplace_back(std::begin(script), std::end(script)); // Push the script</span></span>
+<span id="L380"><span class="lineNum">     380</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             result_stack.push_back(*control_blocks.begin()); // Push the smallest control block</span></span>
+<span id="L381"><span class="lineNum">     381</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (smallest_result_stack.size() == 0 ||</span></span>
+<span id="L382"><span class="lineNum">     382</span>                 :<span class="tlaUNC">           0 :                 GetSerializeSize(result_stack) &lt; GetSerializeSize(smallest_result_stack)) {</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :<span class="tlaUNC">           0 :                 smallest_result_stack = std::move(result_stack);</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :             }</span>
+<span id="L385"><span class="lineNum">     385</span>                 :             :         }</span>
+<span id="L386"><span class="lineNum">     386</span>                 :<span class="tlaGNC">         953 :     }</span></span>
+<span id="L387"><span class="lineNum">     387</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 236312 times"> + </span>]:<span class="tlaGNC">      236312 :     if (smallest_result_stack.size() != 0) {</span></span>
+<span id="L388"><span class="lineNum">     388</span>                 :<span class="tlaUNC">           0 :         result = std::move(smallest_result_stack);</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaUNC">           0 :         return true;</span></span>
+<span id="L390"><span class="lineNum">     390</span>                 :             :     }</span>
+<span id="L391"><span class="lineNum">     391</span>                 :             : </span>
+<span id="L392"><span class="lineNum">     392</span>                 :             :     return false;</span>
+<span id="L393"><span class="lineNum">     393</span>                 :<span class="tlaGNC">      519464 : }</span></span>
+<span id="L394"><span class="lineNum">     394</span>                 :             : </span>
+<span id="L395"><span class="lineNum">     395</span>                 :             : /**</span>
+<span id="L396"><span class="lineNum">     396</span>                 :             :  * Sign scriptPubKey using signature made with creator.</span>
+<span id="L397"><span class="lineNum">     397</span>                 :             :  * Signatures are returned in scriptSigRet (or returns false if scriptPubKey can't be signed),</span>
+<span id="L398"><span class="lineNum">     398</span>                 :             :  * unless whichTypeRet is TxoutType::SCRIPTHASH, in which case scriptSigRet is the redemption script.</span>
+<span id="L399"><span class="lineNum">     399</span>                 :             :  * Returns false if scriptPubKey could not be completely satisfied.</span>
+<span id="L400"><span class="lineNum">     400</span>                 :             :  */</span>
+<span id="L401"><span class="lineNum">     401</span>                 :<span class="tlaGNC">      696993 : static bool SignStep(const SigningProvider&amp; provider, const BaseSignatureCreator&amp; creator, const CScript&amp; scriptPubKey,</span></span>
+<span id="L402"><span class="lineNum">     402</span>                 :             :                      std::vector&lt;valtype&gt;&amp; ret, TxoutType&amp; whichTypeRet, SigVersion sigversion, SignatureData&amp; sigdata)</span>
+<span id="L403"><span class="lineNum">     403</span>                 :             : {</span>
+<span id="L404"><span class="lineNum">     404</span>                 :<span class="tlaGNC">      696993 :     CScript scriptRet;</span></span>
+<span id="L405"><span class="lineNum">     405</span>                 :<span class="tlaGNC">      696993 :     ret.clear();</span></span>
+<span id="L406"><span class="lineNum">     406</span>                 :<span class="tlaGNC">      696993 :     std::vector&lt;unsigned char&gt; sig;</span></span>
+<span id="L407"><span class="lineNum">     407</span>                 :             : </span>
+<span id="L408"><span class="lineNum">     408</span>                 :<span class="tlaGNC">      696993 :     std::vector&lt;valtype&gt; vSolutions;</span></span>
+<span id="L409"><span class="lineNum">     409</span>         [<span class="tlaGBC" title="Branch 0 was taken 696993 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      696993 :     whichTypeRet = Solver(scriptPubKey, vSolutions);</span></span>
+<span id="L410"><span class="lineNum">     410</span>                 :             : </span>
+<span id="L411"><span class="lineNum">     411</span>   [<span class="tlaGBC" title="Branch 0 was taken 6186 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 92237 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 64683 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3258 times"> + </span> :<span class="tlaGNC">      696993 :     switch (whichTypeRet) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 42628 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 11170 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 283152 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 843 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 9 was taken 192836 times"> + </span>]
+<span id="L412"><span class="lineNum">     412</span>                 :             :     case TxoutType::NONSTANDARD:</span>
+<span id="L413"><span class="lineNum">     413</span>                 :             :     case TxoutType::NULL_DATA:</span>
+<span id="L414"><span class="lineNum">     414</span>                 :             :     case TxoutType::WITNESS_UNKNOWN:</span>
+<span id="L415"><span class="lineNum">     415</span>                 :             :         return false;</span>
+<span id="L416"><span class="lineNum">     416</span>                 :<span class="tlaGNC">        6186 :     case TxoutType::PUBKEY:</span></span>
+<span id="L417"><span class="lineNum">     417</span>   [<span class="tlaGBC" title="Branch 0 was taken 6186 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 22 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 6164 times"> + </span>]:<span class="tlaGNC">        6186 :         if (!CreateSig(creator, sigdata, provider, sig, CPubKey(vSolutions[0]), scriptPubKey, sigversion)) return false;</span></span>
+<span id="L418"><span class="lineNum">     418</span>         [<span class="tlaGBC" title="Branch 0 was taken 22 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          22 :         ret.push_back(std::move(sig));</span></span>
+<span id="L419"><span class="lineNum">     419</span>                 :             :         return true;</span>
+<span id="L420"><span class="lineNum">     420</span>                 :<span class="tlaGNC">       92237 :     case TxoutType::PUBKEYHASH: {</span></span>
+<span id="L421"><span class="lineNum">     421</span>         [<span class="tlaGBC" title="Branch 0 was taken 92237 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       92237 :         CKeyID keyID = CKeyID(uint160(vSolutions[0]));</span></span>
+<span id="L422"><span class="lineNum">     422</span>         [<span class="tlaGBC" title="Branch 0 was taken 92237 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       92237 :         CPubKey pubkey;</span></span>
+<span id="L423"><span class="lineNum">     423</span>   [<span class="tlaGBC" title="Branch 0 was taken 92237 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 8978 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 83259 times"> + </span>]:<span class="tlaGNC">       92237 :         if (!GetPubKey(provider, sigdata, keyID, pubkey)) {</span></span>
+<span id="L424"><span class="lineNum">     424</span>                 :             :             // Pubkey could not be found, add to missing</span>
+<span id="L425"><span class="lineNum">     425</span>         [<span class="tlaGBC" title="Branch 0 was taken 8978 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8978 :             sigdata.missing_pubkeys.push_back(keyID);</span></span>
+<span id="L426"><span class="lineNum">     426</span>                 :             :             return false;</span>
+<span id="L427"><span class="lineNum">     427</span>                 :             :         }</span>
+<span id="L428"><span class="lineNum">     428</span>   [<span class="tlaGBC" title="Branch 0 was taken 83259 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 79711 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3548 times"> + </span>]:<span class="tlaGNC">       83259 :         if (!CreateSig(creator, sigdata, provider, sig, pubkey, scriptPubKey, sigversion)) return false;</span></span>
+<span id="L429"><span class="lineNum">     429</span>         [<span class="tlaGBC" title="Branch 0 was taken 79711 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       79711 :         ret.push_back(std::move(sig));</span></span>
+<span id="L430"><span class="lineNum">     430</span>         [<span class="tlaGBC" title="Branch 0 was taken 79711 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      159422 :         ret.push_back(ToByteVector(pubkey));</span></span>
+<span id="L431"><span class="lineNum">     431</span>                 :<span class="tlaGNC">       79711 :         return true;</span></span>
+<span id="L432"><span class="lineNum">     432</span>                 :             :     }</span>
+<span id="L433"><span class="lineNum">     433</span>                 :<span class="tlaGNC">       64683 :     case TxoutType::SCRIPTHASH: {</span></span>
+<span id="L434"><span class="lineNum">     434</span>                 :<span class="tlaGNC">       64683 :         uint160 h160{vSolutions[0]};</span></span>
+<span id="L435"><span class="lineNum">     435</span>   [<span class="tlaGBC" title="Branch 0 was taken 64683 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 41029 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 23654 times"> + </span>]:<span class="tlaGNC">       64683 :         if (GetCScript(provider, sigdata, CScriptID{h160}, scriptRet)) {</span></span>
+<span id="L436"><span class="lineNum">     436</span>   [<span class="tlaGBC" title="Branch 0 was taken 3376 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 37653 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 41029 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       44405 :             ret.emplace_back(scriptRet.begin(), scriptRet.end());</span></span>
+<span id="L437"><span class="lineNum">     437</span>                 :             :             return true;</span>
+<span id="L438"><span class="lineNum">     438</span>                 :             :         }</span>
+<span id="L439"><span class="lineNum">     439</span>                 :             :         // Could not find redeemScript, add to missing</span>
+<span id="L440"><span class="lineNum">     440</span>                 :<span class="tlaGNC">       23654 :         sigdata.missing_redeem_script = h160;</span></span>
+<span id="L441"><span class="lineNum">     441</span>                 :<span class="tlaGNC">       23654 :         return false;</span></span>
+<span id="L442"><span class="lineNum">     442</span>                 :             :     }</span>
+<span id="L443"><span class="lineNum">     443</span>                 :<span class="tlaGNC">        3258 :     case TxoutType::MULTISIG: {</span></span>
+<span id="L444"><span class="lineNum">     444</span>         [<span class="tlaGBC" title="Branch 0 was taken 3258 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3258 :         size_t required = vSolutions.front()[0];</span></span>
+<span id="L445"><span class="lineNum">     445</span>         [<span class="tlaGBC" title="Branch 0 was taken 3258 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3258 :         ret.emplace_back(); // workaround CHECKMULTISIG bug</span></span>
+<span id="L446"><span class="lineNum">     446</span>         [<span class="tlaGBC" title="Branch 0 was taken 9051 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3258 times"> + </span>]:<span class="tlaGNC">       12309 :         for (size_t i = 1; i &lt; vSolutions.size() - 1; ++i) {</span></span>
+<span id="L447"><span class="lineNum">     447</span>                 :<span class="tlaGNC">        9051 :             CPubKey pubkey = CPubKey(vSolutions[i]);</span></span>
+<span id="L448"><span class="lineNum">     448</span>                 :             :             // We need to always call CreateSig in order to fill sigdata with all</span>
+<span id="L449"><span class="lineNum">     449</span>                 :             :             // possible signatures that we can create. This will allow further PSBT</span>
+<span id="L450"><span class="lineNum">     450</span>                 :             :             // processing to work as it needs all possible signature and pubkey pairs</span>
+<span id="L451"><span class="lineNum">     451</span>   [<span class="tlaGBC" title="Branch 0 was taken 9051 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7096 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1955 times"> + </span>]:<span class="tlaGNC">        9051 :             if (CreateSig(creator, sigdata, provider, sig, pubkey, scriptPubKey, sigversion)) {</span></span>
+<span id="L452"><span class="lineNum">     452</span>         [<span class="tlaGBC" title="Branch 0 was taken 6332 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 764 times"> + </span>]:<span class="tlaGNC">        7096 :                 if (ret.size() &lt; required + 1) {</span></span>
+<span id="L453"><span class="lineNum">     453</span>         [<span class="tlaGBC" title="Branch 0 was taken 6332 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        9051 :                     ret.push_back(std::move(sig));</span></span>
+<span id="L454"><span class="lineNum">     454</span>                 :             :                 }</span>
+<span id="L455"><span class="lineNum">     455</span>                 :             :             }</span>
+<span id="L456"><span class="lineNum">     456</span>                 :             :         }</span>
+<span id="L457"><span class="lineNum">     457</span>                 :<span class="tlaGNC">        3258 :         bool ok = ret.size() == required + 1;</span></span>
+<span id="L458"><span class="lineNum">     458</span>         [<span class="tlaGBC" title="Branch 0 was taken 1132 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3258 times"> + </span>]:<span class="tlaGNC">        4390 :         for (size_t i = 0; i + ret.size() &lt; required + 1; ++i) {</span></span>
+<span id="L459"><span class="lineNum">     459</span>         [<span class="tlaGBC" title="Branch 0 was taken 1132 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1132 :             ret.emplace_back();</span></span>
+<span id="L460"><span class="lineNum">     460</span>                 :             :         }</span>
+<span id="L461"><span class="lineNum">     461</span>                 :             :         return ok;</span>
+<span id="L462"><span class="lineNum">     462</span>                 :             :     }</span>
+<span id="L463"><span class="lineNum">     463</span>                 :<span class="tlaGNC">       42628 :     case TxoutType::WITNESS_V0_KEYHASH:</span></span>
+<span id="L464"><span class="lineNum">     464</span>         [<span class="tlaGBC" title="Branch 0 was taken 42628 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       42628 :         ret.push_back(vSolutions[0]);</span></span>
+<span id="L465"><span class="lineNum">     465</span>                 :             :         return true;</span>
+<span id="L466"><span class="lineNum">     466</span>                 :             : </span>
+<span id="L467"><span class="lineNum">     467</span>                 :<span class="tlaGNC">       11170 :     case TxoutType::WITNESS_V0_SCRIPTHASH:</span></span>
+<span id="L468"><span class="lineNum">     468</span>   [<span class="tlaGBC" title="Branch 0 was taken 11170 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 11170 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       11170 :         if (GetCScript(provider, sigdata, CScriptID{RIPEMD160(vSolutions[0])}, scriptRet)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 3793 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 7377 times"> + </span>]
+<span id="L469"><span class="lineNum">     469</span>   [<span class="tlaGBC" title="Branch 0 was taken 1663 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2130 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3793 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        5456 :             ret.emplace_back(scriptRet.begin(), scriptRet.end());</span></span>
+<span id="L470"><span class="lineNum">     470</span>                 :             :             return true;</span>
+<span id="L471"><span class="lineNum">     471</span>                 :             :         }</span>
+<span id="L472"><span class="lineNum">     472</span>                 :             :         // Could not find witnessScript, add to missing</span>
+<span id="L473"><span class="lineNum">     473</span>                 :<span class="tlaGNC">        7377 :         sigdata.missing_witness_script = uint256(vSolutions[0]);</span></span>
+<span id="L474"><span class="lineNum">     474</span>                 :<span class="tlaGNC">        7377 :         return false;</span></span>
+<span id="L475"><span class="lineNum">     475</span>                 :             : </span>
+<span id="L476"><span class="lineNum">     476</span>                 :<span class="tlaGNC">      283152 :     case TxoutType::WITNESS_V1_TAPROOT:</span></span>
+<span id="L477"><span class="lineNum">     477</span>         [<span class="tlaGBC" title="Branch 0 was taken 283152 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      283152 :         return SignTaproot(provider, creator, WitnessV1Taproot(XOnlyPubKey{vSolutions[0]}), sigdata, ret);</span></span>
+<span id="L478"><span class="lineNum">     478</span>                 :             : </span>
+<span id="L479"><span class="lineNum">     479</span>                 :<span class="tlaGNC">         843 :     case TxoutType::ANCHOR:</span></span>
+<span id="L480"><span class="lineNum">     480</span>                 :<span class="tlaGNC">         843 :         return true;</span></span>
+<span id="L481"><span class="lineNum">     481</span>                 :             :     } // no default case, so the compiler can warn about missing cases</span>
+<span id="L482"><span class="lineNum">     482</span>                 :<span class="tlaUNC">           0 :     assert(false);</span></span>
+<span id="L483"><span class="lineNum">     483</span>                 :<span class="tlaGNC">      696993 : }</span></span>
+<span id="L484"><span class="lineNum">     484</span>                 :             : </span>
+<span id="L485"><span class="lineNum">     485</span>                 :<span class="tlaGNC">      609563 : static CScript PushAll(const std::vector&lt;valtype&gt;&amp; values)</span></span>
+<span id="L486"><span class="lineNum">     486</span>                 :             : {</span>
+<span id="L487"><span class="lineNum">     487</span>                 :<span class="tlaGNC">      609563 :     CScript result;</span></span>
+<span id="L488"><span class="lineNum">     488</span>         [<span class="tlaGBC" title="Branch 0 was taken 138043 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 609563 times"> + </span>]:<span class="tlaGNC">      747606 :     for (const valtype&amp; v : values) {</span></span>
+<span id="L489"><span class="lineNum">     489</span>         [<span class="tlaGBC" title="Branch 0 was taken 6127 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 131916 times"> + </span>]:<span class="tlaGNC">      138043 :         if (v.size() == 0) {</span></span>
+<span id="L490"><span class="lineNum">     490</span>         [<span class="tlaGBC" title="Branch 0 was taken 6127 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6127 :             result &lt;&lt; OP_0;</span></span>
+<span id="L491"><span class="lineNum">     491</span>   [<span class="tlaGBC" title="Branch 0 was taken 798 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 131118 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 760 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 38 times"> + </span> :<span class="tlaGNC">      131916 :         } else if (v.size() == 1 &amp;&amp; v[0] &gt;= 1 &amp;&amp; v[0] &lt;= 16) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 569 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 191 times"> + </span>]
+<span id="L492"><span class="lineNum">     492</span>         [<span class="tlaGBC" title="Branch 0 was taken 569 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         569 :             result &lt;&lt; CScript::EncodeOP_N(v[0]);</span></span>
+<span id="L493"><span class="lineNum">     493</span>   [<span class="tlaGBC" title="Branch 0 was taken 229 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 131118 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 174 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 55 times"> + </span>]:<span class="tlaGNC">      131347 :         } else if (v.size() == 1 &amp;&amp; v[0] == 0x81) {</span></span>
+<span id="L494"><span class="lineNum">     494</span>         [<span class="tlaGBC" title="Branch 0 was taken 55 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          55 :             result &lt;&lt; OP_1NEGATE;</span></span>
+<span id="L495"><span class="lineNum">     495</span>                 :             :         } else {</span>
+<span id="L496"><span class="lineNum">     496</span>                 :<span class="tlaGNC">      131292 :             result &lt;&lt; v;</span></span>
+<span id="L497"><span class="lineNum">     497</span>                 :             :         }</span>
+<span id="L498"><span class="lineNum">     498</span>                 :             :     }</span>
+<span id="L499"><span class="lineNum">     499</span>                 :<span class="tlaGNC">      609563 :     return result;</span></span>
+<span id="L500"><span class="lineNum">     500</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L501"><span class="lineNum">     501</span>                 :             : </span>
+<span id="L502"><span class="lineNum">     502</span>                 :<span class="tlaGNC">      633727 : bool ProduceSignature(const SigningProvider&amp; provider, const BaseSignatureCreator&amp; creator, const CScript&amp; fromPubKey, SignatureData&amp; sigdata)</span></span>
+<span id="L503"><span class="lineNum">     503</span>                 :             : {</span>
+<span id="L504"><span class="lineNum">     504</span>         [<span class="tlaGBC" title="Branch 0 was taken 609563 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 24164 times"> + </span>]:<span class="tlaGNC">      633727 :     if (sigdata.complete) return true;</span></span>
+<span id="L505"><span class="lineNum">     505</span>                 :             : </span>
+<span id="L506"><span class="lineNum">     506</span>                 :<span class="tlaGNC">      609563 :     std::vector&lt;valtype&gt; result;</span></span>
+<span id="L507"><span class="lineNum">     507</span>                 :<span class="tlaGNC">      609563 :     TxoutType whichType;</span></span>
+<span id="L508"><span class="lineNum">     508</span>         [<span class="tlaGBC" title="Branch 0 was taken 609563 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      609563 :     bool solved = SignStep(provider, creator, fromPubKey, result, whichType, SigVersion::BASE, sigdata);</span></span>
+<span id="L509"><span class="lineNum">     509</span>                 :<span class="tlaGNC">      609563 :     bool P2SH = false;</span></span>
+<span id="L510"><span class="lineNum">     510</span>                 :<span class="tlaGNC">      609563 :     CScript subscript;</span></span>
+<span id="L511"><span class="lineNum">     511</span>                 :             : </span>
+<span id="L512"><span class="lineNum">     512</span>   [<span class="tlaGBC" title="Branch 0 was taken 144018 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 465545 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 41029 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 102989 times"> + </span>]:<span class="tlaGNC">      609563 :     if (solved &amp;&amp; whichType == TxoutType::SCRIPTHASH)</span></span>
+<span id="L513"><span class="lineNum">     513</span>                 :             :     {</span>
+<span id="L514"><span class="lineNum">     514</span>                 :             :         // Solver returns the subscript that needs to be evaluated;</span>
+<span id="L515"><span class="lineNum">     515</span>                 :             :         // the final scriptSig is the signatures from that</span>
+<span id="L516"><span class="lineNum">     516</span>                 :             :         // and then the serialized subscript:</span>
+<span id="L517"><span class="lineNum">     517</span>                 :<span class="tlaGNC">       41029 :         subscript = CScript(result[0].begin(), result[0].end());</span></span>
+<span id="L518"><span class="lineNum">     518</span>                 :<span class="tlaGNC">       41029 :         sigdata.redeem_script = subscript;</span></span>
+<span id="L519"><span class="lineNum">     519</span>   [<span class="tlaGBC" title="Branch 0 was taken 41029 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 36979 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4050 times"> + </span> :<span class="tlaGNC">       41029 :         solved = solved &amp;&amp; SignStep(provider, creator, subscript, result, whichType, SigVersion::BASE, sigdata) &amp;&amp; whichType != TxoutType::SCRIPTHASH;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 36979 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L520"><span class="lineNum">     520</span>                 :             :         P2SH = true;</span>
+<span id="L521"><span class="lineNum">     521</span>                 :             :     }</span>
+<span id="L522"><span class="lineNum">     522</span>                 :             : </span>
+<span id="L523"><span class="lineNum">     523</span>         [<span class="tlaGBC" title="Branch 0 was taken 42608 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 97360 times"> + </span>]:<span class="tlaGNC">      139968 :     if (solved &amp;&amp; whichType == TxoutType::WITNESS_V0_KEYHASH)</span></span>
+<span id="L524"><span class="lineNum">     524</span>                 :             :     {</span>
+<span id="L525"><span class="lineNum">     525</span>                 :<span class="tlaGNC">       42608 :         CScript witnessscript;</span></span>
+<span id="L526"><span class="lineNum">     526</span>   [<span class="tlaGBC" title="Branch 0 was taken 42608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 42608 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       42608 :         witnessscript &lt;&lt; OP_DUP &lt;&lt; OP_HASH160 &lt;&lt; ToByteVector(result[0]) &lt;&lt; OP_EQUALVERIFY &lt;&lt; OP_CHECKSIG;</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 42608 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 42608 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 42608 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 9 was not taken"> - </span>]
+<span id="L527"><span class="lineNum">     527</span>                 :<span class="tlaGNC">       42608 :         TxoutType subType;</span></span>
+<span id="L528"><span class="lineNum">     528</span>   [<span class="tlaGBC" title="Branch 0 was taken 42608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 42608 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       42608 :         solved = solved &amp;&amp; SignStep(provider, creator, witnessscript, result, subType, SigVersion::WITNESS_V0, sigdata);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 6751 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 35857 times"> + </span>]
+<span id="L529"><span class="lineNum">     529</span>         [<span class="tlaGBC" title="Branch 0 was taken 42608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       42608 :         sigdata.scriptWitness.stack = result;</span></span>
+<span id="L530"><span class="lineNum">     530</span>                 :<span class="tlaGNC">       42608 :         sigdata.witness = true;</span></span>
+<span id="L531"><span class="lineNum">     531</span>                 :<span class="tlaGNC">       42608 :         result.clear();</span></span>
+<span id="L532"><span class="lineNum">     532</span>                 :<span class="tlaGNC">       42608 :     }</span></span>
+<span id="L533"><span class="lineNum">     533</span>   [<span class="tlaGBC" title="Branch 0 was taken 97360 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 465545 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3793 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 93567 times"> + </span>]:<span class="tlaGNC">      562905 :     else if (solved &amp;&amp; whichType == TxoutType::WITNESS_V0_SCRIPTHASH)</span></span>
+<span id="L534"><span class="lineNum">     534</span>                 :             :     {</span>
+<span id="L535"><span class="lineNum">     535</span>                 :<span class="tlaGNC">        3793 :         CScript witnessscript(result[0].begin(), result[0].end());</span></span>
+<span id="L536"><span class="lineNum">     536</span>                 :<span class="tlaGNC">        3793 :         sigdata.witness_script = witnessscript;</span></span>
+<span id="L537"><span class="lineNum">     537</span>                 :             : </span>
+<span id="L538"><span class="lineNum">     538</span>                 :<span class="tlaGNC">        3793 :         TxoutType subType{TxoutType::NONSTANDARD};</span></span>
+<span id="L539"><span class="lineNum">     539</span>   [<span class="tlaGBC" title="Branch 0 was taken 3793 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 212 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3581 times"> + </span> :<span class="tlaGNC">        3793 :         solved = solved &amp;&amp; SignStep(provider, creator, witnessscript, result, subType, SigVersion::WITNESS_V0, sigdata) &amp;&amp; subType != TxoutType::SCRIPTHASH &amp;&amp; subType != TxoutType::WITNESS_V0_SCRIPTHASH &amp;&amp; subType != TxoutType::WITNESS_V0_KEYHASH;</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 212 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 212 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 20 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 9 was taken 192 times"> + </span>]
+<span id="L540"><span class="lineNum">     540</span>                 :             : </span>
+<span id="L541"><span class="lineNum">     541</span>                 :             :         // If we couldn't find a solution with the legacy satisfier, try satisfying the script using Miniscript.</span>
+<span id="L542"><span class="lineNum">     542</span>                 :             :         // Note we need to check if the result stack is empty before, because it might be used even if the Script</span>
+<span id="L543"><span class="lineNum">     543</span>                 :             :         // isn't fully solved. For instance the CHECKMULTISIG satisfaction in SignStep() pushes partial signatures</span>
+<span id="L544"><span class="lineNum">     544</span>                 :             :         // and the extractor relies on this behaviour to combine witnesses.</span>
+<span id="L545"><span class="lineNum">     545</span>         [<span class="tlaGBC" title="Branch 0 was taken 3175 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 426 times"> + </span>]:<span class="tlaGNC">        3601 :         if (!solved &amp;&amp; result.empty()) {</span></span>
+<span id="L546"><span class="lineNum">     546</span>                 :<span class="tlaGNC">        3175 :             WshSatisfier ms_satisfier{provider, sigdata, creator, witnessscript};</span></span>
+<span id="L547"><span class="lineNum">     547</span>         [<span class="tlaGBC" title="Branch 0 was taken 3175 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3175 :             const auto ms = miniscript::FromScript(witnessscript, ms_satisfier);</span></span>
+<span id="L548"><span class="lineNum">     548</span>   [<span class="tlaGBC" title="Branch 0 was taken 77 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3098 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 77 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        3175 :             solved = ms &amp;&amp; ms-&gt;Satisfy(ms_satisfier, result) == miniscript::Availability::YES;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 77 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L549"><span class="lineNum">     549</span>                 :<span class="tlaGNC">        3175 :         }</span></span>
+<span id="L550"><span class="lineNum">     550</span>   [<span class="tlaGBC" title="Branch 0 was taken 1663 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2130 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3793 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        5456 :         result.emplace_back(witnessscript.begin(), witnessscript.end());</span></span>
+<span id="L551"><span class="lineNum">     551</span>                 :             : </span>
+<span id="L552"><span class="lineNum">     552</span>         [<span class="tlaGBC" title="Branch 0 was taken 3793 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3793 :         sigdata.scriptWitness.stack = result;</span></span>
+<span id="L553"><span class="lineNum">     553</span>                 :<span class="tlaGNC">        3793 :         sigdata.witness = true;</span></span>
+<span id="L554"><span class="lineNum">     554</span>                 :<span class="tlaGNC">        3793 :         result.clear();</span></span>
+<span id="L555"><span class="lineNum">     555</span>   [<span class="tlaGBC" title="Branch 0 was taken 283152 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 280010 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 283152 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      566955 :     } else if (whichType == TxoutType::WITNESS_V1_TAPROOT &amp;&amp; !P2SH) {</span></span>
+<span id="L556"><span class="lineNum">     556</span>                 :<span class="tlaGNC">      283152 :         sigdata.witness = true;</span></span>
+<span id="L557"><span class="lineNum">     557</span>         [<span class="tlaGBC" title="Branch 0 was taken 46840 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 236312 times"> + </span>]:<span class="tlaGNC">      283152 :         if (solved) {</span></span>
+<span id="L558"><span class="lineNum">     558</span>                 :<span class="tlaGNC">       46840 :             sigdata.scriptWitness.stack = std::move(result);</span></span>
+<span id="L559"><span class="lineNum">     559</span>                 :             :         }</span>
+<span id="L560"><span class="lineNum">     560</span>                 :<span class="tlaGNC">      283152 :         result.clear();</span></span>
+<span id="L561"><span class="lineNum">     561</span>   [<span class="tlaGBC" title="Branch 0 was taken 46727 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 233283 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 46727 times"> + </span>]:<span class="tlaGNC">      280010 :     } else if (solved &amp;&amp; whichType == TxoutType::WITNESS_UNKNOWN) {</span></span>
+<span id="L562"><span class="lineNum">     562</span>                 :<span class="tlaUNC">           0 :         sigdata.witness = true;</span></span>
+<span id="L563"><span class="lineNum">     563</span>                 :             :     }</span>
+<span id="L564"><span class="lineNum">     564</span>                 :             : </span>
+<span id="L565"><span class="lineNum">     565</span>         [<span class="tlaGBC" title="Branch 0 was taken 280010 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 329553 times"> + </span>]:<span class="tlaGNC">      609563 :     if (!sigdata.witness) sigdata.scriptWitness.stack.clear();</span></span>
+<span id="L566"><span class="lineNum">     566</span>         [<span class="tlaGBC" title="Branch 0 was taken 41029 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 568534 times"> + </span>]:<span class="tlaGNC">      609563 :     if (P2SH) {</span></span>
+<span id="L567"><span class="lineNum">     567</span>   [<span class="tlaGBC" title="Branch 0 was taken 3376 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 37653 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 41029 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       44405 :         result.emplace_back(subscript.begin(), subscript.end());</span></span>
+<span id="L568"><span class="lineNum">     568</span>                 :             :     }</span>
+<span id="L569"><span class="lineNum">     569</span>         [<span class="tlaGBC" title="Branch 0 was taken 609563 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      609563 :     sigdata.scriptSig = PushAll(result);</span></span>
+<span id="L570"><span class="lineNum">     570</span>                 :             : </span>
+<span id="L571"><span class="lineNum">     571</span>                 :             :     // Test solution</span>
+<span id="L572"><span class="lineNum">     572</span>   [<span class="tlaGBC" title="Branch 0 was taken 129616 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 479947 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 129616 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      609563 :     sigdata.complete = solved &amp;&amp; VerifyScript(sigdata.scriptSig, fromPubKey, &amp;sigdata.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, creator.Checker());</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 129616 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 71356 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 58260 times"> + </span>]
+<span id="L573"><span class="lineNum">     573</span>                 :<span class="tlaGNC">      609563 :     return sigdata.complete;</span></span>
+<span id="L574"><span class="lineNum">     574</span>                 :<span class="tlaGNC">      609563 : }</span></span>
+<span id="L575"><span class="lineNum">     575</span>                 :             : </span>
+<span id="L576"><span class="lineNum">     576</span>                 :             : namespace {</span>
+<span id="L577"><span class="lineNum">     577</span>                 :<span class="tlaGNC">      596235 : class SignatureExtractorChecker final : public DeferringSignatureChecker</span></span>
+<span id="L578"><span class="lineNum">     578</span>                 :             : {</span>
+<span id="L579"><span class="lineNum">     579</span>                 :             : private:</span>
+<span id="L580"><span class="lineNum">     580</span>                 :             :     SignatureData&amp; sigdata;</span>
+<span id="L581"><span class="lineNum">     581</span>                 :             : </span>
+<span id="L582"><span class="lineNum">     582</span>                 :             : public:</span>
+<span id="L583"><span class="lineNum">     583</span>                 :<span class="tlaGNC">      596235 :     SignatureExtractorChecker(SignatureData&amp; sigdata, BaseSignatureChecker&amp; checker) : DeferringSignatureChecker(checker), sigdata(sigdata) {}</span></span>
+<span id="L584"><span class="lineNum">     584</span>                 :             : </span>
+<span id="L585"><span class="lineNum">     585</span>                 :<span class="tlaGNC">       17699 :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override</span></span>
+<span id="L586"><span class="lineNum">     586</span>                 :             :     {</span>
+<span id="L587"><span class="lineNum">     587</span>         [<span class="tlaGBC" title="Branch 0 was taken 14473 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3226 times"> + </span>]:<span class="tlaGNC">       17699 :         if (m_checker.CheckECDSASignature(scriptSig, vchPubKey, scriptCode, sigversion)) {</span></span>
+<span id="L588"><span class="lineNum">     588</span>                 :<span class="tlaGNC">       14473 :             CPubKey pubkey(vchPubKey);</span></span>
+<span id="L589"><span class="lineNum">     589</span>   [<span class="tlaGBC" title="Branch 0 was taken 14473 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 14473 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       14473 :             sigdata.signatures.emplace(pubkey.GetID(), SigPair(pubkey, scriptSig));</span></span>
+<span id="L590"><span class="lineNum">     590</span>                 :<span class="tlaGNC">       14473 :             return true;</span></span>
+<span id="L591"><span class="lineNum">     591</span>                 :             :         }</span>
+<span id="L592"><span class="lineNum">     592</span>                 :             :         return false;</span>
+<span id="L593"><span class="lineNum">     593</span>                 :             :     }</span>
+<span id="L594"><span class="lineNum">     594</span>                 :             : };</span>
+<span id="L595"><span class="lineNum">     595</span>                 :             : </span>
+<span id="L596"><span class="lineNum">     596</span>                 :<span class="tlaGNC">      596235 : struct Stacks</span></span>
+<span id="L597"><span class="lineNum">     597</span>                 :             : {</span>
+<span id="L598"><span class="lineNum">     598</span>                 :             :     std::vector&lt;valtype&gt; script;</span>
+<span id="L599"><span class="lineNum">     599</span>                 :             :     std::vector&lt;valtype&gt; witness;</span>
+<span id="L600"><span class="lineNum">     600</span>                 :             : </span>
+<span id="L601"><span class="lineNum">     601</span>                 :             :     Stacks() = delete;</span>
+<span id="L602"><span class="lineNum">     602</span>                 :             :     Stacks(const Stacks&amp;) = delete;</span>
+<span id="L603"><span class="lineNum">     603</span>         [<span class="tlaGBC" title="Branch 0 was taken 596235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      596235 :     explicit Stacks(const SignatureData&amp; data) : witness(data.scriptWitness.stack) {</span></span>
+<span id="L604"><span class="lineNum">     604</span>         [<span class="tlaGBC" title="Branch 0 was taken 596235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      596235 :         EvalScript(script, data.scriptSig, SCRIPT_VERIFY_STRICTENC, BaseSignatureChecker(), SigVersion::BASE);</span></span>
+<span id="L605"><span class="lineNum">     605</span>                 :<span class="tlaGNC">      596235 :     }</span></span>
+<span id="L606"><span class="lineNum">     606</span>                 :             : };</span>
+<span id="L607"><span class="lineNum">     607</span>                 :             : }</span>
+<span id="L608"><span class="lineNum">     608</span>                 :             : </span>
+<span id="L609"><span class="lineNum">     609</span>                 :             : // Extracts signatures and scripts from incomplete scriptSigs. Please do not extend this, use PSBT instead</span>
+<span id="L610"><span class="lineNum">     610</span>                 :<span class="tlaGNC">      596235 : SignatureData DataFromTransaction(const CMutableTransaction&amp; tx, unsigned int nIn, const CTxOut&amp; txout)</span></span>
+<span id="L611"><span class="lineNum">     611</span>                 :             : {</span>
+<span id="L612"><span class="lineNum">     612</span>                 :<span class="tlaGNC">      596235 :     SignatureData data;</span></span>
+<span id="L613"><span class="lineNum">     613</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 596235 times"> + </span>]:<span class="tlaGNC">      596235 :     assert(tx.vin.size() &gt; nIn);</span></span>
+<span id="L614"><span class="lineNum">     614</span>                 :<span class="tlaGNC">      596235 :     data.scriptSig = tx.vin[nIn].scriptSig;</span></span>
+<span id="L615"><span class="lineNum">     615</span>         [<span class="tlaGBC" title="Branch 0 was taken 596235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      596235 :     data.scriptWitness = tx.vin[nIn].scriptWitness;</span></span>
+<span id="L616"><span class="lineNum">     616</span>         [<span class="tlaGBC" title="Branch 0 was taken 596235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      596235 :     Stacks stack(data);</span></span>
+<span id="L617"><span class="lineNum">     617</span>                 :             : </span>
+<span id="L618"><span class="lineNum">     618</span>                 :             :     // Get signatures</span>
+<span id="L619"><span class="lineNum">     619</span>         [<span class="tlaGBC" title="Branch 0 was taken 596235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      596235 :     MutableTransactionSignatureChecker tx_checker(&amp;tx, nIn, txout.nValue, MissingDataBehavior::FAIL);</span></span>
+<span id="L620"><span class="lineNum">     620</span>         [<span class="tlaGBC" title="Branch 0 was taken 596235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      596235 :     SignatureExtractorChecker extractor_checker(data, tx_checker);</span></span>
+<span id="L621"><span class="lineNum">     621</span>   [<span class="tlaGBC" title="Branch 0 was taken 596235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 17284 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 578951 times"> + </span>]:<span class="tlaGNC">      596235 :     if (VerifyScript(data.scriptSig, txout.scriptPubKey, &amp;data.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, extractor_checker)) {</span></span>
+<span id="L622"><span class="lineNum">     622</span>                 :<span class="tlaGNC">       17284 :         data.complete = true;</span></span>
+<span id="L623"><span class="lineNum">     623</span>                 :<span class="tlaGNC">       17284 :         return data;</span></span>
+<span id="L624"><span class="lineNum">     624</span>                 :             :     }</span>
+<span id="L625"><span class="lineNum">     625</span>                 :             : </span>
+<span id="L626"><span class="lineNum">     626</span>                 :             :     // Get scripts</span>
+<span id="L627"><span class="lineNum">     627</span>                 :<span class="tlaGNC">      578951 :     std::vector&lt;std::vector&lt;unsigned char&gt;&gt; solutions;</span></span>
+<span id="L628"><span class="lineNum">     628</span>         [<span class="tlaGBC" title="Branch 0 was taken 578951 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      578951 :     TxoutType script_type = Solver(txout.scriptPubKey, solutions);</span></span>
+<span id="L629"><span class="lineNum">     629</span>                 :<span class="tlaGNC">      578951 :     SigVersion sigversion = SigVersion::BASE;</span></span>
+<span id="L630"><span class="lineNum">     630</span>                 :<span class="tlaGNC">      578951 :     CScript next_script = txout.scriptPubKey;</span></span>
+<span id="L631"><span class="lineNum">     631</span>                 :             : </span>
+<span id="L632"><span class="lineNum">     632</span>   [<span class="tlaGBC" title="Branch 0 was taken 60928 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 518023 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3903 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 57025 times"> + </span> :<span class="tlaGNC">      578951 :     if (script_type == TxoutType::SCRIPTHASH &amp;&amp; !stack.script.empty() &amp;&amp; !stack.script.back().empty()) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 2592 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1311 times"> + </span>]
+<span id="L633"><span class="lineNum">     633</span>                 :             :         // Get the redeemScript</span>
+<span id="L634"><span class="lineNum">     634</span>                 :<span class="tlaGNC">        2592 :         CScript redeem_script(stack.script.back().begin(), stack.script.back().end());</span></span>
+<span id="L635"><span class="lineNum">     635</span>                 :<span class="tlaGNC">        2592 :         data.redeem_script = redeem_script;</span></span>
+<span id="L636"><span class="lineNum">     636</span>                 :<span class="tlaGNC">        2592 :         next_script = std::move(redeem_script);</span></span>
+<span id="L637"><span class="lineNum">     637</span>                 :             : </span>
+<span id="L638"><span class="lineNum">     638</span>                 :             :         // Get redeemScript type</span>
+<span id="L639"><span class="lineNum">     639</span>         [<span class="tlaGBC" title="Branch 0 was taken 2592 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2592 :         script_type = Solver(next_script, solutions);</span></span>
+<span id="L640"><span class="lineNum">     640</span>                 :<span class="tlaGNC">        2592 :         stack.script.pop_back();</span></span>
+<span id="L641"><span class="lineNum">     641</span>                 :<span class="tlaGNC">        2592 :     }</span></span>
+<span id="L642"><span class="lineNum">     642</span>   [<span class="tlaGBC" title="Branch 0 was taken 11149 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 567802 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 5249 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 5900 times"> + </span> :<span class="tlaGNC">      578951 :     if (script_type == TxoutType::WITNESS_V0_SCRIPTHASH &amp;&amp; !stack.witness.empty() &amp;&amp; !stack.witness.back().empty()) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 4774 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 475 times"> + </span>]
+<span id="L643"><span class="lineNum">     643</span>                 :             :         // Get the witnessScript</span>
+<span id="L644"><span class="lineNum">     644</span>                 :<span class="tlaGNC">        4774 :         CScript witness_script(stack.witness.back().begin(), stack.witness.back().end());</span></span>
+<span id="L645"><span class="lineNum">     645</span>                 :<span class="tlaGNC">        4774 :         data.witness_script = witness_script;</span></span>
+<span id="L646"><span class="lineNum">     646</span>                 :<span class="tlaGNC">        4774 :         next_script = std::move(witness_script);</span></span>
+<span id="L647"><span class="lineNum">     647</span>                 :             : </span>
+<span id="L648"><span class="lineNum">     648</span>                 :             :         // Get witnessScript type</span>
+<span id="L649"><span class="lineNum">     649</span>         [<span class="tlaGBC" title="Branch 0 was taken 4774 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4774 :         script_type = Solver(next_script, solutions);</span></span>
+<span id="L650"><span class="lineNum">     650</span>                 :<span class="tlaGNC">        4774 :         stack.witness.pop_back();</span></span>
+<span id="L651"><span class="lineNum">     651</span>                 :<span class="tlaGNC">        4774 :         stack.script = std::move(stack.witness);</span></span>
+<span id="L652"><span class="lineNum">     652</span>                 :<span class="tlaGNC">        4774 :         stack.witness.clear();</span></span>
+<span id="L653"><span class="lineNum">     653</span>                 :<span class="tlaGNC">        4774 :         sigversion = SigVersion::WITNESS_V0;</span></span>
+<span id="L654"><span class="lineNum">     654</span>                 :<span class="tlaGNC">        4774 :     }</span></span>
+<span id="L655"><span class="lineNum">     655</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 578951 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      578951 :     if (script_type == TxoutType::MULTISIG &amp;&amp; !stack.script.empty()) {</span></span>
+<span id="L656"><span class="lineNum">     656</span>                 :             :         // Build a map of pubkey -&gt; signature by matching sigs to pubkeys:</span>
+<span id="L657"><span class="lineNum">     657</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         assert(solutions.size() &gt; 1);</span></span>
+<span id="L658"><span class="lineNum">     658</span>                 :<span class="tlaUNC">           0 :         unsigned int num_pubkeys = solutions.size()-2;</span></span>
+<span id="L659"><span class="lineNum">     659</span>                 :<span class="tlaUNC">           0 :         unsigned int last_success_key = 0;</span></span>
+<span id="L660"><span class="lineNum">     660</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         for (const valtype&amp; sig : stack.script) {</span></span>
+<span id="L661"><span class="lineNum">     661</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             for (unsigned int i = last_success_key; i &lt; num_pubkeys; ++i) {</span></span>
+<span id="L662"><span class="lineNum">     662</span>                 :<span class="tlaUNC">           0 :                 const valtype&amp; pubkey = solutions[i+1];</span></span>
+<span id="L663"><span class="lineNum">     663</span>                 :             :                 // We either have a signature for this pubkey, or we have found a signature and it is valid</span>
+<span id="L664"><span class="lineNum">     664</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :                 if (data.signatures.count(CPubKey(pubkey).GetID()) || extractor_checker.CheckECDSASignature(sig, pubkey, next_script, sigversion)) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L665"><span class="lineNum">     665</span>                 :             :                     last_success_key = i + 1;</span>
+<span id="L666"><span class="lineNum">     666</span>                 :             :                     break;</span>
+<span id="L667"><span class="lineNum">     667</span>                 :             :                 }</span>
+<span id="L668"><span class="lineNum">     668</span>                 :             :             }</span>
+<span id="L669"><span class="lineNum">     669</span>                 :             :         }</span>
+<span id="L670"><span class="lineNum">     670</span>                 :             :     }</span>
+<span id="L671"><span class="lineNum">     671</span>                 :             : </span>
+<span id="L672"><span class="lineNum">     672</span>                 :<span class="tlaGNC">      578951 :     return data;</span></span>
+<span id="L673"><span class="lineNum">     673</span>                 :<span class="tlaGNC">     1192470 : }</span></span>
+<span id="L674"><span class="lineNum">     674</span>                 :             : </span>
+<span id="L675"><span class="lineNum">     675</span>                 :<span class="tlaGNC">      597192 : void UpdateInput(CTxIn&amp; input, const SignatureData&amp; data)</span></span>
+<span id="L676"><span class="lineNum">     676</span>                 :             : {</span>
+<span id="L677"><span class="lineNum">     677</span>                 :<span class="tlaGNC">      597192 :     input.scriptSig = data.scriptSig;</span></span>
+<span id="L678"><span class="lineNum">     678</span>                 :<span class="tlaGNC">      597192 :     input.scriptWitness = data.scriptWitness;</span></span>
+<span id="L679"><span class="lineNum">     679</span>                 :<span class="tlaGNC">      597192 : }</span></span>
+<span id="L680"><span class="lineNum">     680</span>                 :             : </span>
+<span id="L681"><span class="lineNum">     681</span>                 :<span class="tlaGNC">        6845 : void SignatureData::MergeSignatureData(SignatureData sigdata)</span></span>
+<span id="L682"><span class="lineNum">     682</span>                 :             : {</span>
+<span id="L683"><span class="lineNum">     683</span>         [<span class="tlaGBC" title="Branch 0 was taken 6840 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">        6845 :     if (complete) return;</span></span>
+<span id="L684"><span class="lineNum">     684</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 6840 times"> + </span>]:<span class="tlaGNC">        6840 :     if (sigdata.complete) {</span></span>
+<span id="L685"><span class="lineNum">     685</span>                 :<span class="tlaUNC">           0 :         *this = std::move(sigdata);</span></span>
+<span id="L686"><span class="lineNum">     686</span>                 :<span class="tlaUNC">           0 :         return;</span></span>
+<span id="L687"><span class="lineNum">     687</span>                 :             :     }</span>
+<span id="L688"><span class="lineNum">     688</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6838 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 6838 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2 times"> + </span> :<span class="tlaGNC">        6842 :     if (redeem_script.empty() &amp;&amp; !sigdata.redeem_script.empty()) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 6838 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 6838 times"> + </span>]
+<span id="L689"><span class="lineNum">     689</span>                 :<span class="tlaUNC">           0 :         redeem_script = sigdata.redeem_script;</span></span>
+<span id="L690"><span class="lineNum">     690</span>                 :             :     }</span>
+<span id="L691"><span class="lineNum">     691</span>   [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6835 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 6824 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 16 times"> + </span> :<span class="tlaGNC">        6845 :     if (witness_script.empty() &amp;&amp; !sigdata.witness_script.empty()) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 6824 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 6824 times"> + </span>]
+<span id="L692"><span class="lineNum">     692</span>                 :<span class="tlaUNC">           0 :         witness_script = sigdata.witness_script;</span></span>
+<span id="L693"><span class="lineNum">     693</span>                 :             :     }</span>
+<span id="L694"><span class="lineNum">     694</span>                 :<span class="tlaGNC">        6840 :     signatures.insert(std::make_move_iterator(sigdata.signatures.begin()), std::make_move_iterator(sigdata.signatures.end()));</span></span>
+<span id="L695"><span class="lineNum">     695</span>                 :             : }</span>
+<span id="L696"><span class="lineNum">     696</span>                 :             : </span>
+<span id="L697"><span class="lineNum">     697</span>                 :             : namespace {</span>
+<span id="L698"><span class="lineNum">     698</span>                 :             : /** Dummy signature checker which accepts all signatures. */</span>
+<span id="L699"><span class="lineNum">     699</span>                 :             : class DummySignatureChecker final : public BaseSignatureChecker</span>
+<span id="L700"><span class="lineNum">     700</span>                 :             : {</span>
+<span id="L701"><span class="lineNum">     701</span>                 :             : public:</span>
+<span id="L702"><span class="lineNum">     702</span>                 :             :     DummySignatureChecker() = default;</span>
+<span id="L703"><span class="lineNum">     703</span>                 :<span class="tlaGNC">        2132 :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; sig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override { return sig.size() != 0; }</span></span>
+<span id="L704"><span class="lineNum">     704</span>                 :<span class="tlaGNC">         109 :     bool CheckSchnorrSignature(std::span&lt;const unsigned char&gt; sig, std::span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, ScriptExecutionData&amp; execdata, ScriptError* serror) const override { return sig.size() != 0; }</span></span>
+<span id="L705"><span class="lineNum">     705</span>                 :<span class="tlaUNC">           0 :     bool CheckLockTime(const CScriptNum&amp; nLockTime) const override { return true; }</span></span>
+<span id="L706"><span class="lineNum">     706</span>                 :<span class="tlaUNC">           0 :     bool CheckSequence(const CScriptNum&amp; nSequence) const override { return true; }</span></span>
+<span id="L707"><span class="lineNum">     707</span>                 :             : };</span>
+<span id="L708"><span class="lineNum">     708</span>                 :             : }</span>
+<span id="L709"><span class="lineNum">     709</span>                 :             : </span>
+<span id="L710"><span class="lineNum">     710</span>                 :             : const BaseSignatureChecker&amp; DUMMY_CHECKER = DummySignatureChecker();</span>
+<span id="L711"><span class="lineNum">     711</span>                 :             : </span>
+<span id="L712"><span class="lineNum">     712</span>                 :             : namespace {</span>
+<span id="L713"><span class="lineNum">     713</span>                 :             : class DummySignatureCreator final : public BaseSignatureCreator {</span>
+<span id="L714"><span class="lineNum">     714</span>                 :             : private:</span>
+<span id="L715"><span class="lineNum">     715</span>                 :             :     char m_r_len = 32;</span>
+<span id="L716"><span class="lineNum">     716</span>                 :             :     char m_s_len = 32;</span>
+<span id="L717"><span class="lineNum">     717</span>                 :             : public:</span>
+<span id="L718"><span class="lineNum">     718</span>                 :             :     DummySignatureCreator(char r_len, char s_len) : m_r_len(r_len), m_s_len(s_len) {}</span>
+<span id="L719"><span class="lineNum">     719</span>                 :<span class="tlaGNC">        1319 :     const BaseSignatureChecker&amp; Checker() const override { return DUMMY_CHECKER; }</span></span>
+<span id="L720"><span class="lineNum">     720</span>                 :<span class="tlaGNC">        2663 :     bool CreateSig(const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; vchSig, const CKeyID&amp; keyid, const CScript&amp; scriptCode, SigVersion sigversion) const override</span></span>
+<span id="L721"><span class="lineNum">     721</span>                 :             :     {</span>
+<span id="L722"><span class="lineNum">     722</span>                 :             :         // Create a dummy signature that is a valid DER-encoding</span>
+<span id="L723"><span class="lineNum">     723</span>                 :<span class="tlaGNC">        2663 :         vchSig.assign(m_r_len + m_s_len + 7, '\000');</span></span>
+<span id="L724"><span class="lineNum">     724</span>                 :<span class="tlaGNC">        2663 :         vchSig[0] = 0x30;</span></span>
+<span id="L725"><span class="lineNum">     725</span>                 :<span class="tlaGNC">        2663 :         vchSig[1] = m_r_len + m_s_len + 4;</span></span>
+<span id="L726"><span class="lineNum">     726</span>                 :<span class="tlaGNC">        2663 :         vchSig[2] = 0x02;</span></span>
+<span id="L727"><span class="lineNum">     727</span>                 :<span class="tlaGNC">        2663 :         vchSig[3] = m_r_len;</span></span>
+<span id="L728"><span class="lineNum">     728</span>                 :<span class="tlaGNC">        2663 :         vchSig[4] = 0x01;</span></span>
+<span id="L729"><span class="lineNum">     729</span>                 :<span class="tlaGNC">        2663 :         vchSig[4 + m_r_len] = 0x02;</span></span>
+<span id="L730"><span class="lineNum">     730</span>                 :<span class="tlaGNC">        2663 :         vchSig[5 + m_r_len] = m_s_len;</span></span>
+<span id="L731"><span class="lineNum">     731</span>                 :<span class="tlaGNC">        2663 :         vchSig[6 + m_r_len] = 0x01;</span></span>
+<span id="L732"><span class="lineNum">     732</span>                 :<span class="tlaGNC">        2663 :         vchSig[6 + m_r_len + m_s_len] = SIGHASH_ALL;</span></span>
+<span id="L733"><span class="lineNum">     733</span>                 :<span class="tlaGNC">        2663 :         return true;</span></span>
+<span id="L734"><span class="lineNum">     734</span>                 :             :     }</span>
+<span id="L735"><span class="lineNum">     735</span>                 :<span class="tlaGNC">          93 :     bool CreateSchnorrSig(const SigningProvider&amp; provider, std::vector&lt;unsigned char&gt;&amp; sig, const XOnlyPubKey&amp; pubkey, const uint256* leaf_hash, const uint256* tweak, SigVersion sigversion) const override</span></span>
+<span id="L736"><span class="lineNum">     736</span>                 :             :     {</span>
+<span id="L737"><span class="lineNum">     737</span>                 :<span class="tlaGNC">          93 :         sig.assign(64, '\000');</span></span>
+<span id="L738"><span class="lineNum">     738</span>                 :<span class="tlaGNC">          93 :         return true;</span></span>
+<span id="L739"><span class="lineNum">     739</span>                 :             :     }</span>
+<span id="L740"><span class="lineNum">     740</span>                 :             : };</span>
+<span id="L741"><span class="lineNum">     741</span>                 :             : </span>
+<span id="L742"><span class="lineNum">     742</span>                 :             : }</span>
+<span id="L743"><span class="lineNum">     743</span>                 :             : </span>
+<span id="L744"><span class="lineNum">     744</span>                 :             : const BaseSignatureCreator&amp; DUMMY_SIGNATURE_CREATOR = DummySignatureCreator(32, 32);</span>
+<span id="L745"><span class="lineNum">     745</span>                 :             : const BaseSignatureCreator&amp; DUMMY_MAXIMUM_SIGNATURE_CREATOR = DummySignatureCreator(33, 32);</span>
+<span id="L746"><span class="lineNum">     746</span>                 :             : </span>
+<span id="L747"><span class="lineNum">     747</span>                 :<span class="tlaGNC">        6678 : bool IsSegWitOutput(const SigningProvider&amp; provider, const CScript&amp; script)</span></span>
+<span id="L748"><span class="lineNum">     748</span>                 :             : {</span>
+<span id="L749"><span class="lineNum">     749</span>                 :<span class="tlaGNC">        6678 :     int version;</span></span>
+<span id="L750"><span class="lineNum">     750</span>                 :<span class="tlaGNC">        6678 :     valtype program;</span></span>
+<span id="L751"><span class="lineNum">     751</span>   [<span class="tlaGBC" title="Branch 0 was taken 6678 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6532 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 146 times"> + </span>]:<span class="tlaGNC">        6678 :     if (script.IsWitnessProgram(version, program)) return true;</span></span>
+<span id="L752"><span class="lineNum">     752</span>   [<span class="tlaGBC" title="Branch 0 was taken 6532 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 11 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 6521 times"> + </span>]:<span class="tlaGNC">        6532 :     if (script.IsPayToScriptHash()) {</span></span>
+<span id="L753"><span class="lineNum">     753</span>                 :<span class="tlaGNC">          11 :         std::vector&lt;valtype&gt; solutions;</span></span>
+<span id="L754"><span class="lineNum">     754</span>         [<span class="tlaGBC" title="Branch 0 was taken 11 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          11 :         auto whichtype = Solver(script, solutions);</span></span>
+<span id="L755"><span class="lineNum">     755</span>         [<span class="tlaGBC" title="Branch 0 was taken 11 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          11 :         if (whichtype == TxoutType::SCRIPTHASH) {</span></span>
+<span id="L756"><span class="lineNum">     756</span>                 :<span class="tlaGNC">          11 :             auto h160 = uint160(solutions[0]);</span></span>
+<span id="L757"><span class="lineNum">     757</span>                 :<span class="tlaGNC">          11 :             CScript subscript;</span></span>
+<span id="L758"><span class="lineNum">     758</span>   [<span class="tlaGBC" title="Branch 0 was taken 11 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 11 times"> + </span>]:<span class="tlaGNC">          11 :             if (provider.GetCScript(CScriptID{h160}, subscript)) {</span></span>
+<span id="L759"><span class="lineNum">     759</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (subscript.IsWitnessProgram(version, program)) return true;</span></span>
+<span id="L760"><span class="lineNum">     760</span>                 :             :             }</span>
+<span id="L761"><span class="lineNum">     761</span>                 :<span class="tlaGNC">          11 :         }</span></span>
+<span id="L762"><span class="lineNum">     762</span>                 :<span class="tlaGNC">          11 :     }</span></span>
+<span id="L763"><span class="lineNum">     763</span>                 :             :     return false;</span>
+<span id="L764"><span class="lineNum">     764</span>                 :<span class="tlaGNC">        6678 : }</span></span>
+<span id="L765"><span class="lineNum">     765</span>                 :             : </span>
+<span id="L766"><span class="lineNum">     766</span>                 :<span class="tlaGNC">       18500 : bool SignTransaction(CMutableTransaction&amp; mtx, const SigningProvider* keystore, const std::map&lt;COutPoint, Coin&gt;&amp; coins, int nHashType, std::map&lt;int, bilingual_str&gt;&amp; input_errors)</span></span>
+<span id="L767"><span class="lineNum">     767</span>                 :             : {</span>
+<span id="L768"><span class="lineNum">     768</span>                 :<span class="tlaGNC">       18500 :     bool fHashSingle = ((nHashType &amp; ~SIGHASH_ANYONECANPAY) == SIGHASH_SINGLE);</span></span>
+<span id="L769"><span class="lineNum">     769</span>                 :             : </span>
+<span id="L770"><span class="lineNum">     770</span>                 :             :     // Use CTransaction for the constant parts of the</span>
+<span id="L771"><span class="lineNum">     771</span>                 :             :     // transaction to avoid rehashing.</span>
+<span id="L772"><span class="lineNum">     772</span>                 :<span class="tlaGNC">       18500 :     const CTransaction txConst(mtx);</span></span>
+<span id="L773"><span class="lineNum">     773</span>                 :             : </span>
+<span id="L774"><span class="lineNum">     774</span>                 :<span class="tlaGNC">       18500 :     PrecomputedTransactionData txdata;</span></span>
+<span id="L775"><span class="lineNum">     775</span>                 :<span class="tlaGNC">       18500 :     std::vector&lt;CTxOut&gt; spent_outputs;</span></span>
+<span id="L776"><span class="lineNum">     776</span>         [<span class="tlaGBC" title="Branch 0 was taken 336506 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11503 times"> + </span>]:<span class="tlaGNC">      348009 :     for (unsigned int i = 0; i &lt; mtx.vin.size(); ++i) {</span></span>
+<span id="L777"><span class="lineNum">     777</span>                 :<span class="tlaGNC">      336506 :         CTxIn&amp; txin = mtx.vin[i];</span></span>
+<span id="L778"><span class="lineNum">     778</span>                 :<span class="tlaGNC">      336506 :         auto coin = coins.find(txin.prevout);</span></span>
+<span id="L779"><span class="lineNum">     779</span>   [<span class="tlaGBC" title="Branch 0 was taken 329734 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6772 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 225 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 329509 times"> + </span>]:<span class="tlaGNC">      336506 :         if (coin == coins.end() || coin-&gt;second.IsSpent()) {</span></span>
+<span id="L780"><span class="lineNum">     780</span>         [<span class="tlaGBC" title="Branch 0 was taken 6997 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6997 :             txdata.Init(txConst, /*spent_outputs=*/{}, /*force=*/true);</span></span>
+<span id="L781"><span class="lineNum">     781</span>                 :<span class="tlaGNC">        6997 :             break;</span></span>
+<span id="L782"><span class="lineNum">     782</span>                 :             :         } else {</span>
+<span id="L783"><span class="lineNum">     783</span>         [<span class="tlaGBC" title="Branch 0 was taken 329509 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      329509 :             spent_outputs.emplace_back(coin-&gt;second.out.nValue, coin-&gt;second.out.scriptPubKey);</span></span>
+<span id="L784"><span class="lineNum">     784</span>                 :             :         }</span>
+<span id="L785"><span class="lineNum">     785</span>                 :             :     }</span>
+<span id="L786"><span class="lineNum">     786</span>         [<span class="tlaGBC" title="Branch 0 was taken 11503 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6997 times"> + </span>]:<span class="tlaGNC">       18500 :     if (spent_outputs.size() == mtx.vin.size()) {</span></span>
+<span id="L787"><span class="lineNum">     787</span>         [<span class="tlaGBC" title="Branch 0 was taken 11503 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       11503 :         txdata.Init(txConst, std::move(spent_outputs), true);</span></span>
+<span id="L788"><span class="lineNum">     788</span>                 :             :     }</span>
+<span id="L789"><span class="lineNum">     789</span>                 :             : </span>
+<span id="L790"><span class="lineNum">     790</span>                 :             :     // Sign what we can:</span>
+<span id="L791"><span class="lineNum">     791</span>         [<span class="tlaGBC" title="Branch 0 was taken 830608 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 18500 times"> + </span>]:<span class="tlaGNC">      849108 :     for (unsigned int i = 0; i &lt; mtx.vin.size(); ++i) {</span></span>
+<span id="L792"><span class="lineNum">     792</span>                 :<span class="tlaGNC">      830608 :         CTxIn&amp; txin = mtx.vin[i];</span></span>
+<span id="L793"><span class="lineNum">     793</span>                 :<span class="tlaGNC">      830608 :         auto coin = coins.find(txin.prevout);</span></span>
+<span id="L794"><span class="lineNum">     794</span>   [<span class="tlaGBC" title="Branch 0 was taken 607929 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 222679 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 595689 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 12240 times"> + </span>]:<span class="tlaGNC">      830608 :         if (coin == coins.end() || coin-&gt;second.IsSpent()) {</span></span>
+<span id="L795"><span class="lineNum">     795</span>   [<span class="tlaGBC" title="Branch 0 was taken 234919 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 234919 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      234919 :             input_errors[i] = _(&quot;Input not found or already spent&quot;);</span></span>
+<span id="L796"><span class="lineNum">     796</span>                 :<span class="tlaGNC">      234919 :             continue;</span></span>
+<span id="L797"><span class="lineNum">     797</span>                 :             :         }</span>
+<span id="L798"><span class="lineNum">     798</span>         [<span class="tlaGBC" title="Branch 0 was taken 595689 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      595689 :         const CScript&amp; prevPubKey = coin-&gt;second.out.scriptPubKey;</span></span>
+<span id="L799"><span class="lineNum">     799</span>                 :<span class="tlaGNC">      595689 :         const CAmount&amp; amount = coin-&gt;second.out.nValue;</span></span>
+<span id="L800"><span class="lineNum">     800</span>                 :             : </span>
+<span id="L801"><span class="lineNum">     801</span>         [<span class="tlaGBC" title="Branch 0 was taken 595689 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     1191378 :         SignatureData sigdata = DataFromTransaction(mtx, i, coin-&gt;second.out);</span></span>
+<span id="L802"><span class="lineNum">     802</span>                 :             :         // Only sign SIGHASH_SINGLE if there's a corresponding output:</span>
+<span id="L803"><span class="lineNum">     803</span>   [<span class="tlaGBC" title="Branch 0 was taken 3838 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 591851 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1103 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2735 times"> + </span>]:<span class="tlaGNC">      595689 :         if (!fHashSingle || (i &lt; mtx.vout.size())) {</span></span>
+<span id="L804"><span class="lineNum">     804</span>   [<span class="tlaGBC" title="Branch 0 was taken 592954 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 592954 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      592954 :             ProduceSignature(*keystore, MutableTransactionSignatureCreator(mtx, i, amount, &amp;txdata, nHashType), prevPubKey, sigdata);</span></span>
+<span id="L805"><span class="lineNum">     805</span>                 :             :         }</span>
+<span id="L806"><span class="lineNum">     806</span>                 :             : </span>
+<span id="L807"><span class="lineNum">     807</span>         [<span class="tlaGBC" title="Branch 0 was taken 595689 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      595689 :         UpdateInput(txin, sigdata);</span></span>
+<span id="L808"><span class="lineNum">     808</span>                 :             : </span>
+<span id="L809"><span class="lineNum">     809</span>                 :             :         // amount must be specified for valid segwit signature</span>
+<span id="L810"><span class="lineNum">     810</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 595689 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      595689 :         if (amount == MAX_MONEY &amp;&amp; !txin.scriptWitness.IsNull()) {</span></span>
+<span id="L811"><span class="lineNum">     811</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             input_errors[i] = _(&quot;Missing amount&quot;);</span></span>
+<span id="L812"><span class="lineNum">     812</span>                 :<span class="tlaUNC">           0 :             continue;</span></span>
+<span id="L813"><span class="lineNum">     813</span>                 :             :         }</span>
+<span id="L814"><span class="lineNum">     814</span>                 :             : </span>
+<span id="L815"><span class="lineNum">     815</span>                 :<span class="tlaGNC">      595689 :         ScriptError serror = SCRIPT_ERR_OK;</span></span>
+<span id="L816"><span class="lineNum">     816</span>   [<span class="tlaGBC" title="Branch 0 was taken 521143 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 74546 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 521143 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">     1054586 :         if (!sigdata.complete &amp;&amp; !VerifyScript(txin.scriptSig, prevPubKey, &amp;txin.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&amp;txConst, i, amount, txdata, MissingDataBehavior::FAIL), &amp;serror)) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 458897 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 62246 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 458897 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 136792 times"> + </span>]
+<span id="L817"><span class="lineNum">     817</span>         [<span class="tlaGBC" title="Branch 0 was taken 75820 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 383077 times"> + </span>]:<span class="tlaGNC">      458897 :             if (serror == SCRIPT_ERR_INVALID_STACK_OPERATION) {</span></span>
+<span id="L818"><span class="lineNum">     818</span>                 :             :                 // Unable to sign input and verification failed (possible attempt to partially sign).</span>
+<span id="L819"><span class="lineNum">     819</span>   [<span class="tlaGBC" title="Branch 0 was taken 75820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 75820 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      151640 :                 input_errors[i] = Untranslated(&quot;Unable to sign input, invalid stack size (possibly missing key)&quot;);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 75820 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L820"><span class="lineNum">     820</span>         [<span class="tlaGBC" title="Branch 0 was taken 51937 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 331140 times"> + </span>]:<span class="tlaGNC">      383077 :             } else if (serror == SCRIPT_ERR_SIG_NULLFAIL) {</span></span>
+<span id="L821"><span class="lineNum">     821</span>                 :             :                 // Verification failed (possibly due to insufficient signatures).</span>
+<span id="L822"><span class="lineNum">     822</span>   [<span class="tlaGBC" title="Branch 0 was taken 51937 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 51937 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      103874 :                 input_errors[i] = Untranslated(&quot;CHECK(MULTI)SIG failing with non-zero signature (possibly need more signatures)&quot;);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 51937 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L823"><span class="lineNum">     823</span>                 :             :             } else {</span>
+<span id="L824"><span class="lineNum">     824</span>   [<span class="tlaGBC" title="Branch 0 was taken 331140 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 331140 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      662280 :                 input_errors[i] = Untranslated(ScriptErrorString(serror));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 331140 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L825"><span class="lineNum">     825</span>                 :             :             }</span>
+<span id="L826"><span class="lineNum">     826</span>                 :             :         } else {</span>
+<span id="L827"><span class="lineNum">     827</span>                 :             :             // If this input succeeds, make sure there is no error set for it</span>
+<span id="L828"><span class="lineNum">     828</span>                 :<span class="tlaGNC">      136792 :             input_errors.erase(i);</span></span>
+<span id="L829"><span class="lineNum">     829</span>                 :             :         }</span>
+<span id="L830"><span class="lineNum">     830</span>                 :<span class="tlaGNC">      595689 :     }</span></span>
+<span id="L831"><span class="lineNum">     831</span>                 :<span class="tlaGNC">       18500 :     return input_errors.empty();</span></span>
+<span id="L832"><span class="lineNum">     832</span>                 :<span class="tlaGNC">       37000 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
