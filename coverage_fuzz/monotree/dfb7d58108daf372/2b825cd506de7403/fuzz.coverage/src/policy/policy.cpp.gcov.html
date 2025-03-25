@@ -1,0 +1,414 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/policy/policy.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/policy">src/policy</a> - policy.cpp<span style="font-size: 80%;"> (source / <a href="policy.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">98.4&nbsp;%</td>
+            <td class="headerCovTableEntry">123</td>
+            <td class="headerCovTableEntry">121</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-25 18:33:29</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">10</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">89.9&nbsp;%</td>
+            <td class="headerCovTableEntry">148</td>
+            <td class="headerCovTableEntry">133</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : // NOTE: This file is intended to be customised by the end user, and includes only local node policy logic</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : </span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;coins.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;consensus/amount.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;consensus/consensus.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;consensus/validation.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;policy/feerate.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;script/interpreter.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;script/script.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;script/solver.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;serialize.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;cstddef&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">    20184312 : CAmount GetDustThreshold(const CTxOut&amp; txout, const CFeeRate&amp; dustRelayFeeIn)</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : {</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     // &quot;Dust&quot; is defined in terms of dustRelayFee,</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     // which has units satoshis-per-kilobyte.</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     // If you'd pay more in fees than the value of the output</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     // to spend something, then we consider it dust.</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     // A typical spendable non-segwit txout is 34 bytes big, and will</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     // need a CTxIn of at least 148 bytes to spend:</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     // so dust is a spendable txout less than</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     // 182*dustRelayFee/1000 (in satoshis).</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     // 546 satoshis at the default rate of 3000 sat/kvB.</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     // A typical spendable segwit P2WPKH txout is 31 bytes big, and will</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     // need a CTxIn of at least 67 bytes to spend:</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     // so dust is a spendable txout less than</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     // 98*dustRelayFee/1000 (in satoshis).</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     // 294 satoshis at the default rate of 3000 sat/kvB.</span>
+<span id="L42"><span class="lineNum">      42</span>         [<span class="tlaGBC" title="Branch 0 was taken 20160849 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 23463 times"> + </span>]:<span class="tlaGNC">    20184312 :     if (txout.scriptPubKey.IsUnspendable())</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :         return 0;</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">    20160849 :     size_t nSize = GetSerializeSize(txout);</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">    20160849 :     int witnessversion = 0;</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">    20160849 :     std::vector&lt;unsigned char&gt; witnessprogram;</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     // Note this computation is for spending a Segwit v0 P2WPKH output (a 33 bytes</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     // public key + an ECDSA signature). For Segwit v1 Taproot outputs the minimum</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     // satisfaction is lower (a single BIP340 signature) but this computation was</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     // kept to not further reduce the dust level.</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     // See discussion in https://github.com/bitcoin/bitcoin/pull/22779 for details.</span>
+<span id="L54"><span class="lineNum">      54</span>   [<span class="tlaGBC" title="Branch 0 was taken 20160849 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 19916583 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 244266 times"> + </span>]:<span class="tlaGNC">    20160849 :     if (txout.scriptPubKey.IsWitnessProgram(witnessversion, witnessprogram)) {</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :         // sum the sizes of the parts of a transaction input</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :         // with 75% segwit discount applied to the script size.</span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">    19916583 :         nSize += (32 + 4 + 1 + (107 / WITNESS_SCALE_FACTOR) + 4);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     } else {</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">      244266 :         nSize += (32 + 4 + 1 + 107 + 4); // the 148 mentioned above</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     }</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>         [<span class="tlaGBC" title="Branch 0 was taken 20160849 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    20160849 :     return dustRelayFeeIn.GetFee(nSize);</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">    20160849 : }</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">    20127091 : bool IsDust(const CTxOut&amp; txout, const CFeeRate&amp; dustRelayFeeIn)</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : {</span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">    20127091 :     return (txout.nValue &lt; GetDustThreshold(txout, dustRelayFeeIn));</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : }</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : </span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">     5113945 : std::vector&lt;uint32_t&gt; GetDust(const CTransaction&amp; tx, CFeeRate dust_relay_rate)</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : {</span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">     5113945 :     std::vector&lt;uint32_t&gt; dust_outputs;</span></span>
+<span id="L73"><span class="lineNum">      73</span>         [<span class="tlaGBC" title="Branch 0 was taken 18949228 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5113945 times"> + </span>]:<span class="tlaGNC">    24063173 :     for (uint32_t i{0}; i &lt; tx.vout.size(); ++i) {</span></span>
+<span id="L74"><span class="lineNum">      74</span>   [<span class="tlaGBC" title="Branch 0 was taken 18949228 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 412529 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 18536699 times"> + </span> :<span class="tlaGNC">    18949228 :         if (IsDust(tx.vout[i], dust_relay_rate)) dust_outputs.push_back(i);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 412529 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L75"><span class="lineNum">      75</span>                 :             :     }</span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">     5113945 :     return dust_outputs;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">     6372706 : bool IsStandard(const CScript&amp; scriptPubKey, const std::optional&lt;unsigned&gt;&amp; max_datacarrier_bytes, TxoutType&amp; whichType)</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : {</span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">     6372706 :     std::vector&lt;std::vector&lt;unsigned char&gt; &gt; vSolutions;</span></span>
+<span id="L82"><span class="lineNum">      82</span>         [<span class="tlaGBC" title="Branch 0 was taken 6372706 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     6372706 :     whichType = Solver(scriptPubKey, vSolutions);</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : </span>
+<span id="L84"><span class="lineNum">      84</span>         [<span class="tlaGBC" title="Branch 0 was taken 6350370 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 22336 times"> + </span>]:<span class="tlaGNC">     6372706 :     if (whichType == TxoutType::NONSTANDARD) {</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :         return false;</span>
+<span id="L86"><span class="lineNum">      86</span>         [<span class="tlaGBC" title="Branch 0 was taken 3302 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6347068 times"> + </span>]:<span class="tlaGNC">     6350370 :     } else if (whichType == TxoutType::MULTISIG) {</span></span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaGBC" title="Branch 0 was taken 1813 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1489 times"> + </span>]:<span class="tlaGNC">        3302 :         unsigned char m = vSolutions.front()[0];</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">        3302 :         unsigned char n = vSolutions.back()[0];</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :         // Support up to x-of-3 multisig txns as standard</span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 1813 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1489 times"> + </span>]:<span class="tlaGNC">        3302 :         if (n &lt; 1 || n &gt; 3)</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :             return false;</span>
+<span id="L92"><span class="lineNum">      92</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1813 times"> + </span>]:<span class="tlaGNC">        1813 :         if (m &lt; 1 || m &gt; n)</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaUNC">           0 :             return false;</span></span>
+<span id="L94"><span class="lineNum">      94</span>         [<span class="tlaGBC" title="Branch 0 was taken 6480 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6340588 times"> + </span>]:<span class="tlaGNC">     6347068 :     } else if (whichType == TxoutType::NULL_DATA) {</span></span>
+<span id="L95"><span class="lineNum">      95</span>   [<span class="tlaGBC" title="Branch 0 was taken 6452 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 28 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1703 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4749 times"> + </span> :<span class="tlaGNC">        8183 :         if (!max_datacarrier_bytes || scriptPubKey.size() &gt; *max_datacarrier_bytes) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 137 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 6315 times"> + </span>]
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">         165 :             return false;</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :         }</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     }</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             : </span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     return true;</span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">     6372706 : }</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : </span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">      558394 : bool IsStandardTx(const CTransaction&amp; tx, const std::optional&lt;unsigned&gt;&amp; max_datacarrier_bytes, bool permit_bare_multisig, const CFeeRate&amp; dust_relay_fee, std::string&amp; reason)</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : {</span>
+<span id="L105"><span class="lineNum">     105</span>         [<span class="tlaGBC" title="Branch 0 was taken 19581 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 538813 times"> + </span>]:<span class="tlaGNC">      558394 :     if (tx.version &gt; TX_MAX_STANDARD_VERSION || tx.version &lt; 1) {</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">       19581 :         reason = &quot;version&quot;;</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">       19581 :         return false;</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     }</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             : </span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     // Extremely large transactions with lots of inputs can cost the network</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     // almost as much to process as they cost the sender in fees, because</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     // computing signature hashes is O(ninputs*txsize). Limiting transactions</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     // to MAX_STANDARD_TX_WEIGHT mitigates CPU exhaustion attacks.</span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">      538813 :     unsigned int sz = GetTransactionWeight(tx);</span></span>
+<span id="L115"><span class="lineNum">     115</span>         [<span class="tlaGBC" title="Branch 0 was taken 698 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 538115 times"> + </span>]:<span class="tlaGNC">      538813 :     if (sz &gt; MAX_STANDARD_TX_WEIGHT) {</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">         698 :         reason = &quot;tx-size&quot;;</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">         698 :         return false;</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     }</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : </span>
+<span id="L120"><span class="lineNum">     120</span>         [<span class="tlaGBC" title="Branch 0 was taken 3128611 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 533692 times"> + </span>]:<span class="tlaGNC">     3662303 :     for (const CTxIn&amp; txin : tx.vin)</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :     {</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :         // Biggest 'standard' txin involving only keys is a 15-of-15 P2SH</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :         // multisig with compressed keys (remember the MAX_SCRIPT_ELEMENT_SIZE byte limit on</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :         // redeemScript size). That works out to a (15*(33+1))+3=513 byte</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :         // redeemScript, 513+1+15*(73+1)+3=1627 bytes of scriptSig, which</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :         // we round off to 1650(MAX_STANDARD_SCRIPTSIG_SIZE) bytes for</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :         // some minor future-proofing. That's also enough to spend a</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :         // 20-of-20 CHECKMULTISIG scriptPubKey, though such a scriptPubKey</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :         // is not considered standard.</span>
+<span id="L130"><span class="lineNum">     130</span>   [<span class="tlaGBC" title="Branch 0 was taken 7408 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3121203 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 95 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 7313 times"> + </span>]:<span class="tlaGNC">     3128611 :         if (txin.scriptSig.size() &gt; MAX_STANDARD_SCRIPTSIG_SIZE) {</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">          95 :             reason = &quot;scriptsig-size&quot;;</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">          95 :             return false;</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :         }</span>
+<span id="L134"><span class="lineNum">     134</span>         [<span class="tlaGBC" title="Branch 0 was taken 4328 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3124188 times"> + </span>]:<span class="tlaGNC">     3128516 :         if (!txin.scriptSig.IsPushOnly()) {</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">        4328 :             reason = &quot;scriptsig-not-pushonly&quot;;</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">        4328 :             return false;</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :         }</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     }</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             : </span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">      533692 :     unsigned int nDataOut = 0;</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">      533692 :     TxoutType whichType;</span></span>
+<span id="L142"><span class="lineNum">     142</span>         [<span class="tlaGBC" title="Branch 0 was taken 6368249 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 511512 times"> + </span>]:<span class="tlaGNC">     6879761 :     for (const CTxOut&amp; txout : tx.vout) {</span></span>
+<span id="L143"><span class="lineNum">     143</span>         [<span class="tlaGBC" title="Branch 0 was taken 21964 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6346285 times"> + </span>]:<span class="tlaGNC">     6368249 :         if (!::IsStandard(txout.scriptPubKey, max_datacarrier_bytes, whichType)) {</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">       21964 :             reason = &quot;scriptpubkey&quot;;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">       21964 :             return false;</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :         }</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>         [<span class="tlaGBC" title="Branch 0 was taken 6315 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6339970 times"> + </span>]:<span class="tlaGNC">     6346285 :         if (whichType == TxoutType::NULL_DATA)</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">        6315 :             nDataOut++;</span></span>
+<span id="L150"><span class="lineNum">     150</span>   [<span class="tlaGBC" title="Branch 0 was taken 640 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6339330 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 216 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 424 times"> + </span>]:<span class="tlaGNC">     6339970 :         else if ((whichType == TxoutType::MULTISIG) &amp;&amp; (!permit_bare_multisig)) {</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">         216 :             reason = &quot;bare-multisig&quot;;</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">         216 :             return false;</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :         }</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :     }</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     // Only MAX_DUST_OUTPUTS_PER_TX dust is permitted(on otherwise valid ephemeral dust)</span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaGBC" title="Branch 0 was taken 1236 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 510276 times"> + </span>]:<span class="tlaGNC">      511512 :     if (GetDust(tx, dust_relay_fee).size() &gt; MAX_DUST_OUTPUTS_PER_TX) {</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">        1236 :         reason = &quot;dust&quot;;</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaGNC">        1236 :         return false;</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     }</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             : </span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :     // only one OP_RETURN txout is permitted</span>
+<span id="L163"><span class="lineNum">     163</span>         [<span class="tlaGBC" title="Branch 0 was taken 153 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 510123 times"> + </span>]:<span class="tlaGNC">      510276 :     if (nDataOut &gt; 1) {</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">         153 :         reason = &quot;multi-op-return&quot;;</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaGNC">         153 :         return false;</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :     }</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : </span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     return true;</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             : }</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             : </span>
+<span id="L171"><span class="lineNum">     171</span>                 :             : /**</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :  * Check transaction inputs to mitigate two</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :  * potential denial-of-service attacks:</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :  *</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :  * 1. scriptSigs with extra data stuffed into them,</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :  *    not consumed by scriptPubKey (or P2SH script)</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :  * 2. P2SH scripts with a crazy number of expensive</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :  *    CHECKSIG/CHECKMULTISIG operations</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :  *</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :  * Why bother? To avoid denial-of-service attacks; an attacker</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :  * can submit a standard HASH... OP_EQUAL transaction,</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :  * which will get accepted into blocks. The redemption</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :  * script can be anything; an attacker could use a very</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :  * expensive-to-check-upon-redemption script like:</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :  *   DUP CHECKSIG DROP ... repeated 100 times... OP_1</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :  *</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :  * Note that only the non-witness portion of the transaction is checked here.</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :  */</span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">      293006 : bool AreInputsStandard(const CTransaction&amp; tx, const CCoinsViewCache&amp; mapInputs)</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : {</span>
+<span id="L191"><span class="lineNum">     191</span>         [<span class="tlaGBC" title="Branch 0 was taken 292997 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">      293006 :     if (tx.IsCoinBase()) {</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :         return true; // Coinbases don't use vin normally</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     }</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             : </span>
+<span id="L195"><span class="lineNum">     195</span>         [<span class="tlaGBC" title="Branch 0 was taken 1416081 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 291256 times"> + </span>]:<span class="tlaGNC">     1707337 :     for (unsigned int i = 0; i &lt; tx.vin.size(); i++) {</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaGNC">     1416081 :         const CTxOut&amp; prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :             : </span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">     1416081 :         std::vector&lt;std::vector&lt;unsigned char&gt; &gt; vSolutions;</span></span>
+<span id="L199"><span class="lineNum">     199</span>         [<span class="tlaGBC" title="Branch 0 was taken 1416081 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     1416081 :         TxoutType whichType = Solver(prev.scriptPubKey, vSolutions);</span></span>
+<span id="L200"><span class="lineNum">     200</span>         [<span class="tlaGBC" title="Branch 0 was taken 1414785 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1296 times"> + </span>]:<span class="tlaGNC">     1416081 :         if (whichType == TxoutType::NONSTANDARD || whichType == TxoutType::WITNESS_UNKNOWN) {</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :             // WITNESS_UNKNOWN failures are typically also caught with a policy</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :             // flag in the script interpreter, but it can be helpful to catch</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :             // this type of NONSTANDARD transaction earlier in transaction</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :             // validation.</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :             return false;</span>
+<span id="L206"><span class="lineNum">     206</span>         [<span class="tlaGBC" title="Branch 0 was taken 1077 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1413708 times"> + </span>]:<span class="tlaGNC">     1414785 :         } else if (whichType == TxoutType::SCRIPTHASH) {</span></span>
+<span id="L207"><span class="lineNum">     207</span>                 :<span class="tlaGNC">        1077 :             std::vector&lt;std::vector&lt;unsigned char&gt; &gt; stack;</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :             // convert the scriptSig into a stack, so we can inspect the redeemScript</span>
+<span id="L209"><span class="lineNum">     209</span>   [<span class="tlaGBC" title="Branch 0 was taken 1077 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 648 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 429 times"> + </span>]:<span class="tlaGNC">        1077 :             if (!EvalScript(stack, tx.vin[i].scriptSig, SCRIPT_VERIFY_NONE, BaseSignatureChecker(), SigVersion::BASE))</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :                 return false;</span>
+<span id="L211"><span class="lineNum">     211</span>         [<span class="tlaGBC" title="Branch 0 was taken 644 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">         648 :             if (stack.empty())</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :                 return false;</span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">         644 :             CScript subscript(stack.back().begin(), stack.back().end());</span></span>
+<span id="L214"><span class="lineNum">     214</span>   [<span class="tlaGBC" title="Branch 0 was taken 644 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 12 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 632 times"> + </span>]:<span class="tlaGNC">         644 :             if (subscript.GetSigOpCount(true) &gt; MAX_P2SH_SIGOPS) {</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :<span class="tlaGNC">          12 :                 return false;</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :             }</span>
+<span id="L217"><span class="lineNum">     217</span>                 :<span class="tlaGNC">        1077 :         }</span></span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">     1416081 :     }</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : </span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     return true;</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             : }</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : </span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaGNC">      291018 : bool IsWitnessStandard(const CTransaction&amp; tx, const CCoinsViewCache&amp; mapInputs)</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : {</span>
+<span id="L225"><span class="lineNum">     225</span>         [<span class="tlaGBC" title="Branch 0 was taken 291009 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">      291018 :     if (tx.IsCoinBase())</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :         return true; // Coinbases are skipped</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : </span>
+<span id="L228"><span class="lineNum">     228</span>         [<span class="tlaGBC" title="Branch 0 was taken 1479219 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 289522 times"> + </span>]:<span class="tlaGNC">     1768741 :     for (unsigned int i = 0; i &lt; tx.vin.size(); i++)</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     {</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :         // We don't care if witness for this input is empty, since it must not be bloated.</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :         // If the script is invalid without witness, it would be caught sooner or later during validation.</span>
+<span id="L232"><span class="lineNum">     232</span>         [<span class="tlaGBC" title="Branch 0 was taken 67345 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1411874 times"> + </span>]:<span class="tlaGNC">     1479219 :         if (tx.vin[i].scriptWitness.IsNull())</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :<span class="tlaGNC">       67345 :             continue;</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :             : </span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaGNC">     1411874 :         const CTxOut &amp;prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :             : </span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :         // get the scriptPubKey corresponding to this input:</span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">     1411874 :         CScript prevScript = prev.scriptPubKey;</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : </span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :         // witness stuffing detected</span>
+<span id="L241"><span class="lineNum">     241</span>   [<span class="tlaGBC" title="Branch 0 was taken 1411874 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1411873 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1 time"> + </span>]:<span class="tlaGNC">     1411874 :         if (prevScript.IsPayToAnchor()) {</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :             return false;</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :         }</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : </span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">     1411873 :         bool p2sh = false;</span></span>
+<span id="L246"><span class="lineNum">     246</span>   [<span class="tlaGBC" title="Branch 0 was taken 1411873 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 26 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1411847 times"> + </span>]:<span class="tlaGNC">     1411873 :         if (prevScript.IsPayToScriptHash()) {</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaGNC">          26 :             std::vector &lt;std::vector&lt;unsigned char&gt; &gt; stack;</span></span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :             // If the scriptPubKey is P2SH, we try to extract the redeemScript casually by converting the scriptSig</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :             // into a stack. We do not check IsPushOnly nor compare the hash as these will be done later anyway.</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :             // If the check fails at this stage, we know that this txid must be a bad one.</span>
+<span id="L251"><span class="lineNum">     251</span>   [<span class="tlaGBC" title="Branch 0 was taken 26 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 17 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 9 times"> + </span>]:<span class="tlaGNC">          26 :             if (!EvalScript(stack, tx.vin[i].scriptSig, SCRIPT_VERIFY_NONE, BaseSignatureChecker(), SigVersion::BASE))</span></span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :                 return false;</span>
+<span id="L253"><span class="lineNum">     253</span>         [<span class="tlaGBC" title="Branch 0 was taken 16 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">          17 :             if (stack.empty())</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :                 return false;</span>
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaGNC">          16 :             prevScript = CScript(stack.back().begin(), stack.back().end());</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">          16 :             p2sh = true;</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">          26 :         }</span></span>
+<span id="L258"><span class="lineNum">     258</span>                 :             : </span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">     1411863 :         int witnessversion = 0;</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaGNC">     1411863 :         std::vector&lt;unsigned char&gt; witnessprogram;</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :             : </span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :         // Non-witness program must not be associated with any witness</span>
+<span id="L263"><span class="lineNum">     263</span>   [<span class="tlaGBC" title="Branch 0 was taken 1411863 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1410769 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1094 times"> + </span>]:<span class="tlaGNC">     1411863 :         if (!prevScript.IsWitnessProgram(witnessversion, witnessprogram))</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :             return false;</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             : </span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :         // Check P2WSH standard limits</span>
+<span id="L267"><span class="lineNum">     267</span>   [<span class="tlaGBC" title="Branch 0 was taken 1409290 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1479 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1408707 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 583 times"> + </span>]:<span class="tlaGNC">     1410769 :         if (witnessversion == 0 &amp;&amp; witnessprogram.size() == WITNESS_V0_SCRIPTHASH_SIZE) {</span></span>
+<span id="L268"><span class="lineNum">     268</span>         [<span class="tlaGBC" title="Branch 0 was taken 1408637 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 70 times"> + </span>]:<span class="tlaGNC">     1408707 :             if (tx.vin[i].scriptWitness.stack.back().size() &gt; MAX_STANDARD_P2WSH_SCRIPT_SIZE)</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :                 return false;</span>
+<span id="L270"><span class="lineNum">     270</span>         [<span class="tlaGBC" title="Branch 0 was taken 1408636 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">     1408637 :             size_t sizeWitnessStack = tx.vin[i].scriptWitness.stack.size() - 1;</span></span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaGBC" title="Branch 0 was taken 1408636 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">     1408637 :             if (sizeWitnessStack &gt; MAX_STANDARD_P2WSH_STACK_ITEMS)</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :                 return false;</span>
+<span id="L273"><span class="lineNum">     273</span>         [<span class="tlaGBC" title="Branch 0 was taken 509788 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1408330 times"> + </span>]:<span class="tlaGNC">     1918118 :             for (unsigned int j = 0; j &lt; sizeWitnessStack; j++) {</span></span>
+<span id="L274"><span class="lineNum">     274</span>         [<span class="tlaGBC" title="Branch 0 was taken 509482 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 306 times"> + </span>]:<span class="tlaGNC">      509788 :                 if (tx.vin[i].scriptWitness.stack[j].size() &gt; MAX_STANDARD_P2WSH_STACK_ITEM_SIZE)</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :                     return false;</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :             }</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :         }</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :         // Check policy limits for Taproot spends:</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :         // - MAX_STANDARD_TAPSCRIPT_STACK_ITEM_SIZE limit for stack item size</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :         // - No annexes</span>
+<span id="L282"><span class="lineNum">     282</span>   [<span class="tlaGBC" title="Branch 0 was taken 1203 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1409189 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 975 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 228 times"> + </span> :<span class="tlaGNC">     1410392 :         if (witnessversion == 1 &amp;&amp; witnessprogram.size() == WITNESS_V1_TAPROOT_SIZE &amp;&amp; !p2sh) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 975 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L283"><span class="lineNum">     283</span>                 :             :             // Taproot spend (non-P2SH-wrapped, version 1, witness program size 32; see BIP 341)</span>
+<span id="L284"><span class="lineNum">     284</span>         [<span class="tlaGBC" title="Branch 0 was taken 343 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 632 times"> + </span>]:<span class="tlaGNC">         975 :             std::span stack{tx.vin[i].scriptWitness.stack};</span></span>
+<span id="L285"><span class="lineNum">     285</span>   [<span class="tlaGBC" title="Branch 0 was taken 343 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 632 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 342 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1 time"> + </span> :<span class="tlaGNC">         975 :             if (stack.size() &gt;= 2 &amp;&amp; !stack.back().empty() &amp;&amp; stack.back()[0] == ANNEX_TAG) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 341 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1 time"> + </span>]
+<span id="L286"><span class="lineNum">     286</span>                 :             :                 // Annexes are nonstandard as long as no semantics are defined for them.</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :                 return false;</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :             }</span>
+<span id="L289"><span class="lineNum">     289</span>         [<span class="tlaGBC" title="Branch 0 was taken 342 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 632 times"> + </span>]:<span class="tlaGNC">         974 :             if (stack.size() &gt;= 2) {</span></span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :                 // Script path spend (2 or more stack elements after removing optional annex)</span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaGNC">         342 :                 const auto&amp; control_block = SpanPopBack(stack);</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :<span class="tlaGNC">         342 :                 SpanPopBack(stack); // Ignore script</span></span>
+<span id="L293"><span class="lineNum">     293</span>         [<span class="tlaGBC" title="Branch 0 was taken 341 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">         342 :                 if (control_block.empty()) return false; // Empty control block is invalid</span></span>
+<span id="L294"><span class="lineNum">     294</span>         [<span class="tlaGBC" title="Branch 0 was taken 30 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 311 times"> + </span>]:<span class="tlaGNC">         341 :                 if ((control_block[0] &amp; TAPROOT_LEAF_MASK) == TAPROOT_LEAF_TAPSCRIPT) {</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :                     // Leaf version 0xc0 (aka Tapscript, see BIP 342)</span>
+<span id="L296"><span class="lineNum">     296</span>         [<span class="tlaGBC" title="Branch 0 was taken 273 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 27 times"> + </span>]:<span class="tlaGNC">         300 :                     for (const auto&amp; item : stack) {</span></span>
+<span id="L297"><span class="lineNum">     297</span>         [<span class="tlaGBC" title="Branch 0 was taken 270 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">         273 :                         if (item.size() &gt; MAX_STANDARD_TAPSCRIPT_STACK_ITEM_SIZE) return false;</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :                     }</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :                 }</span>
+<span id="L300"><span class="lineNum">     300</span>         [<span class="tlaGBC" title="Branch 0 was taken 632 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         632 :             } else if (stack.size() == 1) {</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :                 // Key path spend (1 stack element after removing optional annex)</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :                 // (no policy rules apply)</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             :             } else {</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :                 // 0 stack elements; this is already invalid by consensus rules</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :                 return false;</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :             }</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :         }</span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaGNC">     1413350 :     }</span></span>
+<span id="L309"><span class="lineNum">     309</span>                 :             :     return true;</span>
+<span id="L310"><span class="lineNum">     310</span>                 :             : }</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             : </span>
+<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaGNC">   909842715 : int64_t GetVirtualTransactionSize(int64_t nWeight, int64_t nSigOpCost, unsigned int bytes_per_sigop)</span></span>
+<span id="L313"><span class="lineNum">     313</span>                 :             : {</span>
+<span id="L314"><span class="lineNum">     314</span>         [<span class="tlaGBC" title="Branch 0 was taken 612660716 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 297181999 times"> + </span>]:<span class="tlaGNC">   909842715 :     return (std::max(nWeight, nSigOpCost * bytes_per_sigop) + WITNESS_SCALE_FACTOR - 1) / WITNESS_SCALE_FACTOR;</span></span>
+<span id="L315"><span class="lineNum">     315</span>                 :             : }</span>
+<span id="L316"><span class="lineNum">     316</span>                 :             : </span>
+<span id="L317"><span class="lineNum">     317</span>                 :<span class="tlaGNC">      141655 : int64_t GetVirtualTransactionSize(const CTransaction&amp; tx, int64_t nSigOpCost, unsigned int bytes_per_sigop)</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             : {</span>
+<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">      141655 :     return GetVirtualTransactionSize(GetTransactionWeight(tx), nSigOpCost, bytes_per_sigop);</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :             : }</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             : </span>
+<span id="L322"><span class="lineNum">     322</span>                 :<span class="tlaGNC">          51 : int64_t GetVirtualTransactionInputSize(const CTxIn&amp; txin, int64_t nSigOpCost, unsigned int bytes_per_sigop)</span></span>
+<span id="L323"><span class="lineNum">     323</span>                 :             : {</span>
+<span id="L324"><span class="lineNum">     324</span>                 :<span class="tlaGNC">          51 :     return GetVirtualTransactionSize(GetTransactionInputWeight(txin), nSigOpCost, bytes_per_sigop);</span></span>
+<span id="L325"><span class="lineNum">     325</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

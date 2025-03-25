@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/policy/packages.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/policy">src/policy</a> - packages.cpp<span style="font-size: 80%;"> (source / <a href="packages.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">90.3&nbsp;%</td>
+            <td class="headerCovTableEntry">72</td>
+            <td class="headerCovTableEntry">65</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-25 18:33:29</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryMed">88.9&nbsp;%</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">8</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">65.6&nbsp;%</td>
+            <td class="headerCovTableEntry">122</td>
+            <td class="headerCovTableEntry">80</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;policy/packages.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;cassert&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;iterator&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;numeric&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : /** IsTopoSortedPackage where a set of txids has been pre-populated. The set is assumed to be correct and</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :  * is mutated within this function (even if return value is false). */</span>
+<span id="L19"><span class="lineNum">      19</span>                 :<span class="tlaGNC">      302278 : bool IsTopoSortedPackage(const Package&amp; txns, std::unordered_set&lt;uint256, SaltedTxidHasher&gt;&amp; later_txids)</span></span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : {</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :     // Avoid misusing this function: later_txids should contain the txids of txns.</span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">      302278 :     Assume(txns.size() == later_txids.size());</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     // later_txids always contains the txids of this transaction and the ones that come later in</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     // txns. If any transaction's input spends a tx in that set, we've found a parent placed later</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     // than its child.</span>
+<span id="L27"><span class="lineNum">      27</span>         [<span class="tlaGBC" title="Branch 0 was taken 654690 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 302165 times"> + </span>]:<span class="tlaGNC">      956855 :     for (const auto&amp; tx : txns) {</span></span>
+<span id="L28"><span class="lineNum">      28</span>         [<span class="tlaGBC" title="Branch 0 was taken 6904480 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 654577 times"> + </span>]:<span class="tlaGNC">     7559057 :         for (const auto&amp; input : tx-&gt;vin) {</span></span>
+<span id="L29"><span class="lineNum">      29</span>         [<span class="tlaGBC" title="Branch 0 was taken 6904367 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 113 times"> + </span>]:<span class="tlaGNC">     6904480 :             if (later_txids.find(input.prevout.hash) != later_txids.end()) {</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :                 // The parent is a subsequent transaction in the package.</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :                 return false;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :             }</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :         }</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :         // Avoid misusing this function: later_txids must contain every tx.</span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">      654577 :         Assume(later_txids.erase(tx-&gt;GetHash()) == 1);</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     }</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     // Avoid misusing this function: later_txids should have contained the txids of txns.</span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">      302165 :     Assume(later_txids.empty());</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">      302165 :     return true;</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : }</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaUNC">           0 : bool IsTopoSortedPackage(const Package&amp; txns)</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : {</span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaUNC">           0 :     std::unordered_set&lt;uint256, SaltedTxidHasher&gt; later_txids;</span></span>
+<span id="L46"><span class="lineNum">      46</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::transform(txns.cbegin(), txns.cend(), std::inserter(later_txids, later_txids.end()),</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaUNC">           0 :                    [](const auto&amp; tx) { return tx-&gt;GetHash(); });</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return IsTopoSortedPackage(txns, later_txids);</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">      302165 : bool IsConsistentPackage(const Package&amp; txns)</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : {</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     // Don't allow any conflicting transactions, i.e. spending the same inputs, in a package.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">      302165 :     std::unordered_set&lt;COutPoint, SaltedOutpointHasher&gt; inputs_seen;</span></span>
+<span id="L56"><span class="lineNum">      56</span>         [<span class="tlaGBC" title="Branch 0 was taken 498215 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 272663 times"> + </span>]:<span class="tlaGNC">      770878 :     for (const auto&amp; tx : txns) {</span></span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaGBC" title="Branch 0 was taken 498173 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 42 times"> + </span>]:<span class="tlaGNC">      498215 :         if (tx-&gt;vin.empty()) {</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :             // This function checks consistency based on inputs, and we can't do that if there are</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :             // no inputs. Duplicate empty transactions are also not consistent with one another.</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :             // This doesn't create false negatives, as unconfirmed transactions are not allowed to</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :             // have no inputs.</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :             return false;</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :         }</span>
+<span id="L64"><span class="lineNum">      64</span>         [<span class="tlaGBC" title="Branch 0 was taken 3965908 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 468713 times"> + </span>]:<span class="tlaGNC">     4434621 :         for (const auto&amp; input : tx-&gt;vin) {</span></span>
+<span id="L65"><span class="lineNum">      65</span>         [<span class="tlaGBC" title="Branch 0 was taken 3936448 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 29460 times"> + </span>]:<span class="tlaGNC">     3965908 :             if (inputs_seen.find(input.prevout) != inputs_seen.end()) {</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :                 // This input is also present in another tx in the package.</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :                 return false;</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :             }</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :         }</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :         // Batch-add all the inputs for a tx at a time. If we added them 1 at a time, we could</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :         // catch duplicate inputs within a single tx.  This is a more severe, consensus error,</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :         // and we want to report that from CheckTransaction instead.</span>
+<span id="L73"><span class="lineNum">      73</span>         [<span class="tlaGBC" title="Branch 0 was taken 468713 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      468713 :         std::transform(tx-&gt;vin.cbegin(), tx-&gt;vin.cend(), std::inserter(inputs_seen, inputs_seen.end()),</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">     3696168 :                        [](const auto&amp; input) { return input.prevout; });</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     }</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     return true;</span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">      302165 : }</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">      312702 : bool IsWellFormedPackage(const Package&amp; txns, PackageValidationState&amp; state, bool require_sorted)</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : {</span>
+<span id="L81"><span class="lineNum">      81</span>         [<span class="tlaGBC" title="Branch 0 was taken 767 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 311935 times"> + </span>]:<span class="tlaGNC">      312702 :     const unsigned int package_count = txns.size();</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : </span>
+<span id="L83"><span class="lineNum">      83</span>         [<span class="tlaGBC" title="Branch 0 was taken 767 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 311935 times"> + </span>]:<span class="tlaGNC">      312702 :     if (package_count &gt; MAX_PACKAGE_COUNT) {</span></span>
+<span id="L84"><span class="lineNum">      84</span>   [<span class="tlaGBC" title="Branch 0 was taken 767 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 767 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         767 :         return state.Invalid(PackageValidationResult::PCKG_POLICY, &quot;package-too-many-transactions&quot;);</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     }</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : </span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaGNC">      311935 :     const int64_t total_weight = std::accumulate(txns.cbegin(), txns.cend(), 0,</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">      779398 :                                [](int64_t sum, const auto&amp; tx) { return sum + GetTransactionWeight(*tx); });</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     // If the package only contains 1 tx, it's better to report the policy violation on individual tx weight.</span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 993 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 310942 times"> + </span>]:<span class="tlaGNC">      311935 :     if (package_count &gt; 1 &amp;&amp; total_weight &gt; MAX_PACKAGE_WEIGHT) {</span></span>
+<span id="L91"><span class="lineNum">      91</span>   [<span class="tlaGBC" title="Branch 0 was taken 993 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 993 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         993 :         return state.Invalid(PackageValidationResult::PCKG_POLICY, &quot;package-too-large&quot;);</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     }</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : </span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">      310942 :     std::unordered_set&lt;uint256, SaltedTxidHasher&gt; later_txids;</span></span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaGBC" title="Branch 0 was taken 310942 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      310942 :     std::transform(txns.cbegin(), txns.cend(), std::inserter(later_txids, later_txids.end()),</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">      758887 :                    [](const auto&amp; tx) { return tx-&gt;GetHash(); });</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     // Package must not contain any duplicate transactions, which is checked by txid. This also</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     // includes transactions with duplicate wtxids and same-txid-different-witness transactions.</span>
+<span id="L100"><span class="lineNum">     100</span>         [<span class="tlaGBC" title="Branch 0 was taken 8664 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 302278 times"> + </span>]:<span class="tlaGNC">      310942 :     if (later_txids.size() != txns.size()) {</span></span>
+<span id="L101"><span class="lineNum">     101</span>   [<span class="tlaGBC" title="Branch 0 was taken 8664 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 8664 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        8664 :         return state.Invalid(PackageValidationResult::PCKG_POLICY, &quot;package-contains-duplicates&quot;);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 8664 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L102"><span class="lineNum">     102</span>                 :             :     }</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :     // Require the package to be sorted in order of dependency, i.e. parents appear before children.</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :     // An unsorted package will fail anyway on missing-inputs, but it's better to quit earlier and</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     // fail on something less ambiguous (missing-inputs could also be an orphan or trying to</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     // spend nonexistent coins).</span>
+<span id="L108"><span class="lineNum">     108</span>   [<span class="tlaGBC" title="Branch 0 was taken 302278 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 302278 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      302278 :     if (require_sorted &amp;&amp; !IsTopoSortedPackage(txns, later_txids)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 113 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 302165 times"> + </span>]
+<span id="L109"><span class="lineNum">     109</span>   [<span class="tlaGBC" title="Branch 0 was taken 113 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 113 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         113 :         return state.Invalid(PackageValidationResult::PCKG_POLICY, &quot;package-not-sorted&quot;);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 113 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L110"><span class="lineNum">     110</span>                 :             :     }</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : </span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     // Don't allow any conflicting transactions, i.e. spending the same inputs, in a package.</span>
+<span id="L113"><span class="lineNum">     113</span>   [<span class="tlaGBC" title="Branch 0 was taken 302165 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 29502 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 272663 times"> + </span>]:<span class="tlaGNC">      302165 :     if (!IsConsistentPackage(txns)) {</span></span>
+<span id="L114"><span class="lineNum">     114</span>   [<span class="tlaGBC" title="Branch 0 was taken 29502 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 29502 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       29502 :         return state.Invalid(PackageValidationResult::PCKG_POLICY, &quot;conflict-in-package&quot;);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 29502 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L115"><span class="lineNum">     115</span>                 :             :     }</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     return true;</span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">      310942 : }</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : </span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">       93908 : bool IsChildWithParents(const Package&amp; package)</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : {</span>
+<span id="L121"><span class="lineNum">     121</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 13533 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 13533 times"> + </span> :<span class="tlaGNC">      283847 :     assert(std::all_of(package.cbegin(), package.cend(), [](const auto&amp; tx){return tx != nullptr;}));</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 13533 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 13533 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 9 was taken 12057 times"> + </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span><span class="tlaGBC" title="Branch 11 was taken 82156 times"> + </span><span class="tlaUNC" title="Branch 12 was not taken"> - </span><span class="tlaGBC" title="Branch 13 was taken 82193 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 14 was not taken"> - </span><span class="tlaGBC" title="Branch 15 was taken 93908 times"> + </span>]
+<span id="L122"><span class="lineNum">     122</span>         [<span class="tlaGBC" title="Branch 0 was taken 93908 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       93908 :     if (package.size() &lt; 2) return false;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : </span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     // The package is expected to be sorted, so the last transaction is the child.</span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">       93908 :     const auto&amp; child = package.back();</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaGNC">       93908 :     std::unordered_set&lt;uint256, SaltedTxidHasher&gt; input_txids;</span></span>
+<span id="L127"><span class="lineNum">     127</span>         [<span class="tlaGBC" title="Branch 0 was taken 93908 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       93908 :     std::transform(child-&gt;vin.cbegin(), child-&gt;vin.cend(),</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :                    std::inserter(input_txids, input_txids.end()),</span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">      433928 :                    [](const auto&amp; input) { return input.prevout.hash; });</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : </span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :     // Every transaction must be a parent of the last transaction in the package.</span>
+<span id="L132"><span class="lineNum">     132</span>         [<span class="tlaGBC" title="Branch 0 was taken 93908 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       93908 :     return std::all_of(package.cbegin(), package.cend() - 1,</span></span>
+<span id="L133"><span class="lineNum">     133</span>   [<span class="tlaGBC" title="Branch 0 was taken 9 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1800 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1797 times"> + </span> :<span class="tlaGNC">      128874 :                        [&amp;input_txids](const auto&amp; ptx) { return input_txids.count(ptx-&gt;GetHash()) &gt; 0; });</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1794 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 1791 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 713 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 9 was taken 11002 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 856 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 22200 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 1031 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 13 was taken 91263 times"> + </span>]
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">       93908 : }</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :             : </span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">          76 : bool IsChildWithParentsTree(const Package&amp; package)</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : {</span>
+<span id="L138"><span class="lineNum">     138</span>         [<span class="tlaGBC" title="Branch 0 was taken 26 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 50 times"> + </span>]:<span class="tlaGNC">          76 :     if (!IsChildWithParents(package)) return false;</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">          26 :     std::unordered_set&lt;uint256, SaltedTxidHasher&gt; parent_txids;</span></span>
+<span id="L140"><span class="lineNum">     140</span>         [<span class="tlaGBC" title="Branch 0 was taken 26 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          26 :     std::transform(package.cbegin(), package.cend() - 1, std::inserter(parent_txids, parent_txids.end()),</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">         107 :                    [](const auto&amp; ptx) { return ptx-&gt;GetHash(); });</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     // Each parent must not have an input who is one of the other parents.</span>
+<span id="L143"><span class="lineNum">     143</span>         [<span class="tlaGBC" title="Branch 0 was taken 26 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         133 :     return std::all_of(package.cbegin(), package.cend() - 1, [&amp;](const auto&amp; ptx) {</span></span>
+<span id="L144"><span class="lineNum">     144</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 107 times"> + </span>]:<span class="tlaGNC">         107 :         for (const auto&amp; input : ptx-&gt;vin) {</span></span>
+<span id="L145"><span class="lineNum">     145</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (parent_txids.count(input.prevout.hash) &gt; 0) return false;</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :         }</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :         return true;</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     });</span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">          26 : }</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : </span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">         954 : uint256 GetPackageHash(const std::vector&lt;CTransactionRef&gt;&amp; transactions)</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : {</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :     // Create a vector of the wtxids.</span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">         954 :     std::vector&lt;Wtxid&gt; wtxids_copy;</span></span>
+<span id="L155"><span class="lineNum">     155</span>         [<span class="tlaGBC" title="Branch 0 was taken 954 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         954 :     std::transform(transactions.cbegin(), transactions.cend(), std::back_inserter(wtxids_copy),</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">        1908 :         [](const auto&amp; tx){ return tx-&gt;GetWitnessHash(); });</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : </span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :     // Sort in ascending order</span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaGNC">        2400 :     std::sort(wtxids_copy.begin(), wtxids_copy.end(), [](const auto&amp; lhs, const auto&amp; rhs) {</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">        1446 :         return std::lexicographical_compare(std::make_reverse_iterator(lhs.end()), std::make_reverse_iterator(lhs.begin()),</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">        1446 :                                             std::make_reverse_iterator(rhs.end()), std::make_reverse_iterator(rhs.begin()));</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :     });</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : </span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :     // Get sha256 hash of the wtxids concatenated in this order</span>
+<span id="L165"><span class="lineNum">     165</span>         [<span class="tlaGBC" title="Branch 0 was taken 954 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         954 :     HashWriter hashwriter;</span></span>
+<span id="L166"><span class="lineNum">     166</span>         [<span class="tlaGBC" title="Branch 0 was taken 1908 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 954 times"> + </span>]:<span class="tlaGNC">        2862 :     for (const auto&amp; wtxid : wtxids_copy) {</span></span>
+<span id="L167"><span class="lineNum">     167</span>         [<span class="tlaGBC" title="Branch 0 was taken 1908 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3816 :         hashwriter &lt;&lt; wtxid;</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     }</span>
+<span id="L169"><span class="lineNum">     169</span>         [<span class="tlaGBC" title="Branch 0 was taken 954 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1908 :     return hashwriter.GetSHA256();</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">         954 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/consensus/params.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/consensus">src/consensus</a> - params.h<span style="font-size: 80%;"> (source / <a href="params.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">15</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-25 18:33:29</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">77.8&nbsp;%</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">14</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_CONSENSUS_PARAMS_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_CONSENSUS_PARAMS_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;chrono&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;map&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : namespace Consensus {</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : /**</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :  * A buried deployment is one where the height of the activation has been hardcoded into</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :  * the client implementation long after the consensus change has activated. See BIP 90.</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :  */</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : enum BuriedDeployment : int16_t {</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     // buried deployments get negative values to avoid overlap with DeploymentPos</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     DEPLOYMENT_HEIGHTINCB = std::numeric_limits&lt;int16_t&gt;::min(),</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     DEPLOYMENT_CLTV,</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     DEPLOYMENT_DERSIG,</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     DEPLOYMENT_CSV,</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     DEPLOYMENT_SEGWIT,</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : };</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : constexpr bool ValidDeployment(BuriedDeployment dep) { return dep &lt;= DEPLOYMENT_SEGWIT; }</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : enum DeploymentPos : uint16_t {</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     DEPLOYMENT_TESTDUMMY,</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     DEPLOYMENT_TAPROOT, // Deployment of Schnorr/Taproot (BIPs 340-342)</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     // NOTE: Also add new deployments to VersionBitsDeploymentInfo in deploymentinfo.cpp</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     MAX_VERSION_BITS_DEPLOYMENTS</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : };</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : constexpr bool ValidDeployment(DeploymentPos dep) { return dep &lt; MAX_VERSION_BITS_DEPLOYMENTS; }</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : /**</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :  * Struct for each individual consensus rule change using BIP9.</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :  */</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : struct BIP9Deployment {</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     /** Bit position to select the particular bit in nVersion. */</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     int bit{28};</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     /** Start MedianTime for version bits miner confirmation. Can be a date in the past */</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     int64_t nStartTime{NEVER_ACTIVE};</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     /** Timeout/expiry MedianTime for the deployment attempt. */</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     int64_t nTimeout{NEVER_ACTIVE};</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     /** If lock in occurs, delay activation until at least this block</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :      *  height.  Note that activation will only occur on a retarget</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :      *  boundary.</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :      */</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     int min_activation_height{0};</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : </span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :     /** Constant for nTimeout very far in the future. */</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     static constexpr int64_t NO_TIMEOUT = std::numeric_limits&lt;int64_t&gt;::max();</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : </span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     /** Special value for nStartTime indicating that the deployment is always active.</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :      *  This is useful for testing, as it means tests don't need to deal with the activation</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :      *  process (which takes at least 3 BIP9 intervals). Only tests that specifically test the</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :      *  behaviour during activation cannot use this. */</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     static constexpr int64_t ALWAYS_ACTIVE = -1;</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     /** Special value for nStartTime indicating that the deployment is never active.</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :      *  This is useful for integrating the code changes for a new feature</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :      *  prior to deploying it on some or all networks. */</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     static constexpr int64_t NEVER_ACTIVE = -2;</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : };</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : </span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : /**</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :  * Parameters that influence chain consensus.</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :  */</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : struct Params {</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     uint256 hashGenesisBlock;</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     int nSubsidyHalvingInterval;</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :     /**</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :      * Hashes of blocks that</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :      * - are known to be consensus valid, and</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :      * - buried in the chain, and</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :      * - fail if the default script verify flags are applied.</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :      */</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     std::map&lt;uint256, uint32_t&gt; script_flag_exceptions;</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     /** Block height and hash at which BIP34 becomes active */</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     int BIP34Height;</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     uint256 BIP34Hash;</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     /** Block height at which BIP65 becomes active */</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     int BIP65Height;</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     /** Block height at which BIP66 becomes active */</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     int BIP66Height;</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :     /** Block height at which CSV (BIP68, BIP112 and BIP113) becomes active */</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     int CSVHeight;</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :     /** Block height at which Segwit (BIP141, BIP143 and BIP147) becomes active.</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :      * Note that segwit v0 script rules are enforced on all blocks except the</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :      * BIP 16 exception blocks. */</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :     int SegwitHeight;</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :     /** Don't warn about unknown BIP 9 activations below this height.</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :      * This prevents us from warning about the CSV and segwit activations. */</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     int MinBIP9WarningHeight;</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     /**</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :      * (nPowTargetTimespan / nPowTargetSpacing) which is also used for BIP9 deployments.</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :      * Examples: 1916 for 95%, 1512 for testchains.</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :      */</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :     uint32_t nRuleChangeActivationThreshold;</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     uint32_t nMinerConfirmationWindow;</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     BIP9Deployment vDeployments[MAX_VERSION_BITS_DEPLOYMENTS];</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     /** Proof of work parameters */</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     uint256 powLimit;</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     bool fPowAllowMinDifficultyBlocks;</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     /**</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :       * Enforce BIP94 timewarp attack mitigation. On testnet4 this also enforces</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :       * the block storm mitigation.</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :       */</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     bool enforce_BIP94;</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     bool fPowNoRetargeting;</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     int64_t nPowTargetSpacing;</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     int64_t nPowTargetTimespan;</span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">        4682 :     std::chrono::seconds PowTargetSpacing() const</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     {</span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">        4682 :         return std::chrono::seconds{nPowTargetSpacing};</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     }</span>
+<span id="L123"><span class="lineNum">     123</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaGNC">     1260133 :     int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 195 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 243179 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 404957 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1369 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 118 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 237770 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 237888 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 118 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 52654 times"> + </span>]
+<span id="L124"><span class="lineNum">     124</span>                 :             :     /** The best chain should have at least this much work */</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :     uint256 nMinimumChainWork;</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     /** By default assume that the signatures in ancestors of this block are valid */</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     uint256 defaultAssumeValid;</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             : </span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :     /**</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :      * If true, witness commitments contain a payload equal to a Bitcoin Script solution</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :      * to the signet challenge. See BIP325.</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :      */</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :     bool signet_blocks{false};</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     std::vector&lt;uint8_t&gt; signet_challenge;</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             : </span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">     1758391 :     int DeploymentHeight(BuriedDeployment dep) const</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :     {</span>
+<span id="L138"><span class="lineNum">     138</span>   [<span class="tlaGBC" title="Branch 0 was taken 148056 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 236570 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 236302 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 526740 times"> + </span> :<span class="tlaGNC">     1758391 :         switch (dep) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 610723 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">      148056 :         case DEPLOYMENT_HEIGHTINCB:</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">      148056 :             return BIP34Height;</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">      236570 :         case DEPLOYMENT_CLTV:</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">      236570 :             return BIP65Height;</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">      236302 :         case DEPLOYMENT_DERSIG:</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">      236302 :             return BIP66Height;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">      526740 :         case DEPLOYMENT_CSV:</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">      526740 :             return CSVHeight;</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :<span class="tlaGNC">      610723 :         case DEPLOYMENT_SEGWIT:</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :<span class="tlaGNC">      610723 :             return SegwitHeight;</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :         } // no default case, so the compiler can warn about missing cases</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :         return std::numeric_limits&lt;int&gt;::max();</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :     }</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : };</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : } // namespace Consensus</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :             : #endif // BITCOIN_CONSENSUS_PARAMS_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/headerssync.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - headerssync.cpp<span style="font-size: 80%;"> (source / <a href="headerssync.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">95.7&nbsp;%</td>
+            <td class="headerCovTableEntry">140</td>
+            <td class="headerCovTableEntry">134</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-03-25 18:33:29</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">63.6&nbsp;%</td>
+            <td class="headerCovTableEntry">154</td>
+            <td class="headerCovTableEntry">98</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;headerssync.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;logging.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;pow.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/time.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;util/vector.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : // The two constants below are computed using the simulation script in</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : // contrib/devtools/headerssync-params.py.</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : //! Store one header commitment per HEADER_COMMITMENT_PERIOD blocks.</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : constexpr size_t HEADER_COMMITMENT_PERIOD{624};</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : //! Only feed headers to validation once this many headers on top have been</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : //! received and validated against commitments.</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : constexpr size_t REDOWNLOAD_BUFFER_SIZE{14827}; // 14827/624 = ~23.8 commitments</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : // Our memory analysis assumes 48 bytes for a CompressedHeader (so we should</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : // re-calculate parameters if we compress further)</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : static_assert(sizeof(CompressedHeader) == 48);</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">         508 : HeadersSyncState::HeadersSyncState(NodeId id, const Consensus::Params&amp; consensus_params,</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">         508 :         const CBlockIndex* chain_start, const arith_uint256&amp; minimum_required_work) :</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">         508 :     m_commit_offset(FastRandomContext().randrange&lt;unsigned&gt;(HEADER_COMMITMENT_PERIOD)),</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         508 :     m_id(id), m_consensus_params(consensus_params),</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">         508 :     m_chain_start(chain_start),</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaGNC">         508 :     m_minimum_required_work(minimum_required_work),</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">         508 :     m_current_chain_work(chain_start-&gt;nChainWork),</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">         508 :     m_last_header_received(m_chain_start-&gt;GetBlockHeader()),</span></span>
+<span id="L34"><span class="lineNum">      34</span>         [<span class="tlaGBC" title="Branch 0 was taken 508 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         508 :     m_current_height(chain_start-&gt;nHeight)</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : {</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     // Estimate the number of blocks that could possibly exist on the peer's</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     // chain *right now* using 6 blocks/second (fastest blockrate given the MTP</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     // rule) times the number of seconds from the last allowed block until</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     // today. This serves as a memory bound on how many commitments we might</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     // store from this peer, and we can safely give up syncing if the peer</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     // exceeds this bound, because it's not possible for a consensus-valid</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     // chain to be longer than this (at the current time -- in the future we</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     // could try again, if necessary, to sync a longer chain).</span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">         508 :     m_max_commitments = 6*(Ticks&lt;std::chrono::seconds&gt;(NodeClock::now() - NodeSeconds{std::chrono::seconds{chain_start-&gt;GetMedianTimePast()}}) + MAX_FUTURE_BLOCK_TIME) / HEADER_COMMITMENT_PERIOD;</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : </span>
+<span id="L46"><span class="lineNum">      46</span>   [<span class="tlaGBC" title="Branch 0 was taken 508 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 508 times"> + </span> :<span class="tlaGNC">         508 :     LogDebug(BCLog::NET, &quot;Initial headers sync started with peer=%d: height=%i, max_commitments=%i, min_work=%s\n&quot;, m_id, m_current_height, m_max_commitments, m_minimum_required_work.ToString());</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">         508 : }</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : /** Free any memory in use, and mark this object as no longer usable. This is</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :  * required to guarantee that we won't reuse this object with the same</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :  * SaltedTxidHasher for another sync. */</span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">         365 : void HeadersSyncState::Finalize()</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : {</span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">         365 :     Assume(m_download_state != State::FINAL);</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">         365 :     ClearShrink(m_header_commitments);</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">         365 :     m_last_header_received.SetNull();</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">         365 :     ClearShrink(m_redownloaded_headers);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">         365 :     m_redownload_buffer_last_hash.SetNull();</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">         365 :     m_redownload_buffer_first_prev_hash.SetNull();</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">         365 :     m_process_all_remaining_headers = false;</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">         365 :     m_current_height = 0;</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">         365 :     m_download_state = State::FINAL;</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">         365 : }</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : </span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : /** Process the next batch of headers received from our peer.</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :  *  Validate and store commitments, and compare total chainwork to our target to</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :  *  see if we can switch to REDOWNLOAD mode.  */</span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">      172608 : HeadersSyncState::ProcessingResult HeadersSyncState::ProcessNextHeaders(const</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :         std::vector&lt;CBlockHeader&gt;&amp; received_headers, const bool full_headers_message)</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : {</span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">      172608 :     ProcessingResult ret;</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaGBC" title="Branch 0 was taken 172608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172608 :     Assume(!received_headers.empty());</span></span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaGBC" title="Branch 0 was taken 172608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172608 :     if (received_headers.empty()) return ret;</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : </span>
+<span id="L77"><span class="lineNum">      77</span>         [<span class="tlaGBC" title="Branch 0 was taken 172608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172608 :     Assume(m_download_state != State::FINAL);</span></span>
+<span id="L78"><span class="lineNum">      78</span>         [<span class="tlaGBC" title="Branch 0 was taken 172608 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172608 :     if (m_download_state == State::FINAL) return ret;</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>         [<span class="tlaGBC" title="Branch 0 was taken 172474 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 134 times"> + </span>]:<span class="tlaGNC">      172608 :     if (m_download_state == State::PRESYNC) {</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :         // During PRESYNC, we minimally validate block headers and</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :         // occasionally add commitments to them, until we reach our work</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :         // threshold (at which point m_download_state is updated to REDOWNLOAD).</span>
+<span id="L84"><span class="lineNum">      84</span>         [<span class="tlaGBC" title="Branch 0 was taken 172474 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172474 :         ret.success = ValidateAndStoreHeadersCommitments(received_headers);</span></span>
+<span id="L85"><span class="lineNum">      85</span>         [<span class="tlaGBC" title="Branch 0 was taken 172175 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 299 times"> + </span>]:<span class="tlaGNC">      172474 :         if (ret.success) {</span></span>
+<span id="L86"><span class="lineNum">      86</span>   [<span class="tlaGBC" title="Branch 0 was taken 44 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 172131 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 27 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 17 times"> + </span>]:<span class="tlaGNC">      172175 :             if (full_headers_message || m_download_state == State::REDOWNLOAD) {</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :                 // A full headers message means the peer may have more to give us;</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :                 // also if we just switched to REDOWNLOAD then we need to re-request</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :                 // headers from the beginning.</span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaGNC">      172158 :                 ret.request_more = true;</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :             } else {</span>
+<span id="L92"><span class="lineNum">      92</span>         [<span class="tlaGBC" title="Branch 0 was taken 17 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          17 :                 Assume(m_download_state == State::PRESYNC);</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :                 // If we're in PRESYNC and we get a non-full headers</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :                 // message, then the peer's chain has ended and definitely doesn't</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :                 // have enough work, so we can stop our sync.</span>
+<span id="L96"><span class="lineNum">      96</span>   [<span class="tlaGBC" title="Branch 0 was taken 17 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 17 times"> + </span> :<span class="tlaGNC">          17 :                 LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: incomplete headers message at height=%i (presync phase)\n&quot;, m_id, m_current_height);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L97"><span class="lineNum">      97</span>                 :             :             }</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :         }</span>
+<span id="L99"><span class="lineNum">      99</span>         [<span class="tlaGBC" title="Branch 0 was taken 134 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         134 :     } else if (m_download_state == State::REDOWNLOAD) {</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :         // During REDOWNLOAD, we compare our stored commitments to what we</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :         // receive, and add headers to our redownload buffer. When the buffer</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :         // gets big enough (meaning that we've checked enough commitments),</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :         // we'll return a batch of headers to the caller for processing.</span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">         134 :         ret.success = true;</span></span>
+<span id="L105"><span class="lineNum">     105</span>         [<span class="tlaGBC" title="Branch 0 was taken 2639 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 127 times"> + </span>]:<span class="tlaGNC">        2766 :         for (const auto&amp; hdr : received_headers) {</span></span>
+<span id="L106"><span class="lineNum">     106</span>   [<span class="tlaGBC" title="Branch 0 was taken 2639 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2632 times"> + </span>]:<span class="tlaGNC">        2639 :             if (!ValidateAndStoreRedownloadedHeader(hdr)) {</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :                 // Something went wrong -- the peer gave us an unexpected chain.</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :                 // We could consider looking at the reason for failure and</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :                 // punishing the peer, but for now just give up on sync.</span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaGNC">           7 :                 ret.success = false;</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">           7 :                 break;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :             }</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :         }</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             : </span>
+<span id="L115"><span class="lineNum">     115</span>         [<span class="tlaGBC" title="Branch 0 was taken 127 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">         134 :         if (ret.success) {</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :             // Return any headers that are ready for acceptance.</span>
+<span id="L117"><span class="lineNum">     117</span>         [<span class="tlaGBC" title="Branch 0 was taken 127 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         127 :             ret.pow_validated_headers = PopHeadersReadyForAcceptance();</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : </span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :             // If we hit our target blockhash, then all remaining headers will be</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :             // returned and we can clear any leftover internal state.</span>
+<span id="L121"><span class="lineNum">     121</span>   [<span class="tlaGBC" title="Branch 0 was taken 28 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 99 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 28 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         127 :             if (m_redownloaded_headers.empty() &amp;&amp; m_process_all_remaining_headers) {</span></span>
+<span id="L122"><span class="lineNum">     122</span>   [<span class="tlaGBC" title="Branch 0 was taken 28 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 28 times"> + </span> :<span class="tlaGNC">          28 :                 LogDebug(BCLog::NET, &quot;Initial headers sync complete with peer=%d: releasing all at height=%i (redownload phase)\n&quot;, m_id, m_redownload_buffer_last_height);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L123"><span class="lineNum">     123</span>         [<span class="tlaGBC" title="Branch 0 was taken 85 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 14 times"> + </span>]:<span class="tlaGNC">          99 :             } else if (full_headers_message) {</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :                 // If the headers message is full, we need to request more.</span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">          85 :                 ret.request_more = true;</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :             } else {</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :                 // For some reason our peer gave us a high-work chain, but is now</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :                 // declining to serve us that full chain again. Give up.</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :                 // Note that there's no more processing to be done with these</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :                 // headers, so we can still return success.</span>
+<span id="L131"><span class="lineNum">     131</span>   [<span class="tlaGBC" title="Branch 0 was taken 14 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 14 times"> + </span> :<span class="tlaGNC">          14 :                 LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: incomplete headers message at height=%i (redownload phase)\n&quot;, m_id, m_redownload_buffer_last_height);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L132"><span class="lineNum">     132</span>                 :             :             }</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :         }</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     }</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             : </span>
+<span id="L136"><span class="lineNum">     136</span>   [<span class="tlaGBC" title="Branch 0 was taken 172302 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 306 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 59 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 172243 times"> + </span> :<span class="tlaGNC">      172608 :     if (!(ret.success &amp;&amp; ret.request_more)) Finalize();</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 365 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L137"><span class="lineNum">     137</span>                 :             :     return ret;</span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             : </span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">      172474 : bool HeadersSyncState::ValidateAndStoreHeadersCommitments(const std::vector&lt;CBlockHeader&gt;&amp; headers)</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : {</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     // The caller should not give us an empty set of headers.</span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">      172474 :     Assume(headers.size() &gt; 0);</span></span>
+<span id="L144"><span class="lineNum">     144</span>         [<span class="tlaGBC" title="Branch 0 was taken 172474 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172474 :     if (headers.size() == 0) return true;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : </span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">      172474 :     Assume(m_download_state == State::PRESYNC);</span></span>
+<span id="L147"><span class="lineNum">     147</span>         [<span class="tlaGBC" title="Branch 0 was taken 172474 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172474 :     if (m_download_state != State::PRESYNC) return false;</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>         [<span class="tlaGBC" title="Branch 0 was taken 45 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 172429 times"> + </span>]:<span class="tlaGNC">      172474 :     if (headers[0].hashPrevBlock != m_last_header_received.GetHash()) {</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :         // Somehow our peer gave us a header that doesn't connect.</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :         // This might be benign -- perhaps our peer reorged away from the chain</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :         // they were on. Give up on this sync for now (likely we will start a</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :         // new sync with a new starting point).</span>
+<span id="L154"><span class="lineNum">     154</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 45 times"> + </span>]:<span class="tlaGNC">          45 :         LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: non-continuous headers at height=%i (presync phase)\n&quot;, m_id, m_current_height);</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">          45 :         return false;</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     }</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : </span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :     // If it does connect, (minimally) validate and occasionally store</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :     // commitments.</span>
+<span id="L160"><span class="lineNum">     160</span>         [<span class="tlaGBC" title="Branch 0 was taken 240621 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 172175 times"> + </span>]:<span class="tlaGNC">      412796 :     for (const auto&amp; hdr : headers) {</span></span>
+<span id="L161"><span class="lineNum">     161</span>         [<span class="tlaGBC" title="Branch 0 was taken 240367 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 254 times"> + </span>]:<span class="tlaGNC">      240621 :         if (!ValidateAndProcessSingleHeader(hdr)) {</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :             return false;</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :         }</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :     }</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             : </span>
+<span id="L166"><span class="lineNum">     166</span>         [<span class="tlaGBC" title="Branch 0 was taken 62 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 172113 times"> + </span>]:<span class="tlaGNC">      172175 :     if (m_current_chain_work &gt;= m_minimum_required_work) {</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">          62 :         m_redownloaded_headers.clear();</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">          62 :         m_redownload_buffer_last_height = m_chain_start-&gt;nHeight;</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaGNC">          62 :         m_redownload_buffer_first_prev_hash = m_chain_start-&gt;GetBlockHash();</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">          62 :         m_redownload_buffer_last_hash = m_chain_start-&gt;GetBlockHash();</span></span>
+<span id="L171"><span class="lineNum">     171</span>         [<span class="tlaGBC" title="Branch 0 was taken 62 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          62 :         m_redownload_chain_work = m_chain_start-&gt;nChainWork;</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">          62 :         m_download_state = State::REDOWNLOAD;</span></span>
+<span id="L173"><span class="lineNum">     173</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 62 times"> + </span>]:<span class="tlaGNC">          62 :         LogDebug(BCLog::NET, &quot;Initial headers sync transition with peer=%d: reached sufficient work at height=%i, redownloading from height=%i\n&quot;, m_id, m_current_height, m_redownload_buffer_last_height);</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     }</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     return true;</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             : }</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : </span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaGNC">      240621 : bool HeadersSyncState::ValidateAndProcessSingleHeader(const CBlockHeader&amp; current)</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : {</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">      240621 :     Assume(m_download_state == State::PRESYNC);</span></span>
+<span id="L181"><span class="lineNum">     181</span>         [<span class="tlaGBC" title="Branch 0 was taken 240621 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      240621 :     if (m_download_state != State::PRESYNC) return false;</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :             : </span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaGNC">      240621 :     int next_height = m_current_height + 1;</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :             : </span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :     // Verify that the difficulty isn't growing too fast; an adversary with</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     // limited hashing capability has a greater chance of producing a high</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :     // work chain if they compress the work into as few blocks as possible,</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :     // so don't let anyone give a chain that would violate the difficulty</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :     // adjustment maximum.</span>
+<span id="L190"><span class="lineNum">     190</span>         [<span class="tlaGBC" title="Branch 0 was taken 254 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 240367 times"> + </span>]:<span class="tlaGNC">      240621 :     if (!PermittedDifficultyTransition(m_consensus_params, next_height,</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC">      240621 :                 m_last_header_received.nBits, current.nBits)) {</span></span>
+<span id="L192"><span class="lineNum">     192</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 254 times"> + </span>]:<span class="tlaGNC">         254 :         LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: invalid difficulty transition at height=%i (presync phase)\n&quot;, m_id, next_height);</span></span>
+<span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaGNC">         254 :         return false;</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :     }</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             : </span>
+<span id="L196"><span class="lineNum">     196</span>         [<span class="tlaGBC" title="Branch 0 was taken 352 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 240015 times"> + </span>]:<span class="tlaGNC">      240367 :     if (next_height % HEADER_COMMITMENT_PERIOD == m_commit_offset) {</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :         // Add a commitment.</span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">         352 :         m_header_commitments.push_back(m_hasher(current.GetHash()) &amp; 1);</span></span>
+<span id="L199"><span class="lineNum">     199</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 352 times"> + </span>]:<span class="tlaGNC">         352 :         if (m_header_commitments.size() &gt; m_max_commitments) {</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :             // The peer's chain is too long; give up.</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :             // It's possible the chain grew since we started the sync; so</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :             // potentially we could succeed in syncing the peer's chain if we</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :             // try again later.</span>
+<span id="L204"><span class="lineNum">     204</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: exceeded max commitments at height=%i (presync phase)\n&quot;, m_id, next_height);</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaUNC">           0 :             return false;</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :         }</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :     }</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : </span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">      240367 :     m_current_chain_work += GetBlockProof(CBlockIndex(current));</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :<span class="tlaGNC">      240367 :     m_last_header_received = current;</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">      240367 :     m_current_height = next_height;</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :             : </span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">      240367 :     return true;</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : }</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             : </span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">        2639 : bool HeadersSyncState::ValidateAndStoreRedownloadedHeader(const CBlockHeader&amp; header)</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : {</span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">        2639 :     Assume(m_download_state == State::REDOWNLOAD);</span></span>
+<span id="L219"><span class="lineNum">     219</span>         [<span class="tlaGBC" title="Branch 0 was taken 2639 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2639 :     if (m_download_state != State::REDOWNLOAD) return false;</span></span>
+<span id="L220"><span class="lineNum">     220</span>                 :             : </span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaGNC">        2639 :     int64_t next_height = m_redownload_buffer_last_height + 1;</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : </span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :     // Ensure that we're working on a header that connects to the chain we're</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :     // downloading.</span>
+<span id="L225"><span class="lineNum">     225</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2635 times"> + </span>]:<span class="tlaGNC">        2639 :     if (header.hashPrevBlock != m_redownload_buffer_last_hash) {</span></span>
+<span id="L226"><span class="lineNum">     226</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           4 :         LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: non-continuous headers at height=%i (redownload phase)\n&quot;, m_id, next_height);</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">           4 :         return false;</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     }</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : </span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     // Check that the difficulty adjustments are within our tolerance:</span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaGNC">        2635 :     uint32_t previous_nBits{0};</span></span>
+<span id="L232"><span class="lineNum">     232</span>         [<span class="tlaGBC" title="Branch 0 was taken 2575 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 60 times"> + </span>]:<span class="tlaGNC">        2635 :     if (!m_redownloaded_headers.empty()) {</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :<span class="tlaGNC">        2575 :         previous_nBits = m_redownloaded_headers.back().nBits;</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :     } else {</span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaGNC">          60 :         previous_nBits = m_chain_start-&gt;nBits;</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :     }</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             : </span>
+<span id="L238"><span class="lineNum">     238</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2633 times"> + </span>]:<span class="tlaGNC">        2635 :     if (!PermittedDifficultyTransition(m_consensus_params, next_height,</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :<span class="tlaGNC">        2635 :                 previous_nBits, header.nBits)) {</span></span>
+<span id="L240"><span class="lineNum">     240</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           2 :         LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: invalid difficulty transition at height=%i (redownload phase)\n&quot;, m_id, next_height);</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaGNC">           2 :         return false;</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :     }</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             : </span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :     // Track work on the redownloaded chain</span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">        2633 :     m_redownload_chain_work += GetBlockProof(CBlockIndex(header));</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :             : </span>
+<span id="L247"><span class="lineNum">     247</span>         [<span class="tlaGBC" title="Branch 0 was taken 40 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2593 times"> + </span>]:<span class="tlaGNC">        2633 :     if (m_redownload_chain_work &gt;= m_minimum_required_work) {</span></span>
+<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaGNC">          40 :         m_process_all_remaining_headers = true;</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     }</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             : </span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :     // If we're at a header for which we previously stored a commitment, verify</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :     // it is correct. Failure will result in aborting download.</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     // Also, don't check commitments once we've gotten to our target blockhash;</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :     // it's possible our peer has extended its chain between our first sync and</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :     // our second, and we don't want to return failure after we've seen our</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :     // target blockhash just because we ran out of commitments.</span>
+<span id="L257"><span class="lineNum">     257</span>   [<span class="tlaGBC" title="Branch 0 was taken 2593 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 40 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 11 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2582 times"> + </span>]:<span class="tlaGNC">        2633 :     if (!m_process_all_remaining_headers &amp;&amp; next_height % HEADER_COMMITMENT_PERIOD == m_commit_offset) {</span></span>
+<span id="L258"><span class="lineNum">     258</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">          11 :         if (m_header_commitments.size() == 0) {</span></span>
+<span id="L259"><span class="lineNum">     259</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: commitment overrun at height=%i (redownload phase)\n&quot;, m_id, next_height);</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :             // Somehow our peer managed to feed us a different chain and</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :             // we've run out of commitments.</span>
+<span id="L262"><span class="lineNum">     262</span>                 :<span class="tlaUNC">           0 :             return false;</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :         }</span>
+<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">          11 :         bool commitment = m_hasher(header.GetHash()) &amp; 1;</span></span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">          11 :         bool expected_commitment = m_header_commitments.front();</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">          11 :         m_header_commitments.pop_front();</span></span>
+<span id="L267"><span class="lineNum">     267</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          11 :         if (commitment != expected_commitment) {</span></span>
+<span id="L268"><span class="lineNum">     268</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :             LogDebug(BCLog::NET, &quot;Initial headers sync aborted with peer=%d: commitment mismatch at height=%i (redownload phase)\n&quot;, m_id, next_height);</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">           1 :             return false;</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :         }</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     }</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : </span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :     // Store this header for later processing.</span>
+<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaGNC">        2632 :     m_redownloaded_headers.emplace_back(header);</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">        2632 :     m_redownload_buffer_last_height = next_height;</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">        2632 :     m_redownload_buffer_last_hash = header.GetHash();</span></span>
+<span id="L277"><span class="lineNum">     277</span>                 :             : </span>
+<span id="L278"><span class="lineNum">     278</span>                 :<span class="tlaGNC">        2632 :     return true;</span></span>
+<span id="L279"><span class="lineNum">     279</span>                 :             : }</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             : </span>
+<span id="L281"><span class="lineNum">     281</span>                 :<span class="tlaGNC">         127 : std::vector&lt;CBlockHeader&gt; HeadersSyncState::PopHeadersReadyForAcceptance()</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :             : {</span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">         127 :     std::vector&lt;CBlockHeader&gt; ret;</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :             : </span>
+<span id="L285"><span class="lineNum">     285</span>         [<span class="tlaGBC" title="Branch 0 was taken 127 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         127 :     Assume(m_download_state == State::REDOWNLOAD);</span></span>
+<span id="L286"><span class="lineNum">     286</span>         [<span class="tlaGBC" title="Branch 0 was taken 127 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         127 :     if (m_download_state != State::REDOWNLOAD) return ret;</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :             : </span>
+<span id="L288"><span class="lineNum">     288</span>         [<span class="tlaGBC" title="Branch 0 was taken 1205 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1205 :     while (m_redownloaded_headers.size() &gt; REDOWNLOAD_BUFFER_SIZE ||</span></span>
+<span id="L289"><span class="lineNum">     289</span>   [<span class="tlaGBC" title="Branch 0 was taken 1177 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 28 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1078 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 99 times"> + </span>]:<span class="tlaGNC">        1205 :             (m_redownloaded_headers.size() &gt; 0 &amp;&amp; m_process_all_remaining_headers)) {</span></span>
+<span id="L290"><span class="lineNum">     290</span>         [<span class="tlaGBC" title="Branch 0 was taken 1078 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1078 :         ret.emplace_back(m_redownloaded_headers.front().GetFullHeader(m_redownload_buffer_first_prev_hash));</span></span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaGNC">        1078 :         m_redownloaded_headers.pop_front();</span></span>
+<span id="L292"><span class="lineNum">     292</span>         [<span class="tlaGBC" title="Branch 0 was taken 1078 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1078 :         m_redownload_buffer_first_prev_hash = ret.back().GetHash();</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :     }</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :     return ret;</span>
+<span id="L295"><span class="lineNum">     295</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L296"><span class="lineNum">     296</span>                 :             : </span>
+<span id="L297"><span class="lineNum">     297</span>                 :<span class="tlaGNC">      172243 : CBlockLocator HeadersSyncState::NextHeadersRequestLocator() const</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :             : {</span>
+<span id="L299"><span class="lineNum">     299</span>                 :<span class="tlaGNC">      172243 :     Assume(m_download_state != State::FINAL);</span></span>
+<span id="L300"><span class="lineNum">     300</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 172243 times"> + </span>]:<span class="tlaGNC">      172243 :     if (m_download_state == State::FINAL) return {};</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :             : </span>
+<span id="L302"><span class="lineNum">     302</span>                 :<span class="tlaGNC">      172243 :     auto chain_start_locator = LocatorEntries(m_chain_start);</span></span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">      172243 :     std::vector&lt;uint256&gt; locator;</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :             : </span>
+<span id="L305"><span class="lineNum">     305</span>         [<span class="tlaGBC" title="Branch 0 was taken 172096 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 147 times"> + </span>]:<span class="tlaGNC">      172243 :     if (m_download_state == State::PRESYNC) {</span></span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :         // During pre-synchronization, we continue from the last header received.</span>
+<span id="L307"><span class="lineNum">     307</span>         [<span class="tlaGBC" title="Branch 0 was taken 172096 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172096 :         locator.push_back(m_last_header_received.GetHash());</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :     }</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             : </span>
+<span id="L310"><span class="lineNum">     310</span>         [<span class="tlaGBC" title="Branch 0 was taken 147 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 172096 times"> + </span>]:<span class="tlaGNC">      172243 :     if (m_download_state == State::REDOWNLOAD) {</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :         // During redownload, we will download from the last received header that we stored.</span>
+<span id="L312"><span class="lineNum">     312</span>         [<span class="tlaGBC" title="Branch 0 was taken 147 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         147 :         locator.push_back(m_redownload_buffer_last_hash);</span></span>
+<span id="L313"><span class="lineNum">     313</span>                 :             :     }</span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : </span>
+<span id="L315"><span class="lineNum">     315</span>         [<span class="tlaGBC" title="Branch 0 was taken 172243 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      172243 :     locator.insert(locator.end(), chain_start_locator.begin(), chain_start_locator.end());</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :             : </span>
+<span id="L317"><span class="lineNum">     317</span>                 :<span class="tlaGNC">      172243 :     return CBlockLocator{std::move(locator)};</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :<span class="tlaGNC">      172243 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
