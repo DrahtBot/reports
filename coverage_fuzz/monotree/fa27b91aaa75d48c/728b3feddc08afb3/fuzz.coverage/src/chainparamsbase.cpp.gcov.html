@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/chainparamsbase.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - chainparamsbase.cpp<span style="font-size: 80%;"> (source / <a href="chainparamsbase.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">96.9&nbsp;%</td>
+            <td class="headerCovTableEntry">32</td>
+            <td class="headerCovTableEntry">31</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-04-03 06:10:19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">54.3&nbsp;%</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntry">25</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2021 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;chainparamsbase.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;common/args.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;tinyformat.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;util/chaintype.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;assert.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :<span class="tlaGNC">           1 : void SetupChainParamsBaseOptions(ArgsManager&amp; argsman)</span></span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : {</span>
+<span id="L16"><span class="lineNum">      16</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-chain=&lt;chain&gt;&quot;, &quot;Use the chain &lt;chain&gt; (default: main). Allowed values: &quot; LIST_CHAIN_NAMES, ArgsManager::ALLOW_ANY, OptionsCategory::CHAINPARAMS);</span></span>
+<span id="L17"><span class="lineNum">      17</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-regtest&quot;, &quot;Enter regression test mode, which uses a special chain in which blocks can be solved instantly. &quot;</span></span>
+<span id="L18"><span class="lineNum">      18</span>                 :<span class="tlaGNC">           1 :                  &quot;This is intended for regression testing tools and app development. Equivalent to -chain=regtest.&quot;, ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::CHAINPARAMS);</span></span>
+<span id="L19"><span class="lineNum">      19</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-testactivationheight=name@height.&quot;, &quot;Set the activation height of 'name' (segwit, bip34, dersig, cltv, csv). (regtest-only)&quot;, ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L20"><span class="lineNum">      20</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-testnet&quot;, &quot;Use the testnet3 chain. Equivalent to -chain=test. Support for testnet3 is deprecated and will be removed in an upcoming release. Consider moving to testnet4 now by using -testnet4.&quot;, ArgsManager::ALLOW_ANY, OptionsCategory::CHAINPARAMS);</span></span>
+<span id="L21"><span class="lineNum">      21</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-testnet4&quot;, &quot;Use the testnet4 chain. Equivalent to -chain=testnet4.&quot;, ArgsManager::ALLOW_ANY, OptionsCategory::CHAINPARAMS);</span></span>
+<span id="L22"><span class="lineNum">      22</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-vbparams=deployment:start:end[:min_activation_height]&quot;, &quot;Use given start/end times and min_activation_height for specified version bits deployment (regtest-only)&quot;, ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::CHAINPARAMS);</span></span>
+<span id="L23"><span class="lineNum">      23</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-signet&quot;, &quot;Use the signet chain. Equivalent to -chain=signet. Note that the network is defined by the -signetchallenge parameter&quot;, ArgsManager::ALLOW_ANY, OptionsCategory::CHAINPARAMS);</span></span>
+<span id="L24"><span class="lineNum">      24</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-signetchallenge&quot;, &quot;Blocks must satisfy the given script to be considered valid (only for signet networks; defaults to the global default signet test network challenge)&quot;, ArgsManager::ALLOW_ANY | ArgsManager::DISALLOW_NEGATION, OptionsCategory::CHAINPARAMS);</span></span>
+<span id="L25"><span class="lineNum">      25</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           2 :     argsman.AddArg(&quot;-signetseednode&quot;, &quot;Specify a seed node for the signet network, in the hostname[:port] format, e.g. sig.net:1234 (may be used multiple times to specify multiple seed nodes; defaults to the global default signet test network seed node(s))&quot;, ArgsManager::ALLOW_ANY | ArgsManager::DISALLOW_NEGATION, OptionsCategory::CHAINPARAMS);</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : </span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : static std::unique_ptr&lt;CBaseChainParams&gt; globalChainBaseParams;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : </span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">           4 : const CBaseChainParams&amp; BaseParams()</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : {</span>
+<span id="L32"><span class="lineNum">      32</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           4 :     assert(globalChainBaseParams);</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">           4 :     return *globalChainBaseParams;</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : }</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : /**</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :  * Port numbers for incoming Tor connections (8334, 18334, 38334, 48334, 18445) have</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :  * been chosen arbitrarily to keep ranges of used ports tight.</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :  */</span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">           6 : std::unique_ptr&lt;CBaseChainParams&gt; CreateBaseChainParams(const ChainType chain)</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : {</span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 3 was taken 1 time"> + </span> :<span class="tlaGNC">           6 :     switch (chain) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">           2 :     case ChainType::MAIN:</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">           2 :         return std::make_unique&lt;CBaseChainParams&gt;(&quot;&quot;, 8332);</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">           1 :     case ChainType::TESTNET:</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">           1 :         return std::make_unique&lt;CBaseChainParams&gt;(&quot;testnet3&quot;, 18332);</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">           1 :     case ChainType::TESTNET4:</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">           1 :         return std::make_unique&lt;CBaseChainParams&gt;(&quot;testnet4&quot;, 48332);</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">           1 :     case ChainType::SIGNET:</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">           1 :         return std::make_unique&lt;CBaseChainParams&gt;(&quot;signet&quot;, 38332);</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">           1 :     case ChainType::REGTEST:</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">           1 :         return std::make_unique&lt;CBaseChainParams&gt;(&quot;regtest&quot;, 18443);</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     }</span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaUNC">           0 :     assert(false);</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : }</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : </span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">           1 : void SelectBaseParams(const ChainType chain)</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : {</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">           1 :     globalChainBaseParams = CreateBaseChainParams(chain);</span></span>
+<span id="L60"><span class="lineNum">      60</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :     gArgs.SelectConfigNetwork(ChainTypeToString(chain));</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">           1 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

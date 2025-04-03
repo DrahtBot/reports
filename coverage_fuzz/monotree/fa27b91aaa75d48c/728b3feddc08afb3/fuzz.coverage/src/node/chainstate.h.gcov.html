@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/node/chainstate.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/node">src/node</a> - chainstate.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-04-03 06:10:19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">50.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_NODE_CHAINSTATE_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_NODE_CHAINSTATE_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;util/translation.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;validation.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;tuple&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : class CTxMemPool;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : namespace kernel {</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : struct CacheSizes;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : } // namespace kernel</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : namespace node {</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 : struct ChainstateLoadOptions {</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     CTxMemPool* mempool{nullptr};</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     bool coins_db_in_memory{false};</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     // Whether to wipe the chainstate database when loading it. If set, this</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     // will cause the chainstate database to be rebuilt starting from genesis.</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     bool wipe_chainstate_db{false};</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     bool prune{false};</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     //! Setting require_full_verification to true will require all checks at</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     //! check_level (below) to succeed for loading to succeed. Setting it to</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     //! false will skip checks if cache is not big enough to run them, so may be</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     //! helpful for running with a small cache.</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     bool require_full_verification{true};</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     int64_t check_blocks{DEFAULT_CHECKBLOCKS};</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     int64_t check_level{DEFAULT_CHECKLEVEL};</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     std::function&lt;void()&gt; coins_error_cb;</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : };</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : //! Chainstate load status. Simple applications can just check for the success</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : //! case, and treat other cases as errors. More complex applications may want to</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : //! try reindexing in the generic failure case, and pass an interrupt callback</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : //! and exit cleanly in the interrupted case.</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : enum class ChainstateLoadStatus {</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     SUCCESS,</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     FAILURE, //!&lt; Generic failure which reindexing may fix</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     FAILURE_FATAL, //!&lt; Fatal error which should not prompt to reindex</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     FAILURE_INCOMPATIBLE_DB,</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     FAILURE_INSUFFICIENT_DBCACHE,</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     INTERRUPTED,</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : };</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : //! Chainstate load status code and optional error string.</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : using ChainstateLoadResult = std::tuple&lt;ChainstateLoadStatus, bilingual_str&gt;;</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : </span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : /** This sequence can have 4 types of outcomes:</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :  *</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :  *  1. Success</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :  *  2. Shutdown requested</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :  *    - nothing failed but a shutdown was triggered in the middle of the</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :  *      sequence</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :  *  3. Soft failure</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :  *    - a failure that might be recovered from with a reindex</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :  *  4. Hard failure</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :  *    - a failure that definitively cannot be recovered from with a reindex</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :  *</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :  *  LoadChainstate returns a (status code, error string) tuple.</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :  */</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : ChainstateLoadResult LoadChainstate(ChainstateManager&amp; chainman, const kernel::CacheSizes&amp; cache_sizes,</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :                                     const ChainstateLoadOptions&amp; options);</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : ChainstateLoadResult VerifyLoadedChainstate(ChainstateManager&amp; chainman, const ChainstateLoadOptions&amp; options);</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : } // namespace node</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : #endif // BITCOIN_NODE_CHAINSTATE_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

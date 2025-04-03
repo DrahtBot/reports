@@ -1,0 +1,491 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/wallet/feebumper.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/wallet">src/wallet</a> - feebumper.cpp<span style="font-size: 80%;"> (source / <a href="feebumper.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">200</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-04-03 06:10:19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">358</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2017-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;common/system.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;consensus/validation.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;interfaces/chain.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;node/types.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;policy/fees.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;util/moneystr.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/rbf.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/translation.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;wallet/coincontrol.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;wallet/feebumper.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;wallet/fees.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;wallet/receive.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;wallet/spend.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;wallet/wallet.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : namespace wallet {</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : //! Check whether transaction has descendant in wallet or mempool, or has been</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : //! mined, or conflicts with a mined transaction. Return a feebumper::Result.</span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaUNC">           0 : static feebumper::Result PreconditionChecks(const CWallet&amp; wallet, const CWalletTx&amp; wtx, bool require_mine, std::vector&lt;bilingual_str&gt;&amp; errors) EXCLUSIVE_LOCKS_REQUIRED(wallet.cs_wallet)</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : {</span>
+<span id="L26"><span class="lineNum">      26</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (wallet.HasWalletSpend(wtx.tx)) {</span></span>
+<span id="L27"><span class="lineNum">      27</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;Transaction has descendants in the wallet&quot;));</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaUNC">           0 :         return feebumper::Result::INVALID_PARAMETER;</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     }</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : </span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaUNC">           0 :     {</span></span>
+<span id="L32"><span class="lineNum">      32</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (wallet.chain().hasDescendantsInMempool(wtx.GetHash())) {</span></span>
+<span id="L33"><span class="lineNum">      33</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             errors.emplace_back(Untranslated(&quot;Transaction has descendants in the mempool&quot;));</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaUNC">           0 :             return feebumper::Result::INVALID_PARAMETER;</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :         }</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     }</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (wallet.GetTxDepthInMainChain(wtx) != 0) {</span></span>
+<span id="L39"><span class="lineNum">      39</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;Transaction has been mined, or is conflicted with a mined transaction&quot;));</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaUNC">           0 :         return feebumper::Result::WALLET_ERROR;</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     }</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!SignalsOptInRBF(*wtx.tx)) {</span></span>
+<span id="L44"><span class="lineNum">      44</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;Transaction is not BIP 125 replaceable&quot;));</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaUNC">           0 :         return feebumper::Result::WALLET_ERROR;</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     }</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (wtx.mapValue.count(&quot;replaced_by_txid&quot;)) {</span></span>
+<span id="L49"><span class="lineNum">      49</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         errors.push_back(Untranslated(strprintf(&quot;Cannot bump transaction %s which was already bumped by transaction %s&quot;, wtx.GetHash().ToString(), wtx.mapValue.at(&quot;replaced_by_txid&quot;))));</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaUNC">           0 :         return feebumper::Result::WALLET_ERROR;</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     }</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (require_mine) {</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :         // check that original tx consists entirely of our inputs</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :         // if not, we can't bump the fee, because the wallet has no way of knowing the value of the other inputs (thus the fee)</span>
+<span id="L56"><span class="lineNum">      56</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         isminefilter filter = wallet.GetLegacyScriptPubKeyMan() &amp;&amp; wallet.IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS) ? ISMINE_WATCH_ONLY : ISMINE_SPENDABLE;</span></span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (!AllInputsMine(wallet, *wtx.tx, filter)) {</span></span>
+<span id="L58"><span class="lineNum">      58</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             errors.emplace_back(Untranslated(&quot;Transaction contains inputs that don't belong to this wallet&quot;));</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaUNC">           0 :             return feebumper::Result::WALLET_ERROR;</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :         }</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     }</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     return feebumper::Result::OK;</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : }</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : </span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : //! Check if the user provided a valid feeRate</span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaUNC">           0 : static feebumper::Result CheckFeeRate(const CWallet&amp; wallet, const CMutableTransaction&amp; mtx, const CFeeRate&amp; newFeerate, const int64_t maxTxSize, CAmount old_fee, std::vector&lt;bilingual_str&gt;&amp; errors)</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : {</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     // check that fee rate is higher than mempool's minimum fee</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     // (no point in bumping fee if we know that the new tx won't be accepted to the mempool)</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     // This may occur if the user set fee_rate or paytxfee too low, if fallbackfee is too low, or, perhaps,</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     // in a rare situation where the mempool minimum fee increased significantly since the fee estimation just a</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :     // moment earlier. In this case, we report an error to the user, who may adjust the fee.</span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaUNC">           0 :     CFeeRate minMempoolFeeRate = wallet.chain().mempoolMinFee();</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : </span>
+<span id="L76"><span class="lineNum">      76</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (newFeerate.GetFeePerK() &lt; minMempoolFeeRate.GetFeePerK()) {</span></span>
+<span id="L77"><span class="lineNum">      77</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.push_back(Untranslated(</span></span>
+<span id="L78"><span class="lineNum">      78</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             strprintf(&quot;New fee rate (%s) is lower than the minimum fee rate (%s) to get into the mempool -- &quot;,</span></span>
+<span id="L79"><span class="lineNum">      79</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             FormatMoney(newFeerate.GetFeePerK()),</span></span>
+<span id="L80"><span class="lineNum">      80</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             FormatMoney(minMempoolFeeRate.GetFeePerK()))));</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaUNC">           0 :         return feebumper::Result::WALLET_ERROR;</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     }</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : </span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;COutPoint&gt; reused_inputs;</span></span>
+<span id="L85"><span class="lineNum">      85</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     reused_inputs.reserve(mtx.vin.size());</span></span>
+<span id="L86"><span class="lineNum">      86</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (const CTxIn&amp; txin : mtx.vin) {</span></span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         reused_inputs.push_back(txin.prevout);</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     }</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : </span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::optional&lt;CAmount&gt; combined_bump_fee = wallet.chain().calculateCombinedBumpFee(reused_inputs, newFeerate);</span></span>
+<span id="L91"><span class="lineNum">      91</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!combined_bump_fee.has_value()) {</span></span>
+<span id="L92"><span class="lineNum">      92</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.push_back(Untranslated(strprintf(&quot;Failed to calculate bump fees, because unconfirmed UTXOs depend on enormous cluster of unconfirmed transactions.&quot;)));</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :     }</span>
+<span id="L94"><span class="lineNum">      94</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     CAmount new_total_fee = newFeerate.GetFee(maxTxSize) + combined_bump_fee.value();</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : </span>
+<span id="L96"><span class="lineNum">      96</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     CFeeRate incrementalRelayFee = wallet.chain().relayIncrementalFee();</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     // Min total fee is old fee + relay fee</span>
+<span id="L99"><span class="lineNum">      99</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     CAmount minTotalFee = old_fee + incrementalRelayFee.GetFee(maxTxSize);</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (new_total_fee &lt; minTotalFee) {</span></span>
+<span id="L102"><span class="lineNum">     102</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.push_back(Untranslated(strprintf(&quot;Insufficient total fee %s, must be at least %s (oldFee %s + incrementalFee %s)&quot;,</span></span>
+<span id="L103"><span class="lineNum">     103</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :             FormatMoney(new_total_fee), FormatMoney(minTotalFee), FormatMoney(old_fee), FormatMoney(incrementalRelayFee.GetFee(maxTxSize)))));</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 9 was not executed"> # </span>]
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaUNC">           0 :         return feebumper::Result::INVALID_PARAMETER;</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :     }</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : </span>
+<span id="L107"><span class="lineNum">     107</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     CAmount requiredFee = GetRequiredFee(wallet, maxTxSize);</span></span>
+<span id="L108"><span class="lineNum">     108</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (new_total_fee &lt; requiredFee) {</span></span>
+<span id="L109"><span class="lineNum">     109</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.push_back(Untranslated(strprintf(&quot;Insufficient total fee (cannot be less than required fee %s)&quot;,</span></span>
+<span id="L110"><span class="lineNum">     110</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             FormatMoney(requiredFee))));</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaUNC">           0 :         return feebumper::Result::INVALID_PARAMETER;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     }</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             : </span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     // Check that in all cases the new fee doesn't violate maxTxFee</span>
+<span id="L115"><span class="lineNum">     115</span>                 :<span class="tlaUNC">           0 :     const CAmount max_tx_fee = wallet.m_default_max_tx_fee;</span></span>
+<span id="L116"><span class="lineNum">     116</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (new_total_fee &gt; max_tx_fee) {</span></span>
+<span id="L117"><span class="lineNum">     117</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.push_back(Untranslated(strprintf(&quot;Specified or calculated fee %s is too high (cannot be higher than -maxtxfee %s)&quot;,</span></span>
+<span id="L118"><span class="lineNum">     118</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             FormatMoney(new_total_fee), FormatMoney(max_tx_fee))));</span></span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaUNC">           0 :         return feebumper::Result::WALLET_ERROR;</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     }</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             : </span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     return feebumper::Result::OK;</span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             : </span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaUNC">           0 : static CFeeRate EstimateFeeRate(const CWallet&amp; wallet, const CWalletTx&amp; wtx, const CAmount old_fee, const CCoinControl&amp; coin_control)</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : {</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     // Get the fee rate of the original transaction. This is calculated from</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :     // the tx fee/vsize, so it may have been rounded down. Add 1 satoshi to the</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :     // result.</span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaUNC">           0 :     int64_t txSize = GetVirtualTransactionSize(*(wtx.tx));</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaUNC">           0 :     CFeeRate feerate(old_fee, txSize);</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaUNC">           0 :     feerate += CFeeRate(1);</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : </span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     // The node has a configurable incremental relay fee. Increment the fee by</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :     // the minimum of that and the wallet's conservative</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :     // WALLET_INCREMENTAL_RELAY_FEE value to future proof against changes to</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :     // network wide policy for incremental relay fee that our node may not be</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     // aware of. This ensures we're over the required relay fee rate</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     // (Rule 4).  The replacement tx will be at least as large as the</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :     // original tx, so the total fee will be greater (Rule 3)</span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaUNC">           0 :     CFeeRate node_incremental_relay_fee = wallet.chain().relayIncrementalFee();</span></span>
+<span id="L142"><span class="lineNum">     142</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     CFeeRate wallet_incremental_relay_fee = CFeeRate(WALLET_INCREMENTAL_RELAY_FEE);</span></span>
+<span id="L143"><span class="lineNum">     143</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     feerate += std::max(node_incremental_relay_fee, wallet_incremental_relay_fee);</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     // Fee rate must also be at least the wallet's GetMinimumFeeRate</span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaUNC">           0 :     CFeeRate min_feerate(GetMinimumFeeRate(wallet, coin_control, /*feeCalc=*/nullptr));</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     // Set the required fee rate for the replacement transaction in coin control.</span>
+<span id="L149"><span class="lineNum">     149</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return std::max(feerate, min_feerate);</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : }</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : </span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : namespace feebumper {</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaUNC">           0 : bool TransactionCanBeBumped(const CWallet&amp; wallet, const uint256&amp; txid)</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : {</span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaUNC">           0 :     LOCK(wallet.cs_wallet);</span></span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     const CWalletTx* wtx = wallet.GetWalletTx(txid);</span></span>
+<span id="L158"><span class="lineNum">     158</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (wtx == nullptr) return false;</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;bilingual_str&gt; errors_dummy;</span></span>
+<span id="L161"><span class="lineNum">     161</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     feebumper::Result res = PreconditionChecks(wallet, *wtx, /* require_mine=*/ true, errors_dummy);</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaUNC">           0 :     return res == feebumper::Result::OK;</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : </span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaUNC">           0 : Result CreateRateBumpTransaction(CWallet&amp; wallet, const uint256&amp; txid, const CCoinControl&amp; coin_control, std::vector&lt;bilingual_str&gt;&amp; errors,</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :                                  CAmount&amp; old_fee, CAmount&amp; new_fee, CMutableTransaction&amp; mtx, bool require_mine, const std::vector&lt;CTxOut&gt;&amp; outputs, std::optional&lt;uint32_t&gt; original_change_index)</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : {</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     // For now, cannot specify both new outputs to use and an output index to send change</span>
+<span id="L169"><span class="lineNum">     169</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!outputs.empty() &amp;&amp; original_change_index.has_value()) {</span></span>
+<span id="L170"><span class="lineNum">     170</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;The options 'outputs' and 'original_change_index' are incompatible. You can only either specify a new set of outputs, or designate a change output to be recycled.&quot;));</span></span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaUNC">           0 :         return Result::INVALID_PARAMETER;</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :     }</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : </span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     // We are going to modify coin control later, copy to reuse</span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaUNC">           0 :     CCoinControl new_coin_control(coin_control);</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :             : </span>
+<span id="L177"><span class="lineNum">     177</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     LOCK(wallet.cs_wallet);</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaUNC">           0 :     errors.clear();</span></span>
+<span id="L179"><span class="lineNum">     179</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     auto it = wallet.mapWallet.find(txid);</span></span>
+<span id="L180"><span class="lineNum">     180</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (it == wallet.mapWallet.end()) {</span></span>
+<span id="L181"><span class="lineNum">     181</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;Invalid or non-wallet transaction id&quot;));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaUNC">           0 :         return Result::INVALID_ADDRESS_OR_KEY;</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     }</span>
+<span id="L184"><span class="lineNum">     184</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     const CWalletTx&amp; wtx = it-&gt;second;</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :             : </span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     // Make sure that original_change_index is valid</span>
+<span id="L187"><span class="lineNum">     187</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (original_change_index.has_value() &amp;&amp; original_change_index.value() &gt;= wtx.tx-&gt;vout.size()) {</span></span>
+<span id="L188"><span class="lineNum">     188</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;Change position is out of range&quot;));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaUNC">           0 :         return Result::INVALID_PARAMETER;</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :     }</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : </span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     // Retrieve all of the UTXOs and add them to coin control</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     // While we're here, calculate the input amount</span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaUNC">           0 :     std::map&lt;COutPoint, Coin&gt; coins;</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaUNC">           0 :     CAmount input_value = 0;</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;CTxOut&gt; spent_outputs;</span></span>
+<span id="L197"><span class="lineNum">     197</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (const CTxIn&amp; txin : wtx.tx-&gt;vin) {</span></span>
+<span id="L198"><span class="lineNum">     198</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         coins[txin.prevout]; // Create empty map entry keyed by prevout.</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :     }</span>
+<span id="L200"><span class="lineNum">     200</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     wallet.chain().findCoins(coins);</span></span>
+<span id="L201"><span class="lineNum">     201</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (const CTxIn&amp; txin : wtx.tx-&gt;vin) {</span></span>
+<span id="L202"><span class="lineNum">     202</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         const Coin&amp; coin = coins.at(txin.prevout);</span></span>
+<span id="L203"><span class="lineNum">     203</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (coin.out.IsNull()) {</span></span>
+<span id="L204"><span class="lineNum">     204</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :             errors.emplace_back(Untranslated(strprintf(&quot;%s:%u is already spent&quot;, txin.prevout.hash.GetHex(), txin.prevout.n)));</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaUNC">           0 :             return Result::MISC_ERROR;</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :         }</span>
+<span id="L207"><span class="lineNum">     207</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         PreselectedInput&amp; preset_txin = new_coin_control.Select(txin.prevout);</span></span>
+<span id="L208"><span class="lineNum">     208</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (!wallet.IsMine(txin.prevout)) {</span></span>
+<span id="L209"><span class="lineNum">     209</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             preset_txin.SetTxOut(coin.out);</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :         }</span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaUNC">           0 :         input_value += coin.out.nValue;</span></span>
+<span id="L212"><span class="lineNum">     212</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         spent_outputs.push_back(coin.out);</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :     }</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : </span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :     // Figure out if we need to compute the input weight, and do so if necessary</span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaUNC">           0 :     PrecomputedTransactionData txdata;</span></span>
+<span id="L217"><span class="lineNum">     217</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     txdata.Init(*wtx.tx, std::move(spent_outputs), /* force=*/ true);</span></span>
+<span id="L218"><span class="lineNum">     218</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (unsigned int i = 0; i &lt; wtx.tx-&gt;vin.size(); ++i) {</span></span>
+<span id="L219"><span class="lineNum">     219</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         const CTxIn&amp; txin = wtx.tx-&gt;vin.at(i);</span></span>
+<span id="L220"><span class="lineNum">     220</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         const Coin&amp; coin = coins.at(txin.prevout);</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :             : </span>
+<span id="L222"><span class="lineNum">     222</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (new_coin_control.IsExternalSelected(txin.prevout)) {</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :             // For external inputs, we estimate the size using the size of this input</span>
+<span id="L224"><span class="lineNum">     224</span>                 :<span class="tlaUNC">           0 :             int64_t input_weight = GetTransactionInputWeight(txin);</span></span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :             // Because signatures can have different sizes, we need to figure out all of the</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :             // signature sizes and replace them with the max sized signature.</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :             // In order to do this, we verify the script with a special SignatureChecker which</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :             // will observe the signatures verified and record their sizes.</span>
+<span id="L229"><span class="lineNum">     229</span>                 :<span class="tlaUNC">           0 :             SignatureWeights weights;</span></span>
+<span id="L230"><span class="lineNum">     230</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             TransactionSignatureChecker tx_checker(wtx.tx.get(), i, coin.out.nValue, txdata, MissingDataBehavior::FAIL);</span></span>
+<span id="L231"><span class="lineNum">     231</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             SignatureWeightChecker size_checker(weights, tx_checker);</span></span>
+<span id="L232"><span class="lineNum">     232</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             VerifyScript(txin.scriptSig, coin.out.scriptPubKey, &amp;txin.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, size_checker);</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :             // Add the difference between max and current to input_weight so that it represents the largest the input could be</span>
+<span id="L234"><span class="lineNum">     234</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             input_weight += weights.GetWeightDiffToMax();</span></span>
+<span id="L235"><span class="lineNum">     235</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             new_coin_control.SetInputWeight(txin.prevout, input_weight);</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaUNC">           0 :         }</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :     }</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             : </span>
+<span id="L239"><span class="lineNum">     239</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     Result result = PreconditionChecks(wallet, wtx, require_mine, errors);</span></span>
+<span id="L240"><span class="lineNum">     240</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (result != Result::OK) {</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :         return result;</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :     }</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             : </span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :     // Calculate the old output amount.</span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaUNC">           0 :     CAmount output_value = 0;</span></span>
+<span id="L246"><span class="lineNum">     246</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (const auto&amp; old_output : wtx.tx-&gt;vout) {</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaUNC">           0 :         output_value += old_output.nValue;</span></span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :     }</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             : </span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaUNC">           0 :     old_fee = input_value - output_value;</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :     // Fill in recipients (and preserve a single change key if there</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     // is one). If outputs vector is non-empty, replace original</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :     // outputs with its contents, otherwise use original outputs.</span>
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;CRecipient&gt; recipients;</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaUNC">           0 :     CAmount new_outputs_value = 0;</span></span>
+<span id="L257"><span class="lineNum">     257</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     const auto&amp; txouts = outputs.empty() ? wtx.tx-&gt;vout : outputs;</span></span>
+<span id="L258"><span class="lineNum">     258</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (size_t i = 0; i &lt; txouts.size(); ++i) {</span></span>
+<span id="L259"><span class="lineNum">     259</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         const CTxOut&amp; output = txouts.at(i);</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaUNC">           0 :         CTxDestination dest;</span></span>
+<span id="L261"><span class="lineNum">     261</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         ExtractDestination(output.scriptPubKey, dest);</span></span>
+<span id="L262"><span class="lineNum">     262</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         if (original_change_index.has_value() ?  original_change_index.value() == i : OutputIsChange(wallet, output)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L263"><span class="lineNum">     263</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             new_coin_control.destChange = dest;</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :         } else {</span>
+<span id="L265"><span class="lineNum">     265</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             CRecipient recipient = {dest, output.nValue, false};</span></span>
+<span id="L266"><span class="lineNum">     266</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             recipients.push_back(recipient);</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaUNC">           0 :         }</span></span>
+<span id="L268"><span class="lineNum">     268</span>                 :<span class="tlaUNC">           0 :         new_outputs_value += output.nValue;</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :             : </span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     // If no recipients, means that we are sending coins to a change address</span>
+<span id="L272"><span class="lineNum">     272</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (recipients.empty()) {</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :         // Just as a sanity check, ensure that the change address exist</span>
+<span id="L274"><span class="lineNum">     274</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (std::get_if&lt;CNoDestination&gt;(&amp;new_coin_control.destChange)) {</span></span>
+<span id="L275"><span class="lineNum">     275</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :             errors.emplace_back(Untranslated(&quot;Unable to create transaction. Transaction must have at least one recipient&quot;));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaUNC">           0 :             return Result::INVALID_PARAMETER;</span></span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :         }</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :         // Add change as recipient with SFFO flag enabled, so fees are deduced from it.</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :         // If the output differs from the original tx output (because the user customized it) a new change output will be created.</span>
+<span id="L281"><span class="lineNum">     281</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         recipients.emplace_back(CRecipient{new_coin_control.destChange, new_outputs_value, /*fSubtractFeeFromAmount=*/true});</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaUNC">           0 :         new_coin_control.destChange = CNoDestination();</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :     }</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             : </span>
+<span id="L285"><span class="lineNum">     285</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (coin_control.m_feerate) {</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :         // The user provided a feeRate argument.</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :         // We calculate this here to avoid compiler warning on the cs_wallet lock</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :         // We need to make a temporary transaction with no input witnesses as the dummy signer expects them to be empty for external inputs</span>
+<span id="L289"><span class="lineNum">     289</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         CMutableTransaction temp_mtx{*wtx.tx};</span></span>
+<span id="L290"><span class="lineNum">     290</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         for (auto&amp; txin : temp_mtx.vin) {</span></span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaUNC">           0 :             txin.scriptSig.clear();</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :<span class="tlaUNC">           0 :             txin.scriptWitness.SetNull();</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :         }</span>
+<span id="L294"><span class="lineNum">     294</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         temp_mtx.vout = txouts;</span></span>
+<span id="L295"><span class="lineNum">     295</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         const int64_t maxTxSize{CalculateMaximumSignedTxSize(CTransaction(temp_mtx), &amp;wallet, &amp;new_coin_control).vsize};</span></span>
+<span id="L296"><span class="lineNum">     296</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         Result res = CheckFeeRate(wallet, temp_mtx, *new_coin_control.m_feerate, maxTxSize, old_fee, errors);</span></span>
+<span id="L297"><span class="lineNum">     297</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (res != Result::OK) {</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :<span class="tlaUNC">           0 :             return res;</span></span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :         }</span>
+<span id="L300"><span class="lineNum">     300</span>                 :<span class="tlaUNC">           0 :     } else {</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :         // The user did not provide a feeRate argument</span>
+<span id="L302"><span class="lineNum">     302</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         new_coin_control.m_feerate = EstimateFeeRate(wallet, wtx, old_fee, new_coin_control);</span></span>
+<span id="L303"><span class="lineNum">     303</span>                 :             :     }</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             : </span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :     // Fill in required inputs we are double-spending(all of them)</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :     // N.B.: bip125 doesn't require all the inputs in the replaced transaction to be</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :     // used in the replacement transaction, but it's very important for wallets to make</span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :     // sure that happens. If not, it would be possible to bump a transaction A twice to</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             :     // A2 and A3 where A2 and A3 don't conflict (or alternatively bump A to A2 and A2</span>
+<span id="L310"><span class="lineNum">     310</span>                 :             :     // to A3 where A and A3 don't conflict). If both later get confirmed then the sender</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :     // has accidentally double paid.</span>
+<span id="L312"><span class="lineNum">     312</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (const auto&amp; inputs : wtx.tx-&gt;vin) {</span></span>
+<span id="L313"><span class="lineNum">     313</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         new_coin_control.Select(COutPoint(inputs.prevout));</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             :     }</span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaUNC">           0 :     new_coin_control.m_allow_other_inputs = true;</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :             : </span>
+<span id="L317"><span class="lineNum">     317</span>                 :             :     // We cannot source new unconfirmed inputs(bip125 rule 2)</span>
+<span id="L318"><span class="lineNum">     318</span>                 :<span class="tlaUNC">           0 :     new_coin_control.m_min_depth = 1;</span></span>
+<span id="L319"><span class="lineNum">     319</span>                 :             : </span>
+<span id="L320"><span class="lineNum">     320</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     auto res = CreateTransaction(wallet, recipients, /*change_pos=*/std::nullopt, new_coin_control, false);</span></span>
+<span id="L321"><span class="lineNum">     321</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!res) {</span></span>
+<span id="L322"><span class="lineNum">     322</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;Unable to create transaction.&quot;) + Untranslated(&quot; &quot;) + util::ErrorString(res));</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 13 was not executed"> # </span>]
+<span id="L323"><span class="lineNum">     323</span>                 :<span class="tlaUNC">           0 :         return Result::WALLET_ERROR;</span></span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :     }</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             : </span>
+<span id="L326"><span class="lineNum">     326</span>                 :<span class="tlaUNC">           0 :     const auto&amp; txr = *res;</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :     // Write back new fee if successful</span>
+<span id="L328"><span class="lineNum">     328</span>                 :<span class="tlaUNC">           0 :     new_fee = txr.fee;</span></span>
+<span id="L329"><span class="lineNum">     329</span>                 :             : </span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     // Write back transaction</span>
+<span id="L331"><span class="lineNum">     331</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     mtx = CMutableTransaction(*txr.tx);</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :             : </span>
+<span id="L333"><span class="lineNum">     333</span>                 :<span class="tlaUNC">           0 :     return Result::OK;</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :             : </span>
+<span id="L336"><span class="lineNum">     336</span>                 :<span class="tlaUNC">           0 : bool SignTransaction(CWallet&amp; wallet, CMutableTransaction&amp; mtx) {</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaUNC">           0 :     LOCK(wallet.cs_wallet);</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :             : </span>
+<span id="L339"><span class="lineNum">     339</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (wallet.IsWalletFlagSet(WALLET_FLAG_EXTERNAL_SIGNER)) {</span></span>
+<span id="L340"><span class="lineNum">     340</span>                 :             :         // Make a blank psbt</span>
+<span id="L341"><span class="lineNum">     341</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         PartiallySignedTransaction psbtx(mtx);</span></span>
+<span id="L342"><span class="lineNum">     342</span>                 :             : </span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :         // First fill transaction with our data without signing,</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :         // so external signers are not asked to sign more than once.</span>
+<span id="L345"><span class="lineNum">     345</span>                 :<span class="tlaUNC">           0 :         bool complete;</span></span>
+<span id="L346"><span class="lineNum">     346</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         wallet.FillPSBT(psbtx, complete, SIGHASH_ALL, false /* sign */, true /* bip32derivs */);</span></span>
+<span id="L347"><span class="lineNum">     347</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         auto err{wallet.FillPSBT(psbtx, complete, SIGHASH_ALL, true /* sign */, false  /* bip32derivs */)};</span></span>
+<span id="L348"><span class="lineNum">     348</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (err) return false;</span></span>
+<span id="L349"><span class="lineNum">     349</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         complete = FinalizeAndExtractPSBT(psbtx, mtx);</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :<span class="tlaUNC">           0 :         return complete;</span></span>
+<span id="L351"><span class="lineNum">     351</span>                 :<span class="tlaUNC">           0 :     } else {</span></span>
+<span id="L352"><span class="lineNum">     352</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return wallet.SignTransaction(mtx);</span></span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :     }</span>
+<span id="L354"><span class="lineNum">     354</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L355"><span class="lineNum">     355</span>                 :             : </span>
+<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaUNC">           0 : Result CommitTransaction(CWallet&amp; wallet, const uint256&amp; txid, CMutableTransaction&amp;&amp; mtx, std::vector&lt;bilingual_str&gt;&amp; errors, uint256&amp; bumped_txid)</span></span>
+<span id="L357"><span class="lineNum">     357</span>                 :             : {</span>
+<span id="L358"><span class="lineNum">     358</span>                 :<span class="tlaUNC">           0 :     LOCK(wallet.cs_wallet);</span></span>
+<span id="L359"><span class="lineNum">     359</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!errors.empty()) {</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :         return Result::MISC_ERROR;</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :     }</span>
+<span id="L362"><span class="lineNum">     362</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     auto it = txid.IsNull() ? wallet.mapWallet.end() : wallet.mapWallet.find(txid);</span></span>
+<span id="L363"><span class="lineNum">     363</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (it == wallet.mapWallet.end()) {</span></span>
+<span id="L364"><span class="lineNum">     364</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;Invalid or non-wallet transaction id&quot;));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaUNC">           0 :         return Result::MISC_ERROR;</span></span>
+<span id="L366"><span class="lineNum">     366</span>                 :             :     }</span>
+<span id="L367"><span class="lineNum">     367</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     const CWalletTx&amp; oldWtx = it-&gt;second;</span></span>
+<span id="L368"><span class="lineNum">     368</span>                 :             : </span>
+<span id="L369"><span class="lineNum">     369</span>                 :             :     // make sure the transaction still has no descendants and hasn't been mined in the meantime</span>
+<span id="L370"><span class="lineNum">     370</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     Result result = PreconditionChecks(wallet, oldWtx, /* require_mine=*/ false, errors);</span></span>
+<span id="L371"><span class="lineNum">     371</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (result != Result::OK) {</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :             :         return result;</span>
+<span id="L373"><span class="lineNum">     373</span>                 :             :     }</span>
+<span id="L374"><span class="lineNum">     374</span>                 :             : </span>
+<span id="L375"><span class="lineNum">     375</span>                 :             :     // commit/broadcast the tx</span>
+<span id="L376"><span class="lineNum">     376</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     CTransactionRef tx = MakeTransactionRef(std::move(mtx));</span></span>
+<span id="L377"><span class="lineNum">     377</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     mapValue_t mapValue = oldWtx.mapValue;</span></span>
+<span id="L378"><span class="lineNum">     378</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     mapValue[&quot;replaces_txid&quot;] = oldWtx.GetHash().ToString();</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L379"><span class="lineNum">     379</span>                 :             : </span>
+<span id="L380"><span class="lineNum">     380</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     wallet.CommitTransaction(tx, std::move(mapValue), oldWtx.vOrderForm);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L381"><span class="lineNum">     381</span>                 :             : </span>
+<span id="L382"><span class="lineNum">     382</span>                 :             :     // mark the original tx as bumped</span>
+<span id="L383"><span class="lineNum">     383</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     bumped_txid = tx-&gt;GetHash();</span></span>
+<span id="L384"><span class="lineNum">     384</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!wallet.MarkReplaced(oldWtx.GetHash(), bumped_txid)) {</span></span>
+<span id="L385"><span class="lineNum">     385</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         errors.emplace_back(Untranslated(&quot;Created new bumpfee transaction but could not mark the original transaction as replaced&quot;));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L386"><span class="lineNum">     386</span>                 :             :     }</span>
+<span id="L387"><span class="lineNum">     387</span>                 :<span class="tlaUNC">           0 :     return Result::OK;</span></span>
+<span id="L388"><span class="lineNum">     388</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 : }</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :             : </span>
+<span id="L390"><span class="lineNum">     390</span>                 :             : } // namespace feebumper</span>
+<span id="L391"><span class="lineNum">     391</span>                 :             : } // namespace wallet</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
