@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/kernel/notifications_interface.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/kernel">src/kernel</a> - notifications_interface.h<span style="font-size: 80%;"> (source / <a href="notifications_interface.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">36.4&nbsp;%</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">4</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-05-16 17:57:15</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">30.0&nbsp;%</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : // Copyright (c) 2023 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>              : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>              : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>              : </span>
+<span id="L5"><span class="lineNum">       5</span>              : #ifndef BITCOIN_KERNEL_NOTIFICATIONS_INTERFACE_H</span>
+<span id="L6"><span class="lineNum">       6</span>              : #define BITCOIN_KERNEL_NOTIFICATIONS_INTERFACE_H</span>
+<span id="L7"><span class="lineNum">       7</span>              : </span>
+<span id="L8"><span class="lineNum">       8</span>              : #include &lt;cstdint&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>              : #include &lt;variant&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>              : </span>
+<span id="L11"><span class="lineNum">      11</span>              : class CBlockIndex;</span>
+<span id="L12"><span class="lineNum">      12</span>              : enum class SynchronizationState;</span>
+<span id="L13"><span class="lineNum">      13</span>              : struct bilingual_str;</span>
+<span id="L14"><span class="lineNum">      14</span>              : </span>
+<span id="L15"><span class="lineNum">      15</span>              : namespace kernel {</span>
+<span id="L16"><span class="lineNum">      16</span>              : </span>
+<span id="L17"><span class="lineNum">      17</span>              : //! Result type for use with std::variant to indicate that an operation should be interrupted.</span>
+<span id="L18"><span class="lineNum">      18</span>              : struct Interrupted{};</span>
+<span id="L19"><span class="lineNum">      19</span>              : enum class Warning;</span>
+<span id="L20"><span class="lineNum">      20</span>              : </span>
+<span id="L21"><span class="lineNum">      21</span>              : </span>
+<span id="L22"><span class="lineNum">      22</span>              : //! Simple result type for functions that need to propagate an interrupt status and don't have other return values.</span>
+<span id="L23"><span class="lineNum">      23</span>              : using InterruptResult = std::variant&lt;std::monostate, Interrupted&gt;;</span>
+<span id="L24"><span class="lineNum">      24</span>              : </span>
+<span id="L25"><span class="lineNum">      25</span>              : template &lt;typename T&gt;</span>
+<span id="L26"><span class="lineNum">      26</span> <span class="tlaGNC">       58649 : bool IsInterrupted(const T&amp; result)</span></span>
+<span id="L27"><span class="lineNum">      27</span>              : {</span>
+<span id="L28"><span class="lineNum">      28</span> <span class="tlaGNC">       58649 :     return std::holds_alternative&lt;kernel::Interrupted&gt;(result);</span></span>
+<span id="L29"><span class="lineNum">      29</span>              : }</span>
+<span id="L30"><span class="lineNum">      30</span>              : </span>
+<span id="L31"><span class="lineNum">      31</span>              : /**</span>
+<span id="L32"><span class="lineNum">      32</span>              :  * A base class defining functions for notifying about certain kernel</span>
+<span id="L33"><span class="lineNum">      33</span>              :  * events.</span>
+<span id="L34"><span class="lineNum">      34</span>              :  */</span>
+<span id="L35"><span class="lineNum">      35</span> <span class="tlaGNC">         842 : class Notifications</span></span>
+<span id="L36"><span class="lineNum">      36</span>              : {</span>
+<span id="L37"><span class="lineNum">      37</span>              : public:</span>
+<span id="L38"><span class="lineNum">      38</span> <span class="tlaGNC">         900 :     virtual ~Notifications() = default;</span></span>
+<span id="L39"><span class="lineNum">      39</span>              : </span>
+<span id="L40"><span class="lineNum">      40</span> <span class="tlaUNC">           0 :     [[nodiscard]] virtual InterruptResult blockTip(SynchronizationState state, CBlockIndex&amp; index) { return {}; }</span></span>
+<span id="L41"><span class="lineNum">      41</span> <span class="tlaUNC">           0 :     virtual void headerTip(SynchronizationState state, int64_t height, int64_t timestamp, bool presync) {}</span></span>
+<span id="L42"><span class="lineNum">      42</span> <span class="tlaUNC">           0 :     virtual void progress(const bilingual_str&amp; title, int progress_percent, bool resume_possible) {}</span></span>
+<span id="L43"><span class="lineNum">      43</span> <span class="tlaUNC">           0 :     virtual void warningSet(Warning id, const bilingual_str&amp; message) {}</span></span>
+<span id="L44"><span class="lineNum">      44</span> <span class="tlaUNC">           0 :     virtual void warningUnset(Warning id) {}</span></span>
+<span id="L45"><span class="lineNum">      45</span>              : </span>
+<span id="L46"><span class="lineNum">      46</span>              :     //! The flush error notification is sent to notify the user that an error</span>
+<span id="L47"><span class="lineNum">      47</span>              :     //! occurred while flushing block data to disk. Kernel code may ignore flush</span>
+<span id="L48"><span class="lineNum">      48</span>              :     //! errors that don't affect the immediate operation it is trying to</span>
+<span id="L49"><span class="lineNum">      49</span>              :     //! perform. Applications can choose to handle the flush error notification</span>
+<span id="L50"><span class="lineNum">      50</span>              :     //! by logging the error, or notifying the user, or triggering an early</span>
+<span id="L51"><span class="lineNum">      51</span>              :     //! shutdown as a precaution against causing more errors.</span>
+<span id="L52"><span class="lineNum">      52</span> <span class="tlaUNC">           0 :     virtual void flushError(const bilingual_str&amp; message) {}</span></span>
+<span id="L53"><span class="lineNum">      53</span>              : </span>
+<span id="L54"><span class="lineNum">      54</span>              :     //! The fatal error notification is sent to notify the user when an error</span>
+<span id="L55"><span class="lineNum">      55</span>              :     //! occurs in kernel code that can't be recovered from. After this</span>
+<span id="L56"><span class="lineNum">      56</span>              :     //! notification is sent, whatever function triggered the error should also</span>
+<span id="L57"><span class="lineNum">      57</span>              :     //! return an error code or raise an exception. Applications can choose to</span>
+<span id="L58"><span class="lineNum">      58</span>              :     //! handle the fatal error notification by logging the error, or notifying</span>
+<span id="L59"><span class="lineNum">      59</span>              :     //! the user, or triggering an early shutdown as a precaution against</span>
+<span id="L60"><span class="lineNum">      60</span>              :     //! causing more errors.</span>
+<span id="L61"><span class="lineNum">      61</span> <span class="tlaUNC">           0 :     virtual void fatalError(const bilingual_str&amp; message) {}</span></span>
+<span id="L62"><span class="lineNum">      62</span>              : };</span>
+<span id="L63"><span class="lineNum">      63</span>              : } // namespace kernel</span>
+<span id="L64"><span class="lineNum">      64</span>              : </span>
+<span id="L65"><span class="lineNum">      65</span>              : #endif // BITCOIN_KERNEL_NOTIFICATIONS_INTERFACE_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
