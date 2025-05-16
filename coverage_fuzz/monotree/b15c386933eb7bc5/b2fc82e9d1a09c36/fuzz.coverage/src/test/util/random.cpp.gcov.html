@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/util/random.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/util">src/test/util</a> - random.cpp<span style="font-size: 80%;"> (source / <a href="random.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">13</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-05-16 19:08:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">62.5&nbsp;%</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2023-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;test/util/random.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;logging.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;random.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;cstdlib&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;iostream&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : std::atomic&lt;bool&gt; g_seeded_g_prng_zero{false};</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : extern void MakeRandDeterministicDANGEROUS(const uint256&amp; seed) noexcept;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :<span class="tlaGNC">       59492 : void SeedRandomStateForTest(SeedRand seedtype)</span></span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : {</span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">       59492 :     constexpr auto RANDOM_CTX_SEED{&quot;RANDOM_CTX_SEED&quot;};</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     // Do this once, on the first call, regardless of seedtype, because once</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     // MakeRandDeterministicDANGEROUS is called, the output of GetRandHash is</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     // no longer truly random. It should be enough to get the seed once for the</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     // process.</span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">       59713 :     static const auto g_ctx_seed = []() -&gt; std::optional&lt;uint256&gt; {</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">         221 :         if (EnableFuzzDeterminism()) return {};</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :         // If RANDOM_CTX_SEED is set, use that as seed.</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :         if (const char* num{std::getenv(RANDOM_CTX_SEED)}) {</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :             if (auto num_parsed{uint256::FromUserHex(num)}) {</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :                 return *num_parsed;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :             } else {</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :                 std::cerr &lt;&lt; RANDOM_CTX_SEED &lt;&lt; &quot; must consist of up to &quot; &lt;&lt; uint256::size() * 2 &lt;&lt; &quot; hex digits (\&quot;0x\&quot; prefix allowed), it was set to: '&quot; &lt;&lt; num &lt;&lt; &quot;'.\n&quot;;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :                 std::abort();</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :             }</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :         }</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :         // Otherwise use a (truly) random value.</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :         return GetRandHash();</span>
+<span id="L40"><span class="lineNum">      40</span>   [<span class="tlaGBC" title="Branch 0 was taken 221 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 59271 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 221 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       59492 :     }();</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : </span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">       59492 :     g_seeded_g_prng_zero = seedtype == SeedRand::ZEROS;</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">       59492 :     if (EnableFuzzDeterminism()) {</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">       59492 :         Assert(g_seeded_g_prng_zero); // Only SeedRandomStateForTest(SeedRand::ZEROS) is allowed in fuzz tests</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">       59492 :         Assert(!g_used_g_prng);       // The global PRNG must not have been used before SeedRandomStateForTest(SeedRand::ZEROS)</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     }</span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 59492 times"> + </span>]:<span class="tlaGNC">       59492 :     const uint256&amp; seed{seedtype == SeedRand::FIXED_SEED ? g_ctx_seed.value() : uint256::ZERO};</span></span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaGBC" title="Branch 0 was taken 59492 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       59492 :     LogInfo(&quot;Setting random seed for current tests to %s=%s\n&quot;, RANDOM_CTX_SEED, seed.GetHex());</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">       59492 :     MakeRandDeterministicDANGEROUS(seed);</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">       59492 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
