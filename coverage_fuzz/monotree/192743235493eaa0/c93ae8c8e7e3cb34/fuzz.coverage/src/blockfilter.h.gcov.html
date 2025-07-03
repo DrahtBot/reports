@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/blockfilter.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - blockfilter.h<span style="font-size: 80%;"> (source / <a href="blockfilter.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">96.3&nbsp;%</td>
+            <td class="headerCovTableEntry">27</td>
+            <td class="headerCovTableEntry">26</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-07-03 06:26:38</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryMed">75.0&nbsp;%</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">57.7&nbsp;%</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntry">15</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2018-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_BLOCKFILTER_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_BLOCKFILTER_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;cstddef&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;ios&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;set&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;string&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;unordered_set&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;attributes.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;util/bytevectorhash.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : class CBlock;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : class CBlockUndo;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : /**</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :  * This implements a Golomb-coded set as defined in BIP 158. It is a</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :  * compact, probabilistic data structure for testing set membership.</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :  */</span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">         529 : class GCSFilter</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : {</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : public:</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     typedef std::vector&lt;unsigned char&gt; Element;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     typedef std::unordered_set&lt;Element, ByteVectorHash&gt; ElementSet;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     struct Params</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     {</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :         uint64_t m_siphash_k0;</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :         uint64_t m_siphash_k1;</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :         uint8_t m_P;  //!&lt; Golomb-Rice coding parameter</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :         uint32_t m_M;  //!&lt; Inverse false positive rate</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">         961 :         Params(uint64_t siphash_k0 = 0, uint64_t siphash_k1 = 0, uint8_t P = 0, uint32_t M = 1)</span></span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaGNC">         495 :             : m_siphash_k0(siphash_k0), m_siphash_k1(siphash_k1), m_P(P), m_M(M)</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :         {}</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     };</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : </span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : private:</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     Params m_params;</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     uint32_t m_N;  //!&lt; Number of elements in the filter</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     uint64_t m_F;  //!&lt; Range of element hashes, F = N * M</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     std::vector&lt;unsigned char&gt; m_encoded;</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     /** Hash a data element to an integer in the range [0, N * M). */</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     uint64_t HashToRange(const Element&amp; element) const;</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     std::vector&lt;uint64_t&gt; BuildHashedSet(const ElementSet&amp; elements) const;</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : </span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     /** Helper method used to implement Match and MatchAny */</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     bool MatchInternal(const uint64_t* sorted_element_hashes, size_t size) const;</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : </span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : public:</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     /** Constructs an empty filter. */</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     explicit GCSFilter(const Params&amp; params = Params());</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     /** Reconstructs an already-created filter from an encoding. */</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     GCSFilter(const Params&amp; params, std::vector&lt;unsigned char&gt; encoded_filter, bool skip_decode_check);</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : </span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     /** Builds a new filter from the params and set of elements. */</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     GCSFilter(const Params&amp; params, const ElementSet&amp; elements);</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : </span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     uint32_t GetN() const { return m_N; }</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     const Params&amp; GetParams() const LIFETIMEBOUND { return m_params; }</span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">         794 :     const std::vector&lt;unsigned char&gt;&amp; GetEncoded() const LIFETIMEBOUND { return m_encoded; }</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : </span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     /**</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :      * Checks if the element may be in the set. False positives are possible</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :      * with probability 1/M.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :      */</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :     bool Match(const Element&amp; element) const;</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : </span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     /**</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :      * Checks if any of the given elements may be in the set. False positives</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :      * are possible with probability 1/M per element checked. This is more</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :      * efficient that checking Match on multiple elements separately.</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :      */</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     bool MatchAny(const ElementSet&amp; elements) const;</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : };</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : constexpr uint8_t BASIC_FILTER_P = 19;</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : constexpr uint32_t BASIC_FILTER_M = 784931;</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : enum class BlockFilterType : uint8_t</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : {</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     BASIC = 0,</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     INVALID = 255,</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : };</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : /** Get the human-readable name for a filter type. Returns empty string for unknown types. */</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             : const std::string&amp; BlockFilterTypeName(BlockFilterType filter_type);</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : /** Find a filter type by its human-readable name. */</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : bool BlockFilterTypeByName(const std::string&amp; name, BlockFilterType&amp; filter_type);</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : /** Get a list of known filter types. */</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : const std::set&lt;BlockFilterType&gt;&amp; AllBlockFilterTypes();</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : </span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : /** Get a comma-separated list of known filter type names. */</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : const std::string&amp; ListBlockFilterTypes();</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             : </span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : /**</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :  * Complete block filter struct as defined in BIP 157. Serialization matches</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :  * payload of &quot;cfilter&quot; messages.</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :  */</span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">         874 : class BlockFilter</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : {</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             : private:</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     BlockFilterType m_filter_type = BlockFilterType::INVALID;</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     uint256 m_block_hash;</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :     GCSFilter m_filter;</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : </span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :     bool BuildParams(GCSFilter::Params&amp; params) const;</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             : </span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : public:</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             : </span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">         495 :     BlockFilter() = default;</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : </span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     //! Reconstruct a BlockFilter from parts.</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :     BlockFilter(BlockFilterType filter_type, const uint256&amp; block_hash,</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :                 std::vector&lt;unsigned char&gt; filter, bool skip_decode_check);</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : </span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :     //! Construct a new BlockFilter of the specified type from a block.</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     BlockFilter(BlockFilterType filter_type, const CBlock&amp; block, const CBlockUndo&amp; block_undo);</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : </span>
+<span id="L134"><span class="lineNum">     134</span>         [<span class="tlaGBC" title="Branch 0 was taken 379 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         379 :     BlockFilterType GetFilterType() const { return m_filter_type; }</span></span>
+<span id="L135"><span class="lineNum">     135</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     const uint256&amp; GetBlockHash() const LIFETIMEBOUND { return m_block_hash; }</span></span>
+<span id="L136"><span class="lineNum">     136</span>         [<span class="tlaGBC" title="Branch 0 was taken 379 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         379 :     const GCSFilter&amp; GetFilter() const LIFETIMEBOUND { return m_filter; }</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">         758 :     const std::vector&lt;unsigned char&gt;&amp; GetEncodedFilter() const LIFETIMEBOUND</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     {</span>
+<span id="L140"><span class="lineNum">     140</span>         [<span class="tlaGBC" title="Branch 0 was taken 379 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1137 :         return m_filter.GetEncoded();</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     }</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : </span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     //! Compute the filter hash.</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :     uint256 GetHash() const;</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : </span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :     //! Compute the filter header given the previous one.</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :     uint256 ComputeHeader(const uint256&amp; prev_header) const;</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaGNC">          36 :     void Serialize(Stream&amp; s) const {</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">          36 :         s &lt;&lt; static_cast&lt;uint8_t&gt;(m_filter_type)</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">          36 :           &lt;&lt; m_block_hash</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaGNC">          36 :           &lt;&lt; m_filter.GetEncoded();</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">          36 :     }</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">         495 :     void Unserialize(Stream&amp; s) {</span></span>
+<span id="L158"><span class="lineNum">     158</span>         [<span class="tlaGBC" title="Branch 0 was taken 494 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">         495 :         std::vector&lt;unsigned char&gt; encoded_filter;</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :         uint8_t filter_type;</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             : </span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">         494 :         s &gt;&gt; filter_type</span></span>
+<span id="L162"><span class="lineNum">     162</span>   [<span class="tlaGBC" title="Branch 0 was taken 485 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 466 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 19 times"> + </span>]:<span class="tlaGNC">         494 :           &gt;&gt; m_block_hash</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">         466 :           &gt;&gt; encoded_filter;</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : </span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaGNC">         466 :         m_filter_type = static_cast&lt;BlockFilterType&gt;(filter_type);</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             : </span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">         466 :         GCSFilter::Params params;</span></span>
+<span id="L168"><span class="lineNum">     168</span>   [<span class="tlaGBC" title="Branch 0 was taken 466 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 463 times"> + </span>]:<span class="tlaGNC">         466 :         if (!BuildParams(params)) {</span></span>
+<span id="L169"><span class="lineNum">     169</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           3 :             throw std::ios_base::failure(&quot;unknown filter_type&quot;);</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :         }</span>
+<span id="L171"><span class="lineNum">     171</span>         [<span class="tlaGBC" title="Branch 0 was taken 415 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 48 times"> + </span>]:<span class="tlaGNC">         511 :         m_filter = GCSFilter(params, std::move(encoded_filter), /*skip_decode_check=*/false);</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">         415 :     }</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : };</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             : </span>
+<span id="L175"><span class="lineNum">     175</span>                 :             : #endif // BITCOIN_BLOCKFILTER_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/buffered_file.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - buffered_file.cpp<span style="font-size: 80%;"> (source / <a href="buffered_file.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntry">41</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-07-03 06:26:38</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">76.3&nbsp;%</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntry">29</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;streams.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;array&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;cstddef&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;iostream&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>         [<span class="tlaGBC" title="Branch 0 was taken 223 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         710 : FUZZ_TARGET(buffered_file)</span></span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : {</span>
+<span id="L20"><span class="lineNum">      20</span>         [<span class="tlaGBC" title="Branch 0 was taken 264 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         264 :     FuzzedDataProvider fuzzed_data_provider{buffer.data(), buffer.size()};</span></span>
+<span id="L21"><span class="lineNum">      21</span>         [<span class="tlaGBC" title="Branch 0 was taken 264 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         264 :     FuzzedFileProvider fuzzed_file_provider{fuzzed_data_provider};</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">         264 :     std::optional&lt;BufferedFile&gt; opt_buffered_file;</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">         264 :     AutoFile fuzzed_file{</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :         fuzzed_file_provider.open(),</span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">         264 :         ConsumeRandomLengthByteVector&lt;std::byte&gt;(fuzzed_data_provider),</span></span>
+<span id="L26"><span class="lineNum">      26</span>   [<span class="tlaGBC" title="Branch 0 was taken 264 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 264 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         264 :     };</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">         264 :     try {</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">         264 :         auto n_buf_size = fuzzed_data_provider.ConsumeIntegralInRange&lt;uint64_t&gt;(0, 4096);</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         264 :         auto n_rewind_in = fuzzed_data_provider.ConsumeIntegralInRange&lt;uint64_t&gt;(0, 4096);</span></span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="Branch 0 was taken 243 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span>]:<span class="tlaGNC">         264 :         opt_buffered_file.emplace(fuzzed_file, n_buf_size, n_rewind_in);</span></span>
+<span id="L31"><span class="lineNum">      31</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span>]:<span class="tlaGNC">          21 :     } catch (const std::ios_base::failure&amp;) {</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">          21 :     }</span></span>
+<span id="L33"><span class="lineNum">      33</span>   [<span class="tlaGBC" title="Branch 0 was taken 243 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 240 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3 times"> + </span>]:<span class="tlaGNC">         264 :     if (opt_buffered_file &amp;&amp; !fuzzed_file.IsNull()) {</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">         240 :         bool setpos_fail = false;</span></span>
+<span id="L35"><span class="lineNum">      35</span>   [<span class="tlaGBC" title="Branch 0 was taken 7727 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 214 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 7701 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 26 times"> + </span>]:<span class="tlaGNC">        7941 :         LIMITED_WHILE(fuzzed_data_provider.ConsumeBool(), 100)</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :         {</span>
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaGBC" title="Branch 0 was taken 7701 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        7701 :             CallOneOf(</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :                 fuzzed_data_provider,</span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">         775 :                 [&amp;] {</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">         775 :                     std::array&lt;std::byte, 4096&gt; arr{};</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">         775 :                     try {</span></span>
+<span id="L42"><span class="lineNum">      42</span>         [<span class="tlaGBC" title="Branch 0 was taken 311 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 464 times"> + </span>]:<span class="tlaGNC">         775 :                         opt_buffered_file-&gt;read({arr.data(), fuzzed_data_provider.ConsumeIntegralInRange&lt;size_t&gt;(0, 4096)});</span></span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 464 times"> + </span>]:<span class="tlaGNC">         464 :                     } catch (const std::ios_base::failure&amp;) {</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">         464 :                     }</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">         775 :                 },</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">         847 :                 [&amp;] {</span></span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 412 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 435 times"> + </span>]:<span class="tlaGNC">         847 :                     opt_buffered_file-&gt;SetLimit(fuzzed_data_provider.ConsumeIntegralInRange&lt;uint64_t&gt;(0, 4096));</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">         847 :                 },</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">        1011 :                 [&amp;] {</span></span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaGBC" title="Branch 0 was taken 334 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 677 times"> + </span>]:<span class="tlaGNC">        1688 :                     if (!opt_buffered_file-&gt;SetPos(fuzzed_data_provider.ConsumeIntegralInRange&lt;uint64_t&gt;(0, 4096))) {</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">         568 :                         setpos_fail = true;</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :                     }</span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">        1011 :                 },</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">        1833 :                 [&amp;] {</span></span>
+<span id="L55"><span class="lineNum">      55</span>         [<span class="tlaGBC" title="Branch 0 was taken 1585 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 248 times"> + </span>]:<span class="tlaGNC">        1833 :                     if (setpos_fail) {</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :                         // Calling FindByte(...) after a failed SetPos(...) call may result in an infinite loop.</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :                         return;</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :                     }</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">        1585 :                     try {</span></span>
+<span id="L60"><span class="lineNum">      60</span>         [<span class="tlaGBC" title="Branch 0 was taken 1169 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 416 times"> + </span>]:<span class="tlaGNC">        1585 :                         opt_buffered_file-&gt;FindByte(std::byte(fuzzed_data_provider.ConsumeIntegral&lt;uint8_t&gt;()));</span></span>
+<span id="L61"><span class="lineNum">      61</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 416 times"> + </span>]:<span class="tlaGNC">         416 :                     } catch (const std::ios_base::failure&amp;) {</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">         416 :                     }</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :                 },</span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">        3235 :                 [&amp;] {</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">        3235 :                     ReadFromStream(fuzzed_data_provider, *opt_buffered_file);</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">        3235 :                 });</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :         }</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :         opt_buffered_file-&gt;GetPos();</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     }</span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">         264 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
