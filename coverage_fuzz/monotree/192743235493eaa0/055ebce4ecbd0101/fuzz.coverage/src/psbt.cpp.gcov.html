@@ -1,0 +1,722 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/psbt.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - psbt.cpp<span style="font-size: 80%;"> (source / <a href="psbt.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">94.9&nbsp;%</td>
+            <td class="headerCovTableEntry">334</td>
+            <td class="headerCovTableEntry">317</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-07-03 08:46:02</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntry">28</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">77.9&nbsp;%</td>
+            <td class="headerCovTableEntry">502</td>
+            <td class="headerCovTableEntry">391</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;psbt.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;common/types.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;node/types.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;script/signingprovider.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/strencodings.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : using common::PSBTError;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>         [<span class="tlaGBC" title="Branch 0 was taken 3547 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3547 : PartiallySignedTransaction::PartiallySignedTransaction(const CMutableTransaction&amp; tx) : tx(tx)</span></span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : {</span>
+<span id="L18"><span class="lineNum">      18</span>         [<span class="tlaGBC" title="Branch 0 was taken 3547 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3547 :     inputs.resize(tx.vin.size());</span></span>
+<span id="L19"><span class="lineNum">      19</span>         [<span class="tlaGBC" title="Branch 0 was taken 3547 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3547 :     outputs.resize(tx.vout.size());</span></span>
+<span id="L20"><span class="lineNum">      20</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3547 : }</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">        2938 : bool PartiallySignedTransaction::IsNull() const</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : {</span>
+<span id="L24"><span class="lineNum">      24</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2938 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        2938 :     return !tx &amp;&amp; inputs.empty() &amp;&amp; outputs.empty() &amp;&amp; unknown.empty();</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L25"><span class="lineNum">      25</span>                 :             : }</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">        9047 : bool PartiallySignedTransaction::Merge(const PartiallySignedTransaction&amp; psbt)</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : {</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     // Prohibited to merge two PSBTs over different transactions</span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="Branch 0 was taken 8700 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 347 times"> + </span>]:<span class="tlaGNC">        9047 :     if (tx-&gt;GetHash() != psbt.tx-&gt;GetHash()) {</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :         return false;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     }</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>         [<span class="tlaGBC" title="Branch 0 was taken 14371 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 8700 times"> + </span>]:<span class="tlaGNC">       23071 :     for (unsigned int i = 0; i &lt; inputs.size(); ++i) {</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">       14371 :         inputs[i].Merge(psbt.inputs[i]);</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     }</span>
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaGBC" title="Branch 0 was taken 21414 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 8700 times"> + </span>]:<span class="tlaGNC">       30114 :     for (unsigned int i = 0; i &lt; outputs.size(); ++i) {</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">       21414 :         outputs[i].Merge(psbt.outputs[i]);</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     }</span>
+<span id="L40"><span class="lineNum">      40</span>         [<span class="tlaGBC" title="Branch 0 was taken 3867 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 8700 times"> + </span>]:<span class="tlaGNC">       12567 :     for (auto&amp; xpub_pair : psbt.m_xpubs) {</span></span>
+<span id="L41"><span class="lineNum">      41</span>         [<span class="tlaGBC" title="Branch 0 was taken 574 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3293 times"> + </span>]:<span class="tlaGNC">        3867 :         if (m_xpubs.count(xpub_pair.first) == 0) {</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">         574 :             m_xpubs[xpub_pair.first] = xpub_pair.second;</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :         } else {</span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">        3293 :             m_xpubs[xpub_pair.first].insert(xpub_pair.second.begin(), xpub_pair.second.end());</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :         }</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     }</span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">        8700 :     unknown.insert(psbt.unknown.begin(), psbt.unknown.end());</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">        8700 :     return true;</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : }</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">        6260 : bool PartiallySignedTransaction::AddInput(const CTxIn&amp; txin, PSBTInput&amp; psbtin)</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : {</span>
+<span id="L54"><span class="lineNum">      54</span>         [<span class="tlaGBC" title="Branch 0 was taken 1500 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4760 times"> + </span>]:<span class="tlaGNC">        6260 :     if (std::find(tx-&gt;vin.begin(), tx-&gt;vin.end(), txin) != tx-&gt;vin.end()) {</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :         return false;</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :     }</span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">        1500 :     tx-&gt;vin.push_back(txin);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">        1500 :     psbtin.partial_sigs.clear();</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">        1500 :     psbtin.final_script_sig.clear();</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">        1500 :     psbtin.final_script_witness.SetNull();</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">        1500 :     inputs.push_back(psbtin);</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">        1500 :     return true;</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : }</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">       29821 : bool PartiallySignedTransaction::AddOutput(const CTxOut&amp; txout, const PSBTOutput&amp; psbtout)</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : {</span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">       29821 :     tx-&gt;vout.push_back(txout);</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">       29821 :     outputs.push_back(psbtout);</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">       29821 :     return true;</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : }</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : </span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">       32196 : bool PartiallySignedTransaction::GetInputUTXO(CTxOut&amp; utxo, int input_index) const</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : {</span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaGBC" title="Branch 0 was taken 519 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 31677 times"> + </span>]:<span class="tlaGNC">       32196 :     const PSBTInput&amp; input = inputs[input_index];</span></span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaGBC" title="Branch 0 was taken 519 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 31677 times"> + </span>]:<span class="tlaGNC">       32196 :     uint32_t prevout_index = tx-&gt;vin[input_index].prevout.n;</span></span>
+<span id="L76"><span class="lineNum">      76</span>         [<span class="tlaGBC" title="Branch 0 was taken 519 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 31677 times"> + </span>]:<span class="tlaGNC">       32196 :     if (input.non_witness_utxo) {</span></span>
+<span id="L77"><span class="lineNum">      77</span>         [<span class="tlaGBC" title="Branch 0 was taken 519 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         519 :         if (prevout_index &gt;= input.non_witness_utxo-&gt;vout.size()) {</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :             return false;</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :         }</span>
+<span id="L80"><span class="lineNum">      80</span>         [<span class="tlaGBC" title="Branch 0 was taken 519 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         519 :         if (input.non_witness_utxo-&gt;GetHash() != tx-&gt;vin[input_index].prevout.hash) {</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :             return false;</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :         }</span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">         519 :         utxo = input.non_witness_utxo-&gt;vout[prevout_index];</span></span>
+<span id="L84"><span class="lineNum">      84</span>         [<span class="tlaGBC" title="Branch 0 was taken 18954 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 12723 times"> + </span>]:<span class="tlaGNC">       31677 :     } else if (!input.witness_utxo.IsNull()) {</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">       18954 :         utxo = input.witness_utxo;</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     } else {</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :         return false;</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     }</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     return true;</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : }</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">        4775 : bool PSBTInput::IsNull() const</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : {</span>
+<span id="L94"><span class="lineNum">      94</span>   [<span class="tlaGBC" title="Branch 0 was taken 4679 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 96 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1746 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2933 times"> + </span> :<span class="tlaGNC">        4795 :     return !non_witness_utxo &amp;&amp; witness_utxo.IsNull() &amp;&amp; partial_sigs.empty() &amp;&amp; unknown.empty() &amp;&amp; hd_keypaths.empty() &amp;&amp; redeem_script.empty() &amp;&amp; witness_script.empty();</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1746 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1269 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 477 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 1253 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 9 was taken 16 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 1247 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 1244 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 9 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 14 was taken 14 times"> + </span><span class="tlaGBC" title="Branch 15 was taken 1230 times"> + </span><span class="tlaGBC" title="Branch 16 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 17 was taken 1225 times"> + </span>]
+<span id="L95"><span class="lineNum">      95</span>                 :             : }</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :<span class="tlaGNC">       19329 : void PSBTInput::FillSignatureData(SignatureData&amp; sigdata) const</span></span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : {</span>
+<span id="L99"><span class="lineNum">      99</span>   [<span class="tlaGBC" title="Branch 0 was taken 5062 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 14267 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 5535 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13794 times"> + </span>]:<span class="tlaGNC">       24391 :     if (!final_script_sig.empty()) {</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">        5535 :         sigdata.scriptSig = final_script_sig;</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">        5535 :         sigdata.complete = true;</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :     }</span>
+<span id="L103"><span class="lineNum">     103</span>         [<span class="tlaGBC" title="Branch 0 was taken 329 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 19000 times"> + </span>]:<span class="tlaGNC">       19329 :     if (!final_script_witness.IsNull()) {</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">         329 :         sigdata.scriptWitness = final_script_witness;</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">         329 :         sigdata.complete = true;</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     }</span>
+<span id="L107"><span class="lineNum">     107</span>         [<span class="tlaGBC" title="Branch 0 was taken 13470 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5859 times"> + </span>]:<span class="tlaGNC">       19329 :     if (sigdata.complete) {</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :         return;</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     }</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : </span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">       13470 :     sigdata.signatures.insert(partial_sigs.begin(), partial_sigs.end());</span></span>
+<span id="L112"><span class="lineNum">     112</span>   [<span class="tlaGBC" title="Branch 0 was taken 232 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13238 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 349 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13121 times"> + </span>]:<span class="tlaGNC">       13702 :     if (!redeem_script.empty()) {</span></span>
+<span id="L113"><span class="lineNum">     113</span>                 :<span class="tlaGNC">         349 :         sigdata.redeem_script = redeem_script;</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     }</span>
+<span id="L115"><span class="lineNum">     115</span>   [<span class="tlaGBC" title="Branch 0 was taken 288 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13182 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 723 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 12747 times"> + </span>]:<span class="tlaGNC">       13758 :     if (!witness_script.empty()) {</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">         723 :         sigdata.witness_script = witness_script;</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     }</span>
+<span id="L118"><span class="lineNum">     118</span>         [<span class="tlaGBC" title="Branch 0 was taken 2271 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13470 times"> + </span>]:<span class="tlaGNC">       15741 :     for (const auto&amp; key_pair : hd_keypaths) {</span></span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">        2271 :         sigdata.misc_pubkeys.emplace(key_pair.first.GetID(), key_pair);</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     }</span>
+<span id="L121"><span class="lineNum">     121</span>         [<span class="tlaGBC" title="Branch 0 was taken 143 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13327 times"> + </span>]:<span class="tlaGNC">       13470 :     if (!m_tap_key_sig.empty()) {</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">         143 :         sigdata.taproot_key_path_sig = m_tap_key_sig;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :     }</span>
+<span id="L124"><span class="lineNum">     124</span>         [<span class="tlaGBC" title="Branch 0 was taken 2565 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13470 times"> + </span>]:<span class="tlaGNC">       16035 :     for (const auto&amp; [pubkey_leaf, sig] : m_tap_script_sigs) {</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">        2565 :         sigdata.taproot_script_sigs.emplace(pubkey_leaf, sig);</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     }</span>
+<span id="L127"><span class="lineNum">     127</span>         [<span class="tlaGBC" title="Branch 0 was taken 137 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13333 times"> + </span>]:<span class="tlaGNC">       13470 :     if (!m_tap_internal_key.IsNull()) {</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">         137 :         sigdata.tr_spenddata.internal_key = m_tap_internal_key;</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :     }</span>
+<span id="L130"><span class="lineNum">     130</span>         [<span class="tlaGBC" title="Branch 0 was taken 227 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13243 times"> + </span>]:<span class="tlaGNC">       13470 :     if (!m_tap_merkle_root.IsNull()) {</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">         227 :         sigdata.tr_spenddata.merkle_root = m_tap_merkle_root;</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     }</span>
+<span id="L133"><span class="lineNum">     133</span>         [<span class="tlaGBC" title="Branch 0 was taken 3617 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13470 times"> + </span>]:<span class="tlaGNC">       17087 :     for (const auto&amp; [leaf_script, control_block] : m_tap_scripts) {</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">        3617 :         sigdata.tr_spenddata.scripts.emplace(leaf_script, control_block);</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :     }</span>
+<span id="L136"><span class="lineNum">     136</span>         [<span class="tlaGBC" title="Branch 0 was taken 1488 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13470 times"> + </span>]:<span class="tlaGNC">       14958 :     for (const auto&amp; [pubkey, leaf_origin] : m_tap_bip32_paths) {</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaGNC">        1488 :         sigdata.taproot_misc_pubkeys.emplace(pubkey, leaf_origin);</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">        1488 :         sigdata.tap_pubkeys.emplace(Hash160(pubkey), pubkey);</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     }</span>
+<span id="L140"><span class="lineNum">     140</span>         [<span class="tlaGBC" title="Branch 0 was taken 707 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13470 times"> + </span>]:<span class="tlaGNC">       14177 :     for (const auto&amp; [hash, preimage] : ripemd160_preimages) {</span></span>
+<span id="L141"><span class="lineNum">     141</span>         [<span class="tlaGBC" title="Branch 0 was taken 707 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1414 :         sigdata.ripemd160_preimages.emplace(std::vector&lt;unsigned char&gt;(hash.begin(), hash.end()), preimage);</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     }</span>
+<span id="L143"><span class="lineNum">     143</span>         [<span class="tlaGBC" title="Branch 0 was taken 3104 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13470 times"> + </span>]:<span class="tlaGNC">       16574 :     for (const auto&amp; [hash, preimage] : sha256_preimages) {</span></span>
+<span id="L144"><span class="lineNum">     144</span>         [<span class="tlaGBC" title="Branch 0 was taken 3104 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6208 :         sigdata.sha256_preimages.emplace(std::vector&lt;unsigned char&gt;(hash.begin(), hash.end()), preimage);</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     }</span>
+<span id="L146"><span class="lineNum">     146</span>         [<span class="tlaGBC" title="Branch 0 was taken 2553 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13470 times"> + </span>]:<span class="tlaGNC">       16023 :     for (const auto&amp; [hash, preimage] : hash160_preimages) {</span></span>
+<span id="L147"><span class="lineNum">     147</span>         [<span class="tlaGBC" title="Branch 0 was taken 2553 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        5106 :         sigdata.hash160_preimages.emplace(std::vector&lt;unsigned char&gt;(hash.begin(), hash.end()), preimage);</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     }</span>
+<span id="L149"><span class="lineNum">     149</span>         [<span class="tlaGBC" title="Branch 0 was taken 1746 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13470 times"> + </span>]:<span class="tlaGNC">       15216 :     for (const auto&amp; [hash, preimage] : hash256_preimages) {</span></span>
+<span id="L150"><span class="lineNum">     150</span>         [<span class="tlaGBC" title="Branch 0 was taken 1746 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3492 :         sigdata.hash256_preimages.emplace(std::vector&lt;unsigned char&gt;(hash.begin(), hash.end()), preimage);</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :     }</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : }</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">        2281 : void PSBTInput::FromSignatureData(const SignatureData&amp; sigdata)</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : {</span>
+<span id="L156"><span class="lineNum">     156</span>         [<span class="tlaGBC" title="Branch 0 was taken 368 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1913 times"> + </span>]:<span class="tlaGNC">        2281 :     if (sigdata.complete) {</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">         368 :         partial_sigs.clear();</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">         368 :         hd_keypaths.clear();</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaGNC">         368 :         redeem_script.clear();</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">         368 :         witness_script.clear();</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :             : </span>
+<span id="L162"><span class="lineNum">     162</span>   [<span class="tlaGBC" title="Branch 0 was taken 68 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 300 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 110 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 258 times"> + </span>]:<span class="tlaGNC">         436 :         if (!sigdata.scriptSig.empty()) {</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">         110 :             final_script_sig = sigdata.scriptSig;</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :         }</span>
+<span id="L165"><span class="lineNum">     165</span>         [<span class="tlaGBC" title="Branch 0 was taken 265 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 103 times"> + </span>]:<span class="tlaGNC">         368 :         if (!sigdata.scriptWitness.IsNull()) {</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">         265 :             final_script_witness = sigdata.scriptWitness;</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :         }</span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">         368 :         return;</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :     }</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             : </span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaGNC">        1913 :     partial_sigs.insert(sigdata.signatures.begin(), sigdata.signatures.end());</span></span>
+<span id="L172"><span class="lineNum">     172</span>   [<span class="tlaGBC" title="Branch 0 was taken 84 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1829 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1821 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 92 times"> + </span> :<span class="tlaGNC">        1999 :     if (redeem_script.empty() &amp;&amp; !sigdata.redeem_script.empty()) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1819 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 1819 times"> + </span>]
+<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaGNC">           2 :         redeem_script = sigdata.redeem_script;</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     }</span>
+<span id="L175"><span class="lineNum">     175</span>   [<span class="tlaGBC" title="Branch 0 was taken 47 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1866 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1662 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 251 times"> + </span> :<span class="tlaGNC">        1960 :     if (witness_script.empty() &amp;&amp; !sigdata.witness_script.empty()) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 1662 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 1659 times"> + </span>]
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">           3 :         witness_script = sigdata.witness_script;</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     }</span>
+<span id="L178"><span class="lineNum">     178</span>         [<span class="tlaGBC" title="Branch 0 was taken 1455 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1913 times"> + </span>]:<span class="tlaGNC">        3368 :     for (const auto&amp; entry : sigdata.misc_pubkeys) {</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaGNC">        1455 :         hd_keypaths.emplace(entry.second);</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     }</span>
+<span id="L181"><span class="lineNum">     181</span>         [<span class="tlaGBC" title="Branch 0 was taken 22 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1891 times"> + </span>]:<span class="tlaGNC">        1913 :     if (!sigdata.taproot_key_path_sig.empty()) {</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaGNC">          22 :         m_tap_key_sig = sigdata.taproot_key_path_sig;</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     }</span>
+<span id="L184"><span class="lineNum">     184</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1913 times"> + </span>]:<span class="tlaGNC">        1913 :     for (const auto&amp; [pubkey_leaf, sig] : sigdata.taproot_script_sigs) {</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaUNC">           0 :         m_tap_script_sigs.emplace(pubkey_leaf, sig);</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     }</span>
+<span id="L187"><span class="lineNum">     187</span>         [<span class="tlaGBC" title="Branch 0 was taken 15 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1898 times"> + </span>]:<span class="tlaGNC">        1913 :     if (!sigdata.tr_spenddata.internal_key.IsNull()) {</span></span>
+<span id="L188"><span class="lineNum">     188</span>                 :<span class="tlaGNC">          15 :         m_tap_internal_key = sigdata.tr_spenddata.internal_key;</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :     }</span>
+<span id="L190"><span class="lineNum">     190</span>         [<span class="tlaGBC" title="Branch 0 was taken 95 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1818 times"> + </span>]:<span class="tlaGNC">        1913 :     if (!sigdata.tr_spenddata.merkle_root.IsNull()) {</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC">          95 :         m_tap_merkle_root = sigdata.tr_spenddata.merkle_root;</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     }</span>
+<span id="L193"><span class="lineNum">     193</span>         [<span class="tlaGBC" title="Branch 0 was taken 1030 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1913 times"> + </span>]:<span class="tlaGNC">        2943 :     for (const auto&amp; [leaf_script, control_block] : sigdata.tr_spenddata.scripts) {</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">        1030 :         m_tap_scripts.emplace(leaf_script, control_block);</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :     }</span>
+<span id="L196"><span class="lineNum">     196</span>         [<span class="tlaGBC" title="Branch 0 was taken 281 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1913 times"> + </span>]:<span class="tlaGNC">        2194 :     for (const auto&amp; [pubkey, leaf_origin] : sigdata.taproot_misc_pubkeys) {</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :<span class="tlaGNC">         281 :         m_tap_bip32_paths.emplace(pubkey, leaf_origin);</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     }</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : }</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             : </span>
+<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">       14371 : void PSBTInput::Merge(const PSBTInput&amp; input)</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : {</span>
+<span id="L203"><span class="lineNum">     203</span>   [<span class="tlaGBC" title="Branch 0 was taken 14181 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 190 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 14181 times"> + </span>]:<span class="tlaGNC">       14371 :     if (!non_witness_utxo &amp;&amp; input.non_witness_utxo) non_witness_utxo = input.non_witness_utxo;</span></span>
+<span id="L204"><span class="lineNum">     204</span>   [<span class="tlaGBC" title="Branch 0 was taken 8126 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6245 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 50 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 8076 times"> + </span>]:<span class="tlaGNC">       14371 :     if (witness_utxo.IsNull() &amp;&amp; !input.witness_utxo.IsNull()) {</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">          50 :         witness_utxo = input.witness_utxo;</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :     }</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : </span>
+<span id="L208"><span class="lineNum">     208</span>                 :<span class="tlaGNC">       14371 :     partial_sigs.insert(input.partial_sigs.begin(), input.partial_sigs.end());</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">       14371 :     ripemd160_preimages.insert(input.ripemd160_preimages.begin(), input.ripemd160_preimages.end());</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :<span class="tlaGNC">       14371 :     sha256_preimages.insert(input.sha256_preimages.begin(), input.sha256_preimages.end());</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">       14371 :     hash160_preimages.insert(input.hash160_preimages.begin(), input.hash160_preimages.end());</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">       14371 :     hash256_preimages.insert(input.hash256_preimages.begin(), input.hash256_preimages.end());</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">       14371 :     hd_keypaths.insert(input.hd_keypaths.begin(), input.hd_keypaths.end());</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">       14371 :     unknown.insert(input.unknown.begin(), input.unknown.end());</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :<span class="tlaGNC">       14371 :     m_tap_script_sigs.insert(input.m_tap_script_sigs.begin(), input.m_tap_script_sigs.end());</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">       14371 :     m_tap_scripts.insert(input.m_tap_scripts.begin(), input.m_tap_scripts.end());</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :<span class="tlaGNC">       14371 :     m_tap_bip32_paths.insert(input.m_tap_bip32_paths.begin(), input.m_tap_bip32_paths.end());</span></span>
+<span id="L218"><span class="lineNum">     218</span>                 :             : </span>
+<span id="L219"><span class="lineNum">     219</span>   [<span class="tlaGBC" title="Branch 0 was taken 415 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13956 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 13924 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 447 times"> + </span> :<span class="tlaGNC">       14805 :     if (redeem_script.empty() &amp;&amp; !input.redeem_script.empty()) redeem_script = input.redeem_script;</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 13905 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 13905 times"> + </span>]
+<span id="L220"><span class="lineNum">     220</span>   [<span class="tlaGBC" title="Branch 0 was taken 1050 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13321 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 13221 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1150 times"> + </span> :<span class="tlaGNC">       15466 :     if (witness_script.empty() &amp;&amp; !input.witness_script.empty()) witness_script = input.witness_script;</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 45 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 13176 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 41 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 13180 times"> + </span>]
+<span id="L221"><span class="lineNum">     221</span>   [<span class="tlaGBC" title="Branch 0 was taken 2561 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11810 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 11340 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3031 times"> + </span> :<span class="tlaGNC">       16951 :     if (final_script_sig.empty() &amp;&amp; !input.final_script_sig.empty()) final_script_sig = input.final_script_sig;</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 11321 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 34 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 11306 times"> + </span>]
+<span id="L222"><span class="lineNum">     222</span>   [<span class="tlaGBC" title="Branch 0 was taken 14160 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 211 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 35 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 14125 times"> + </span>]:<span class="tlaGNC">       14371 :     if (final_script_witness.IsNull() &amp;&amp; !input.final_script_witness.IsNull()) final_script_witness = input.final_script_witness;</span></span>
+<span id="L223"><span class="lineNum">     223</span>   [<span class="tlaGBC" title="Branch 0 was taken 14114 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 257 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 12 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 14102 times"> + </span>]:<span class="tlaGNC">       14371 :     if (m_tap_key_sig.empty() &amp;&amp; !input.m_tap_key_sig.empty()) m_tap_key_sig = input.m_tap_key_sig;</span></span>
+<span id="L224"><span class="lineNum">     224</span>   [<span class="tlaGBC" title="Branch 0 was taken 13487 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 884 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 20 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13467 times"> + </span>]:<span class="tlaGNC">       14371 :     if (m_tap_internal_key.IsNull() &amp;&amp; !input.m_tap_internal_key.IsNull()) m_tap_internal_key = input.m_tap_internal_key;</span></span>
+<span id="L225"><span class="lineNum">     225</span>   [<span class="tlaGBC" title="Branch 0 was taken 13807 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 564 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 29 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13778 times"> + </span>]:<span class="tlaGNC">       14371 :     if (m_tap_merkle_root.IsNull() &amp;&amp; !input.m_tap_merkle_root.IsNull()) m_tap_merkle_root = input.m_tap_merkle_root;</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :<span class="tlaGNC">       14371 : }</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : </span>
+<span id="L228"><span class="lineNum">     228</span>                 :<span class="tlaGNC">        1235 : void PSBTOutput::FillSignatureData(SignatureData&amp; sigdata) const</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : {</span>
+<span id="L230"><span class="lineNum">     230</span>   [<span class="tlaGBC" title="Branch 0 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1216 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 46 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1189 times"> + </span>]:<span class="tlaGNC">        1254 :     if (!redeem_script.empty()) {</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaGNC">          46 :         sigdata.redeem_script = redeem_script;</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :     }</span>
+<span id="L233"><span class="lineNum">     233</span>   [<span class="tlaGBC" title="Branch 0 was taken 37 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1198 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 49 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1186 times"> + </span>]:<span class="tlaGNC">        1272 :     if (!witness_script.empty()) {</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :<span class="tlaGNC">          49 :         sigdata.witness_script = witness_script;</span></span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :     }</span>
+<span id="L236"><span class="lineNum">     236</span>         [<span class="tlaGBC" title="Branch 0 was taken 338 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1235 times"> + </span>]:<span class="tlaGNC">        1573 :     for (const auto&amp; key_pair : hd_keypaths) {</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">         338 :         sigdata.misc_pubkeys.emplace(key_pair.first.GetID(), key_pair);</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :     }</span>
+<span id="L239"><span class="lineNum">     239</span>   [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1227 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 8 times"> + </span>]:<span class="tlaGNC">        1235 :     if (!m_tap_tree.empty() &amp;&amp; m_tap_internal_key.IsFullyValid()) {</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :<span class="tlaUNC">           0 :         TaprootBuilder builder;</span></span>
+<span id="L241"><span class="lineNum">     241</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         for (const auto&amp; [depth, leaf_ver, script] : m_tap_tree) {</span></span>
+<span id="L242"><span class="lineNum">     242</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             builder.Add((int)depth, script, (int)leaf_ver, /*track=*/true);</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :         }</span>
+<span id="L244"><span class="lineNum">     244</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         assert(builder.IsComplete());</span></span>
+<span id="L245"><span class="lineNum">     245</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         builder.Finalize(m_tap_internal_key);</span></span>
+<span id="L246"><span class="lineNum">     246</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         TaprootSpendData spenddata = builder.GetSpendData();</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :             : </span>
+<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaUNC">           0 :         sigdata.tr_spenddata.internal_key = m_tap_internal_key;</span></span>
+<span id="L249"><span class="lineNum">     249</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         sigdata.tr_spenddata.Merge(spenddata);</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L251"><span class="lineNum">     251</span>         [<span class="tlaGBC" title="Branch 0 was taken 218 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1235 times"> + </span>]:<span class="tlaGNC">        1453 :     for (const auto&amp; [pubkey, leaf_origin] : m_tap_bip32_paths) {</span></span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaGNC">         218 :         sigdata.taproot_misc_pubkeys.emplace(pubkey, leaf_origin);</span></span>
+<span id="L253"><span class="lineNum">     253</span>                 :<span class="tlaGNC">         218 :         sigdata.tap_pubkeys.emplace(Hash160(pubkey), pubkey);</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :     }</span>
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaGNC">        1235 : }</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :             : </span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">        1235 : void PSBTOutput::FromSignatureData(const SignatureData&amp; sigdata)</span></span>
+<span id="L258"><span class="lineNum">     258</span>                 :             : {</span>
+<span id="L259"><span class="lineNum">     259</span>   [<span class="tlaGBC" title="Branch 0 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1216 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1189 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 46 times"> + </span> :<span class="tlaGNC">        1254 :     if (redeem_script.empty() &amp;&amp; !sigdata.redeem_script.empty()) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 1189 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 1189 times"> + </span>]
+<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaUNC">           0 :         redeem_script = sigdata.redeem_script;</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :     }</span>
+<span id="L262"><span class="lineNum">     262</span>   [<span class="tlaGBC" title="Branch 0 was taken 37 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1198 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1186 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 49 times"> + </span> :<span class="tlaGNC">        1272 :     if (witness_script.empty() &amp;&amp; !sigdata.witness_script.empty()) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 1186 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 1186 times"> + </span>]
+<span id="L263"><span class="lineNum">     263</span>                 :<span class="tlaUNC">           0 :         witness_script = sigdata.witness_script;</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :     }</span>
+<span id="L265"><span class="lineNum">     265</span>         [<span class="tlaGBC" title="Branch 0 was taken 338 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1235 times"> + </span>]:<span class="tlaGNC">        1573 :     for (const auto&amp; entry : sigdata.misc_pubkeys) {</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">         338 :         hd_keypaths.emplace(entry.second);</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :     }</span>
+<span id="L268"><span class="lineNum">     268</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1235 times"> + </span>]:<span class="tlaGNC">        1235 :     if (!sigdata.tr_spenddata.internal_key.IsNull()) {</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaUNC">           0 :         m_tap_internal_key = sigdata.tr_spenddata.internal_key;</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :     }</span>
+<span id="L271"><span class="lineNum">     271</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1235 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1235 :     if (sigdata.tr_builder.has_value() &amp;&amp; sigdata.tr_builder-&gt;HasScripts()) {</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaUNC">           0 :         m_tap_tree = sigdata.tr_builder-&gt;GetTreeTuples();</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :     }</span>
+<span id="L274"><span class="lineNum">     274</span>         [<span class="tlaGBC" title="Branch 0 was taken 218 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1235 times"> + </span>]:<span class="tlaGNC">        1453 :     for (const auto&amp; [pubkey, leaf_origin] : sigdata.taproot_misc_pubkeys) {</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">         218 :         m_tap_bip32_paths.emplace(pubkey, leaf_origin);</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :     }</span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">        1235 : }</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">        7836 : bool PSBTOutput::IsNull() const</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :             : {</span>
+<span id="L281"><span class="lineNum">     281</span>   [<span class="tlaGBC" title="Branch 0 was taken 78 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7758 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 7434 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 402 times"> + </span> :<span class="tlaGNC">        7993 :     return redeem_script.empty() &amp;&amp; witness_script.empty() &amp;&amp; hd_keypaths.empty() &amp;&amp; unknown.empty();</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 79 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 7355 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 7153 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 281 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 6519 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="Branch 9 was taken 634 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 2169 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 4350 times"> + </span>]
+<span id="L282"><span class="lineNum">     282</span>                 :             : }</span>
+<span id="L283"><span class="lineNum">     283</span>                 :             : </span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaGNC">       21414 : void PSBTOutput::Merge(const PSBTOutput&amp; output)</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :             : {</span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaGNC">       21414 :     hd_keypaths.insert(output.hd_keypaths.begin(), output.hd_keypaths.end());</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaGNC">       21414 :     unknown.insert(output.unknown.begin(), output.unknown.end());</span></span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">       21414 :     m_tap_bip32_paths.insert(output.m_tap_bip32_paths.begin(), output.m_tap_bip32_paths.end());</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : </span>
+<span id="L290"><span class="lineNum">     290</span>   [<span class="tlaGBC" title="Branch 0 was taken 487 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 20927 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 20268 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1146 times"> + </span> :<span class="tlaGNC">       21953 :     if (redeem_script.empty() &amp;&amp; !output.redeem_script.empty()) redeem_script = output.redeem_script;</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 52 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 20216 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 72 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 20196 times"> + </span>]
+<span id="L291"><span class="lineNum">     291</span>   [<span class="tlaGBC" title="Branch 0 was taken 494 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 20920 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 20446 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 968 times"> + </span> :<span class="tlaGNC">       21972 :     if (witness_script.empty() &amp;&amp; !output.witness_script.empty()) witness_script = output.witness_script;</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 64 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 20382 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 66 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 20380 times"> + </span>]
+<span id="L292"><span class="lineNum">     292</span>   [<span class="tlaGBC" title="Branch 0 was taken 20825 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 589 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 20 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 20805 times"> + </span>]:<span class="tlaGNC">       21414 :     if (m_tap_internal_key.IsNull() &amp;&amp; !output.m_tap_internal_key.IsNull()) m_tap_internal_key = output.m_tap_internal_key;</span></span>
+<span id="L293"><span class="lineNum">     293</span>   [<span class="tlaGBC" title="Branch 0 was taken 20851 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 563 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 55 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 20796 times"> + </span>]:<span class="tlaGNC">       21414 :     if (m_tap_tree.empty() &amp;&amp; !output.m_tap_tree.empty()) m_tap_tree = output.m_tap_tree;</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :<span class="tlaGNC">       21414 : }</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :             : </span>
+<span id="L296"><span class="lineNum">     296</span>                 :<span class="tlaGNC">       12640 : bool PSBTInputSigned(const PSBTInput&amp; input)</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :             : {</span>
+<span id="L298"><span class="lineNum">     298</span>   [<span class="tlaGBC" title="Branch 0 was taken 2600 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10040 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 9738 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2902 times"> + </span> :<span class="tlaGNC">       15240 :     return !input.final_script_sig.empty() || !input.final_script_witness.IsNull();</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 224 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 9514 times"> + </span>]
+<span id="L299"><span class="lineNum">     299</span>                 :             : }</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             : </span>
+<span id="L301"><span class="lineNum">     301</span>                 :<span class="tlaGNC">       26426 : bool PSBTInputSignedAndVerified(const PartiallySignedTransaction psbt, unsigned int input_index, const PrecomputedTransactionData* txdata)</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             : {</span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">       26426 :     CTxOut utxo;</span></span>
+<span id="L304"><span class="lineNum">     304</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 26426 times"> + </span>]:<span class="tlaGNC">       26426 :     assert(psbt.inputs.size() &gt;= input_index);</span></span>
+<span id="L305"><span class="lineNum">     305</span>         [<span class="tlaGBC" title="Branch 0 was taken 423 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 26003 times"> + </span>]:<span class="tlaGNC">       26426 :     const PSBTInput&amp; input = psbt.inputs[input_index];</span></span>
+<span id="L306"><span class="lineNum">     306</span>                 :             : </span>
+<span id="L307"><span class="lineNum">     307</span>         [<span class="tlaGBC" title="Branch 0 was taken 423 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 26003 times"> + </span>]:<span class="tlaGNC">       26426 :     if (input.non_witness_utxo) {</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :         // If we're taking our information from a non-witness UTXO, verify that it matches the prevout.</span>
+<span id="L309"><span class="lineNum">     309</span>         [<span class="tlaGBC" title="Branch 0 was taken 423 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         423 :         COutPoint prevout = psbt.tx-&gt;vin[input_index].prevout;</span></span>
+<span id="L310"><span class="lineNum">     310</span>         [<span class="tlaGBC" title="Branch 0 was taken 423 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         423 :         if (prevout.n &gt;= input.non_witness_utxo-&gt;vout.size()) {</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :             return false;</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :         }</span>
+<span id="L313"><span class="lineNum">     313</span>         [<span class="tlaGBC" title="Branch 0 was taken 423 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         423 :         if (input.non_witness_utxo-&gt;GetHash() != prevout.hash) {</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             :             return false;</span>
+<span id="L315"><span class="lineNum">     315</span>                 :             :         }</span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaGNC">         423 :         utxo = input.non_witness_utxo-&gt;vout[prevout.n];</span></span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaGBC" title="Branch 0 was taken 16225 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9778 times"> + </span>]:<span class="tlaGNC">       26003 :     } else if (!input.witness_utxo.IsNull()) {</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :<span class="tlaGNC">       16225 :         utxo = input.witness_utxo;</span></span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :     } else {</span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :         return false;</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :     }</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             : </span>
+<span id="L323"><span class="lineNum">     323</span>         [<span class="tlaGBC" title="Branch 0 was taken 14704 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1944 times"> + </span>]:<span class="tlaGNC">       16648 :     if (txdata) {</span></span>
+<span id="L324"><span class="lineNum">     324</span>         [<span class="tlaGBC" title="Branch 0 was taken 14704 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       14704 :         return VerifyScript(input.final_script_sig, utxo.scriptPubKey, &amp;input.final_script_witness, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker{&amp;(*psbt.tx), input_index, utxo.nValue, *txdata, MissingDataBehavior::FAIL});</span></span>
+<span id="L325"><span class="lineNum">     325</span>                 :             :     } else {</span>
+<span id="L326"><span class="lineNum">     326</span>         [<span class="tlaGBC" title="Branch 0 was taken 1944 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1944 :         return VerifyScript(input.final_script_sig, utxo.scriptPubKey, &amp;input.final_script_witness, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker{&amp;(*psbt.tx), input_index, utxo.nValue, MissingDataBehavior::FAIL});</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :     }</span>
+<span id="L328"><span class="lineNum">     328</span>                 :<span class="tlaGNC">       26426 : }</span></span>
+<span id="L329"><span class="lineNum">     329</span>                 :             : </span>
+<span id="L330"><span class="lineNum">     330</span>                 :<span class="tlaGNC">        2938 : size_t CountPSBTUnsignedInputs(const PartiallySignedTransaction&amp; psbt) {</span></span>
+<span id="L331"><span class="lineNum">     331</span>                 :<span class="tlaGNC">        2938 :     size_t count = 0;</span></span>
+<span id="L332"><span class="lineNum">     332</span>         [<span class="tlaGBC" title="Branch 0 was taken 4775 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2938 times"> + </span>]:<span class="tlaGNC">        7713 :     for (const auto&amp; input : psbt.inputs) {</span></span>
+<span id="L333"><span class="lineNum">     333</span>         [<span class="tlaGBC" title="Branch 0 was taken 3279 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1496 times"> + </span>]:<span class="tlaGNC">        4775 :         if (!PSBTInputSigned(input)) {</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">        3279 :             count++;</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :             :         }</span>
+<span id="L336"><span class="lineNum">     336</span>                 :             :     }</span>
+<span id="L337"><span class="lineNum">     337</span>                 :             : </span>
+<span id="L338"><span class="lineNum">     338</span>                 :<span class="tlaGNC">        2938 :     return count;</span></span>
+<span id="L339"><span class="lineNum">     339</span>                 :             : }</span>
+<span id="L340"><span class="lineNum">     340</span>                 :             : </span>
+<span id="L341"><span class="lineNum">     341</span>                 :<span class="tlaGNC">        1235 : void UpdatePSBTOutput(const SigningProvider&amp; provider, PartiallySignedTransaction&amp; psbt, int index)</span></span>
+<span id="L342"><span class="lineNum">     342</span>                 :             : {</span>
+<span id="L343"><span class="lineNum">     343</span>                 :<span class="tlaGNC">        1235 :     CMutableTransaction&amp; tx = *Assert(psbt.tx);</span></span>
+<span id="L344"><span class="lineNum">     344</span>                 :<span class="tlaGNC">        1235 :     const CTxOut&amp; out = tx.vout.at(index);</span></span>
+<span id="L345"><span class="lineNum">     345</span>                 :<span class="tlaGNC">        1235 :     PSBTOutput&amp; psbt_out = psbt.outputs.at(index);</span></span>
+<span id="L346"><span class="lineNum">     346</span>                 :             : </span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :     // Fill a SignatureData with output info</span>
+<span id="L348"><span class="lineNum">     348</span>                 :<span class="tlaGNC">        1235 :     SignatureData sigdata;</span></span>
+<span id="L349"><span class="lineNum">     349</span>         [<span class="tlaGBC" title="Branch 0 was taken 1235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1235 :     psbt_out.FillSignatureData(sigdata);</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             : </span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :     // Construct a would-be spend of this output, to update sigdata with.</span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :     // Note that ProduceSignature is used to fill in metadata (not actual signatures),</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :     // so provider does not need to provide any private keys (it can be a HidingSigningProvider).</span>
+<span id="L354"><span class="lineNum">     354</span>         [<span class="tlaGBC" title="Branch 0 was taken 1235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1235 :     MutableTransactionSignatureCreator creator(tx, /*input_idx=*/0, out.nValue, SIGHASH_ALL);</span></span>
+<span id="L355"><span class="lineNum">     355</span>         [<span class="tlaGBC" title="Branch 0 was taken 1235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1235 :     ProduceSignature(provider, creator, out.scriptPubKey, sigdata);</span></span>
+<span id="L356"><span class="lineNum">     356</span>                 :             : </span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :     // Put redeem_script, witness_script, key paths, into PSBTOutput.</span>
+<span id="L358"><span class="lineNum">     358</span>         [<span class="tlaGBC" title="Branch 0 was taken 1235 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1235 :     psbt_out.FromSignatureData(sigdata);</span></span>
+<span id="L359"><span class="lineNum">     359</span>                 :<span class="tlaGNC">        1235 : }</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :             : </span>
+<span id="L361"><span class="lineNum">     361</span>                 :<span class="tlaGNC">       13299 : PrecomputedTransactionData PrecomputePSBTData(const PartiallySignedTransaction&amp; psbt)</span></span>
+<span id="L362"><span class="lineNum">     362</span>                 :             : {</span>
+<span id="L363"><span class="lineNum">     363</span>                 :<span class="tlaGNC">       13299 :     const CMutableTransaction&amp; tx = *psbt.tx;</span></span>
+<span id="L364"><span class="lineNum">     364</span>                 :<span class="tlaGNC">       13299 :     bool have_all_spent_outputs = true;</span></span>
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">       13299 :     std::vector&lt;CTxOut&gt; utxos(tx.vin.size());</span></span>
+<span id="L366"><span class="lineNum">     366</span>         [<span class="tlaGBC" title="Branch 0 was taken 20064 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13299 times"> + </span>]:<span class="tlaGNC">       33363 :     for (size_t idx = 0; idx &lt; tx.vin.size(); ++idx) {</span></span>
+<span id="L367"><span class="lineNum">     367</span>   [<span class="tlaGBC" title="Branch 0 was taken 20064 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 8309 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 11755 times"> + </span>]:<span class="tlaGNC">       20064 :         if (!psbt.GetInputUTXO(utxos[idx], idx)) have_all_spent_outputs = false;</span></span>
+<span id="L368"><span class="lineNum">     368</span>                 :             :     }</span>
+<span id="L369"><span class="lineNum">     369</span>                 :<span class="tlaGNC">       13299 :     PrecomputedTransactionData txdata;</span></span>
+<span id="L370"><span class="lineNum">     370</span>         [<span class="tlaGBC" title="Branch 0 was taken 9221 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4078 times"> + </span>]:<span class="tlaGNC">       13299 :     if (have_all_spent_outputs) {</span></span>
+<span id="L371"><span class="lineNum">     371</span>         [<span class="tlaGBC" title="Branch 0 was taken 9221 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        9221 :         txdata.Init(tx, std::move(utxos), true);</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :             :     } else {</span>
+<span id="L373"><span class="lineNum">     373</span>         [<span class="tlaGBC" title="Branch 0 was taken 4078 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4078 :         txdata.Init(tx, {}, true);</span></span>
+<span id="L374"><span class="lineNum">     374</span>                 :             :     }</span>
+<span id="L375"><span class="lineNum">     375</span>                 :<span class="tlaGNC">       13299 :     return txdata;</span></span>
+<span id="L376"><span class="lineNum">     376</span>                 :<span class="tlaGNC">       13299 : }</span></span>
+<span id="L377"><span class="lineNum">     377</span>                 :             : </span>
+<span id="L378"><span class="lineNum">     378</span>                 :<span class="tlaGNC">       19949 : PSBTError SignPSBTInput(const SigningProvider&amp; provider, PartiallySignedTransaction&amp; psbt, int index, const PrecomputedTransactionData* txdata, std::optional&lt;int&gt; sighash,  SignatureData* out_sigdata, bool finalize)</span></span>
+<span id="L379"><span class="lineNum">     379</span>                 :             : {</span>
+<span id="L380"><span class="lineNum">     380</span>                 :<span class="tlaGNC">       19949 :     PSBTInput&amp; input = psbt.inputs.at(index);</span></span>
+<span id="L381"><span class="lineNum">     381</span>                 :<span class="tlaGNC">       19949 :     const CMutableTransaction&amp; tx = *psbt.tx;</span></span>
+<span id="L382"><span class="lineNum">     382</span>                 :             : </span>
+<span id="L383"><span class="lineNum">     383</span>   [<span class="tlaGBC" title="Branch 0 was taken 19949 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 19329 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 620 times"> + </span>]:<span class="tlaGNC">       19949 :     if (PSBTInputSignedAndVerified(psbt, index, txdata)) {</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :         return PSBTError::OK;</span>
+<span id="L385"><span class="lineNum">     385</span>                 :             :     }</span>
+<span id="L386"><span class="lineNum">     386</span>                 :             : </span>
+<span id="L387"><span class="lineNum">     387</span>                 :             :     // Fill SignatureData with input info</span>
+<span id="L388"><span class="lineNum">     388</span>                 :<span class="tlaGNC">       19329 :     SignatureData sigdata;</span></span>
+<span id="L389"><span class="lineNum">     389</span>         [<span class="tlaGBC" title="Branch 0 was taken 19329 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       19329 :     input.FillSignatureData(sigdata);</span></span>
+<span id="L390"><span class="lineNum">     390</span>                 :             : </span>
+<span id="L391"><span class="lineNum">     391</span>                 :             :     // Get UTXO</span>
+<span id="L392"><span class="lineNum">     392</span>                 :<span class="tlaGNC">       19329 :     bool require_witness_sig = false;</span></span>
+<span id="L393"><span class="lineNum">     393</span>                 :<span class="tlaGNC">       19329 :     CTxOut utxo;</span></span>
+<span id="L394"><span class="lineNum">     394</span>                 :             : </span>
+<span id="L395"><span class="lineNum">     395</span>         [<span class="tlaGBC" title="Branch 0 was taken 330 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 18999 times"> + </span>]:<span class="tlaGNC">       19329 :     if (input.non_witness_utxo) {</span></span>
+<span id="L396"><span class="lineNum">     396</span>                 :             :         // If we're taking our information from a non-witness UTXO, verify that it matches the prevout.</span>
+<span id="L397"><span class="lineNum">     397</span>         [<span class="tlaGBC" title="Branch 0 was taken 330 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         330 :         COutPoint prevout = tx.vin[index].prevout;</span></span>
+<span id="L398"><span class="lineNum">     398</span>         [<span class="tlaGBC" title="Branch 0 was taken 330 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         330 :         if (prevout.n &gt;= input.non_witness_utxo-&gt;vout.size()) {</span></span>
+<span id="L399"><span class="lineNum">     399</span>                 :             :             return PSBTError::MISSING_INPUTS;</span>
+<span id="L400"><span class="lineNum">     400</span>                 :             :         }</span>
+<span id="L401"><span class="lineNum">     401</span>         [<span class="tlaGBC" title="Branch 0 was taken 330 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         330 :         if (input.non_witness_utxo-&gt;GetHash() != prevout.hash) {</span></span>
+<span id="L402"><span class="lineNum">     402</span>                 :             :             return PSBTError::MISSING_INPUTS;</span>
+<span id="L403"><span class="lineNum">     403</span>                 :             :         }</span>
+<span id="L404"><span class="lineNum">     404</span>                 :<span class="tlaGNC">         330 :         utxo = input.non_witness_utxo-&gt;vout[prevout.n];</span></span>
+<span id="L405"><span class="lineNum">     405</span>         [<span class="tlaGBC" title="Branch 0 was taken 11889 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7110 times"> + </span>]:<span class="tlaGNC">       18999 :     } else if (!input.witness_utxo.IsNull()) {</span></span>
+<span id="L406"><span class="lineNum">     406</span>                 :<span class="tlaGNC">       11889 :         utxo = input.witness_utxo;</span></span>
+<span id="L407"><span class="lineNum">     407</span>                 :             :         // When we're taking our information from a witness UTXO, we can't verify it is actually data from</span>
+<span id="L408"><span class="lineNum">     408</span>                 :             :         // the output being spent. This is safe in case a witness signature is produced (which includes this</span>
+<span id="L409"><span class="lineNum">     409</span>                 :             :         // information directly in the hash), but not for non-witness signatures. Remember that we require</span>
+<span id="L410"><span class="lineNum">     410</span>                 :             :         // a witness signature in this situation.</span>
+<span id="L411"><span class="lineNum">     411</span>                 :<span class="tlaGNC">       11889 :         require_witness_sig = true;</span></span>
+<span id="L412"><span class="lineNum">     412</span>                 :             :     } else {</span>
+<span id="L413"><span class="lineNum">     413</span>                 :             :         return PSBTError::MISSING_INPUTS;</span>
+<span id="L414"><span class="lineNum">     414</span>                 :             :     }</span>
+<span id="L415"><span class="lineNum">     415</span>                 :             : </span>
+<span id="L416"><span class="lineNum">     416</span>                 :             :     // Get the sighash type</span>
+<span id="L417"><span class="lineNum">     417</span>                 :             :     // If both the field and the parameter are provided, they must match</span>
+<span id="L418"><span class="lineNum">     418</span>                 :             :     // If only the parameter is provided, use it and add it to the PSBT if it is other than SIGHASH_DEFAULT</span>
+<span id="L419"><span class="lineNum">     419</span>                 :             :     // for all input types, and not SIGHASH_ALL for non-taproot input types.</span>
+<span id="L420"><span class="lineNum">     420</span>                 :             :     // If neither are provided, use SIGHASH_DEFAULT if it is taproot, and SIGHASH_ALL for everything else.</span>
+<span id="L421"><span class="lineNum">     421</span>   [<span class="tlaGBC" title="Branch 0 was taken 11671 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 548 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 11671 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       23112 :     if (!sighash) sighash = utxo.scriptPubKey.IsPayToTaproot() ? SIGHASH_DEFAULT : SIGHASH_ALL;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 10893 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 778 times"> + </span>]
+<span id="L422"><span class="lineNum">     422</span>         [<span class="tlaGBC" title="Branch 0 was taken 12219 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12219 :     Assert(sighash.has_value());</span></span>
+<span id="L423"><span class="lineNum">     423</span>                 :             :     // For user safety, the desired sighash must be provided if the PSBT wants something other than the default set in the previous line.</span>
+<span id="L424"><span class="lineNum">     424</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 12219 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       31548 :     if (input.sighash_type &amp;&amp; input.sighash_type != sighash) {</span></span>
+<span id="L425"><span class="lineNum">     425</span>                 :             :         return PSBTError::SIGHASH_MISMATCH;</span>
+<span id="L426"><span class="lineNum">     426</span>                 :             :     }</span>
+<span id="L427"><span class="lineNum">     427</span>                 :             :     // Set the PSBT sighash field when sighash is not DEFAULT or ALL</span>
+<span id="L428"><span class="lineNum">     428</span>                 :             :     // DEFAULT is allowed for non-taproot inputs since DEFAULT may be passed for them (e.g. the psbt being signed also has taproot inputs)</span>
+<span id="L429"><span class="lineNum">     429</span>                 :             :     // Note that signing already aliases DEFAULT to ALL for non-taproot inputs.</span>
+<span id="L430"><span class="lineNum">     430</span>   [<span class="tlaGBC" title="Branch 0 was taken 12219 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 778 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 11441 times"> + </span> :<span class="tlaGNC">       12219 :     if (utxo.scriptPubKey.IsPayToTaproot() ? sighash != SIGHASH_DEFAULT :</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 778 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L431"><span class="lineNum">     431</span>   [<span class="tlaGBC" title="Branch 0 was taken 11441 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 11391 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       22832 :                                             (sighash != SIGHASH_DEFAULT &amp;&amp; sighash != SIGHASH_ALL)) {</span></span>
+<span id="L432"><span class="lineNum">     432</span>                 :<span class="tlaGNC">         495 :         input.sighash_type = sighash;</span></span>
+<span id="L433"><span class="lineNum">     433</span>                 :             :     }</span>
+<span id="L434"><span class="lineNum">     434</span>                 :             : </span>
+<span id="L435"><span class="lineNum">     435</span>                 :             :     // Check all existing signatures use the sighash type</span>
+<span id="L436"><span class="lineNum">     436</span>         [<span class="tlaGBC" title="Branch 0 was taken 12219 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12219 :     if (sighash == SIGHASH_DEFAULT) {</span></span>
+<span id="L437"><span class="lineNum">     437</span>   [<span class="tlaGBC" title="Branch 0 was taken 70 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 758 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 36 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 34 times"> + </span>]:<span class="tlaGNC">         828 :         if (!input.m_tap_key_sig.empty() &amp;&amp; input.m_tap_key_sig.size() != 64) {</span></span>
+<span id="L438"><span class="lineNum">     438</span>                 :             :             return PSBTError::SIGHASH_MISMATCH;</span>
+<span id="L439"><span class="lineNum">     439</span>                 :             :         }</span>
+<span id="L440"><span class="lineNum">     440</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 18 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 18 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 776 times"> + </span>]:<span class="tlaGNC">         794 :         for (const auto&amp; [_, sig] : input.m_tap_script_sigs) {</span></span>
+<span id="L441"><span class="lineNum">     441</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 18 times"> + </span>]:<span class="tlaGNC">          18 :             if (sig.size() != 64) return PSBTError::SIGHASH_MISMATCH;</span></span>
+<span id="L442"><span class="lineNum">     442</span>                 :             :         }</span>
+<span id="L443"><span class="lineNum">     443</span>                 :             :     } else {</span>
+<span id="L444"><span class="lineNum">     444</span>   [<span class="tlaGBC" title="Branch 0 was taken 25 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11366 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 13 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 12 times"> + </span> :<span class="tlaGNC">       11391 :         if (!input.m_tap_key_sig.empty() &amp;&amp; (input.m_tap_key_sig.size() != 65 || input.m_tap_key_sig.back() != *sighash)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 10 times"> + </span>]
+<span id="L445"><span class="lineNum">     445</span>                 :             :             return PSBTError::SIGHASH_MISMATCH;</span>
+<span id="L446"><span class="lineNum">     446</span>                 :             :         }</span>
+<span id="L447"><span class="lineNum">     447</span>   [<span class="tlaGBC" title="Branch 0 was taken 474 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 474 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 10923 times"> + </span>]:<span class="tlaGNC">       11397 :         for (const auto&amp; [_, sig] : input.m_tap_script_sigs) {</span></span>
+<span id="L448"><span class="lineNum">     448</span>   [<span class="tlaGBC" title="Branch 0 was taken 474 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 28 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 446 times"> + </span>]:<span class="tlaGNC">         474 :             if (sig.size() != 65 || sig.back() != *sighash) return PSBTError::SIGHASH_MISMATCH;</span></span>
+<span id="L449"><span class="lineNum">     449</span>                 :             :         }</span>
+<span id="L450"><span class="lineNum">     450</span>   [<span class="tlaGBC" title="Branch 0 was taken 33 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 307 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 340 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 10616 times"> + </span>]:<span class="tlaGNC">       10956 :         for (const auto&amp; [_, sig] : input.partial_sigs) {</span></span>
+<span id="L451"><span class="lineNum">     451</span>         [<span class="tlaGBC" title="Branch 0 was taken 33 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 307 times"> + </span>]:<span class="tlaGNC">         340 :             if (sig.second.back() != *sighash) return PSBTError::SIGHASH_MISMATCH;</span></span>
+<span id="L452"><span class="lineNum">     452</span>                 :             :         }</span>
+<span id="L453"><span class="lineNum">     453</span>                 :             :     }</span>
+<span id="L454"><span class="lineNum">     454</span>                 :             : </span>
+<span id="L455"><span class="lineNum">     455</span>                 :<span class="tlaGNC">       11392 :     sigdata.witness = false;</span></span>
+<span id="L456"><span class="lineNum">     456</span>                 :<span class="tlaGNC">       11392 :     bool sig_complete;</span></span>
+<span id="L457"><span class="lineNum">     457</span>         [<span class="tlaGBC" title="Branch 0 was taken 1800 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9592 times"> + </span>]:<span class="tlaGNC">       11392 :     if (txdata == nullptr) {</span></span>
+<span id="L458"><span class="lineNum">     458</span>         [<span class="tlaGBC" title="Branch 0 was taken 1800 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1800 :         sig_complete = ProduceSignature(provider, DUMMY_SIGNATURE_CREATOR, utxo.scriptPubKey, sigdata);</span></span>
+<span id="L459"><span class="lineNum">     459</span>                 :             :     } else {</span>
+<span id="L460"><span class="lineNum">     460</span>         [<span class="tlaGBC" title="Branch 0 was taken 9592 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        9592 :         MutableTransactionSignatureCreator creator(tx, index, utxo.nValue, txdata, *sighash);</span></span>
+<span id="L461"><span class="lineNum">     461</span>         [<span class="tlaGBC" title="Branch 0 was taken 9592 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        9592 :         sig_complete = ProduceSignature(provider, creator, utxo.scriptPubKey, sigdata);</span></span>
+<span id="L462"><span class="lineNum">     462</span>                 :<span class="tlaGNC">        9592 :     }</span></span>
+<span id="L463"><span class="lineNum">     463</span>                 :             :     // Verify that a witness signature was produced in case one was required.</span>
+<span id="L464"><span class="lineNum">     464</span>   [<span class="tlaGBC" title="Branch 0 was taken 11069 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 323 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1958 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 9111 times"> + </span>]:<span class="tlaGNC">       11392 :     if (require_witness_sig &amp;&amp; !sigdata.witness) return PSBTError::INCOMPLETE;</span></span>
+<span id="L465"><span class="lineNum">     465</span>                 :             : </span>
+<span id="L466"><span class="lineNum">     466</span>                 :             :     // If we are not finalizing, set sigdata.complete to false to not set the scriptWitness</span>
+<span id="L467"><span class="lineNum">     467</span>   [<span class="tlaGBC" title="Branch 0 was taken 226 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2055 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 226 times"> + </span>]:<span class="tlaGNC">        2281 :     if (!finalize &amp;&amp; sigdata.complete) sigdata.complete = false;</span></span>
+<span id="L468"><span class="lineNum">     468</span>                 :             : </span>
+<span id="L469"><span class="lineNum">     469</span>         [<span class="tlaGBC" title="Branch 0 was taken 2281 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2281 :     input.FromSignatureData(sigdata);</span></span>
+<span id="L470"><span class="lineNum">     470</span>                 :             : </span>
+<span id="L471"><span class="lineNum">     471</span>                 :             :     // If we have a witness signature, put a witness UTXO.</span>
+<span id="L472"><span class="lineNum">     472</span>         [<span class="tlaGBC" title="Branch 0 was taken 2123 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 158 times"> + </span>]:<span class="tlaGNC">        2281 :     if (sigdata.witness) {</span></span>
+<span id="L473"><span class="lineNum">     473</span>                 :<span class="tlaGNC">        2123 :         input.witness_utxo = utxo;</span></span>
+<span id="L474"><span class="lineNum">     474</span>                 :             :         // We can remove the non_witness_utxo if and only if there are no non-segwit or segwit v0</span>
+<span id="L475"><span class="lineNum">     475</span>                 :             :         // inputs in this transaction. Since this requires inspecting the entire transaction, this</span>
+<span id="L476"><span class="lineNum">     476</span>                 :             :         // is something for the caller to deal with (i.e. FillPSBT).</span>
+<span id="L477"><span class="lineNum">     477</span>                 :             :     }</span>
+<span id="L478"><span class="lineNum">     478</span>                 :             : </span>
+<span id="L479"><span class="lineNum">     479</span>                 :             :     // Fill in the missing info</span>
+<span id="L480"><span class="lineNum">     480</span>         [<span class="tlaGBC" title="Branch 0 was taken 787 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1494 times"> + </span>]:<span class="tlaGNC">        2281 :     if (out_sigdata) {</span></span>
+<span id="L481"><span class="lineNum">     481</span>         [<span class="tlaGBC" title="Branch 0 was taken 787 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         787 :         out_sigdata-&gt;missing_pubkeys = sigdata.missing_pubkeys;</span></span>
+<span id="L482"><span class="lineNum">     482</span>         [<span class="tlaGBC" title="Branch 0 was taken 787 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         787 :         out_sigdata-&gt;missing_sigs = sigdata.missing_sigs;</span></span>
+<span id="L483"><span class="lineNum">     483</span>                 :<span class="tlaGNC">         787 :         out_sigdata-&gt;missing_redeem_script = sigdata.missing_redeem_script;</span></span>
+<span id="L484"><span class="lineNum">     484</span>                 :<span class="tlaGNC">         787 :         out_sigdata-&gt;missing_witness_script = sigdata.missing_witness_script;</span></span>
+<span id="L485"><span class="lineNum">     485</span>                 :             :     }</span>
+<span id="L486"><span class="lineNum">     486</span>                 :             : </span>
+<span id="L487"><span class="lineNum">     487</span>         [<span class="tlaGBC" title="Branch 0 was taken 1913 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 368 times"> + </span>]:<span class="tlaGNC">        2281 :     return sig_complete ? PSBTError::OK : PSBTError::INCOMPLETE;</span></span>
+<span id="L488"><span class="lineNum">     488</span>                 :<span class="tlaGNC">       19329 : }</span></span>
+<span id="L489"><span class="lineNum">     489</span>                 :             : </span>
+<span id="L490"><span class="lineNum">     490</span>                 :<span class="tlaGNC">         377 : void RemoveUnnecessaryTransactions(PartiallySignedTransaction&amp; psbtx)</span></span>
+<span id="L491"><span class="lineNum">     491</span>                 :             : {</span>
+<span id="L492"><span class="lineNum">     492</span>                 :             :     // Figure out if any non_witness_utxos should be dropped</span>
+<span id="L493"><span class="lineNum">     493</span>                 :<span class="tlaGNC">         377 :     std::vector&lt;unsigned int&gt; to_drop;</span></span>
+<span id="L494"><span class="lineNum">     494</span>         [<span class="tlaGBC" title="Branch 0 was taken 468 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 121 times"> + </span>]:<span class="tlaGNC">         589 :     for (unsigned int i = 0; i &lt; psbtx.inputs.size(); ++i) {</span></span>
+<span id="L495"><span class="lineNum">     495</span>         [<span class="tlaGBC" title="Branch 0 was taken 468 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         468 :         const auto&amp; input = psbtx.inputs.at(i);</span></span>
+<span id="L496"><span class="lineNum">     496</span>                 :<span class="tlaGNC">         468 :         int wit_ver;</span></span>
+<span id="L497"><span class="lineNum">     497</span>                 :<span class="tlaGNC">         468 :         std::vector&lt;unsigned char&gt; wit_prog;</span></span>
+<span id="L498"><span class="lineNum">     498</span>   [<span class="tlaGBC" title="Branch 0 was taken 366 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 102 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 366 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         468 :         if (input.witness_utxo.IsNull() || !input.witness_utxo.scriptPubKey.IsWitnessProgram(wit_ver, wit_prog)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 147 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 219 times"> + </span>]
+<span id="L499"><span class="lineNum">     499</span>                 :             :             // There's a non-segwit input, so we cannot drop any non_witness_utxos</span>
+<span id="L500"><span class="lineNum">     500</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 249 times"> + </span>]:<span class="tlaGNC">         249 :             to_drop.clear();</span></span>
+<span id="L501"><span class="lineNum">     501</span>                 :             :             break;</span>
+<span id="L502"><span class="lineNum">     502</span>                 :             :         }</span>
+<span id="L503"><span class="lineNum">     503</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 212 times"> + </span>]:<span class="tlaGNC">         219 :         if (wit_ver == 0) {</span></span>
+<span id="L504"><span class="lineNum">     504</span>                 :             :             // Segwit v0, so we cannot drop any non_witness_utxos</span>
+<span id="L505"><span class="lineNum">     505</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           7 :             to_drop.clear();</span></span>
+<span id="L506"><span class="lineNum">     506</span>                 :             :             break;</span>
+<span id="L507"><span class="lineNum">     507</span>                 :             :         }</span>
+<span id="L508"><span class="lineNum">     508</span>                 :             :         // non_witness_utxos cannot be dropped if the sighash type includes SIGHASH_ANYONECANPAY</span>
+<span id="L509"><span class="lineNum">     509</span>                 :             :         // Since callers should have called SignPSBTInput which updates the sighash type in the PSBT, we only</span>
+<span id="L510"><span class="lineNum">     510</span>                 :             :         // need to look at that field. If it is not present, then we can assume SIGHASH_DEFAULT or SIGHASH_ALL.</span>
+<span id="L511"><span class="lineNum">     511</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 212 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         212 :         if (input.sighash_type != std::nullopt &amp;&amp; (*input.sighash_type &amp; 0x80) == SIGHASH_ANYONECANPAY) {</span></span>
+<span id="L512"><span class="lineNum">     512</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         256 :             to_drop.clear();</span></span>
+<span id="L513"><span class="lineNum">     513</span>                 :             :             break;</span>
+<span id="L514"><span class="lineNum">     514</span>                 :             :         }</span>
+<span id="L515"><span class="lineNum">     515</span>                 :             : </span>
+<span id="L516"><span class="lineNum">     516</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 212 times"> + </span>]:<span class="tlaGNC">         212 :         if (input.non_witness_utxo) {</span></span>
+<span id="L517"><span class="lineNum">     517</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             to_drop.push_back(i);</span></span>
+<span id="L518"><span class="lineNum">     518</span>                 :             :         }</span>
+<span id="L519"><span class="lineNum">     519</span>                 :<span class="tlaGNC">         468 :     }</span></span>
+<span id="L520"><span class="lineNum">     520</span>                 :             : </span>
+<span id="L521"><span class="lineNum">     521</span>                 :             :     // Drop the non_witness_utxos that we can drop</span>
+<span id="L522"><span class="lineNum">     522</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 377 times"> + </span>]:<span class="tlaGNC">         377 :     for (unsigned int i : to_drop) {</span></span>
+<span id="L523"><span class="lineNum">     523</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         psbtx.inputs.at(i).non_witness_utxo = nullptr;</span></span>
+<span id="L524"><span class="lineNum">     524</span>                 :             :     }</span>
+<span id="L525"><span class="lineNum">     525</span>                 :<span class="tlaGNC">         377 : }</span></span>
+<span id="L526"><span class="lineNum">     526</span>                 :             : </span>
+<span id="L527"><span class="lineNum">     527</span>                 :<span class="tlaGNC">        6165 : bool FinalizePSBT(PartiallySignedTransaction&amp; psbtx)</span></span>
+<span id="L528"><span class="lineNum">     528</span>                 :             : {</span>
+<span id="L529"><span class="lineNum">     529</span>                 :             :     // Finalize input signatures -- in case we have partial signatures that add up to a complete</span>
+<span id="L530"><span class="lineNum">     530</span>                 :             :     //   signature, but have not combined them yet (e.g. because the combiner that created this</span>
+<span id="L531"><span class="lineNum">     531</span>                 :             :     //   PartiallySignedTransaction did not understand them), this will combine them into a final</span>
+<span id="L532"><span class="lineNum">     532</span>                 :             :     //   script.</span>
+<span id="L533"><span class="lineNum">     533</span>                 :<span class="tlaGNC">        6165 :     bool complete = true;</span></span>
+<span id="L534"><span class="lineNum">     534</span>                 :<span class="tlaGNC">        6165 :     const PrecomputedTransactionData txdata = PrecomputePSBTData(psbtx);</span></span>
+<span id="L535"><span class="lineNum">     535</span>         [<span class="tlaGBC" title="Branch 0 was taken 10325 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6165 times"> + </span>]:<span class="tlaGNC">       16490 :     for (unsigned int i = 0; i &lt; psbtx.tx-&gt;vin.size(); ++i) {</span></span>
+<span id="L536"><span class="lineNum">     536</span>         [<span class="tlaGBC" title="Branch 0 was taken 10325 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       10325 :         PSBTInput&amp; input = psbtx.inputs.at(i);</span></span>
+<span id="L537"><span class="lineNum">     537</span>         [<span class="tlaGBC" title="Branch 0 was taken 10325 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       10325 :         complete &amp;= (SignPSBTInput(DUMMY_SIGNING_PROVIDER, psbtx, i, &amp;txdata, input.sighash_type, nullptr, true) == PSBTError::OK);</span></span>
+<span id="L538"><span class="lineNum">     538</span>                 :             :     }</span>
+<span id="L539"><span class="lineNum">     539</span>                 :             : </span>
+<span id="L540"><span class="lineNum">     540</span>                 :<span class="tlaGNC">        6165 :     return complete;</span></span>
+<span id="L541"><span class="lineNum">     541</span>                 :<span class="tlaGNC">        6165 : }</span></span>
+<span id="L542"><span class="lineNum">     542</span>                 :             : </span>
+<span id="L543"><span class="lineNum">     543</span>                 :<span class="tlaGNC">        3227 : bool FinalizeAndExtractPSBT(PartiallySignedTransaction&amp; psbtx, CMutableTransaction&amp; result)</span></span>
+<span id="L544"><span class="lineNum">     544</span>                 :             : {</span>
+<span id="L545"><span class="lineNum">     545</span>                 :             :     // It's not safe to extract a PSBT that isn't finalized, and there's no easy way to check</span>
+<span id="L546"><span class="lineNum">     546</span>                 :             :     //   whether a PSBT is finalized without finalizing it, so we just do this.</span>
+<span id="L547"><span class="lineNum">     547</span>         [<span class="tlaGBC" title="Branch 0 was taken 624 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2603 times"> + </span>]:<span class="tlaGNC">        3227 :     if (!FinalizePSBT(psbtx)) {</span></span>
+<span id="L548"><span class="lineNum">     548</span>                 :             :         return false;</span>
+<span id="L549"><span class="lineNum">     549</span>                 :             :     }</span>
+<span id="L550"><span class="lineNum">     550</span>                 :             : </span>
+<span id="L551"><span class="lineNum">     551</span>                 :<span class="tlaGNC">         624 :     result = *psbtx.tx;</span></span>
+<span id="L552"><span class="lineNum">     552</span>         [<span class="tlaGBC" title="Branch 0 was taken 230 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 624 times"> + </span>]:<span class="tlaGNC">         854 :     for (unsigned int i = 0; i &lt; result.vin.size(); ++i) {</span></span>
+<span id="L553"><span class="lineNum">     553</span>                 :<span class="tlaGNC">         230 :         result.vin[i].scriptSig = psbtx.inputs[i].final_script_sig;</span></span>
+<span id="L554"><span class="lineNum">     554</span>                 :<span class="tlaGNC">         230 :         result.vin[i].scriptWitness = psbtx.inputs[i].final_script_witness;</span></span>
+<span id="L555"><span class="lineNum">     555</span>                 :             :     }</span>
+<span id="L556"><span class="lineNum">     556</span>                 :             :     return true;</span>
+<span id="L557"><span class="lineNum">     557</span>                 :             : }</span>
+<span id="L558"><span class="lineNum">     558</span>                 :             : </span>
+<span id="L559"><span class="lineNum">     559</span>                 :<span class="tlaGNC">        3272 : bool CombinePSBTs(PartiallySignedTransaction&amp; out, const std::vector&lt;PartiallySignedTransaction&gt;&amp; psbtxs)</span></span>
+<span id="L560"><span class="lineNum">     560</span>                 :             : {</span>
+<span id="L561"><span class="lineNum">     561</span>                 :<span class="tlaGNC">        3272 :     out = psbtxs[0]; // Copy the first one</span></span>
+<span id="L562"><span class="lineNum">     562</span>                 :             : </span>
+<span id="L563"><span class="lineNum">     563</span>                 :             :     // Merge</span>
+<span id="L564"><span class="lineNum">     564</span>         [<span class="tlaGBC" title="Branch 0 was taken 6109 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3067 times"> + </span>]:<span class="tlaGNC">        9176 :     for (auto it = std::next(psbtxs.begin()); it != psbtxs.end(); ++it) {</span></span>
+<span id="L565"><span class="lineNum">     565</span>         [<span class="tlaGBC" title="Branch 0 was taken 5904 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 205 times"> + </span>]:<span class="tlaGNC">        6109 :         if (!out.Merge(*it)) {</span></span>
+<span id="L566"><span class="lineNum">     566</span>                 :             :             return false;</span>
+<span id="L567"><span class="lineNum">     567</span>                 :             :         }</span>
+<span id="L568"><span class="lineNum">     568</span>                 :             :     }</span>
+<span id="L569"><span class="lineNum">     569</span>                 :             :     return true;</span>
+<span id="L570"><span class="lineNum">     570</span>                 :             : }</span>
+<span id="L571"><span class="lineNum">     571</span>                 :             : </span>
+<span id="L572"><span class="lineNum">     572</span>                 :<span class="tlaGNC">        9944 : std::string PSBTRoleName(PSBTRole role) {</span></span>
+<span id="L573"><span class="lineNum">     573</span>   [<span class="tlaGBC" title="Branch 0 was taken 1079 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 8164 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 234 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 44 times"> + </span> :<span class="tlaGNC">        9944 :     switch (role) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 423 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L574"><span class="lineNum">     574</span>                 :<span class="tlaGNC">        1079 :     case PSBTRole::CREATOR: return &quot;creator&quot;;</span></span>
+<span id="L575"><span class="lineNum">     575</span>                 :<span class="tlaGNC">        8164 :     case PSBTRole::UPDATER: return &quot;updater&quot;;</span></span>
+<span id="L576"><span class="lineNum">     576</span>                 :<span class="tlaGNC">         234 :     case PSBTRole::SIGNER: return &quot;signer&quot;;</span></span>
+<span id="L577"><span class="lineNum">     577</span>                 :<span class="tlaGNC">          44 :     case PSBTRole::FINALIZER: return &quot;finalizer&quot;;</span></span>
+<span id="L578"><span class="lineNum">     578</span>                 :<span class="tlaGNC">         423 :     case PSBTRole::EXTRACTOR: return &quot;extractor&quot;;</span></span>
+<span id="L579"><span class="lineNum">     579</span>                 :             :         // no default case, so the compiler can warn about missing cases</span>
+<span id="L580"><span class="lineNum">     580</span>                 :             :     }</span>
+<span id="L581"><span class="lineNum">     581</span>                 :<span class="tlaUNC">           0 :     assert(false);</span></span>
+<span id="L582"><span class="lineNum">     582</span>                 :             : }</span>
+<span id="L583"><span class="lineNum">     583</span>                 :             : </span>
+<span id="L584"><span class="lineNum">     584</span>                 :<span class="tlaGNC">       14298 : bool DecodeBase64PSBT(PartiallySignedTransaction&amp; psbt, const std::string&amp; base64_tx, std::string&amp; error)</span></span>
+<span id="L585"><span class="lineNum">     585</span>                 :             : {</span>
+<span id="L586"><span class="lineNum">     586</span>                 :<span class="tlaGNC">       14298 :     auto tx_data = DecodeBase64(base64_tx);</span></span>
+<span id="L587"><span class="lineNum">     587</span>         [<span class="tlaGBC" title="Branch 0 was taken 116 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 14182 times"> + </span>]:<span class="tlaGNC">       14298 :     if (!tx_data) {</span></span>
+<span id="L588"><span class="lineNum">     588</span>         [<span class="tlaGBC" title="Branch 0 was taken 116 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       14298 :         error = &quot;invalid base64&quot;;</span></span>
+<span id="L589"><span class="lineNum">     589</span>                 :             :         return false;</span>
+<span id="L590"><span class="lineNum">     590</span>                 :             :     }</span>
+<span id="L591"><span class="lineNum">     591</span>         [<span class="tlaGBC" title="Branch 0 was taken 14182 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       14182 :     return DecodeRawPSBT(psbt, MakeByteSpan(*tx_data), error);</span></span>
+<span id="L592"><span class="lineNum">     592</span>                 :<span class="tlaGNC">       14298 : }</span></span>
+<span id="L593"><span class="lineNum">     593</span>                 :             : </span>
+<span id="L594"><span class="lineNum">     594</span>                 :<span class="tlaGNC">       21355 : bool DecodeRawPSBT(PartiallySignedTransaction&amp; psbt, std::span&lt;const std::byte&gt; tx_data, std::string&amp; error)</span></span>
+<span id="L595"><span class="lineNum">     595</span>                 :             : {</span>
+<span id="L596"><span class="lineNum">     596</span>                 :<span class="tlaGNC">       21355 :     DataStream ss_data{tx_data};</span></span>
+<span id="L597"><span class="lineNum">     597</span>                 :<span class="tlaGNC">       21355 :     try {</span></span>
+<span id="L598"><span class="lineNum">     598</span>         [<span class="tlaGBC" title="Branch 0 was taken 15830 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5525 times"> + </span>]:<span class="tlaGNC">       21355 :         ss_data &gt;&gt; psbt;</span></span>
+<span id="L599"><span class="lineNum">     599</span>         [<span class="tlaGBC" title="Branch 0 was taken 389 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 15441 times"> + </span>]:<span class="tlaGNC">       15830 :         if (!ss_data.empty()) {</span></span>
+<span id="L600"><span class="lineNum">     600</span>         [<span class="tlaGBC" title="Branch 0 was taken 389 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       21355 :             error = &quot;extra data after PSBT&quot;;</span></span>
+<span id="L601"><span class="lineNum">     601</span>                 :             :             return false;</span>
+<span id="L602"><span class="lineNum">     602</span>                 :             :         }</span>
+<span id="L603"><span class="lineNum">     603</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5525 times"> + </span>]:<span class="tlaGNC">        5525 :     } catch (const std::exception&amp; e) {</span></span>
+<span id="L604"><span class="lineNum">     604</span>         [<span class="tlaGBC" title="Branch 0 was taken 5525 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        5525 :         error = e.what();</span></span>
+<span id="L605"><span class="lineNum">     605</span>                 :<span class="tlaGNC">        5525 :         return false;</span></span>
+<span id="L606"><span class="lineNum">     606</span>                 :<span class="tlaGNC">        5525 :     }</span></span>
+<span id="L607"><span class="lineNum">     607</span>                 :             :     return true;</span>
+<span id="L608"><span class="lineNum">     608</span>                 :<span class="tlaGNC">       21355 : }</span></span>
+<span id="L609"><span class="lineNum">     609</span>                 :             : </span>
+<span id="L610"><span class="lineNum">     610</span>                 :<span class="tlaGNC">       32631 : uint32_t PartiallySignedTransaction::GetVersion() const</span></span>
+<span id="L611"><span class="lineNum">     611</span>                 :             : {</span>
+<span id="L612"><span class="lineNum">     612</span>         [<span class="tlaGBC" title="Branch 0 was taken 81 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 32550 times"> + </span>]:<span class="tlaGNC">       32631 :     if (m_version != std::nullopt) {</span></span>
+<span id="L613"><span class="lineNum">     613</span>                 :<span class="tlaGNC">          81 :         return *m_version;</span></span>
+<span id="L614"><span class="lineNum">     614</span>                 :             :     }</span>
+<span id="L615"><span class="lineNum">     615</span>                 :             :     return 0;</span>
+<span id="L616"><span class="lineNum">     616</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/netgroup.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - netgroup.cpp<span style="font-size: 80%;"> (source / <a href="netgroup.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">97.0&nbsp;%</td>
+            <td class="headerCovTableEntry">66</td>
+            <td class="headerCovTableEntry">64</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-07-03 08:46:02</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryMed">80.0&nbsp;%</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">4</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">72.0&nbsp;%</td>
+            <td class="headerCovTableEntry">93</td>
+            <td class="headerCovTableEntry">67</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;netgroup.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;hash.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;logging.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/asmap.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :<span class="tlaGNC">        5283 : uint256 NetGroupManager::GetAsmapChecksum() const</span></span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : {</span>
+<span id="L13"><span class="lineNum">      13</span>         [<span class="tlaGBC" title="Branch 0 was taken 3336 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1947 times"> + </span>]:<span class="tlaGNC">        5283 :     if (!m_asmap.size()) return {};</span></span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :<span class="tlaGNC">        1947 :     return (HashWriter{} &lt;&lt; m_asmap).GetHash();</span></span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : }</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :<span class="tlaGNC">    41040845 : std::vector&lt;unsigned char&gt; NetGroupManager::GetGroup(const CNetAddr&amp; address) const</span></span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : {</span>
+<span id="L20"><span class="lineNum">      20</span>                 :<span class="tlaGNC">    41040845 :     std::vector&lt;unsigned char&gt; vchRet;</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :     // If non-empty asmap is supplied and the address is IPv4/IPv6,</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :     // return ASN to be used for bucketing.</span>
+<span id="L23"><span class="lineNum">      23</span>         [<span class="tlaGBC" title="Branch 0 was taken 41040845 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    41040845 :     uint32_t asn = GetMappedAS(address);</span></span>
+<span id="L24"><span class="lineNum">      24</span>         [<span class="tlaGBC" title="Branch 0 was taken 5959031 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 35081814 times"> + </span>]:<span class="tlaGNC">    41040845 :     if (asn != 0) { // Either asmap was empty, or address has non-asmappable net class (e.g. TOR).</span></span>
+<span id="L25"><span class="lineNum">      25</span>         [<span class="tlaGBC" title="Branch 0 was taken 5959031 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     5959031 :         vchRet.push_back(NET_IPV6); // IPv4 and IPv6 with same ASN should be in the same bucket</span></span>
+<span id="L26"><span class="lineNum">      26</span>         [<span class="tlaGBC" title="Branch 0 was taken 23836124 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5959031 times"> + </span>]:<span class="tlaGNC">    29795155 :         for (int i = 0; i &lt; 4; i++) {</span></span>
+<span id="L27"><span class="lineNum">      27</span>         [<span class="tlaGBC" title="Branch 0 was taken 23836124 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    23836124 :             vchRet.push_back((asn &gt;&gt; (8 * i)) &amp; 0xFF);</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :         }</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :         return vchRet;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     }</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>   [<span class="tlaGBC" title="Branch 0 was taken 35081814 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 35081814 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">    35081814 :     vchRet.push_back(address.GetNetClass());</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">    35081814 :     int nStartByte{0};</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">    35081814 :     int nBits{0};</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>   [<span class="tlaGBC" title="Branch 0 was taken 35081814 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 34907560 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 174254 times"> + </span>]:<span class="tlaGNC">    35081814 :     if (address.IsLocal()) {</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :         // all local addresses belong to the same group</span>
+<span id="L38"><span class="lineNum">      38</span>   [<span class="tlaGBC" title="Branch 0 was taken 34907560 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 34685707 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 221853 times"> + </span>]:<span class="tlaGNC">    34907560 :     } else if (address.IsInternal()) {</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :         // All internal-usage addresses get their own group.</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :         // Skip over the INTERNAL_IN_IPV6_PREFIX returned by CAddress::GetAddrBytes().</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :         nStartByte = INTERNAL_IN_IPV6_PREFIX.size();</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :         nBits = ADDR_INTERNAL_SIZE * 8;</span>
+<span id="L43"><span class="lineNum">      43</span>   [<span class="tlaGBC" title="Branch 0 was taken 34685707 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 34445546 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 240161 times"> + </span>]:<span class="tlaGNC">    34685707 :     } else if (!address.IsRoutable()) {</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :         // all other unroutable addresses belong to the same group</span>
+<span id="L45"><span class="lineNum">      45</span>   [<span class="tlaGBC" title="Branch 0 was taken 34445546 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 4800140 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 29645406 times"> + </span>]:<span class="tlaGNC">    34445546 :     } else if (address.HasLinkedIPv4()) {</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :         // IPv4 addresses (and mapped IPv4 addresses) use /16 groups</span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 4800140 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     4800140 :         uint32_t ipv4 = address.GetLinkedIPv4();</span></span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaGBC" title="Branch 0 was taken 4800140 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     4800140 :         vchRet.push_back((ipv4 &gt;&gt; 24) &amp; 0xFF);</span></span>
+<span id="L49"><span class="lineNum">      49</span>         [<span class="tlaGBC" title="Branch 0 was taken 4800140 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    41040845 :         vchRet.push_back((ipv4 &gt;&gt; 16) &amp; 0xFF);</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :         return vchRet;</span>
+<span id="L51"><span class="lineNum">      51</span>      [<span class="tlaGBC" title="Branch 0 was taken 6918483 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7369050 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 15357873 times"> + </span>]:<span class="tlaGNC">    29645406 :     } else if (address.IsTor() || address.IsI2P()) {</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :         nBits = 4;</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     } else if (address.IsCJDNS()) {</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :         // Treat in the same way as Tor and I2P because the address in all of</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :         // them is &quot;random&quot; bytes (derived from a public key). However in CJDNS</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :         // the first byte is a constant (see CJDNS_PREFIX), so the random bytes</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :         // come after it. Thus skip the constant 8 bits at the start.</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :         nBits = 12;</span>
+<span id="L59"><span class="lineNum">      59</span>   [<span class="tlaGBC" title="Branch 0 was taken 7369050 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 7359215 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 9835 times"> + </span>]:<span class="tlaGNC">     7369050 :     } else if (address.IsHeNet()) {</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :         // for he.net, use /36 groups</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :         nBits = 36;</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     } else {</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :         // for the rest of the IPv6 network, use /32 groups</span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">     7359215 :         nBits = 32;</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     }</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : </span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :     // Push our address onto vchRet.</span>
+<span id="L68"><span class="lineNum">      68</span>         [<span class="tlaGBC" title="Branch 0 was taken 30281674 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    30281674 :     auto addr_bytes = address.GetAddrBytes();</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">    30281674 :     const size_t num_bytes = nBits / 8;</span></span>
+<span id="L70"><span class="lineNum">      70</span>         [<span class="tlaGBC" title="Branch 0 was taken 30281674 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    30281674 :     vchRet.insert(vchRet.end(), addr_bytes.begin() + nStartByte, addr_bytes.begin() + nStartByte + num_bytes);</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">    30281674 :     nBits %= 8;</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     // ...for the last byte, push nBits and for the rest of the byte push 1's</span>
+<span id="L73"><span class="lineNum">      73</span>         [<span class="tlaGBC" title="Branch 0 was taken 22286191 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7995483 times"> + </span>]:<span class="tlaGNC">    30281674 :     if (nBits &gt; 0) {</span></span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 22286191 times"> + </span>]:<span class="tlaGNC">    22286191 :         assert(num_bytes &lt; addr_bytes.size());</span></span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaGBC" title="Branch 0 was taken 22286191 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    22286191 :         vchRet.push_back(addr_bytes[num_bytes + nStartByte] | ((1 &lt;&lt; (8 - nBits)) - 1));</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     }</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : </span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">    30281674 :     return vchRet;</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">    30281674 : }</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : </span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">    53373288 : uint32_t NetGroupManager::GetMappedAS(const CNetAddr&amp; address) const</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : {</span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">    53373288 :     uint32_t net_class = address.GetNetClass();</span></span>
+<span id="L84"><span class="lineNum">      84</span>   [<span class="tlaGBC" title="Branch 0 was taken 23957911 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 29415377 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 10114010 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13843901 times"> + </span>]:<span class="tlaGNC">    53373288 :     if (m_asmap.size() == 0 || (net_class != NET_IPV4 &amp;&amp; net_class != NET_IPV6)) {</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :         return 0; // Indicates not found, safe because AS0 is reserved per RFC7607.</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     }</span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaGBC" title="Branch 0 was taken 10114010 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    10114010 :     std::vector&lt;bool&gt; ip_bits(128);</span></span>
+<span id="L88"><span class="lineNum">      88</span>   [<span class="tlaGBC" title="Branch 0 was taken 10114010 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3688522 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 6425488 times"> + </span>]:<span class="tlaGNC">    10114010 :     if (address.HasLinkedIPv4()) {</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :         // For lookup, treat as if it was just an IPv4 address (IPV4_IN_IPV6_PREFIX + IPv4 bits)</span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 44262264 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3688522 times"> + </span>]:<span class="tlaGNC">    47950786 :         for (int8_t byte_i = 0; byte_i &lt; 12; ++byte_i) {</span></span>
+<span id="L91"><span class="lineNum">      91</span>         [<span class="tlaGBC" title="Branch 0 was taken 354098112 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 44262264 times"> + </span>]:<span class="tlaGNC">   398360376 :             for (uint8_t bit_i = 0; bit_i &lt; 8; ++bit_i) {</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">   354098112 :                 ip_bits[byte_i * 8 + bit_i] = (IPV4_IN_IPV6_PREFIX[byte_i] &gt;&gt; (7 - bit_i)) &amp; 1;</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :             }</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :         }</span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaGBC" title="Branch 0 was taken 3688522 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     3688522 :         uint32_t ipv4 = address.GetLinkedIPv4();</span></span>
+<span id="L96"><span class="lineNum">      96</span>         [<span class="tlaGBC" title="Branch 0 was taken 118032704 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3688522 times"> + </span>]:<span class="tlaGNC">   121721226 :         for (int i = 0; i &lt; 32; ++i) {</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :<span class="tlaGNC">   118032704 :             ip_bits[96 + i] = (ipv4 &gt;&gt; (31 - i)) &amp; 1;</span></span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :         }</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     } else {</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :         // Use all 128 bits of the IPv6 address otherwise</span>
+<span id="L101"><span class="lineNum">     101</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 6425488 times"> + </span>]:<span class="tlaGNC">     6425488 :         assert(address.IsIPv6());</span></span>
+<span id="L102"><span class="lineNum">     102</span>         [<span class="tlaGBC" title="Branch 0 was taken 6425488 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     6425488 :         auto addr_bytes = address.GetAddrBytes();</span></span>
+<span id="L103"><span class="lineNum">     103</span>         [<span class="tlaGBC" title="Branch 0 was taken 102807808 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6425488 times"> + </span>]:<span class="tlaGNC">   109233296 :         for (int8_t byte_i = 0; byte_i &lt; 16; ++byte_i) {</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">   102807808 :             uint8_t cur_byte = addr_bytes[byte_i];</span></span>
+<span id="L105"><span class="lineNum">     105</span>         [<span class="tlaGBC" title="Branch 0 was taken 822462464 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 102807808 times"> + </span>]:<span class="tlaGNC">   925270272 :             for (uint8_t bit_i = 0; bit_i &lt; 8; ++bit_i) {</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">   822462464 :                 ip_bits[byte_i * 8 + bit_i] = (cur_byte &gt;&gt; (7 - bit_i)) &amp; 1;</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :             }</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :         }</span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">     6425488 :     }</span></span>
+<span id="L110"><span class="lineNum">     110</span>         [<span class="tlaGBC" title="Branch 0 was taken 10114010 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    10114010 :     uint32_t mapped_as = Interpret(m_asmap, ip_bits);</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">    10114010 :     return mapped_as;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :<span class="tlaGNC">    10114010 : }</span></span>
+<span id="L113"><span class="lineNum">     113</span>                 :             : </span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">        1847 : void NetGroupManager::ASMapHealthCheck(const std::vector&lt;CNetAddr&gt;&amp; clearnet_addrs) const {</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :<span class="tlaGNC">        1847 :     std::set&lt;uint32_t&gt; clearnet_asns{};</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">        1847 :     int unmapped_count{0};</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : </span>
+<span id="L118"><span class="lineNum">     118</span>         [<span class="tlaGBC" title="Branch 0 was taken 893 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1847 times"> + </span>]:<span class="tlaGNC">        2740 :     for (const auto&amp; addr : clearnet_addrs) {</span></span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaGBC" title="Branch 0 was taken 893 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         893 :         uint32_t asn = GetMappedAS(addr);</span></span>
+<span id="L120"><span class="lineNum">     120</span>         [<span class="tlaGBC" title="Branch 0 was taken 721 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 172 times"> + </span>]:<span class="tlaGNC">         893 :         if (asn == 0) {</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">         721 :             ++unmapped_count;</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">         721 :             continue;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :         }</span>
+<span id="L124"><span class="lineNum">     124</span>         [<span class="tlaGBC" title="Branch 0 was taken 172 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         172 :         clearnet_asns.insert(asn);</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :     }</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : </span>
+<span id="L127"><span class="lineNum">     127</span>         [<span class="tlaGBC" title="Branch 0 was taken 1847 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1847 :     LogPrintf(&quot;ASMap Health Check: %i clearnet peers are mapped to %i ASNs with %i peers being unmapped\n&quot;, clearnet_addrs.size(), clearnet_asns.size(), unmapped_count);</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">        1847 : }</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaUNC">           0 : bool NetGroupManager::UsingASMap() const {</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaUNC">           0 :     return m_asmap.size() &gt; 0;</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
