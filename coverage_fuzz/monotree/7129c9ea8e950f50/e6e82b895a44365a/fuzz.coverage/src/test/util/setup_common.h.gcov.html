@@ -1,0 +1,399 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/util/setup_common.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/util">src/test/util</a> - setup_common.h<span style="font-size: 80%;"> (source / <a href="setup_common.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-07-22 19:11:23</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">41.7&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2015-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_TEST_UTIL_SETUP_COMMON_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_TEST_UTIL_SETUP_COMMON_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;common/args.h&gt; // IWYU pragma: export</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;kernel/caches.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;kernel/context.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;key.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;node/caches.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;node/context.h&gt; // IWYU pragma: export</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;ostream&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;pubkey.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;stdexcept&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;test/util/random.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;util/chaintype.h&gt; // IWYU pragma: export</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;util/fs.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;util/signalinterrupt.h&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;util/string.h&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #include &lt;util/vector.h&gt;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : #include &lt;type_traits&gt;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : </span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : class arith_uint256;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : class CFeeRate;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : class Chainstate;</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : class FastRandomContext;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : class uint160;</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : class uint256;</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : /** This is connected to the logger. Can be used to redirect logs to any other log */</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : extern const std::function&lt;void(const std::string&amp;)&gt; G_TEST_LOG_FUN;</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : /** Retrieve the command line arguments. */</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : extern const std::function&lt;std::vector&lt;const char*&gt;()&gt; G_TEST_COMMAND_LINE_ARGUMENTS;</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : </span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : /** Retrieve the unit test name. */</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : extern const std::function&lt;std::string()&gt; G_TEST_GET_FULL_NAME;</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : static constexpr CAmount CENT{1000000};</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : /** Register common test args. Shared across binaries that rely on the test framework. */</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : void SetupCommonTestArgs(ArgsManager&amp; argsman);</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span> [<span class="tlaGBC" title="Branch 0 was taken 1286 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> :<span class="tlaGNC">        5424 : struct TestOpts {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 27 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 1312 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1312 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L53"><span class="lineNum">      53</span>                 :             :     std::vector&lt;const char*&gt; extra_args{};</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     bool coins_db_in_memory{true};</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     bool block_tree_db_in_memory{true};</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :     bool setup_net{true};</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     bool setup_validation_interface{true};</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     bool min_validation_cache{false}; // Equivalent of -maxsigcachebytes=0</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : };</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : </span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : /** Basic testing setup.</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :  * This just configures logging, data dir and chain parameters.</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :  */</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : struct BasicTestingSetup {</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     util::SignalInterrupt m_interrupt;</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     node::NodeContext m_node; // keep as first member to be destructed last</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : </span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     FastRandomContext m_rng;</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     /** Seed the global RNG state and m_rng for testing and log the seed value. This affects all randomness, except GetStrongRandBytes(). */</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     void SeedRandomForTest(SeedRand seed)</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     {</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :         SeedRandomStateForTest(seed);</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :         m_rng.Reseed(GetRandHash());</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     }</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : </span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     explicit BasicTestingSetup(const ChainType chainType = ChainType::MAIN, TestOpts = {});</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :     ~BasicTestingSetup();</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :     fs::path m_path_root;</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     fs::path m_path_lock;</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     bool m_has_custom_datadir{false};</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     /** @brief Test-specific arguments and settings.</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :      *</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :      * This member is intended to be the primary source of settings for code</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :      * being tested by unit tests. It exists to make tests more self-contained</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :      * and reduce reliance on global state.</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :      *</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :      * Usage guidelines:</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :      * 1. Prefer using m_args where possible in test code.</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :      * 2. If m_args is not accessible, use m_node.args as a fallback.</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :      * 3. Avoid direct references to gArgs in test code.</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :      *</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :      * Note: Currently, m_node.args points to gArgs for backwards</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :      * compatibility. In the future, it will point to m_args to further isolate</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :      * test environments.</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :      *</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :      * @see https://github.com/bitcoin/bitcoin/issues/25055 for additional context.</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :      */</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     ArgsManager m_args;</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : };</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : </span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : /** Testing setup that performs all steps up until right before</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :  * ChainstateManager gets initialized. Meant for testing ChainstateManager</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :  * initialization behaviour.</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :  */</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : struct ChainTestingSetup : public BasicTestingSetup {</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     kernel::CacheSizes m_kernel_cache_sizes{node::CalculateCacheSizes(m_args).kernel};</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     bool m_coins_db_in_memory{true};</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     bool m_block_tree_db_in_memory{true};</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     std::function&lt;void()&gt; m_make_chainman{};</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : </span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     explicit ChainTestingSetup(const ChainType chainType = ChainType::MAIN, TestOpts = {});</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     ~ChainTestingSetup();</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             : </span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     // Supplies a chainstate, if one is needed</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     void LoadVerifyActivateChainstate();</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : };</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : </span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : /** Testing setup that configures a complete environment.</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :  */</span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">          27 : struct TestingSetup : public ChainTestingSetup {</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     explicit TestingSetup(</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :         const ChainType chainType = ChainType::MAIN,</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :         TestOpts = {});</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : };</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : </span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : /** Identical to TestingSetup, but chain set to regtest */</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             : struct RegTestingSetup : public TestingSetup {</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :     RegTestingSetup()</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :         : TestingSetup{ChainType::REGTEST} {}</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : };</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : </span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : /** Identical to TestingSetup, but chain set to testnet4 */</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : struct Testnet4Setup : public TestingSetup {</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :     Testnet4Setup()</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :         : TestingSetup{ChainType::TESTNET4} {}</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : };</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             : </span>
+<span id="L139"><span class="lineNum">     139</span>                 :             : class CBlock;</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : struct CMutableTransaction;</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : class CScript;</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : </span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : /**</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :  * Testing fixture that pre-creates a 100-block REGTEST-mode block chain</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :  */</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : struct TestChain100Setup : public TestingSetup {</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :     TestChain100Setup(</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :         const ChainType chain_type = ChainType::REGTEST,</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :         TestOpts = {});</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : </span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :     /**</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :      * Create a new block with just given transactions, coinbase paying to</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :      * scriptPubKey, and try to add it to the current chain.</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :      * If no chainstate is specified, default to the active.</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :      */</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     CBlock CreateAndProcessBlock(const std::vector&lt;CMutableTransaction&gt;&amp; txns,</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :                                  const CScript&amp; scriptPubKey,</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :                                  Chainstate* chainstate = nullptr);</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     /**</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :      * Create a new block with just given transactions, coinbase paying to</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :      * scriptPubKey.</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :      */</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :     CBlock CreateBlock(</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :         const std::vector&lt;CMutableTransaction&gt;&amp; txns,</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :         const CScript&amp; scriptPubKey,</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :         Chainstate&amp; chainstate);</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             : </span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :     //! Mine a series of new blocks on the active chain.</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :     void mineBlocks(int num_blocks);</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             : </span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :     /**</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     * Create a transaction, optionally setting the fee based on the feerate.</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     * Note: The feerate may not be met exactly depending on whether the signatures can have different sizes.</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     *</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     * @param input_transactions   The transactions to spend</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     * @param inputs               Outpoints with which to construct transaction vin.</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     * @param input_height         The height of the block that included the input transactions.</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     * @param input_signing_keys   The keys to spend the input transactions.</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     * @param outputs              Transaction vout.</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :     * @param feerate              The feerate the transaction should pay.</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :     * @param fee_output           The index of the output to take the fee from.</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     * @return The transaction and the fee it pays</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :     */</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :     std::pair&lt;CMutableTransaction, CAmount&gt; CreateValidTransaction(const std::vector&lt;CTransactionRef&gt;&amp; input_transactions,</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :                                                                    const std::vector&lt;COutPoint&gt;&amp; inputs,</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :                                                                    int input_height,</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :                                                                    const std::vector&lt;CKey&gt;&amp; input_signing_keys,</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :                                                                    const std::vector&lt;CTxOut&gt;&amp; outputs,</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :                                                                    const std::optional&lt;CFeeRate&gt;&amp; feerate,</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :                                                                    const std::optional&lt;uint32_t&gt;&amp; fee_output);</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     /**</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :      * Create a transaction and, optionally, submit to the mempool.</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :      *</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :      * @param input_transactions   The transactions to spend</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :      * @param inputs               Outpoints with which to construct transaction vin.</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :      * @param input_height         The height of the block that included the input transaction(s).</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :      * @param input_signing_keys   The keys to spend inputs.</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :      * @param outputs              Transaction vout.</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :      * @param submit               Whether or not to submit to mempool</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :      */</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     CMutableTransaction CreateValidMempoolTransaction(const std::vector&lt;CTransactionRef&gt;&amp; input_transactions,</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :                                                       const std::vector&lt;COutPoint&gt;&amp; inputs,</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :                                                       int input_height,</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :                                                       const std::vector&lt;CKey&gt;&amp; input_signing_keys,</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :                                                       const std::vector&lt;CTxOut&gt;&amp; outputs,</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :                                                       bool submit = true);</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : </span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     /**</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :      * Create a 1-in-1-out transaction and, optionally, submit to the mempool.</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :      *</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :      * @param input_transaction  The transaction to spend</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :      * @param input_vout         The vout to spend from the input_transaction</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :      * @param input_height       The height of the block that included the input_transaction</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :      * @param input_signing_key  The key to spend the input_transaction</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :      * @param output_destination Where to send the output</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :      * @param output_amount      How much to send</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :      * @param submit             Whether or not to submit to mempool</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :      */</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     CMutableTransaction CreateValidMempoolTransaction(CTransactionRef input_transaction,</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :                                                       uint32_t input_vout,</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :                                                       int input_height,</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :                                                       CKey input_signing_key,</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :                                                       CScript output_destination,</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :                                                       CAmount output_amount = CAmount(1 * COIN),</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :                                                       bool submit = true);</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : </span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     /** Create transactions spending from m_coinbase_txns. These transactions will only spend coins</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :      * that exist in the current chain, but may be premature coinbase spends, have missing</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :      * signatures, or violate some other consensus rules. They should only be used for testing</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :      * mempool consistency. All transactions will have some random number of inputs and outputs</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :      * (between 1 and 24). Transactions may or may not be dependent upon each other; if dependencies</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :      * exit, every parent will always be somewhere in the list before the child so each transaction</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :      * can be submitted in the same order they appear in the list.</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :      * @param[in]   submit      When true, submit transactions to the mempool.</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :      *                          When false, return them but don't submit them.</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :      * @returns A vector of transactions that can be submitted to the mempool.</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :      */</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :     std::vector&lt;CTransactionRef&gt; PopulateMempool(FastRandomContext&amp; det_rand, size_t num_transactions, bool submit);</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             : </span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :     /** Mock the mempool minimum feerate by adding a transaction and calling TrimToSize(0),</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :      * simulating the mempool &quot;reaching capacity&quot; and evicting by descendant feerate.  Note that</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :      * this clears the mempool, and the new minimum feerate will depend on the maximum feerate of</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :      * transactions removed, so this must be called while the mempool is empty.</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :      *</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :      * @param target_feerate    The new mempool minimum feerate after this function returns.</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :      *                          Must be above max(incremental feerate, min relay feerate),</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :      *                          or 1sat/vB with default settings.</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :      */</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :     void MockMempoolMinFee(const CFeeRate&amp; target_feerate);</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :     std::vector&lt;CTransactionRef&gt; m_coinbase_txns; // For convenience, coinbase transactions</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     CKey coinbaseKey; // private/public key needed to spend coinbase transactions</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             : };</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : </span>
+<span id="L256"><span class="lineNum">     256</span>                 :             : /**</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :  * Make a test setup that has disk access to the debug.log file disabled. Can</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :  * be used in &quot;hot loops&quot;, for example fuzzing or benchmarking.</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :  */</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             : template &lt;class T = const BasicTestingSetup&gt;</span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">          87 : std::unique_ptr&lt;T&gt; MakeNoLogFileContext(const ChainType chain_type = ChainType::REGTEST, TestOpts opts = {})</span></span>
+<span id="L262"><span class="lineNum">     262</span>                 :             : {</span>
+<span id="L263"><span class="lineNum">     263</span>         [<span class="tlaGBC" title="Branch 0 was taken 87 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         174 :     opts.extra_args = Cat(</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :         {</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :             &quot;-nodebuglogfile&quot;,</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :             &quot;-nodebug&quot;,</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :         },</span>
+<span id="L268"><span class="lineNum">     268</span>                 :<span class="tlaGNC">         174 :         opts.extra_args);</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :             : </span>
+<span id="L270"><span class="lineNum">     270</span>                 :<span class="tlaGNC">          87 :     return std::make_unique&lt;T&gt;(chain_type, opts);</span></span>
+<span id="L271"><span class="lineNum">     271</span>                 :             : }</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : </span>
+<span id="L273"><span class="lineNum">     273</span>                 :             : CBlock getBlock13b8a();</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             : </span>
+<span id="L275"><span class="lineNum">     275</span>                 :             : // Make types usable in BOOST_CHECK_* @{</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             : namespace std {</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             : template &lt;typename T&gt; requires std::is_enum_v&lt;T&gt;</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : inline std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const T&amp; e)</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             : {</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :     return os &lt;&lt; static_cast&lt;std::underlying_type_t&lt;T&gt;&gt;(e);</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             : }</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             : </span>
+<span id="L283"><span class="lineNum">     283</span>                 :             : template &lt;typename T&gt;</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             : inline std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const std::optional&lt;T&gt;&amp; v)</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             : {</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :     return v ? os &lt;&lt; *v</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :              : os &lt;&lt; &quot;std::nullopt&quot;;</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             : }</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : } // namespace std</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             : </span>
+<span id="L291"><span class="lineNum">     291</span>                 :             : std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const arith_uint256&amp; num);</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             : std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const uint160&amp; num);</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             : std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const uint256&amp; num);</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             : // @}</span>
+<span id="L295"><span class="lineNum">     295</span>                 :             : </span>
+<span id="L296"><span class="lineNum">     296</span>                 :             : /**</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :  * BOOST_CHECK_EXCEPTION predicates to check the specific validation error.</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :  * Use as</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :  * BOOST_CHECK_EXCEPTION(code that throws, exception type, HasReason(&quot;foo&quot;));</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :  */</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             : class HasReason</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             : {</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : public:</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :     explicit HasReason(std::string_view reason) : m_reason(reason) {}</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :     bool operator()(std::string_view s) const { return s.find(m_reason) != std::string_view::npos; }</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :     bool operator()(const std::exception&amp; e) const { return (*this)(e.what()); }</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             : </span>
+<span id="L308"><span class="lineNum">     308</span>                 :             : private:</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             :     const std::string m_reason;</span>
+<span id="L310"><span class="lineNum">     310</span>                 :             : };</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             : </span>
+<span id="L312"><span class="lineNum">     312</span>                 :             : #endif // BITCOIN_TEST_UTIL_SETUP_COMMON_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
