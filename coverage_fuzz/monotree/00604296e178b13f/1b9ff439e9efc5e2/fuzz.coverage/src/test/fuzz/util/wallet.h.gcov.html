@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/util/wallet.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz/util">src/test/fuzz/util</a> - wallet.h<span style="font-size: 80%;"> (source / <a href="wallet.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">97.5&nbsp;%</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntry">39</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-07-30 14:09:27</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">50.0&nbsp;%</td>
+            <td class="headerCovTableEntry">118</td>
+            <td class="headerCovTableEntry">59</td>
+          </tr>
+                  <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2024-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_TEST_FUZZ_UTIL_WALLET_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_TEST_FUZZ_UTIL_WALLET_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;wallet/coincontrol.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;wallet/fees.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;wallet/spend.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;wallet/test/util.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;wallet/wallet.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : namespace wallet {</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : /**</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :  * Wraps a descriptor wallet for fuzzing.</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :  */</span>
+<span id="L23"><span class="lineNum">      23</span>   [<span class="tlaGBC" title="Branch 0 was taken 43 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1895 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        3876 : struct FuzzedWallet {</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L24"><span class="lineNum">      24</span>                 :             :     std::shared_ptr&lt;CWallet&gt; wallet;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">        1938 :     FuzzedWallet(interfaces::Chain&amp; chain, const std::string&amp; name, const std::string&amp; seed_insecure)</span></span>
+<span id="L26"><span class="lineNum">      26</span>         [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1938 :     {</span></span>
+<span id="L27"><span class="lineNum">      27</span>   [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        1938 :         wallet = std::make_shared&lt;CWallet&gt;(&amp;chain, name, CreateMockableWalletDatabase());</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 1938 times"> + </span>]
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">        1938 :         {</span></span>
+<span id="L29"><span class="lineNum">      29</span>         [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1938 :             LOCK(wallet-&gt;cs_wallet);</span></span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1938 :             wallet-&gt;SetWalletFlag(WALLET_FLAG_DESCRIPTORS);</span></span>
+<span id="L31"><span class="lineNum">      31</span>   [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        1938 :             auto height{*Assert(chain.getHeight())};</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L32"><span class="lineNum">      32</span>   [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1938 :             wallet-&gt;SetLastBlockProcessed(height, chain.getBlockHash(height));</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaUNC">           0 :         }</span></span>
+<span id="L34"><span class="lineNum">      34</span>         [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1938 :         wallet-&gt;m_keypool_size = 1; // Avoid timeout in TopUp()</span></span>
+<span id="L35"><span class="lineNum">      35</span>   [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 1938 times"> + </span>]:<span class="tlaGNC">        1938 :         assert(wallet-&gt;IsWalletFlagSet(WALLET_FLAG_DESCRIPTORS));</span></span>
+<span id="L36"><span class="lineNum">      36</span>         [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1938 :         ImportDescriptors(seed_insecure);</span></span>
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1938 :     }</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">        1938 :     void ImportDescriptors(const std::string&amp; seed_insecure)</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     {</span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">        1938 :         const std::vector&lt;std::string&gt; DESCS{</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :             &quot;pkh(%s/%s/*)&quot;,</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :             &quot;sh(wpkh(%s/%s/*))&quot;,</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :             &quot;tr(%s/%s/*)&quot;,</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :             &quot;wpkh(%s/%s/*)&quot;,</span>
+<span id="L45"><span class="lineNum">      45</span>   [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 1938 times"> + </span> :<span class="tlaGNC">       11628 :         };</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 7752 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 7752 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1938 times"> + </span>]:<span class="tlaGNC">        9690 :         for (const std::string&amp; desc_fmt : DESCS) {</span></span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7752 times"> + </span>]:<span class="tlaGNC">       23256 :             for (bool internal : {true, false}) {</span></span>
+<span id="L49"><span class="lineNum">      49</span>   [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       15504 :                 const auto descriptor{strprintf(tfm::RuntimeFormat{desc_fmt}, &quot;[5aa9973a/66h/4h/2h]&quot; + seed_insecure, int{internal})};</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : </span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">       15504 :                 FlatSigningProvider keys;</span></span>
+<span id="L52"><span class="lineNum">      52</span>         [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       15504 :                 std::string error;</span></span>
+<span id="L53"><span class="lineNum">      53</span>         [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       31008 :                 auto parsed_desc = std::move(Parse(descriptor, keys, error, /*require_checksum=*/false).at(0));</span></span>
+<span id="L54"><span class="lineNum">      54</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 15504 times"> + </span>]:<span class="tlaGNC">       15504 :                 assert(parsed_desc);</span></span>
+<span id="L55"><span class="lineNum">      55</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 15504 times"> + </span>]:<span class="tlaGNC">       15504 :                 assert(error.empty());</span></span>
+<span id="L56"><span class="lineNum">      56</span>   [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 15504 times"> + </span>]:<span class="tlaGNC">       15504 :                 assert(parsed_desc-&gt;IsRange());</span></span>
+<span id="L57"><span class="lineNum">      57</span>   [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 15504 times"> + </span>]:<span class="tlaGNC">       15504 :                 assert(parsed_desc-&gt;IsSingleType());</span></span>
+<span id="L58"><span class="lineNum">      58</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 15504 times"> + </span>]:<span class="tlaGNC">       15504 :                 assert(!keys.keys.empty());</span></span>
+<span id="L59"><span class="lineNum">      59</span>   [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       15504 :                 WalletDescriptor w_desc{std::move(parsed_desc), /*creation_time=*/0, /*range_start=*/0, /*range_end=*/1, /*next_index=*/0};</span></span>
+<span id="L60"><span class="lineNum">      60</span>   [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 15504 times"> + </span>]:<span class="tlaGNC">       15504 :                 assert(!wallet-&gt;GetDescriptorScriptPubKeyMan(w_desc));</span></span>
+<span id="L61"><span class="lineNum">      61</span>         [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       15504 :                 LOCK(wallet-&gt;cs_wallet);</span></span>
+<span id="L62"><span class="lineNum">      62</span>   [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       15504 :                 auto&amp; spk_manager = Assert(wallet-&gt;AddWalletDescriptor(w_desc, keys, /*label=*/&quot;&quot;, internal))-&gt;get();</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L63"><span class="lineNum">      63</span>   [<span class="tlaGBC" title="Branch 0 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       15504 :                 wallet-&gt;AddActiveScriptPubKeyMan(spk_manager.GetID(), *Assert(w_desc.descriptor-&gt;GetOutputType()), internal);</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 15504 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">       15504 :             }</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :         }</span>
+<span id="L66"><span class="lineNum">      66</span>   [<span class="tlaGBC" title="Branch 0 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        3876 :     }</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1938 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 9 was not taken"> - </span>]
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">      155982 :     CTxDestination GetDestination(FuzzedDataProvider&amp; fuzzed_data_provider)</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     {</span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">      155982 :         auto type{fuzzed_data_provider.PickValueInArray(OUTPUT_TYPES)};</span></span>
+<span id="L70"><span class="lineNum">      70</span>         [<span class="tlaGBC" title="Branch 0 was taken 104583 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 51399 times"> + </span>]:<span class="tlaGNC">      155982 :         if (fuzzed_data_provider.ConsumeBool()) {</span></span>
+<span id="L71"><span class="lineNum">      71</span>   [<span class="tlaGBC" title="Branch 0 was taken 104583 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 104583 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      209166 :             return *Assert(wallet-&gt;GetNewDestination(type, &quot;&quot;));</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 104583 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L72"><span class="lineNum">      72</span>                 :             :         } else {</span>
+<span id="L73"><span class="lineNum">      73</span>   [<span class="tlaGBC" title="Branch 0 was taken 51399 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 51399 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      102798 :             return *Assert(wallet-&gt;GetNewChangeDestination(type));</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :         }</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     }</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     CScript GetScriptPubKey(FuzzedDataProvider&amp; fuzzed_data_provider) { return GetScriptForDestination(GetDestination(fuzzed_data_provider)); }</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : };</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : }</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : #endif // BITCOIN_TEST_FUZZ_UTIL_WALLET_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

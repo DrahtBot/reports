@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/netbase_dns_lookup.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - netbase_dns_lookup.cpp<span style="font-size: 80%;"> (source / <a href="netbase_dns_lookup.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">92.7&nbsp;%</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntry">38</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-07-30 14:09:27</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">64.3&nbsp;%</td>
+            <td class="headerCovTableEntry">56</td>
+            <td class="headerCovTableEntry">36</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;netaddress.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;netbase.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;test/fuzz/util/net.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;string&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>         [<span class="tlaGBC" title="Branch 0 was taken 227 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1136 : FUZZ_TARGET(netbase_dns_lookup)</span></span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : {</span>
+<span id="L17"><span class="lineNum">      17</span>                 :<span class="tlaGNC">         682 :     FuzzedDataProvider fuzzed_data_provider{buffer.data(), buffer.size()};</span></span>
+<span id="L18"><span class="lineNum">      18</span>                 :<span class="tlaGNC">         682 :     const std::string name = fuzzed_data_provider.ConsumeRandomLengthString(512);</span></span>
+<span id="L19"><span class="lineNum">      19</span>                 :<span class="tlaGNC">         682 :     const unsigned int max_results = fuzzed_data_provider.ConsumeIntegral&lt;unsigned int&gt;();</span></span>
+<span id="L20"><span class="lineNum">      20</span>                 :<span class="tlaGNC">         682 :     const bool allow_lookup = fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">         682 :     const uint16_t default_port = fuzzed_data_provider.ConsumeIntegral&lt;uint16_t&gt;();</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">        4011 :     auto fuzzed_dns_lookup_function = [&amp;](const std::string&amp;, bool) {</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">        3329 :         std::vector&lt;CNetAddr&gt; resolved_addresses;</span></span>
+<span id="L25"><span class="lineNum">      25</span>   [<span class="tlaGBC" title="Branch 0 was taken 929692 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3289 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 929652 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 40 times"> + </span>]:<span class="tlaGNC">      932981 :         LIMITED_WHILE(fuzzed_data_provider.ConsumeBool(), 10000) {</span></span>
+<span id="L26"><span class="lineNum">      26</span>         [<span class="tlaGBC" title="Branch 0 was taken 929652 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      929652 :             resolved_addresses.push_back(ConsumeNetAddr(fuzzed_data_provider));</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :         }</span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">        3329 :         return resolved_addresses;</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         682 :     };</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : </span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaGNC">         682 :     {</span></span>
+<span id="L32"><span class="lineNum">      32</span>         [<span class="tlaGBC" title="Branch 0 was taken 682 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         682 :         const std::vector&lt;CNetAddr&gt; resolved_addresses{LookupHost(name, max_results, allow_lookup, fuzzed_dns_lookup_function)};</span></span>
+<span id="L33"><span class="lineNum">      33</span>         [<span class="tlaGBC" title="Branch 0 was taken 273109 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 682 times"> + </span>]:<span class="tlaGNC">      273791 :         for (const CNetAddr&amp; resolved_address : resolved_addresses) {</span></span>
+<span id="L34"><span class="lineNum">      34</span>   [<span class="tlaGBC" title="Branch 0 was taken 273109 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 273109 times"> + </span>]:<span class="tlaGNC">      273109 :             assert(!resolved_address.IsInternal());</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :         }</span>
+<span id="L36"><span class="lineNum">      36</span>   [<span class="tlaGBC" title="Branch 0 was taken 35 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 647 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 35 times"> + </span>]:<span class="tlaGNC">         682 :         assert(resolved_addresses.size() &lt;= max_results || max_results == 0);</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">         682 :     }</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">         682 :     {</span></span>
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaGBC" title="Branch 0 was taken 682 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         682 :         const std::optional&lt;CNetAddr&gt; resolved_address{LookupHost(name, allow_lookup, fuzzed_dns_lookup_function)};</span></span>
+<span id="L40"><span class="lineNum">      40</span>         [<span class="tlaGBC" title="Branch 0 was taken 220 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 462 times"> + </span>]:<span class="tlaGNC">         682 :         if (resolved_address.has_value()) {</span></span>
+<span id="L41"><span class="lineNum">      41</span>   [<span class="tlaGBC" title="Branch 0 was taken 220 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 220 times"> + </span>]:<span class="tlaGNC">         220 :             assert(!resolved_address.value().IsInternal());</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :         }</span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">         682 :     {</span></span>
+<span id="L45"><span class="lineNum">      45</span>         [<span class="tlaGBC" title="Branch 0 was taken 682 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         682 :         const std::vector&lt;CService&gt; resolved_services{Lookup(name, default_port, allow_lookup, max_results, fuzzed_dns_lookup_function)};</span></span>
+<span id="L46"><span class="lineNum">      46</span>         [<span class="tlaGBC" title="Branch 0 was taken 209677 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 682 times"> + </span>]:<span class="tlaGNC">      210359 :         for (const CNetAddr&amp; resolved_service : resolved_services) {</span></span>
+<span id="L47"><span class="lineNum">      47</span>   [<span class="tlaGBC" title="Branch 0 was taken 209677 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 209677 times"> + </span>]:<span class="tlaGNC">      209677 :             assert(!resolved_service.IsInternal());</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :         }</span>
+<span id="L49"><span class="lineNum">      49</span>   [<span class="tlaGBC" title="Branch 0 was taken 25 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 657 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 25 times"> + </span>]:<span class="tlaGNC">         682 :         assert(resolved_services.size() &lt;= max_results || max_results == 0);</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">         682 :     }</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">         682 :     {</span></span>
+<span id="L52"><span class="lineNum">      52</span>         [<span class="tlaGBC" title="Branch 0 was taken 682 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         682 :         const std::optional&lt;CService&gt; resolved_service{Lookup(name, default_port, allow_lookup, fuzzed_dns_lookup_function)};</span></span>
+<span id="L53"><span class="lineNum">      53</span>         [<span class="tlaGBC" title="Branch 0 was taken 228 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 454 times"> + </span>]:<span class="tlaGNC">         682 :         if (resolved_service.has_value()) {</span></span>
+<span id="L54"><span class="lineNum">      54</span>   [<span class="tlaGBC" title="Branch 0 was taken 228 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 228 times"> + </span>]:<span class="tlaGNC">         228 :             assert(!resolved_service.value().IsInternal());</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :         }</span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">         682 :     {</span></span>
+<span id="L58"><span class="lineNum">      58</span>         [<span class="tlaGBC" title="Branch 0 was taken 682 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         682 :         CService resolved_service = LookupNumeric(name, default_port, fuzzed_dns_lookup_function);</span></span>
+<span id="L59"><span class="lineNum">      59</span>   [<span class="tlaGBC" title="Branch 0 was taken 682 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 682 times"> + </span>]:<span class="tlaGNC">         682 :         assert(!resolved_service.IsInternal());</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">         682 :     {</span></span>
+<span id="L62"><span class="lineNum">      62</span>         [<span class="tlaGBC" title="Branch 0 was taken 682 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1364 :         (void)LookupSubNet(name);</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     }</span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">         682 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
