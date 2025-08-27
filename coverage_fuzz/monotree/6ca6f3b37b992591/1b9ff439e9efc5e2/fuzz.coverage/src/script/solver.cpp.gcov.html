@@ -1,0 +1,333 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/script/solver.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/script">src/script</a> - solver.cpp<span style="font-size: 80%;"> (source / <a href="solver.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">98.4&nbsp;%</td>
+            <td class="headerCovTableEntry">126</td>
+            <td class="headerCovTableEntry">124</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-08-27 15:46:05</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">9</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">77.7&nbsp;%</td>
+            <td class="headerCovTableEntry">256</td>
+            <td class="headerCovTableEntry">199</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;pubkey.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;script/interpreter.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;script/script.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;script/solver.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;cassert&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;string&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : typedef std::vector&lt;unsigned char&gt; valtype;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :<span class="tlaGNC">     1468300 : std::string GetTxnOutputType(TxoutType t)</span></span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : {</span>
+<span id="L20"><span class="lineNum">      20</span>   [<span class="tlaGBC" title="Branch 0 was taken 1037757 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 31953 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 27243 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 144455 times"> + </span> :<span class="tlaGNC">     1468300 :     switch (t) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 28728 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 5956 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 2522 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 67602 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 75305 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="Branch 9 was taken 17283 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 29496 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span>]
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">     1037757 :     case TxoutType::NONSTANDARD: return &quot;nonstandard&quot;;</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">       31953 :     case TxoutType::PUBKEY: return &quot;pubkey&quot;;</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">       27243 :     case TxoutType::PUBKEYHASH: return &quot;pubkeyhash&quot;;</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">      144455 :     case TxoutType::SCRIPTHASH: return &quot;scripthash&quot;;</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">       28728 :     case TxoutType::MULTISIG: return &quot;multisig&quot;;</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">        5956 :     case TxoutType::NULL_DATA: return &quot;nulldata&quot;;</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">        2522 :     case TxoutType::ANCHOR: return &quot;anchor&quot;;</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">       67602 :     case TxoutType::WITNESS_V0_KEYHASH: return &quot;witness_v0_keyhash&quot;;</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">       75305 :     case TxoutType::WITNESS_V0_SCRIPTHASH: return &quot;witness_v0_scripthash&quot;;</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">       17283 :     case TxoutType::WITNESS_V1_TAPROOT: return &quot;witness_v1_taproot&quot;;</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaGNC">       29496 :     case TxoutType::WITNESS_UNKNOWN: return &quot;witness_unknown&quot;;</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     } // no default case, so the compiler can warn about missing cases</span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaUNC">           0 :     assert(false);</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : }</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">     5061474 : static bool MatchPayToPubkey(const CScript&amp; script, valtype&amp; pubkey)</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : {</span>
+<span id="L38"><span class="lineNum">      38</span>   [<span class="tlaGBC" title="Branch 0 was taken 1122004 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3939470 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 46985 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1075019 times"> + </span> :<span class="tlaGNC">     5061474 :     if (script.size() == CPubKey::SIZE + 2 &amp;&amp; script[0] == CPubKey::SIZE &amp;&amp; script.back() == OP_CHECKSIG) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 36831 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 10154 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 4096 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 32735 times"> + </span>]
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">       65470 :         pubkey = valtype(script.begin() + 1, script.begin() + CPubKey::SIZE + 1);</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">       32735 :         return CPubKey::ValidSize(pubkey);</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     }</span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaGBC" title="Branch 0 was taken 1089269 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3939470 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 144096 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4884643 times"> + </span> :<span class="tlaGNC">     6382609 :     if (script.size() == CPubKey::COMPRESSED_SIZE + 2 &amp;&amp; script[0] == CPubKey::COMPRESSED_SIZE &amp;&amp; script.back() == OP_CHECKSIG) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 143722 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 374 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 120505 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 23591 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 120137 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="Branch 9 was taken 368 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 114060 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 6445 times"> + </span>]
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">      228120 :         pubkey = valtype(script.begin() + 1, script.begin() + CPubKey::COMPRESSED_SIZE + 1);</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">      114060 :         return CPubKey::ValidSize(pubkey);</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     }</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     return false;</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : }</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">     4927758 : static bool MatchPayToPubkeyHash(const CScript&amp; script, valtype&amp; pubkeyhash)</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : {</span>
+<span id="L51"><span class="lineNum">      51</span>   [<span class="tlaGBC" title="Branch 0 was taken 1093156 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3834602 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 289688 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4638070 times"> + </span> :<span class="tlaGNC">     7418181 :     if (script.size() == 25 &amp;&amp; script[0] == OP_DUP &amp;&amp; script[1] == OP_HASH160 &amp;&amp; script[2] == 20 &amp;&amp; script[23] == OP_EQUALVERIFY &amp;&amp; script[24] == OP_CHECKSIG) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 278752 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 10936 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 281539 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 8149 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 271648 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 9 was taken 9891 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 277738 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 3801 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 268164 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 9574 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 276044 times"> + </span><span class="tlaGBC" title="Branch 15 was taken 1694 times"> + </span><span class="tlaGBC" title="Branch 16 was taken 266695 times"> + </span><span class="tlaGBC" title="Branch 17 was taken 9349 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 272258 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 19 was taken 3786 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 263232 times"> + </span><span class="tlaGBC" title="Branch 21 was taken 9026 times"> + </span><span class="tlaGBC" title="Branch 22 was taken 269953 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 23 was taken 2305 times"> + </span>]
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">      539906 :         pubkeyhash = valtype(script.begin () + 3, script.begin() + 23);</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">      269953 :         return true;</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     }</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     return false;</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : }</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : </span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : /** Test for &quot;small positive integer&quot; script opcodes - OP_1 through OP_16. */</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">      358262 : static constexpr bool IsSmallInteger(opcodetype opcode)</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : {</span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">      358262 :     return opcode &gt;= OP_1 &amp;&amp; opcode &lt;= OP_16;</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : }</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : </span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : /** Retrieve a minimally-encoded number in range [min,max] from an (opcode, data) pair,</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :  *  whether it's OP_n or through a push. */</span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">      358262 : static std::optional&lt;int&gt; GetScriptNumber(opcodetype opcode, valtype data, int min, int max)</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : {</span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">      358262 :     int count;</span></span>
+<span id="L69"><span class="lineNum">      69</span>         [<span class="tlaGBC" title="Branch 0 was taken 224695 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 133567 times"> + </span>]:<span class="tlaGNC">      358262 :     if (IsSmallInteger(opcode)) {</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">      224695 :         count = CScript::DecodeOP_N(opcode);</span></span>
+<span id="L71"><span class="lineNum">      71</span>         [<span class="tlaGBC" title="Branch 0 was taken 96022 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 37545 times"> + </span>]:<span class="tlaGNC">      133567 :     } else if (IsPushdataOp(opcode)) {</span></span>
+<span id="L72"><span class="lineNum">      72</span>         [<span class="tlaGBC" title="Branch 0 was taken 8079 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 87943 times"> + </span>]:<span class="tlaGNC">       96022 :         if (!CheckMinimalPush(data, opcode)) return {};</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">       87943 :         try {</span></span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaGBC" title="Branch 0 was taken 59275 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 28668 times"> + </span>]:<span class="tlaGNC">       87943 :             count = CScriptNum(data, /* fRequireMinimal = */ true).getint();</span></span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 28668 times"> + </span>]:<span class="tlaGNC">       28668 :         } catch (const scriptnum_error&amp;) {</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">       28668 :             return {};</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">       28668 :         }</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     } else {</span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">       37545 :         return {};</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     }</span>
+<span id="L81"><span class="lineNum">      81</span>   [<span class="tlaGBC" title="Branch 0 was taken 267662 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 16308 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 16672 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 250990 times"> + </span>]:<span class="tlaGNC">      283970 :     if (count &lt; min || count &gt; max) return {};</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      250990 :     return count;</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : }</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : </span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">     4657805 : static bool MatchMultisig(const CScript&amp; script, int&amp; required_sigs, std::vector&lt;valtype&gt;&amp; pubkeys)</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : {</span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaGNC">     4657805 :     opcodetype opcode;</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">     4657805 :     valtype data;</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : </span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 3573441 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1084364 times"> + </span>]:<span class="tlaGNC">     4657805 :     CScript::const_iterator it = script.begin();</span></span>
+<span id="L91"><span class="lineNum">      91</span>   [<span class="tlaGBC" title="Branch 0 was taken 1084364 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3573441 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3688051 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 969754 times"> + </span> :<span class="tlaGNC">     9430220 :     if (script.size() &lt; 1 || script.back() != OP_CHECKMULTISIG) return false;</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 2605605 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1082446 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 217929 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 3470122 times"> + </span>]
+<span id="L92"><span class="lineNum">      92</span>                 :             : </span>
+<span id="L93"><span class="lineNum">      93</span>   [<span class="tlaGBC" title="Branch 0 was taken 217929 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 209641 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 8288 times"> + </span>]:<span class="tlaGNC">      217929 :     if (!script.GetOp(it, opcode, data)) return false;</span></span>
+<span id="L94"><span class="lineNum">      94</span>   [<span class="tlaGBC" title="Branch 0 was taken 209641 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 209641 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      209641 :     auto req_sigs = GetScriptNumber(opcode, data, 1, MAX_PUBKEYS_PER_MULTISIG);</span></span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaGBC" title="Branch 0 was taken 145941 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 63700 times"> + </span>]:<span class="tlaGNC">      209641 :     if (!req_sigs) return false;</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">      145941 :     required_sigs = *req_sigs;</span></span>
+<span id="L97"><span class="lineNum">      97</span>   [<span class="tlaGBC" title="Branch 0 was taken 682626 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 679901 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2725 times"> + </span> :<span class="tlaGNC">      682626 :     while (script.GetOp(it, opcode, data) &amp;&amp; CPubKey::ValidSize(data)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 143216 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 536685 times"> + </span>]
+<span id="L98"><span class="lineNum">      98</span>         [<span class="tlaGBC" title="Branch 0 was taken 536685 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      536685 :         pubkeys.emplace_back(std::move(data));</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     }</span>
+<span id="L100"><span class="lineNum">     100</span>   [<span class="tlaGBC" title="Branch 0 was taken 145941 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 145941 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      145941 :     auto num_keys = GetScriptNumber(opcode, data, required_sigs, MAX_PUBKEYS_PER_MULTISIG);</span></span>
+<span id="L101"><span class="lineNum">     101</span>         [<span class="tlaGBC" title="Branch 0 was taken 102369 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 43572 times"> + </span>]:<span class="tlaGNC">      145941 :     if (!num_keys) return false;</span></span>
+<span id="L102"><span class="lineNum">     102</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 102369 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 97708 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4661 times"> + </span>]:<span class="tlaGNC">      102369 :     if (pubkeys.size() != static_cast&lt;unsigned long&gt;(*num_keys)) return false;</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">       97708 :     return (it + 1 == script.end());</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">     4657805 : }</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : </span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">       19840 : std::optional&lt;std::pair&lt;int, std::vector&lt;std::span&lt;const unsigned char&gt;&gt;&gt;&gt; MatchMultiA(const CScript&amp; script)</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : {</span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">       19840 :     std::vector&lt;std::span&lt;const unsigned char&gt;&gt; keyspans;</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : </span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     // Redundant, but very fast and selective test.</span>
+<span id="L112"><span class="lineNum">     112</span>   [<span class="tlaGBC" title="Branch 0 was taken 12974 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6866 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 19840 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       60626 :     if (script.size() == 0 || script[0] != 32 || script.back() != OP_NUMEQUAL) return {};</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 6866 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 12974 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 7972 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 11868 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 5172 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="Branch 9 was taken 2800 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 5292 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 2680 times"> + </span>]
+<span id="L113"><span class="lineNum">     113</span>                 :             : </span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     // Parse keys</span>
+<span id="L115"><span class="lineNum">     115</span>                 :<span class="tlaGNC">        2680 :     auto it = script.begin();</span></span>
+<span id="L116"><span class="lineNum">     116</span>         [<span class="tlaGBC" title="Branch 0 was taken 323319 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2680 times"> + </span>]:<span class="tlaGNC">      325999 :     while (script.end() - it &gt;= 34) {</span></span>
+<span id="L117"><span class="lineNum">     117</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 323319 times"> + </span>]:<span class="tlaGNC">      323319 :         if (*it != 32) return {};</span></span>
+<span id="L118"><span class="lineNum">     118</span>         [<span class="tlaGBC" title="Branch 0 was taken 323319 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      323319 :         ++it;</span></span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaGBC" title="Branch 0 was taken 323319 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      323319 :         keyspans.emplace_back(&amp;*it, 32);</span></span>
+<span id="L120"><span class="lineNum">     120</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 323319 times"> + </span>]:<span class="tlaGNC">      323319 :         it += 32;</span></span>
+<span id="L121"><span class="lineNum">     121</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 323319 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 320639 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2680 times"> + </span> :<span class="tlaGNC">      643958 :         if (*it != (keyspans.size() == 1 ? OP_CHECKSIG : OP_CHECKSIGADD)) return {};</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 323319 times"> + </span>]
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">      323319 :         ++it;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :     }</span>
+<span id="L124"><span class="lineNum">     124</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2680 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 2680 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        2680 :     if (keyspans.size() == 0 || keyspans.size() &gt; MAX_PUBKEYS_PER_MULTI_A) return {};</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 2680 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     // Parse threshold.</span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaGNC">        2680 :     opcodetype opcode;</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">        2680 :     std::vector&lt;unsigned char&gt; data;</span></span>
+<span id="L129"><span class="lineNum">     129</span>   [<span class="tlaGBC" title="Branch 0 was taken 2680 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 2680 times"> + </span>]:<span class="tlaGNC">        2680 :     if (!script.GetOp(it, opcode, data)) return {};</span></span>
+<span id="L130"><span class="lineNum">     130</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2680 times"> + </span>]:<span class="tlaGNC">        2680 :     if (it == script.end()) return {};</span></span>
+<span id="L131"><span class="lineNum">     131</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2680 times"> + </span>]:<span class="tlaGNC">        2680 :     if (*it != OP_NUMEQUAL) return {};</span></span>
+<span id="L132"><span class="lineNum">     132</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2680 times"> + </span>]:<span class="tlaGNC">        2680 :     ++it;</span></span>
+<span id="L133"><span class="lineNum">     133</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2680 times"> + </span>]:<span class="tlaGNC">        2680 :     if (it != script.end()) return {};</span></span>
+<span id="L134"><span class="lineNum">     134</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2680 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 2680 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        2680 :     auto threshold = GetScriptNumber(opcode, data, 1, (int)keyspans.size());</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 2680 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L135"><span class="lineNum">     135</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2680 times"> + </span>]:<span class="tlaGNC">        2680 :     if (!threshold) return {};</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :             : </span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :     // Construct result.</span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">        2680 :     return std::pair{*threshold, std::move(keyspans)};</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">       22520 : }</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : </span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">    19876723 : TxoutType Solver(const CScript&amp; scriptPubKey, std::vector&lt;std::vector&lt;unsigned char&gt;&gt;&amp; vSolutionsRet)</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : {</span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">    19876723 :     vSolutionsRet.clear();</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     // Shortcut for pay-to-script-hash, which are more constrained than the other types:</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :     // it is always OP_HASH160 20 [20 byte hash] OP_EQUAL</span>
+<span id="L147"><span class="lineNum">     147</span>         [<span class="tlaGBC" title="Branch 0 was taken 732130 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 19144593 times"> + </span>]:<span class="tlaGNC">    19876723 :     if (scriptPubKey.IsPayToScriptHash())</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     {</span>
+<span id="L149"><span class="lineNum">     149</span>         [<span class="tlaGBC" title="Branch 0 was taken 730242 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1888 times"> + </span>]:<span class="tlaGNC">     1464260 :         std::vector&lt;unsigned char&gt; hashBytes(scriptPubKey.begin()+2, scriptPubKey.begin()+22);</span></span>
+<span id="L150"><span class="lineNum">     150</span>         [<span class="tlaGBC" title="Branch 0 was taken 732130 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      732130 :         vSolutionsRet.push_back(hashBytes);</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">      732130 :         return TxoutType::SCRIPTHASH;</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">      732130 :     }</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">    19144593 :     int witnessversion;</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">    19144593 :     std::vector&lt;unsigned char&gt; witnessprogram;</span></span>
+<span id="L156"><span class="lineNum">     156</span>   [<span class="tlaGBC" title="Branch 0 was taken 19144593 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 14053010 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 5091583 times"> + </span>]:<span class="tlaGNC">    19144593 :     if (scriptPubKey.IsWitnessProgram(witnessversion, witnessprogram)) {</span></span>
+<span id="L157"><span class="lineNum">     157</span>   [<span class="tlaGBC" title="Branch 0 was taken 13767951 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 285059 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 328477 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13439474 times"> + </span>]:<span class="tlaGNC">    27820961 :         if (witnessversion == 0 &amp;&amp; witnessprogram.size() == WITNESS_V0_KEYHASH_SIZE) {</span></span>
+<span id="L158"><span class="lineNum">     158</span>         [<span class="tlaGBC" title="Branch 0 was taken 328477 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      328477 :             vSolutionsRet.push_back(std::move(witnessprogram));</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :             return TxoutType::WITNESS_V0_KEYHASH;</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :         }</span>
+<span id="L161"><span class="lineNum">     161</span>   [<span class="tlaGBC" title="Branch 0 was taken 13439474 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 285059 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 7701 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13431773 times"> + </span>]:<span class="tlaGNC">    27164007 :         if (witnessversion == 0 &amp;&amp; witnessprogram.size() == WITNESS_V0_SCRIPTHASH_SIZE) {</span></span>
+<span id="L162"><span class="lineNum">     162</span>         [<span class="tlaGBC" title="Branch 0 was taken 13431773 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    13431773 :             vSolutionsRet.push_back(std::move(witnessprogram));</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :             return TxoutType::WITNESS_V0_SCRIPTHASH;</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :         }</span>
+<span id="L165"><span class="lineNum">     165</span>   [<span class="tlaGBC" title="Branch 0 was taken 167757 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 125003 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 15549 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 152208 times"> + </span>]:<span class="tlaGNC">      460517 :         if (witnessversion == 1 &amp;&amp; witnessprogram.size() == WITNESS_V1_TAPROOT_SIZE) {</span></span>
+<span id="L166"><span class="lineNum">     166</span>         [<span class="tlaGBC" title="Branch 0 was taken 152208 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      152208 :             vSolutionsRet.push_back(std::move(witnessprogram));</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :             return TxoutType::WITNESS_V1_TAPROOT;</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :         }</span>
+<span id="L169"><span class="lineNum">     169</span>   [<span class="tlaGBC" title="Branch 0 was taken 140552 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 136222 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4330 times"> + </span>]:<span class="tlaGNC">      140552 :         if (scriptPubKey.IsPayToAnchor()) {</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :             return TxoutType::ANCHOR;</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :         }</span>
+<span id="L172"><span class="lineNum">     172</span>         [<span class="tlaGBC" title="Branch 0 was taken 128521 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7701 times"> + </span>]:<span class="tlaGNC">      136222 :         if (witnessversion != 0) {</span></span>
+<span id="L173"><span class="lineNum">     173</span>   [<span class="tlaGBC" title="Branch 0 was taken 128521 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 128521 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      257042 :             vSolutionsRet.push_back(std::vector&lt;unsigned char&gt;{(unsigned char)witnessversion});</span></span>
+<span id="L174"><span class="lineNum">     174</span>         [<span class="tlaGBC" title="Branch 0 was taken 128521 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    19144593 :             vSolutionsRet.push_back(std::move(witnessprogram));</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :             return TxoutType::WITNESS_UNKNOWN;</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :         }</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :         return TxoutType::NONSTANDARD;</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     }</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : </span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     // Provably prunable, data-carrying output</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :     //</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :     // So long as script passes the IsUnspendable() test and all but the first</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     // byte passes the IsPushOnly() test we don't care what exactly is in the</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :     // script.</span>
+<span id="L185"><span class="lineNum">     185</span>   [<span class="tlaGBC" title="Branch 0 was taken 1133315 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3958268 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 4121829 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 969754 times"> + </span> :<span class="tlaGNC">    10346727 :     if (scriptPubKey.size() &gt;= 1 &amp;&amp; scriptPubKey[0] == OP_RETURN &amp;&amp; scriptPubKey.IsPushOnly(scriptPubKey.begin()+1)) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 2990432 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1131397 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 66050 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 4055779 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 66050 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 35941 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 30109 times"> + </span>]
+<span id="L186"><span class="lineNum">     186</span>                 :             :         return TxoutType::NULL_DATA;</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :     }</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             : </span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">     5061474 :     std::vector&lt;unsigned char&gt; data;</span></span>
+<span id="L190"><span class="lineNum">     190</span>   [<span class="tlaGBC" title="Branch 0 was taken 5061474 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 133716 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4927758 times"> + </span>]:<span class="tlaGNC">     5061474 :     if (MatchPayToPubkey(scriptPubKey, data)) {</span></span>
+<span id="L191"><span class="lineNum">     191</span>         [<span class="tlaGBC" title="Branch 0 was taken 133716 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      133716 :         vSolutionsRet.push_back(std::move(data));</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :         return TxoutType::PUBKEY;</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     }</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             : </span>
+<span id="L195"><span class="lineNum">     195</span>   [<span class="tlaGBC" title="Branch 0 was taken 4927758 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 269953 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4657805 times"> + </span>]:<span class="tlaGNC">     4927758 :     if (MatchPayToPubkeyHash(scriptPubKey, data)) {</span></span>
+<span id="L196"><span class="lineNum">     196</span>         [<span class="tlaGBC" title="Branch 0 was taken 269953 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     5061474 :         vSolutionsRet.push_back(std::move(data));</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :         return TxoutType::PUBKEYHASH;</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     }</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : </span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">     4657805 :     int required;</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">     4657805 :     std::vector&lt;std::vector&lt;unsigned char&gt;&gt; keys;</span></span>
+<span id="L202"><span class="lineNum">     202</span>   [<span class="tlaGBC" title="Branch 0 was taken 4657805 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 97531 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4560274 times"> + </span>]:<span class="tlaGNC">     4657805 :     if (MatchMultisig(scriptPubKey, required, keys)) {</span></span>
+<span id="L203"><span class="lineNum">     203</span>   [<span class="tlaGBC" title="Branch 0 was taken 97531 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 97531 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      195062 :         vSolutionsRet.push_back({static_cast&lt;unsigned char&gt;(required)}); // safe as required is in range 1..20</span></span>
+<span id="L204"><span class="lineNum">     204</span>         [<span class="tlaGBC" title="Branch 0 was taken 97531 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       97531 :         vSolutionsRet.insert(vSolutionsRet.end(), keys.begin(), keys.end());</span></span>
+<span id="L205"><span class="lineNum">     205</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 97531 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 97531 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      195062 :         vSolutionsRet.push_back({static_cast&lt;unsigned char&gt;(keys.size())}); // safe as size is in range 1..20</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :<span class="tlaGNC">       97531 :         return TxoutType::MULTISIG;</span></span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :     }</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : </span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">     4560274 :     vSolutionsRet.clear();</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :<span class="tlaGNC">     4560274 :     return TxoutType::NONSTANDARD;</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">    28863872 : }</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :             : </span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">        9140 : CScript GetScriptForRawPubKey(const CPubKey&amp; pubKey)</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : {</span>
+<span id="L215"><span class="lineNum">     215</span>   [<span class="tlaGBC" title="Branch 0 was taken 9140 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 9140 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       18280 :     return CScript() &lt;&lt; std::vector&lt;unsigned char&gt;(pubKey.begin(), pubKey.end()) &lt;&lt; OP_CHECKSIG;</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :             : }</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : </span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">       12325 : CScript GetScriptForMultisig(int nRequired, const std::vector&lt;CPubKey&gt;&amp; keys)</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : {</span>
+<span id="L220"><span class="lineNum">     220</span>                 :<span class="tlaGNC">       12325 :     CScript script;</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :             : </span>
+<span id="L222"><span class="lineNum">     222</span>         [<span class="tlaGBC" title="Branch 0 was taken 12325 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12325 :     script &lt;&lt; nRequired;</span></span>
+<span id="L223"><span class="lineNum">     223</span>         [<span class="tlaGBC" title="Branch 0 was taken 112851 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 12325 times"> + </span>]:<span class="tlaGNC">      125176 :     for (const CPubKey&amp; key : keys)</span></span>
+<span id="L224"><span class="lineNum">     224</span>         [<span class="tlaGBC" title="Branch 0 was taken 112851 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      225702 :         script &lt;&lt; ToByteVector(key);</span></span>
+<span id="L225"><span class="lineNum">     225</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 12325 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 12325 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       12325 :     script &lt;&lt; keys.size() &lt;&lt; OP_CHECKMULTISIG;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 12325 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L226"><span class="lineNum">     226</span>                 :             : </span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">       12325 :     return script;</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :<span class="tlaUNC">           0 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

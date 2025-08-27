@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/fuzz.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - fuzz.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-08-27 15:46:05</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">50.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2021 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_TEST_FUZZ_FUZZ_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_TEST_FUZZ_FUZZ_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;span&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;string_view&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : /**</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             :  * Can be used to limit a theoretically unbounded loop. This caps the runtime</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             :  * to avoid timeouts or OOMs.</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             :  *</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             :  * This can be used in combination with a check in the condition to confirm</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :  * whether the fuzz engine provided &quot;good&quot; data. If the fuzz input contains</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :  * invalid data, the loop aborts early. This will teach the fuzz engine to look</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :  * for useful data and avoids bloating the fuzz input folder with useless data.</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :  */</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #define LIMITED_WHILE(condition, limit) \</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     for (unsigned _count{limit}; (condition) &amp;&amp; _count; --_count)</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : </span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : using FuzzBufferType = std::span&lt;const uint8_t&gt;;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : using TypeTestOneInput = std::function&lt;void(FuzzBufferType)&gt;;</span>
+<span id="L28"><span class="lineNum">      28</span>         [<span class="tlaGBC" title="Branch 0 was taken 51984 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      156636 : struct FuzzTargetOptions {</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     std::function&lt;void()&gt; init{[] {}};</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     bool hidden{false};</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : };</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : void FuzzFrameworkRegisterTarget(std::string_view name, TypeTestOneInput target, FuzzTargetOptions opts);</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : </span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : #define FUZZ_TARGET(...) DETAIL_FUZZ(__VA_ARGS__)</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : </span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : #define DETAIL_FUZZ(name, ...)                                                        \</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     void name##_fuzz_target(FuzzBufferType);                                          \</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     struct name##_Before_Main {                                                       \</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :         name##_Before_Main()                                                          \</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :         {                                                                             \</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :             FuzzFrameworkRegisterTarget(#name, name##_fuzz_target, {__VA_ARGS__});    \</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :         }                                                                             \</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     } const static g_##name##_before_main;                                            \</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     void name##_fuzz_target(FuzzBufferType buffer)</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : #endif // BITCOIN_TEST_FUZZ_FUZZ_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
