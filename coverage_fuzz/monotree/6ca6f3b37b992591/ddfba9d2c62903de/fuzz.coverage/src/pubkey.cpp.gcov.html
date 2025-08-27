@@ -1,0 +1,513 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/pubkey.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - pubkey.cpp<span style="font-size: 80%;"> (source / <a href="pubkey.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">98.6&nbsp;%</td>
+            <td class="headerCovTableEntry">218</td>
+            <td class="headerCovTableEntry">215</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-08-27 16:35:37</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntry">22</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">84.7&nbsp;%</td>
+            <td class="headerCovTableEntry">150</td>
+            <td class="headerCovTableEntry">127</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2017 The Zcash developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;pubkey.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;hash.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;secp256k1.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;secp256k1_ellswift.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;secp256k1_extrakeys.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;secp256k1_recovery.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;secp256k1_schnorrsig.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;util/strencodings.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;cassert&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : using namespace util::hex_literals;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : namespace {</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : </span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : struct Secp256k1SelfTester</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : {</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     Secp256k1SelfTester() {</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :         /* Run libsecp256k1 self-test before using the secp256k1_context_static. */</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :         secp256k1_selftest();</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     }</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : } SECP256K1_SELFTESTER;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : } // namespace</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : </span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : /** This function is taken from the libsecp256k1 distribution and implements</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :  *  DER parsing for ECDSA signatures, while supporting an arbitrary subset of</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :  *  format violations.</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :  *</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :  *  Supported violations include negative integers, excessive padding, garbage</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :  *  at the end, and overly long length descriptors. This is safe to use in</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :  *  Bitcoin because since the activation of BIP66, signatures are verified to be</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :  *  strict DER before being passed to this module, and we know it supports all</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :  *  violations present in the blockchain before that point.</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :  */</span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">      357297 : int ecdsa_signature_parse_der_lax(secp256k1_ecdsa_signature* sig, const unsigned char *input, size_t inputlen) {</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">      357297 :     size_t rpos, rlen, spos, slen;</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">      357297 :     size_t pos = 0;</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">      357297 :     size_t lenbyte;</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">      357297 :     unsigned char tmpsig[64] = {0};</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">      357297 :     int overflow = 0;</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     /* Hack to initialize sig with a correctly-parsed but invalid signature. */</span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">      357297 :     secp256k1_ecdsa_signature_parse_compact(secp256k1_context_static, sig, tmpsig);</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     /* Sequence tag byte */</span>
+<span id="L56"><span class="lineNum">      56</span>   [<span class="tlaGBC" title="Branch 0 was taken 353988 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3309 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 352330 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1658 times"> + </span>]:<span class="tlaGNC">      357297 :     if (pos == inputlen || input[pos] != 0x30) {</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :         return 0;</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     }</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">      352330 :     pos++;</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : </span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     /* Sequence length bytes */</span>
+<span id="L62"><span class="lineNum">      62</span>         [<span class="tlaGBC" title="Branch 0 was taken 352243 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 87 times"> + </span>]:<span class="tlaGNC">      352330 :     if (pos == inputlen) {</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :         return 0;</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     }</span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">      352243 :     lenbyte = input[pos++];</span></span>
+<span id="L66"><span class="lineNum">      66</span>         [<span class="tlaGBC" title="Branch 0 was taken 1646 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 350597 times"> + </span>]:<span class="tlaGNC">      352243 :     if (lenbyte &amp; 0x80) {</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">        1646 :         lenbyte -= 0x80;</span></span>
+<span id="L68"><span class="lineNum">      68</span>         [<span class="tlaGBC" title="Branch 0 was taken 1091 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 555 times"> + </span>]:<span class="tlaGNC">        1646 :         if (lenbyte &gt; inputlen - pos) {</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :             return 0;</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :         }</span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">        1091 :         pos += lenbyte;</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     }</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     /* Integer tag byte for R */</span>
+<span id="L75"><span class="lineNum">      75</span>   [<span class="tlaGBC" title="Branch 0 was taken 351058 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 630 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 350322 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 736 times"> + </span>]:<span class="tlaGNC">      351688 :     if (pos == inputlen || input[pos] != 0x02) {</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :         return 0;</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :     }</span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">      350322 :     pos++;</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     /* Integer length for R */</span>
+<span id="L81"><span class="lineNum">      81</span>         [<span class="tlaGBC" title="Branch 0 was taken 350242 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 80 times"> + </span>]:<span class="tlaGNC">      350322 :     if (pos == inputlen) {</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :         return 0;</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     }</span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">      350242 :     lenbyte = input[pos++];</span></span>
+<span id="L85"><span class="lineNum">      85</span>         [<span class="tlaGBC" title="Branch 0 was taken 2973 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 347269 times"> + </span>]:<span class="tlaGNC">      350242 :     if (lenbyte &amp; 0x80) {</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :<span class="tlaGNC">        2973 :         lenbyte -= 0x80;</span></span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaGBC" title="Branch 0 was taken 1530 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1443 times"> + </span>]:<span class="tlaGNC">        2973 :         if (lenbyte &gt; inputlen - pos) {</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :             return 0;</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :         }</span>
+<span id="L90"><span class="lineNum">      90</span>   [<span class="tlaGBC" title="Branch 0 was taken 2997 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 327 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1794 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1203 times"> + </span>]:<span class="tlaGNC">        3324 :         while (lenbyte &gt; 0 &amp;&amp; input[pos] == 0) {</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">        1794 :             pos++;</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">        1794 :             lenbyte--;</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :         }</span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">        1530 :         static_assert(sizeof(size_t) &gt;= 4, &quot;size_t too small&quot;);</span></span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaGBC" title="Branch 0 was taken 1259 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 271 times"> + </span>]:<span class="tlaGNC">        1530 :         if (lenbyte &gt;= 4) {</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :             return 0;</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :         }</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :         rlen = 0;</span>
+<span id="L99"><span class="lineNum">      99</span>         [<span class="tlaGBC" title="Branch 0 was taken 2176 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1259 times"> + </span>]:<span class="tlaGNC">        3435 :         while (lenbyte &gt; 0) {</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">        2176 :             rlen = (rlen &lt;&lt; 8) + input[pos];</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">        2176 :             pos++;</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">        2176 :             lenbyte--;</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :         }</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :     } else {</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :         rlen = lenbyte;</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     }</span>
+<span id="L107"><span class="lineNum">     107</span>         [<span class="tlaGBC" title="Branch 0 was taken 347774 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 754 times"> + </span>]:<span class="tlaGNC">      348528 :     if (rlen &gt; inputlen - pos) {</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :         return 0;</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     }</span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaGNC">      347774 :     rpos = pos;</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">      347774 :     pos += rlen;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : </span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     /* Integer tag byte for S */</span>
+<span id="L114"><span class="lineNum">     114</span>   [<span class="tlaGBC" title="Branch 0 was taken 347669 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 105 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 346217 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1452 times"> + </span>]:<span class="tlaGNC">      347774 :     if (pos == inputlen || input[pos] != 0x02) {</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :         return 0;</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     }</span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">      346217 :     pos++;</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : </span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :     /* Integer length for S */</span>
+<span id="L120"><span class="lineNum">     120</span>         [<span class="tlaGBC" title="Branch 0 was taken 346120 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 97 times"> + </span>]:<span class="tlaGNC">      346217 :     if (pos == inputlen) {</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :         return 0;</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     }</span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">      346120 :     lenbyte = input[pos++];</span></span>
+<span id="L124"><span class="lineNum">     124</span>         [<span class="tlaGBC" title="Branch 0 was taken 1234 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 344886 times"> + </span>]:<span class="tlaGNC">      346120 :     if (lenbyte &amp; 0x80) {</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">        1234 :         lenbyte -= 0x80;</span></span>
+<span id="L126"><span class="lineNum">     126</span>         [<span class="tlaGBC" title="Branch 0 was taken 636 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 598 times"> + </span>]:<span class="tlaGNC">        1234 :         if (lenbyte &gt; inputlen - pos) {</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :             return 0;</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :         }</span>
+<span id="L129"><span class="lineNum">     129</span>   [<span class="tlaGBC" title="Branch 0 was taken 2156 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 196 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1716 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 440 times"> + </span>]:<span class="tlaGNC">        2352 :         while (lenbyte &gt; 0 &amp;&amp; input[pos] == 0) {</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaGNC">        1716 :             pos++;</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">        1716 :             lenbyte--;</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :         }</span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">         636 :         static_assert(sizeof(size_t) &gt;= 4, &quot;size_t too small&quot;);</span></span>
+<span id="L134"><span class="lineNum">     134</span>         [<span class="tlaGBC" title="Branch 0 was taken 501 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 135 times"> + </span>]:<span class="tlaGNC">         636 :         if (lenbyte &gt;= 4) {</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :             return 0;</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :         }</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :         slen = 0;</span>
+<span id="L138"><span class="lineNum">     138</span>         [<span class="tlaGBC" title="Branch 0 was taken 810 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 501 times"> + </span>]:<span class="tlaGNC">        1311 :         while (lenbyte &gt; 0) {</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">         810 :             slen = (slen &lt;&lt; 8) + input[pos];</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">         810 :             pos++;</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">         810 :             lenbyte--;</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :         }</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     } else {</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :         slen = lenbyte;</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     }</span>
+<span id="L146"><span class="lineNum">     146</span>         [<span class="tlaGBC" title="Branch 0 was taken 342554 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2833 times"> + </span>]:<span class="tlaGNC">      345387 :     if (slen &gt; inputlen - pos) {</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :         return 0;</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     }</span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">      386753 :     spos = pos;</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : </span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :     /* Ignore leading zeroes in R */</span>
+<span id="L152"><span class="lineNum">     152</span>   [<span class="tlaGBC" title="Branch 0 was taken 384165 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2588 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 44199 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 339966 times"> + </span>]:<span class="tlaGNC">      386753 :     while (rlen &gt; 0 &amp;&amp; input[rpos] == 0) {</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaGNC">       44199 :         rlen--;</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">       44199 :         rpos++;</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :     }</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     /* Copy R value */</span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaGBC" title="Branch 0 was taken 340587 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1967 times"> + </span>]:<span class="tlaGNC">      342554 :     if (rlen &gt; 32) {</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">      342554 :         overflow = 1;</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :     } else {</span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">      340587 :         memcpy(tmpsig + 32 - rlen, input + rpos, rlen);</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :     }</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             : </span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :     /* Ignore leading zeroes in S */</span>
+<span id="L164"><span class="lineNum">     164</span>   [<span class="tlaGBC" title="Branch 0 was taken 368233 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2977 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 28656 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 339577 times"> + </span>]:<span class="tlaGNC">      371210 :     while (slen &gt; 0 &amp;&amp; input[spos] == 0) {</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaGNC">       28656 :         slen--;</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">       28656 :         spos++;</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :     }</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     /* Copy S value */</span>
+<span id="L169"><span class="lineNum">     169</span>         [<span class="tlaGBC" title="Branch 0 was taken 340401 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2153 times"> + </span>]:<span class="tlaGNC">      342554 :     if (slen &gt; 32) {</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :         overflow = 1;</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     } else {</span>
+<span id="L172"><span class="lineNum">     172</span>         [<span class="tlaGBC" title="Branch 0 was taken 338477 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1924 times"> + </span>]:<span class="tlaGNC">      340401 :         memcpy(tmpsig + 64 - slen, input + spos, slen);</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     }</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             : </span>
+<span id="L175"><span class="lineNum">     175</span>         [<span class="tlaGBC" title="Branch 0 was taken 338477 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1924 times"> + </span>]:<span class="tlaGNC">      340401 :     if (!overflow) {</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">      338477 :         overflow = !secp256k1_ecdsa_signature_parse_compact(secp256k1_context_static, sig, tmpsig);</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     }</span>
+<span id="L178"><span class="lineNum">     178</span>         [<span class="tlaGBC" title="Branch 0 was taken 3567 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 337063 times"> + </span>]:<span class="tlaGNC">      340630 :     if (overflow) {</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :         /* Overwrite the result again with a correctly-parsed but invalid</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :            signature if parsing failed. */</span>
+<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaGNC">        5491 :         memset(tmpsig, 0, 64);</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaGNC">        5491 :         secp256k1_ecdsa_signature_parse_compact(secp256k1_context_static, sig, tmpsig);</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     }</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :     return 1;</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             : }</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             : </span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : /** Nothing Up My Sleeve (NUMS) point</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :  *</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :  *  NUMS_H is a point with an unknown discrete logarithm, constructed by taking the sha256 of 'g'</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :  *  (uncompressed encoding), which happens to be a point on the curve.</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :  *</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :  *  For an example script for calculating H, refer to the unit tests in</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :  *  ./test/functional/test_framework/crypto/secp256k1.py</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :  */</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             : constexpr XOnlyPubKey XOnlyPubKey::NUMS_H{</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :     // Use immediate lambda to work around GCC-14 bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117966</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :     []() consteval { return XOnlyPubKey{&quot;50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0&quot;_hex_u8}; }(),</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             : };</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : </span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">      624968 : std::vector&lt;CPubKey&gt; XOnlyPubKey::GetCPubKeys() const</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :             : {</span>
+<span id="L202"><span class="lineNum">     202</span>                 :<span class="tlaGNC">      624968 :     std::vector&lt;CPubKey&gt; out;</span></span>
+<span id="L203"><span class="lineNum">     203</span>                 :<span class="tlaGNC">      624968 :     unsigned char b[33] = {0x02};</span></span>
+<span id="L204"><span class="lineNum">     204</span>                 :<span class="tlaGNC">      624968 :     std::copy(m_keydata.begin(), m_keydata.end(), b + 1);</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">      624968 :     CPubKey fullpubkey;</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :<span class="tlaGNC">      624968 :     fullpubkey.Set(b, b + 33);</span></span>
+<span id="L207"><span class="lineNum">     207</span>         [<span class="tlaGBC" title="Branch 0 was taken 624968 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      624968 :     out.push_back(fullpubkey);</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :<span class="tlaGNC">      624968 :     b[0] = 0x03;</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">      624968 :     fullpubkey.Set(b, b + 33);</span></span>
+<span id="L210"><span class="lineNum">     210</span>         [<span class="tlaGBC" title="Branch 0 was taken 624968 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      624968 :     out.push_back(fullpubkey);</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">      624968 :     return out;</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">      624968 : std::vector&lt;CKeyID&gt; XOnlyPubKey::GetKeyIDs() const</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :             : {</span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">      624968 :     std::vector&lt;CKeyID&gt; out;</span></span>
+<span id="L217"><span class="lineNum">     217</span>   [<span class="tlaGBC" title="Branch 0 was taken 624968 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1249936 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 624968 times"> + </span>]:<span class="tlaGNC">     1874904 :     for (const CPubKey&amp; pk : GetCPubKeys()) {</span></span>
+<span id="L218"><span class="lineNum">     218</span>         [<span class="tlaGBC" title="Branch 0 was taken 1249936 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     2499872 :         out.push_back(pk.GetID());</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L220"><span class="lineNum">     220</span>                 :<span class="tlaGNC">      624968 :     return out;</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : </span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaGNC">      487233 : CPubKey XOnlyPubKey::GetEvenCorrespondingCPubKey() const</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : {</span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaGNC">      487233 :     unsigned char full_key[CPubKey::COMPRESSED_SIZE] = {0x02};</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :<span class="tlaGNC">      487233 :     std::copy(begin(), end(), full_key + 1);</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">      487233 :     return CPubKey{full_key};</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :             : }</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : </span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaGNC">      217265 : bool XOnlyPubKey::IsFullyValid() const</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : {</span>
+<span id="L232"><span class="lineNum">     232</span>                 :<span class="tlaGNC">      217265 :     secp256k1_xonly_pubkey pubkey;</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :<span class="tlaGNC">      217265 :     return secp256k1_xonly_pubkey_parse(secp256k1_context_static, &amp;pubkey, m_keydata.data());</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :             : }</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             : </span>
+<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaGNC">        3620 : bool XOnlyPubKey::VerifySchnorr(const uint256&amp; msg, std::span&lt;const unsigned char&gt; sigbytes) const</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :             : {</span>
+<span id="L238"><span class="lineNum">     238</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 3620 times"> + </span>]:<span class="tlaGNC">        3620 :     assert(sigbytes.size() == 64);</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :<span class="tlaGNC">        3620 :     secp256k1_xonly_pubkey pubkey;</span></span>
+<span id="L240"><span class="lineNum">     240</span>         [<span class="tlaGBC" title="Branch 0 was taken 3477 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 143 times"> + </span>]:<span class="tlaGNC">        3620 :     if (!secp256k1_xonly_pubkey_parse(secp256k1_context_static, &amp;pubkey, m_keydata.data())) return false;</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaGNC">        3477 :     return secp256k1_schnorrsig_verify(secp256k1_context_static, sigbytes.data(), msg.begin(), 32, &amp;pubkey);</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :             : }</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             : </span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : static const HashWriter HASHER_TAPTWEAK{TaggedHash(&quot;TapTweak&quot;)};</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             : </span>
+<span id="L246"><span class="lineNum">     246</span>                 :<span class="tlaGNC">      197348 : uint256 XOnlyPubKey::ComputeTapTweakHash(const uint256* merkle_root) const</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :             : {</span>
+<span id="L248"><span class="lineNum">     248</span>         [<span class="tlaGBC" title="Branch 0 was taken 149058 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 48290 times"> + </span>]:<span class="tlaGNC">      197348 :     if (merkle_root == nullptr) {</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :         // We have no scripts. The actual tweak does not matter, but follow BIP341 here to</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :         // allow for reproducible tweaking.</span>
+<span id="L251"><span class="lineNum">     251</span>                 :<span class="tlaGNC">      149058 :         return (HashWriter{HASHER_TAPTWEAK} &lt;&lt; m_keydata).GetSHA256();</span></span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :     } else {</span>
+<span id="L253"><span class="lineNum">     253</span>                 :<span class="tlaGNC">       48290 :         return (HashWriter{HASHER_TAPTWEAK} &lt;&lt; m_keydata &lt;&lt; *merkle_root).GetSHA256();</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :     }</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : }</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             : </span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">        5225 : bool XOnlyPubKey::CheckTapTweak(const XOnlyPubKey&amp; internal, const uint256&amp; merkle_root, bool parity) const</span></span>
+<span id="L258"><span class="lineNum">     258</span>                 :             : {</span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">        5225 :     secp256k1_xonly_pubkey internal_key;</span></span>
+<span id="L260"><span class="lineNum">     260</span>         [<span class="tlaGBC" title="Branch 0 was taken 3400 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1825 times"> + </span>]:<span class="tlaGNC">        5225 :     if (!secp256k1_xonly_pubkey_parse(secp256k1_context_static, &amp;internal_key, internal.data())) return false;</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">        3400 :     uint256 tweak = internal.ComputeTapTweakHash(&amp;merkle_root);</span></span>
+<span id="L262"><span class="lineNum">     262</span>                 :<span class="tlaGNC">        3400 :     return secp256k1_xonly_pubkey_tweak_add_check(secp256k1_context_static, m_keydata.begin(), parity, &amp;internal_key, tweak.begin());</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :             : }</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             : </span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">      193948 : std::optional&lt;std::pair&lt;XOnlyPubKey, bool&gt;&gt; XOnlyPubKey::CreateTapTweak(const uint256* merkle_root) const</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :             : {</span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">      193948 :     secp256k1_xonly_pubkey base_point;</span></span>
+<span id="L268"><span class="lineNum">     268</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 193948 times"> + </span>]:<span class="tlaGNC">      193948 :     if (!secp256k1_xonly_pubkey_parse(secp256k1_context_static, &amp;base_point, data())) return std::nullopt;</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">      193948 :     secp256k1_pubkey out;</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :<span class="tlaGNC">      193948 :     uint256 tweak = ComputeTapTweakHash(merkle_root);</span></span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 193948 times"> + </span>]:<span class="tlaGNC">      193948 :     if (!secp256k1_xonly_pubkey_tweak_add(secp256k1_context_static, &amp;out, &amp;base_point, tweak.data())) return std::nullopt;</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaGNC">      193948 :     int parity = -1;</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC">      193948 :     std::pair&lt;XOnlyPubKey, bool&gt; ret;</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaGNC">      193948 :     secp256k1_xonly_pubkey out_xonly;</span></span>
+<span id="L275"><span class="lineNum">     275</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 193948 times"> + </span>]:<span class="tlaGNC">      193948 :     if (!secp256k1_xonly_pubkey_from_pubkey(secp256k1_context_static, &amp;out_xonly, &amp;parity, &amp;out)) return std::nullopt;</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">      193948 :     secp256k1_xonly_pubkey_serialize(secp256k1_context_static, ret.first.begin(), &amp;out_xonly);</span></span>
+<span id="L277"><span class="lineNum">     277</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 193948 times"> + </span>]:<span class="tlaGNC">      193948 :     assert(parity == 0 || parity == 1);</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :<span class="tlaGNC">      193948 :     ret.second = parity;</span></span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">      193948 :     return ret;</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :             : }</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             : </span>
+<span id="L282"><span class="lineNum">     282</span>                 :             : </span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">      187632 : bool CPubKey::Verify(const uint256 &amp;hash, const std::vector&lt;unsigned char&gt;&amp; vchSig) const {</span></span>
+<span id="L284"><span class="lineNum">     284</span>         [<span class="tlaGBC" title="Branch 0 was taken 186125 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1507 times"> + </span>]:<span class="tlaGNC">      187632 :     if (!IsValid())</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :         return false;</span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaGNC">      186125 :     secp256k1_pubkey pubkey;</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaGNC">      186125 :     secp256k1_ecdsa_signature sig;</span></span>
+<span id="L288"><span class="lineNum">     288</span>         [<span class="tlaGBC" title="Branch 0 was taken 180821 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5304 times"> + </span>]:<span class="tlaGNC">      186125 :     if (!secp256k1_ec_pubkey_parse(secp256k1_context_static, &amp;pubkey, vch, size())) {</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :         return false;</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     }</span>
+<span id="L291"><span class="lineNum">     291</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 180821 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 167338 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13483 times"> + </span>]:<span class="tlaGNC">      180821 :     if (!ecdsa_signature_parse_der_lax(&amp;sig, vchSig.data(), vchSig.size())) {</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :         return false;</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :     }</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :     /* libsecp256k1's ECDSA verification requires lower-S signatures, which have</span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :      * not historically been enforced in Bitcoin, so normalize them first. */</span>
+<span id="L296"><span class="lineNum">     296</span>                 :<span class="tlaGNC">      167338 :     secp256k1_ecdsa_signature_normalize(secp256k1_context_static, &amp;sig, &amp;sig);</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :<span class="tlaGNC">      167338 :     return secp256k1_ecdsa_verify(secp256k1_context_static, &amp;sig, hash.begin(), &amp;pubkey);</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :             : }</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             : </span>
+<span id="L300"><span class="lineNum">     300</span>                 :<span class="tlaGNC">        3745 : bool CPubKey::RecoverCompact(const uint256 &amp;hash, const std::vector&lt;unsigned char&gt;&amp; vchSig) {</span></span>
+<span id="L301"><span class="lineNum">     301</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 3745 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3742 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3 times"> + </span>]:<span class="tlaGNC">        3745 :     if (vchSig.size() != COMPACT_SIGNATURE_SIZE)</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :         return false;</span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">        3742 :     int recid = (vchSig[0] - 27) &amp; 3;</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">        3742 :     bool fComp = ((vchSig[0] - 27) &amp; 4) != 0;</span></span>
+<span id="L305"><span class="lineNum">     305</span>                 :<span class="tlaGNC">        3742 :     secp256k1_pubkey pubkey;</span></span>
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">        3742 :     secp256k1_ecdsa_recoverable_signature sig;</span></span>
+<span id="L307"><span class="lineNum">     307</span>         [<span class="tlaGBC" title="Branch 0 was taken 3741 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">        3742 :     if (!secp256k1_ecdsa_recoverable_signature_parse_compact(secp256k1_context_static, &amp;sig, &amp;vchSig[1], recid)) {</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :         return false;</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             :     }</span>
+<span id="L310"><span class="lineNum">     310</span>         [<span class="tlaGBC" title="Branch 0 was taken 3725 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 16 times"> + </span>]:<span class="tlaGNC">        3741 :     if (!secp256k1_ecdsa_recover(secp256k1_context_static, &amp;pubkey, &amp;sig, hash.begin())) {</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :         return false;</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :     }</span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaGNC">        3725 :     unsigned char pub[SIZE];</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaGNC">        3725 :     size_t publen = SIZE;</span></span>
+<span id="L315"><span class="lineNum">     315</span>         [<span class="tlaGBC" title="Branch 0 was taken 1908 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1817 times"> + </span>]:<span class="tlaGNC">        5633 :     secp256k1_ec_pubkey_serialize(secp256k1_context_static, pub, &amp;publen, &amp;pubkey, fComp ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED);</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaGNC">        3725 :     Set(pub, pub + publen);</span></span>
+<span id="L317"><span class="lineNum">     317</span>                 :<span class="tlaGNC">        3725 :     return true;</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             : }</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             : </span>
+<span id="L320"><span class="lineNum">     320</span>                 :<span class="tlaGNC">      392865 : bool CPubKey::IsFullyValid() const {</span></span>
+<span id="L321"><span class="lineNum">     321</span>         [<span class="tlaGBC" title="Branch 0 was taken 281002 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 111863 times"> + </span>]:<span class="tlaGNC">      392865 :     if (!IsValid())</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :         return false;</span>
+<span id="L323"><span class="lineNum">     323</span>                 :<span class="tlaGNC">      281002 :     secp256k1_pubkey pubkey;</span></span>
+<span id="L324"><span class="lineNum">     324</span>                 :<span class="tlaGNC">      281002 :     return secp256k1_ec_pubkey_parse(secp256k1_context_static, &amp;pubkey, vch, size());</span></span>
+<span id="L325"><span class="lineNum">     325</span>                 :             : }</span>
+<span id="L326"><span class="lineNum">     326</span>                 :             : </span>
+<span id="L327"><span class="lineNum">     327</span>                 :<span class="tlaGNC">      112171 : bool CPubKey::Decompress() {</span></span>
+<span id="L328"><span class="lineNum">     328</span>         [<span class="tlaGBC" title="Branch 0 was taken 112171 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      112171 :     if (!IsValid())</span></span>
+<span id="L329"><span class="lineNum">     329</span>                 :             :         return false;</span>
+<span id="L330"><span class="lineNum">     330</span>                 :<span class="tlaGNC">      112171 :     secp256k1_pubkey pubkey;</span></span>
+<span id="L331"><span class="lineNum">     331</span>         [<span class="tlaGBC" title="Branch 0 was taken 53841 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 58330 times"> + </span>]:<span class="tlaGNC">      112171 :     if (!secp256k1_ec_pubkey_parse(secp256k1_context_static, &amp;pubkey, vch, size())) {</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :         return false;</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :     }</span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">       53841 :     unsigned char pub[SIZE];</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :<span class="tlaGNC">       53841 :     size_t publen = SIZE;</span></span>
+<span id="L336"><span class="lineNum">     336</span>                 :<span class="tlaGNC">       53841 :     secp256k1_ec_pubkey_serialize(secp256k1_context_static, pub, &amp;publen, &amp;pubkey, SECP256K1_EC_UNCOMPRESSED);</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaGNC">       53841 :     Set(pub, pub + publen);</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :<span class="tlaGNC">       53841 :     return true;</span></span>
+<span id="L339"><span class="lineNum">     339</span>                 :             : }</span>
+<span id="L340"><span class="lineNum">     340</span>                 :             : </span>
+<span id="L341"><span class="lineNum">     341</span>                 :<span class="tlaGNC">     1006396 : bool CPubKey::Derive(CPubKey&amp; pubkeyChild, ChainCode &amp;ccChild, unsigned int nChild, const ChainCode&amp; cc) const {</span></span>
+<span id="L342"><span class="lineNum">     342</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1006396 times"> + </span>]:<span class="tlaGNC">     1006396 :     assert(IsValid());</span></span>
+<span id="L343"><span class="lineNum">     343</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1006396 times"> + </span>]:<span class="tlaGNC">     1006396 :     assert((nChild &gt;&gt; 31) == 0);</span></span>
+<span id="L344"><span class="lineNum">     344</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1006396 times"> + </span>]:<span class="tlaGNC">     1006396 :     assert(size() == COMPRESSED_SIZE);</span></span>
+<span id="L345"><span class="lineNum">     345</span>                 :<span class="tlaGNC">     1006396 :     unsigned char out[64];</span></span>
+<span id="L346"><span class="lineNum">     346</span>                 :<span class="tlaGNC">     1006396 :     BIP32Hash(cc, nChild, *begin(), begin()+1, out);</span></span>
+<span id="L347"><span class="lineNum">     347</span>                 :<span class="tlaGNC">     1006396 :     memcpy(ccChild.begin(), out+32, 32);</span></span>
+<span id="L348"><span class="lineNum">     348</span>                 :<span class="tlaGNC">     1006396 :     secp256k1_pubkey pubkey;</span></span>
+<span id="L349"><span class="lineNum">     349</span>         [<span class="tlaGBC" title="Branch 0 was taken 1006396 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     1006396 :     if (!secp256k1_ec_pubkey_parse(secp256k1_context_static, &amp;pubkey, vch, size())) {</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :         return false;</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :     }</span>
+<span id="L352"><span class="lineNum">     352</span>         [<span class="tlaGBC" title="Branch 0 was taken 1006396 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     1006396 :     if (!secp256k1_ec_pubkey_tweak_add(secp256k1_context_static, &amp;pubkey, out)) {</span></span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :         return false;</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             :     }</span>
+<span id="L355"><span class="lineNum">     355</span>                 :<span class="tlaGNC">     1006396 :     unsigned char pub[COMPRESSED_SIZE];</span></span>
+<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaGNC">     1006396 :     size_t publen = COMPRESSED_SIZE;</span></span>
+<span id="L357"><span class="lineNum">     357</span>                 :<span class="tlaGNC">     1006396 :     secp256k1_ec_pubkey_serialize(secp256k1_context_static, pub, &amp;publen, &amp;pubkey, SECP256K1_EC_COMPRESSED);</span></span>
+<span id="L358"><span class="lineNum">     358</span>                 :<span class="tlaGNC">     1006396 :     pubkeyChild.Set(pub, pub + publen);</span></span>
+<span id="L359"><span class="lineNum">     359</span>                 :<span class="tlaGNC">     1006396 :     return true;</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :             : }</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             : </span>
+<span id="L362"><span class="lineNum">     362</span>                 :<span class="tlaGNC">       16453 : EllSwiftPubKey::EllSwiftPubKey(std::span&lt;const std::byte&gt; ellswift) noexcept</span></span>
+<span id="L363"><span class="lineNum">     363</span>                 :             : {</span>
+<span id="L364"><span class="lineNum">     364</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 16453 times"> + </span>]:<span class="tlaGNC">       16453 :     assert(ellswift.size() == SIZE);</span></span>
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">       16453 :     std::copy(ellswift.begin(), ellswift.end(), m_pubkey.begin());</span></span>
+<span id="L366"><span class="lineNum">     366</span>                 :<span class="tlaGNC">       16453 : }</span></span>
+<span id="L367"><span class="lineNum">     367</span>                 :             : </span>
+<span id="L368"><span class="lineNum">     368</span>                 :<span class="tlaGNC">        1811 : CPubKey EllSwiftPubKey::Decode() const</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :             : {</span>
+<span id="L370"><span class="lineNum">     370</span>                 :<span class="tlaGNC">        1811 :     secp256k1_pubkey pubkey;</span></span>
+<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaGNC">        1811 :     secp256k1_ellswift_decode(secp256k1_context_static, &amp;pubkey, UCharCast(m_pubkey.data()));</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : </span>
+<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaGNC">        1811 :     size_t sz = CPubKey::COMPRESSED_SIZE;</span></span>
+<span id="L374"><span class="lineNum">     374</span>                 :<span class="tlaGNC">        1811 :     std::array&lt;uint8_t, CPubKey::COMPRESSED_SIZE&gt; vch_bytes;</span></span>
+<span id="L375"><span class="lineNum">     375</span>                 :             : </span>
+<span id="L376"><span class="lineNum">     376</span>                 :<span class="tlaGNC">        1811 :     secp256k1_ec_pubkey_serialize(secp256k1_context_static, vch_bytes.data(), &amp;sz, &amp;pubkey, SECP256K1_EC_COMPRESSED);</span></span>
+<span id="L377"><span class="lineNum">     377</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1811 times"> + </span>]:<span class="tlaGNC">        1811 :     assert(sz == vch_bytes.size());</span></span>
+<span id="L378"><span class="lineNum">     378</span>                 :             : </span>
+<span id="L379"><span class="lineNum">     379</span>                 :<span class="tlaGNC">        1811 :     return CPubKey{vch_bytes.begin(), vch_bytes.end()};</span></span>
+<span id="L380"><span class="lineNum">     380</span>                 :             : }</span>
+<span id="L381"><span class="lineNum">     381</span>                 :             : </span>
+<span id="L382"><span class="lineNum">     382</span>                 :<span class="tlaGNC">     1998203 : void CExtPubKey::Encode(unsigned char code[BIP32_EXTKEY_SIZE]) const {</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :<span class="tlaGNC">     1998203 :     code[0] = nDepth;</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :<span class="tlaGNC">     1998203 :     memcpy(code+1, vchFingerprint, 4);</span></span>
+<span id="L385"><span class="lineNum">     385</span>                 :<span class="tlaGNC">     1998203 :     WriteBE32(code+5, nChild);</span></span>
+<span id="L386"><span class="lineNum">     386</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1998203 times"> + </span>]:<span class="tlaGNC">     1998203 :     memcpy(code+9, chaincode.begin(), 32);</span></span>
+<span id="L387"><span class="lineNum">     387</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1998203 times"> + </span>]:<span class="tlaGNC">     1998203 :     assert(pubkey.size() == CPubKey::COMPRESSED_SIZE);</span></span>
+<span id="L388"><span class="lineNum">     388</span>                 :<span class="tlaGNC">     1998203 :     memcpy(code+41, pubkey.begin(), CPubKey::COMPRESSED_SIZE);</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaGNC">     1998203 : }</span></span>
+<span id="L390"><span class="lineNum">     390</span>                 :             : </span>
+<span id="L391"><span class="lineNum">     391</span>                 :<span class="tlaGNC">      146388 : void CExtPubKey::Decode(const unsigned char code[BIP32_EXTKEY_SIZE]) {</span></span>
+<span id="L392"><span class="lineNum">     392</span>                 :<span class="tlaGNC">      146388 :     nDepth = code[0];</span></span>
+<span id="L393"><span class="lineNum">     393</span>                 :<span class="tlaGNC">      146388 :     memcpy(vchFingerprint, code+1, 4);</span></span>
+<span id="L394"><span class="lineNum">     394</span>                 :<span class="tlaGNC">      146388 :     nChild = ReadBE32(code+5);</span></span>
+<span id="L395"><span class="lineNum">     395</span>                 :<span class="tlaGNC">      146388 :     memcpy(chaincode.begin(), code+9, 32);</span></span>
+<span id="L396"><span class="lineNum">     396</span>                 :<span class="tlaGNC">      146388 :     pubkey.Set(code+41, code+BIP32_EXTKEY_SIZE);</span></span>
+<span id="L397"><span class="lineNum">     397</span>   [<span class="tlaGBC" title="Branch 0 was taken 43812 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 102576 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 38460 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 5352 times"> + </span> :<span class="tlaGNC">      146388 :     if ((nDepth == 0 &amp;&amp; (nChild != 0 || ReadLE32(vchFingerprint) != 0)) || !pubkey.IsFullyValid()) pubkey = CPubKey();</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 37461 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 999 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 77610 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 62427 times"> + </span>]
+<span id="L398"><span class="lineNum">     398</span>                 :<span class="tlaGNC">      146388 : }</span></span>
+<span id="L399"><span class="lineNum">     399</span>                 :             : </span>
+<span id="L400"><span class="lineNum">     400</span>                 :<span class="tlaGNC">       18515 : void CExtPubKey::EncodeWithVersion(unsigned char code[BIP32_EXTKEY_WITH_VERSION_SIZE]) const</span></span>
+<span id="L401"><span class="lineNum">     401</span>                 :             : {</span>
+<span id="L402"><span class="lineNum">     402</span>                 :<span class="tlaGNC">       18515 :     memcpy(code, version, 4);</span></span>
+<span id="L403"><span class="lineNum">     403</span>                 :<span class="tlaGNC">       18515 :     Encode(&amp;code[4]);</span></span>
+<span id="L404"><span class="lineNum">     404</span>                 :<span class="tlaGNC">       18515 : }</span></span>
+<span id="L405"><span class="lineNum">     405</span>                 :             : </span>
+<span id="L406"><span class="lineNum">     406</span>                 :<span class="tlaGNC">       38445 : void CExtPubKey::DecodeWithVersion(const unsigned char code[BIP32_EXTKEY_WITH_VERSION_SIZE])</span></span>
+<span id="L407"><span class="lineNum">     407</span>                 :             : {</span>
+<span id="L408"><span class="lineNum">     408</span>                 :<span class="tlaGNC">       38445 :     memcpy(version, code, 4);</span></span>
+<span id="L409"><span class="lineNum">     409</span>                 :<span class="tlaGNC">       38445 :     Decode(&amp;code[4]);</span></span>
+<span id="L410"><span class="lineNum">     410</span>                 :<span class="tlaGNC">       38445 : }</span></span>
+<span id="L411"><span class="lineNum">     411</span>                 :             : </span>
+<span id="L412"><span class="lineNum">     412</span>                 :<span class="tlaGNC">     1005193 : bool CExtPubKey::Derive(CExtPubKey &amp;out, unsigned int _nChild) const {</span></span>
+<span id="L413"><span class="lineNum">     413</span>         [<span class="tlaGBC" title="Branch 0 was taken 1005193 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     1005193 :     if (nDepth == std::numeric_limits&lt;unsigned char&gt;::max()) return false;</span></span>
+<span id="L414"><span class="lineNum">     414</span>                 :<span class="tlaGNC">     1005193 :     out.nDepth = nDepth + 1;</span></span>
+<span id="L415"><span class="lineNum">     415</span>                 :<span class="tlaGNC">     1005193 :     CKeyID id = pubkey.GetID();</span></span>
+<span id="L416"><span class="lineNum">     416</span>                 :<span class="tlaGNC">     1005193 :     memcpy(out.vchFingerprint, &amp;id, 4);</span></span>
+<span id="L417"><span class="lineNum">     417</span>                 :<span class="tlaGNC">     1005193 :     out.nChild = _nChild;</span></span>
+<span id="L418"><span class="lineNum">     418</span>                 :<span class="tlaGNC">     1005193 :     return pubkey.Derive(out.pubkey, out.chaincode, _nChild, chaincode);</span></span>
+<span id="L419"><span class="lineNum">     419</span>                 :             : }</span>
+<span id="L420"><span class="lineNum">     420</span>                 :             : </span>
+<span id="L421"><span class="lineNum">     421</span>                 :<span class="tlaGNC">      176348 : /* static */ bool CPubKey::CheckLowS(const std::vector&lt;unsigned char&gt;&amp; vchSig) {</span></span>
+<span id="L422"><span class="lineNum">     422</span>                 :<span class="tlaGNC">      176348 :     secp256k1_ecdsa_signature sig;</span></span>
+<span id="L423"><span class="lineNum">     423</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 176348 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 175145 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1203 times"> + </span>]:<span class="tlaGNC">      176348 :     if (!ecdsa_signature_parse_der_lax(&amp;sig, vchSig.data(), vchSig.size())) {</span></span>
+<span id="L424"><span class="lineNum">     424</span>                 :             :         return false;</span>
+<span id="L425"><span class="lineNum">     425</span>                 :             :     }</span>
+<span id="L426"><span class="lineNum">     426</span>                 :<span class="tlaGNC">      175145 :     return (!secp256k1_ecdsa_signature_normalize(secp256k1_context_static, nullptr, &amp;sig));</span></span>
+<span id="L427"><span class="lineNum">     427</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

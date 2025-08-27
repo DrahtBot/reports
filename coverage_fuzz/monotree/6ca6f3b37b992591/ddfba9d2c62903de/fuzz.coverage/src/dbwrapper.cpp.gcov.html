@@ -1,0 +1,493 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/dbwrapper.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - dbwrapper.cpp<span style="font-size: 80%;"> (source / <a href="dbwrapper.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryMed">75.9&nbsp;%</td>
+            <td class="headerCovTableEntry">195</td>
+            <td class="headerCovTableEntry">148</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-08-27 16:35:37</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">96.7&nbsp;%</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">29</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">35.9&nbsp;%</td>
+            <td class="headerCovTableEntry">262</td>
+            <td class="headerCovTableEntry">94</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2012-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;dbwrapper.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;logging.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;random.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;serialize.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;streams.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/fs.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/fs_helpers.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;util/obfuscation.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;util/strencodings.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;cassert&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;cstdarg&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;cstdio&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;leveldb/cache.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;leveldb/db.h&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;leveldb/env.h&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #include &lt;leveldb/filter_policy.h&gt;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #include &lt;leveldb/helpers/memenv/memenv.h&gt;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #include &lt;leveldb/iterator.h&gt;</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : #include &lt;leveldb/options.h&gt;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #include &lt;leveldb/slice.h&gt;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : #include &lt;leveldb/status.h&gt;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : #include &lt;leveldb/write_batch.h&gt;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">    32026862 : static auto CharCast(const std::byte* data) { return reinterpret_cast&lt;const char*&gt;(data); }</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaUNC">           0 : bool DestroyDB(const std::string&amp; path_str)</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : {</span>
+<span id="L40"><span class="lineNum">      40</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     return leveldb::DestroyDB(path_str, {}).ok();</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : }</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : /** Handle database error by throwing dbwrapper_error exception.</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :  */</span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">     3314745 : static void HandleError(const leveldb::Status&amp; status)</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : {</span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 3314745 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     3314745 :     if (status.ok())</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">     3314745 :         return;</span></span>
+<span id="L49"><span class="lineNum">      49</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     const std::string errmsg = &quot;Fatal LevelDB error: &quot; + status.ToString();</span></span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     LogPrintf(&quot;%s\n&quot;, errmsg);</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     LogPrintf(&quot;You can use -debug=leveldb to get more complete diagnostic messages\n&quot;);</span></span>
+<span id="L52"><span class="lineNum">      52</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     throw dbwrapper_error(errmsg);</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">       12820 : class CBitcoinLevelDBLogger : public leveldb::Logger {</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : public:</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     // This code is adapted from posix_logger.h, which is why it is using vsprintf.</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     // Please do not do this in normal code</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">       64532 :     void Logv(const char * format, va_list ap) override {</span></span>
+<span id="L60"><span class="lineNum">      60</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 64532 times"> + </span>]:<span class="tlaGNC">       64532 :             if (!LogAcceptCategory(BCLog::LEVELDB, BCLog::Level::Debug)) {</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :                 return;</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :             }</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :             char buffer[500];</span>
+<span id="L64"><span class="lineNum">      64</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             for (int iter = 0; iter &lt; 2; iter++) {</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaUNC">           0 :                 char* base;</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaUNC">           0 :                 int bufsize;</span></span>
+<span id="L67"><span class="lineNum">      67</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (iter == 0) {</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :                     bufsize = sizeof(buffer);</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :                     base = buffer;</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :                 }</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :                 else {</span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaUNC">           0 :                     bufsize = 30000;</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaUNC">           0 :                     base = new char[bufsize];</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :                 }</span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaUNC">           0 :                 char* p = base;</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaUNC">           0 :                 char* limit = base + bufsize;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : </span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :                 // Print the message</span>
+<span id="L79"><span class="lineNum">      79</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (p &lt; limit) {</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaUNC">           0 :                     va_list backup_ap;</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaUNC">           0 :                     va_copy(backup_ap, ap);</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :                     // Do not use vsnprintf elsewhere in bitcoin source code, see above.</span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaUNC">           0 :                     p += vsnprintf(p, limit - p, format, backup_ap);</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaUNC">           0 :                     va_end(backup_ap);</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :                 }</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : </span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :                 // Truncate to available space if necessary</span>
+<span id="L88"><span class="lineNum">      88</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (p &gt;= limit) {</span></span>
+<span id="L89"><span class="lineNum">      89</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                     if (iter == 0) {</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaUNC">           0 :                         continue;       // Try again with larger buffer</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :                     }</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :                     else {</span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaUNC">           0 :                         p = limit - 1;</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :                     }</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :                 }</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :                 // Add newline if necessary</span>
+<span id="L98"><span class="lineNum">      98</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (p == base || p[-1] != '\n') {</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaUNC">           0 :                     *p++ = '\n';</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :                 }</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : </span>
+<span id="L102"><span class="lineNum">     102</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 assert(p &lt;= limit);</span></span>
+<span id="L103"><span class="lineNum">     103</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 base[std::min(bufsize - 1, (int)(p - base))] = '\0';</span></span>
+<span id="L104"><span class="lineNum">     104</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 LogDebug(BCLog::LEVELDB, &quot;%s\n&quot;, util::RemoveSuffixView(base, &quot;\n&quot;));</span></span>
+<span id="L105"><span class="lineNum">     105</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (base != buffer) {</span></span>
+<span id="L106"><span class="lineNum">     106</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                     delete[] base;</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :                 }</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :                 break;</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :             }</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     }</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : };</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : </span>
+<span id="L113"><span class="lineNum">     113</span>                 :<span class="tlaGNC">       12820 : static void SetMaxOpenFiles(leveldb::Options *options) {</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     // On most platforms the default setting of max_open_files (which is 1000)</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     // is optimal. On Windows using a large file count is OK because the handles</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     // do not interfere with select() loops. On 64-bit Unix hosts this value is</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     // also OK, because up to that amount LevelDB will use an mmap</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     // implementation that does not use extra file descriptors (the fds are</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :     // closed after being mmap'ed).</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     //</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :     // Increasing the value beyond the default is dangerous because LevelDB will</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     // fall back to a non-mmap implementation when the file count is too large.</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :     // On 32-bit Unix host we should decrease the value because the handles use</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     // up real fds, and we want to avoid fd exhaustion issues.</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :     //</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     // See PR #12495 for further discussion.</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : </span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">       12820 :     int default_open_files = options-&gt;max_open_files;</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : #ifndef WIN32</span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaGNC">       12820 :     if (sizeof(void*) &lt; 8) {</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :         options-&gt;max_open_files = 64;</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     }</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : #endif</span>
+<span id="L134"><span class="lineNum">     134</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 12820 times"> + </span>]:<span class="tlaGNC">       12820 :     LogDebug(BCLog::LEVELDB, &quot;LevelDB using max_open_files=%d (default=%d)\n&quot;,</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :              options-&gt;max_open_files, default_open_files);</span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">       12820 : }</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">       12820 : static leveldb::Options GetOptions(size_t nCacheSize)</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             : {</span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">       12820 :     leveldb::Options options;</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">       12820 :     options.block_cache = leveldb::NewLRUCache(nCacheSize / 2);</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">       12820 :     options.write_buffer_size = nCacheSize / 4; // up to two write buffers may be held in memory simultaneously</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">       12820 :     options.filter_policy = leveldb::NewBloomFilterPolicy(10);</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">       12820 :     options.compression = leveldb::kNoCompression;</span></span>
+<span id="L145"><span class="lineNum">     145</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 12820 times"> + </span>]:<span class="tlaGNC">       12820 :     options.info_log = new CBitcoinLevelDBLogger();</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">       12820 :     if (leveldb::kMajorVersion &gt; 1 || (leveldb::kMajorVersion == 1 &amp;&amp; leveldb::kMinorVersion &gt;= 16)) {</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :         // LevelDB versions before 1.16 consider short writes to be corruption. Only trigger error</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :         // on corruption in later versions.</span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">       12820 :         options.paranoid_checks = true;</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :     }</span>
+<span id="L151"><span class="lineNum">     151</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 12820 times"> + </span>]:<span class="tlaGNC">       12820 :     options.max_file_size = std::max(options.max_file_size, DBWRAPPER_MAX_FILE_SIZE);</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">       12820 :     SetMaxOpenFiles(&amp;options);</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaGNC">       12820 :     return options;</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : }</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>         [<span class="tlaGBC" title="Branch 0 was taken 3301925 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     6603850 : struct CDBBatch::WriteBatchImpl {</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :     leveldb::WriteBatch batch;</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             : };</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">     3301925 : CDBBatch::CDBBatch(const CDBWrapper&amp; _parent)</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">     3301925 :     : parent{_parent},</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaGNC">     3301925 :       m_impl_batch{std::make_unique&lt;CDBBatch::WriteBatchImpl&gt;()}</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : {</span>
+<span id="L164"><span class="lineNum">     164</span>         [<span class="tlaGBC" title="Branch 0 was taken 3301925 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     3301925 :     Clear();</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaGNC">     3301925 : };</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             : </span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">     3301925 : CDBBatch::~CDBBatch() = default;</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :             : </span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaGNC">     3301925 : void CDBBatch::Clear()</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             : {</span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaGNC">     3301925 :     m_impl_batch-&gt;batch.Clear();</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">     3301925 : }</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : </span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">     9550839 : void CDBBatch::WriteImpl(std::span&lt;const std::byte&gt; key, DataStream&amp; ssValue)</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :             : {</span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">     9550839 :     leveldb::Slice slKey(CharCast(key.data()), key.size());</span></span>
+<span id="L177"><span class="lineNum">     177</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 9550839 times"> + </span>]:<span class="tlaGNC">     9550839 :     dbwrapper_private::GetObfuscation(parent)(ssValue);</span></span>
+<span id="L178"><span class="lineNum">     178</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 9550839 times"> + </span>]:<span class="tlaGNC">     9550839 :     leveldb::Slice slValue(CharCast(ssValue.data()), ssValue.size());</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaGNC">     9550839 :     m_impl_batch-&gt;batch.Put(slKey, slValue);</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">     9550839 : }</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : </span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaGNC">     6305686 : void CDBBatch::EraseImpl(std::span&lt;const std::byte&gt; key)</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :             : {</span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">     6305686 :     leveldb::Slice slKey(CharCast(key.data()), key.size());</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaGNC">     6305686 :     m_impl_batch-&gt;batch.Delete(slKey);</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaGNC">     6305686 : }</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : </span>
+<span id="L188"><span class="lineNum">     188</span>                 :<span class="tlaGNC">      736026 : size_t CDBBatch::ApproximateSize() const</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :             : {</span>
+<span id="L190"><span class="lineNum">     190</span>                 :<span class="tlaGNC">      736026 :     return m_impl_batch-&gt;batch.ApproximateSize();</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : }</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : </span>
+<span id="L193"><span class="lineNum">     193</span>                 :             : struct LevelDBContext {</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :     //! custom environment this database is using (may be nullptr in case of default environment)</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :     leveldb::Env* penv;</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             : </span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :     //! database options used</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     leveldb::Options options;</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : </span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     //! options used when reading from the database</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     leveldb::ReadOptions readoptions;</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : </span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     //! options used when iterating over values of the database</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :     leveldb::ReadOptions iteroptions;</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             : </span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :     //! options used when writing to the database</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :     leveldb::WriteOptions writeoptions;</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : </span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     //! options used when sync writing to the database</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :     leveldb::WriteOptions syncoptions;</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             : </span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :     //! the database itself</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :     leveldb::DB* pdb;</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : };</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             : </span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">       12820 : CDBWrapper::CDBWrapper(const DBParams&amp; params)</span></span>
+<span id="L217"><span class="lineNum">     217</span>   [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 12820 times"> + </span> :<span class="tlaGNC">       76920 :     : m_db_context{std::make_unique&lt;LevelDBContext&gt;()}, m_name{fs::PathToString(params.path.stem())}, m_path{params.path}, m_is_memory{params.memory_only}</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L218"><span class="lineNum">     218</span>                 :             : {</span>
+<span id="L219"><span class="lineNum">     219</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     DBContext().penv = nullptr;</span></span>
+<span id="L220"><span class="lineNum">     220</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     DBContext().readoptions.verify_checksums = true;</span></span>
+<span id="L221"><span class="lineNum">     221</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     DBContext().iteroptions.verify_checksums = true;</span></span>
+<span id="L222"><span class="lineNum">     222</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     DBContext().iteroptions.fill_cache = false;</span></span>
+<span id="L223"><span class="lineNum">     223</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     DBContext().syncoptions.sync = true;</span></span>
+<span id="L224"><span class="lineNum">     224</span>   [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     DBContext().options = GetOptions(params.cache_bytes);</span></span>
+<span id="L225"><span class="lineNum">     225</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     DBContext().options.create_if_missing = true;</span></span>
+<span id="L226"><span class="lineNum">     226</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     if (params.memory_only) {</span></span>
+<span id="L227"><span class="lineNum">     227</span>   [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       12820 :         DBContext().penv = leveldb::NewMemEnv(leveldb::Env::Default());</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L228"><span class="lineNum">     228</span>   [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       12820 :         DBContext().options.env = DBContext().penv;</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     } else {</span>
+<span id="L230"><span class="lineNum">     230</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (params.wipe_data) {</span></span>
+<span id="L231"><span class="lineNum">     231</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             LogInfo(&quot;Wiping LevelDB in %s&quot;, fs::PathToString(params.path));</span></span>
+<span id="L232"><span class="lineNum">     232</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :             leveldb::Status result = leveldb::DestroyDB(fs::PathToString(params.path), DBContext().options);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L233"><span class="lineNum">     233</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             HandleError(result);</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :<span class="tlaUNC">           0 :         }</span></span>
+<span id="L235"><span class="lineNum">     235</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         TryCreateDirectories(params.path);</span></span>
+<span id="L236"><span class="lineNum">     236</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogInfo(&quot;Opening LevelDB in %s&quot;, fs::PathToString(params.path));</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :     }</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :     // PathToString() return value is safe to pass to leveldb open function,</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :     // because on POSIX leveldb passes the byte string directly to ::open(), and</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     // on Windows it converts from UTF-8 to UTF-16 before calling ::CreateFileW</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :     // (see env_posix.cc and env_windows.cc).</span>
+<span id="L242"><span class="lineNum">     242</span>   [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 12820 times"> + </span> :<span class="tlaGNC">       25640 :     leveldb::Status status = leveldb::DB::Open(DBContext().options, fs::PathToString(params.path), &amp;DBContext().pdb);</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L243"><span class="lineNum">     243</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     HandleError(status);</span></span>
+<span id="L244"><span class="lineNum">     244</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     LogInfo(&quot;Opened LevelDB successfully&quot;);</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :             : </span>
+<span id="L246"><span class="lineNum">     246</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 12820 times"> + </span>]:<span class="tlaGNC">       12820 :     if (params.options.force_compact) {</span></span>
+<span id="L247"><span class="lineNum">     247</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogInfo(&quot;Starting database compaction of %s&quot;, fs::PathToString(params.path));</span></span>
+<span id="L248"><span class="lineNum">     248</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         DBContext().pdb-&gt;CompactRange(nullptr, nullptr);</span></span>
+<span id="L249"><span class="lineNum">     249</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogInfo(&quot;Finished database compaction of %s&quot;, fs::PathToString(params.path));</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :     }</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>   [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">       12820 :     if (!Read(OBFUSCATION_KEY, m_obfuscation) &amp;&amp; params.obfuscate &amp;&amp; IsEmpty()) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 4761 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 8059 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 4761 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 4761 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 9 was not taken"> - </span>]
+<span id="L253"><span class="lineNum">     253</span>                 :             :         // Generate and write the new obfuscation key.</span>
+<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaGNC">        4761 :         const Obfuscation obfuscation{FastRandomContext{}.randbytes&lt;Obfuscation::KEY_SIZE&gt;()};</span></span>
+<span id="L255"><span class="lineNum">     255</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4761 times"> + </span>]:<span class="tlaGNC">        4761 :         assert(!m_obfuscation); // Make sure the key is written without obfuscation.</span></span>
+<span id="L256"><span class="lineNum">     256</span>         [<span class="tlaGBC" title="Branch 0 was taken 4761 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4761 :         Write(OBFUSCATION_KEY, obfuscation);</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">        4761 :         m_obfuscation = obfuscation;</span></span>
+<span id="L258"><span class="lineNum">     258</span>   [<span class="tlaGBC" title="Branch 0 was taken 4761 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 4761 times"> + </span> :<span class="tlaGNC">       14283 :         LogInfo(&quot;Wrote new obfuscation key for %s: %s&quot;, fs::PathToString(params.path), m_obfuscation.HexKey());</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 4761 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L259"><span class="lineNum">     259</span>                 :             :     }</span>
+<span id="L260"><span class="lineNum">     260</span>   [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 12820 times"> + </span> :<span class="tlaGNC">       38460 :     LogInfo(&quot;Using obfuscation key for %s: %s&quot;, fs::PathToString(params.path), m_obfuscation.HexKey());</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 12820 times"> + </span>]
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">       12820 : }</span></span>
+<span id="L262"><span class="lineNum">     262</span>                 :             : </span>
+<span id="L263"><span class="lineNum">     263</span>                 :<span class="tlaGNC">       25640 : CDBWrapper::~CDBWrapper()</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :             : {</span>
+<span id="L265"><span class="lineNum">     265</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     delete DBContext().pdb;</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">       12820 :     DBContext().pdb = nullptr;</span></span>
+<span id="L267"><span class="lineNum">     267</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     delete DBContext().options.filter_policy;</span></span>
+<span id="L268"><span class="lineNum">     268</span>                 :<span class="tlaGNC">       12820 :     DBContext().options.filter_policy = nullptr;</span></span>
+<span id="L269"><span class="lineNum">     269</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     delete DBContext().options.info_log;</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :<span class="tlaGNC">       12820 :     DBContext().options.info_log = nullptr;</span></span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     delete DBContext().options.block_cache;</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaGNC">       12820 :     DBContext().options.block_cache = nullptr;</span></span>
+<span id="L273"><span class="lineNum">     273</span>         [<span class="tlaGBC" title="Branch 0 was taken 12820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       12820 :     delete DBContext().penv;</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaGNC">       12820 :     DBContext().options.env = nullptr;</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">       12820 : }</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :             : </span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">     3301925 : bool CDBWrapper::WriteBatch(CDBBatch&amp; batch, bool fSync)</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : {</span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">     3301925 :     const bool log_memory = LogAcceptCategory(BCLog::LEVELDB, BCLog::Level::Debug);</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :<span class="tlaGNC">     3301925 :     double mem_before = 0;</span></span>
+<span id="L281"><span class="lineNum">     281</span>         [<span class="tlaGBC" title="Branch 0 was taken 454 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3301471 times"> + </span>]:<span class="tlaGNC">     3301925 :     if (log_memory) {</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaGNC">         454 :         mem_before = DynamicMemoryUsage() / 1024.0 / 1024;</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :     }</span>
+<span id="L284"><span class="lineNum">     284</span>         [<span class="tlaGBC" title="Branch 0 was taken 156824 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3145101 times"> + </span>]:<span class="tlaGNC">     3301925 :     leveldb::Status status = DBContext().pdb-&gt;Write(fSync ? DBContext().syncoptions : DBContext().writeoptions, &amp;batch.m_impl_batch-&gt;batch);</span></span>
+<span id="L285"><span class="lineNum">     285</span>         [<span class="tlaGBC" title="Branch 0 was taken 3301925 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     3301925 :     HandleError(status);</span></span>
+<span id="L286"><span class="lineNum">     286</span>         [<span class="tlaGBC" title="Branch 0 was taken 454 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3301471 times"> + </span>]:<span class="tlaGNC">     3301925 :     if (log_memory) {</span></span>
+<span id="L287"><span class="lineNum">     287</span>         [<span class="tlaGBC" title="Branch 0 was taken 454 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         454 :         double mem_after = DynamicMemoryUsage() / 1024.0 / 1024;</span></span>
+<span id="L288"><span class="lineNum">     288</span>   [<span class="tlaGBC" title="Branch 0 was taken 454 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 454 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         454 :         LogDebug(BCLog::LEVELDB, &quot;WriteBatch memory usage: db=%s, before=%.1fMiB, after=%.1fMiB\n&quot;,</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 454 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L289"><span class="lineNum">     289</span>                 :             :                  m_name, mem_before, mem_after);</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     }</span>
+<span id="L291"><span class="lineNum">     291</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 3301925 times"> + </span>]:<span class="tlaGNC">     3301925 :     return true;</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :<span class="tlaGNC">     3301925 : }</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :             : </span>
+<span id="L294"><span class="lineNum">     294</span>                 :<span class="tlaGNC">         908 : size_t CDBWrapper::DynamicMemoryUsage() const</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :             : {</span>
+<span id="L296"><span class="lineNum">     296</span>         [<span class="tlaGBC" title="Branch 0 was taken 908 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         908 :     std::string memory;</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :<span class="tlaGNC">         908 :     std::optional&lt;size_t&gt; parsed;</span></span>
+<span id="L298"><span class="lineNum">     298</span>   [<span class="tlaGBC" title="Branch 0 was taken 908 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 908 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        1816 :     if (!DBContext().pdb-&gt;GetProperty(&quot;leveldb.approximate-memory-usage&quot;, &amp;memory) || !(parsed = ToIntegral&lt;size_t&gt;(memory))) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 908 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 908 times"> + </span>]
+<span id="L299"><span class="lineNum">     299</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         LogDebug(BCLog::LEVELDB, &quot;Failed to get approximate-memory-usage property\n&quot;);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L300"><span class="lineNum">     300</span>                 :<span class="tlaUNC">           0 :         return 0;</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :     }</span>
+<span id="L302"><span class="lineNum">     302</span>                 :<span class="tlaGNC">         908 :     return parsed.value();</span></span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">         908 : }</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :             : </span>
+<span id="L305"><span class="lineNum">     305</span>                 :<span class="tlaGNC">     6116827 : std::optional&lt;std::string&gt; CDBWrapper::ReadImpl(std::span&lt;const std::byte&gt; key) const</span></span>
+<span id="L306"><span class="lineNum">     306</span>                 :             : {</span>
+<span id="L307"><span class="lineNum">     307</span>         [<span class="tlaGBC" title="Branch 0 was taken 6116827 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     6116827 :     leveldb::Slice slKey(CharCast(key.data()), key.size());</span></span>
+<span id="L308"><span class="lineNum">     308</span>         [<span class="tlaGBC" title="Branch 0 was taken 6116827 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     6116827 :     std::string strValue;</span></span>
+<span id="L309"><span class="lineNum">     309</span>   [<span class="tlaGBC" title="Branch 0 was taken 6116827 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6116827 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">     6116827 :     leveldb::Status status = DBContext().pdb-&gt;Get(DBContext().readoptions, slKey, &amp;strValue);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 6116827 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L310"><span class="lineNum">     310</span>         [<span class="tlaGBC" title="Branch 0 was taken 2425257 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3691570 times"> + </span>]:<span class="tlaGNC">     6116827 :     if (!status.ok()) {</span></span>
+<span id="L311"><span class="lineNum">     311</span>         [<span class="tlaGBC" title="Branch 0 was taken 2425257 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     2425257 :         if (status.IsNotFound())</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaGNC">     2425257 :             return std::nullopt;</span></span>
+<span id="L313"><span class="lineNum">     313</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogPrintf(&quot;LevelDB read failure: %s\n&quot;, status.ToString());</span></span>
+<span id="L314"><span class="lineNum">     314</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         HandleError(status);</span></span>
+<span id="L315"><span class="lineNum">     315</span>                 :             :     }</span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaGNC">     3691570 :     return strValue;</span></span>
+<span id="L317"><span class="lineNum">     317</span>                 :<span class="tlaGNC">     6116827 : }</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             : </span>
+<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">        8738 : bool CDBWrapper::ExistsImpl(std::span&lt;const std::byte&gt; key) const</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :             : {</span>
+<span id="L321"><span class="lineNum">     321</span>         [<span class="tlaGBC" title="Branch 0 was taken 8738 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8738 :     leveldb::Slice slKey(CharCast(key.data()), key.size());</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :             : </span>
+<span id="L323"><span class="lineNum">     323</span>         [<span class="tlaGBC" title="Branch 0 was taken 8738 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        8738 :     std::string strValue;</span></span>
+<span id="L324"><span class="lineNum">     324</span>   [<span class="tlaGBC" title="Branch 0 was taken 8738 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 8738 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        8738 :     leveldb::Status status = DBContext().pdb-&gt;Get(DBContext().readoptions, slKey, &amp;strValue);</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 8738 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L325"><span class="lineNum">     325</span>         [<span class="tlaGBC" title="Branch 0 was taken 5415 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3323 times"> + </span>]:<span class="tlaGNC">        8738 :     if (!status.ok()) {</span></span>
+<span id="L326"><span class="lineNum">     326</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5415 times"> + </span>]:<span class="tlaGNC">        5415 :         if (status.IsNotFound())</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :             return false;</span>
+<span id="L328"><span class="lineNum">     328</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogPrintf(&quot;LevelDB read failure: %s\n&quot;, status.ToString());</span></span>
+<span id="L329"><span class="lineNum">     329</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         HandleError(status);</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     }</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             :     return true;</span>
+<span id="L332"><span class="lineNum">     332</span>                 :<span class="tlaGNC">        8738 : }</span></span>
+<span id="L333"><span class="lineNum">     333</span>                 :             : </span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">      164054 : size_t CDBWrapper::EstimateSizeImpl(std::span&lt;const std::byte&gt; key1, std::span&lt;const std::byte&gt; key2) const</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :             : {</span>
+<span id="L336"><span class="lineNum">     336</span>                 :<span class="tlaGNC">      164054 :     leveldb::Slice slKey1(CharCast(key1.data()), key1.size());</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaGNC">      164054 :     leveldb::Slice slKey2(CharCast(key2.data()), key2.size());</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :<span class="tlaGNC">      164054 :     uint64_t size = 0;</span></span>
+<span id="L339"><span class="lineNum">     339</span>                 :<span class="tlaGNC">      164054 :     leveldb::Range range(slKey1, slKey2);</span></span>
+<span id="L340"><span class="lineNum">     340</span>                 :<span class="tlaGNC">      164054 :     DBContext().pdb-&gt;GetApproximateSizes(&amp;range, 1, &amp;size);</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :<span class="tlaGNC">      164054 :     return size;</span></span>
+<span id="L342"><span class="lineNum">     342</span>                 :             : }</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             : </span>
+<span id="L344"><span class="lineNum">     344</span>                 :<span class="tlaGNC">        4761 : bool CDBWrapper::IsEmpty()</span></span>
+<span id="L345"><span class="lineNum">     345</span>                 :             : {</span>
+<span id="L346"><span class="lineNum">     346</span>         [<span class="tlaGBC" title="Branch 0 was taken 4761 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4761 :     std::unique_ptr&lt;CDBIterator&gt; it(NewIterator());</span></span>
+<span id="L347"><span class="lineNum">     347</span>         [<span class="tlaGBC" title="Branch 0 was taken 4761 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        4761 :     it-&gt;SeekToFirst();</span></span>
+<span id="L348"><span class="lineNum">     348</span>         [<span class="tlaGBC" title="Branch 0 was taken 4761 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        9522 :     return !(it-&gt;Valid());</span></span>
+<span id="L349"><span class="lineNum">     349</span>                 :<span class="tlaGNC">        4761 : }</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             : </span>
+<span id="L351"><span class="lineNum">     351</span>                 :<span class="tlaGNC">      170586 : struct CDBIterator::IteratorImpl {</span></span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :     const std::unique_ptr&lt;leveldb::Iterator&gt; iter;</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             : </span>
+<span id="L354"><span class="lineNum">     354</span>                 :<span class="tlaGNC">      170586 :     explicit IteratorImpl(leveldb::Iterator* _iter) : iter{_iter} {}</span></span>
+<span id="L355"><span class="lineNum">     355</span>                 :             : };</span>
+<span id="L356"><span class="lineNum">     356</span>                 :             : </span>
+<span id="L357"><span class="lineNum">     357</span>                 :<span class="tlaGNC">      170586 : CDBIterator::CDBIterator(const CDBWrapper&amp; _parent, std::unique_ptr&lt;IteratorImpl&gt; _piter) : parent(_parent),</span></span>
+<span id="L358"><span class="lineNum">     358</span>                 :<span class="tlaGNC">      170586 :                                                                                             m_impl_iter(std::move(_piter)) {}</span></span>
+<span id="L359"><span class="lineNum">     359</span>                 :             : </span>
+<span id="L360"><span class="lineNum">     360</span>                 :<span class="tlaGNC">      170586 : CDBIterator* CDBWrapper::NewIterator()</span></span>
+<span id="L361"><span class="lineNum">     361</span>                 :             : {</span>
+<span id="L362"><span class="lineNum">     362</span>   [<span class="tlaGBC" title="Branch 0 was taken 170586 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 170586 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      170586 :     return new CDBIterator{*this, std::make_unique&lt;CDBIterator::IteratorImpl&gt;(DBContext().pdb-&gt;NewIterator(DBContext().iteroptions))};</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 170586 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 170586 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 170586 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 9 was not taken"> - </span>]
+<span id="L363"><span class="lineNum">     363</span>                 :             : }</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             : </span>
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">      165825 : void CDBIterator::SeekImpl(std::span&lt;const std::byte&gt; key)</span></span>
+<span id="L366"><span class="lineNum">     366</span>                 :             : {</span>
+<span id="L367"><span class="lineNum">     367</span>                 :<span class="tlaGNC">      165825 :     leveldb::Slice slKey(CharCast(key.data()), key.size());</span></span>
+<span id="L368"><span class="lineNum">     368</span>                 :<span class="tlaGNC">      165825 :     m_impl_iter-&gt;iter-&gt;Seek(slKey);</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :<span class="tlaGNC">      165825 : }</span></span>
+<span id="L370"><span class="lineNum">     370</span>                 :             : </span>
+<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaGNC">     8179336 : std::span&lt;const std::byte&gt; CDBIterator::GetKeyImpl() const</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : {</span>
+<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaGNC">     8179336 :     return MakeByteSpan(m_impl_iter-&gt;iter-&gt;key());</span></span>
+<span id="L374"><span class="lineNum">     374</span>                 :             : }</span>
+<span id="L375"><span class="lineNum">     375</span>                 :             : </span>
+<span id="L376"><span class="lineNum">     376</span>                 :<span class="tlaGNC">     8175665 : std::span&lt;const std::byte&gt; CDBIterator::GetValueImpl() const</span></span>
+<span id="L377"><span class="lineNum">     377</span>                 :             : {</span>
+<span id="L378"><span class="lineNum">     378</span>                 :<span class="tlaGNC">     8175665 :     return MakeByteSpan(m_impl_iter-&gt;iter-&gt;value());</span></span>
+<span id="L379"><span class="lineNum">     379</span>                 :             : }</span>
+<span id="L380"><span class="lineNum">     380</span>                 :             : </span>
+<span id="L381"><span class="lineNum">     381</span>                 :<span class="tlaGNC">      170586 : CDBIterator::~CDBIterator() = default;</span></span>
+<span id="L382"><span class="lineNum">     382</span>                 :<span class="tlaGNC">     8346251 : bool CDBIterator::Valid() const { return m_impl_iter-&gt;iter-&gt;Valid(); }</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :<span class="tlaGNC">        4761 : void CDBIterator::SeekToFirst() { m_impl_iter-&gt;iter-&gt;SeekToFirst(); }</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :<span class="tlaGNC">     8175665 : void CDBIterator::Next() { m_impl_iter-&gt;iter-&gt;Next(); }</span></span>
+<span id="L385"><span class="lineNum">     385</span>                 :             : </span>
+<span id="L386"><span class="lineNum">     386</span>                 :             : namespace dbwrapper_private {</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             : </span>
+<span id="L388"><span class="lineNum">     388</span>                 :<span class="tlaGNC">    17726504 : const Obfuscation&amp; GetObfuscation(const CDBWrapper&amp; w)</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :             : {</span>
+<span id="L390"><span class="lineNum">     390</span>                 :<span class="tlaGNC">    17726504 :     return w.m_obfuscation;</span></span>
+<span id="L391"><span class="lineNum">     391</span>                 :             : }</span>
+<span id="L392"><span class="lineNum">     392</span>                 :             : </span>
+<span id="L393"><span class="lineNum">     393</span>                 :             : } // namespace dbwrapper_private</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

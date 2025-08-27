@@ -1,0 +1,567 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/random.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - random.h<span style="font-size: 80%;"> (source / <a href="random.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">99.0&nbsp;%</td>
+            <td class="headerCovTableEntry">97</td>
+            <td class="headerCovTableEntry">96</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-08-27 16:35:37</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryMed">87.9&nbsp;%</td>
+            <td class="headerCovTableEntry">33</td>
+            <td class="headerCovTableEntry">29</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">64.3&nbsp;%</td>
+            <td class="headerCovTableEntry">56</td>
+            <td class="headerCovTableEntry">36</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_RANDOM_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_RANDOM_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;crypto/chacha20.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;crypto/common.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;bit&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;cassert&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;chrono&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;concepts&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;type_traits&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : /**</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :  * Overall design of the RNG and entropy sources.</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :  *</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :  * We maintain a single global 256-bit RNG state for all high-quality randomness.</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :  * The following (classes of) functions interact with that state by mixing in new</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :  * entropy, and optionally extracting random output from it:</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :  *</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :  * - GetRandBytes, GetRandHash, GetRandDur, as well as construction of FastRandomContext</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :  *   objects, perform 'fast' seeding, consisting of mixing in:</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :  *   - A stack pointer (indirectly committing to calling thread and call stack)</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :  *   - A high-precision timestamp (rdtsc when available, c++ high_resolution_clock otherwise)</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :  *   - 64 bits from the hardware RNG (rdrand) when available.</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :  *   These entropy sources are very fast, and only designed to protect against situations</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :  *   where a VM state restore/copy results in multiple systems with the same randomness.</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :  *   FastRandomContext on the other hand does not protect against this once created, but</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :  *   is even faster (and acceptable to use inside tight loops).</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :  *</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :  * - The GetStrongRandBytes() function performs 'slow' seeding, including everything</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :  *   that fast seeding includes, but additionally:</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :  *   - OS entropy (/dev/urandom, getrandom(), ...). The application will terminate if</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :  *     this entropy source fails.</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :  *   - Another high-precision timestamp (indirectly committing to a benchmark of all the</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :  *     previous sources).</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :  *   These entropy sources are slower, but designed to make sure the RNG state contains</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :  *   fresh data that is unpredictable to attackers.</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :  *</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :  * - RandAddPeriodic() seeds everything that fast seeding includes, but additionally:</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :  *   - A high-precision timestamp</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :  *   - Dynamic environment data (clocks, resource usage, ...)</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :  *   - Strengthen the entropy for 10 ms using repeated SHA512.</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :  *   This is run once every minute.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :  *</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :  * - On first use of the RNG (regardless of what function is called first), all entropy</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :  *   sources used in the 'slow' seeder are included, but also:</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :  *   - 256 bits from the hardware RNG (rdseed or rdrand) when available.</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :  *   - Dynamic environment data (performance monitoring, ...)</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :  *   - Static environment data</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :  *   - Strengthen the entropy for 100 ms using repeated SHA512.</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :  *</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :  * When mixing in new entropy, H = SHA512(entropy || old_rng_state) is computed, and</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :  * (up to) the first 32 bytes of H are produced as output, while the last 32 bytes</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :  * become the new RNG state.</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :  *</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :  * During tests, the RNG can be put into a special deterministic mode, in which the output</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :  * of all RNG functions, with the exception of GetStrongRandBytes(), is replaced with the</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :  * output of a deterministic RNG. This deterministic RNG does not gather entropy, and is</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :  * unaffected by RandAddPeriodic() or RandAddEvent(). It produces pseudorandom data that</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :  * only depends on the seed it was initialized with, possibly until it is reinitialized.</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : */</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : </span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : /* ============================= INITIALIZATION AND ADDING ENTROPY ============================= */</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : </span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : /**</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :  * Initialize global RNG state and log any CPU features that are used.</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :  *</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :  * Calling this function is optional. RNG state will be initialized when first</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :  * needed if it is not called.</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :  */</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : void RandomInit();</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : </span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : /**</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :  * Gather entropy from various expensive sources, and feed them to the PRNG state.</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :  *</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :  * Thread-safe.</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :  */</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : void RandAddPeriodic() noexcept;</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : /**</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :  * Gathers entropy from the low bits of the time at which events occur. Should</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :  * be called with a uint32_t describing the event at the time an event occurs.</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :  *</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :  * Thread-safe.</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :  */</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : void RandAddEvent(const uint32_t event_info) noexcept;</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             : </span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : /* =========================== BASE RANDOMNESS GENERATION FUNCTIONS ===========================</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :  *</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :  * All produced randomness is eventually generated by one of these functions.</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :  */</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : </span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : /**</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :  * Generate random data via the internal PRNG.</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :  *</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :  * These functions are designed to be fast (sub microsecond), but do not necessarily</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :  * meaningfully add entropy to the PRNG state.</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :  *</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :  * In test mode (see SeedRandomForTest in src/test/util/random.h), the normal PRNG state is</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :  * bypassed, and a deterministic, seeded, PRNG is used instead.</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :  *</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :  * Thread-safe.</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :  */</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : void GetRandBytes(std::span&lt;unsigned char&gt; bytes) noexcept;</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : </span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : /**</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :  * Gather entropy from various sources, feed it into the internal PRNG, and</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :  * generate random data using it.</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :  *</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :  * This function will cause failure whenever the OS RNG fails.</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :  *</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :  * The normal PRNG is never bypassed here, even in test mode.</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :  *</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :  * Thread-safe.</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :  */</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : void GetStrongRandBytes(std::span&lt;unsigned char&gt; bytes) noexcept;</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : </span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : </span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : /* ============================= RANDOM NUMBER GENERATION CLASSES =============================</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :  *</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :  * In this section, 3 classes are defined:</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :  * - RandomMixin:            a base class that adds functionality to all RNG classes.</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :  * - FastRandomContext:      a cryptographic RNG (seeded through GetRandBytes in its default</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :  *                           constructor).</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :  * - InsecureRandomContext:  a non-cryptographic, very fast, RNG.</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :  */</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : </span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : // Forward declaration of RandomMixin, used in RandomNumberGenerator concept.</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : template&lt;typename T&gt;</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : class RandomMixin;</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :             : /** A concept for RandomMixin-based random number generators. */</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : template&lt;typename T&gt;</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : concept RandomNumberGenerator = requires(T&amp; rng, std::span&lt;std::byte&gt; s) {</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     // A random number generator must provide rand64().</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     { rng.rand64() } noexcept -&gt; std::same_as&lt;uint64_t&gt;;</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :     // A random number generator must derive from RandomMixin, which adds other rand* functions.</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :     requires std::derived_from&lt;std::remove_reference_t&lt;T&gt;, RandomMixin&lt;std::remove_reference_t&lt;T&gt;&gt;&gt;;</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : };</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : /** A concept for C++ std::chrono durations. */</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : template&lt;typename T&gt;</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             : concept StdChronoDuration = requires {</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :     []&lt;class Rep, class Period&gt;(std::type_identity&lt;std::chrono::duration&lt;Rep, Period&gt;&gt;){}(</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :         std::type_identity&lt;T&gt;());</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : };</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             : </span>
+<span id="L161"><span class="lineNum">     161</span>                 :             : /** Given a uniformly random uint64_t, return an exponentially distributed double with mean 1. */</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             : double MakeExponentiallyDistributed(uint64_t uniform) noexcept;</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : </span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : /** Mixin class that provides helper randomness functions.</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :  *</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :  * Intended to be used through CRTP: https://en.cppreference.com/w/cpp/language/crtp.</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :  * An RNG class FunkyRNG would derive publicly from RandomMixin&lt;FunkyRNG&gt;. This permits</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :  * RandomMixin from accessing the derived class's rand64() function, while also allowing</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :  * the derived class to provide more.</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :  *</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :  * The derived class must satisfy the RandomNumberGenerator concept.</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :  */</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : template&lt;typename T&gt;</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             : class RandomMixin</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             : {</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             : private:</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     uint64_t bitbuf{0};</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     int bitbuf_size{0};</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : </span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     /** Access the underlying generator.</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :      *</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :      * This also enforces the RandomNumberGenerator concept. We cannot declare that in the template</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :      * (no template&lt;RandomNumberGenerator T&gt;) because the type isn't fully instantiated yet there.</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :      */</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :     RandomNumberGenerator auto&amp; Impl() noexcept { return static_cast&lt;T&amp;&gt;(*this); }</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             : </span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : protected:</span>
+<span id="L188"><span class="lineNum">     188</span>                 :<span class="tlaGNC">       11542 :     constexpr void FlushCache() noexcept</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :     {</span>
+<span id="L190"><span class="lineNum">     190</span>                 :<span class="tlaGNC">       11542 :         bitbuf = 0;</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC">       11542 :         bitbuf_size = 0;</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     }</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             : </span>
+<span id="L194"><span class="lineNum">     194</span>                 :             : public:</span>
+<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">    39805566 :     constexpr RandomMixin() noexcept = default;</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :             : </span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :     // Do not permit copying or moving an RNG.</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     RandomMixin(const RandomMixin&amp;) = delete;</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :     RandomMixin&amp; operator=(const RandomMixin&amp;) = delete;</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     RandomMixin(RandomMixin&amp;&amp;) = delete;</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     RandomMixin&amp; operator=(RandomMixin&amp;&amp;) = delete;</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : </span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     /** Generate a random (bits)-bit integer. */</span>
+<span id="L204"><span class="lineNum">     204</span>                 :<span class="tlaGNC">    66710708 :     uint64_t randbits(int bits) noexcept</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :     {</span>
+<span id="L206"><span class="lineNum">     206</span>                 :<span class="tlaGNC">    66710708 :         Assume(bits &lt;= 64);</span></span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :         // Requests for the full 64 bits are passed through.</span>
+<span id="L208"><span class="lineNum">     208</span>         [<span class="tlaGBC" title="Branch 0 was taken 628 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 66710080 times"> + </span>]:<span class="tlaGNC">    66710708 :         if (bits == 64) return Impl().rand64();</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :         uint64_t ret;</span>
+<span id="L210"><span class="lineNum">     210</span>         [<span class="tlaGBC" title="Branch 0 was taken 56351345 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10358735 times"> + </span>]:<span class="tlaGNC">    66710080 :         if (bits &lt;= bitbuf_size) {</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :             // If there is enough entropy left in bitbuf, return its bottom bits bits.</span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">    56351345 :             ret = bitbuf;</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">    56351345 :             bitbuf &gt;&gt;= bits;</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">    56351345 :             bitbuf_size -= bits;</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :         } else {</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :             // If not, return all of bitbuf, supplemented with the (bits - bitbuf_size) bottom</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :             // bits of a newly generated 64-bit number on top. The remainder of that generated</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :             // number becomes the new bitbuf.</span>
+<span id="L219"><span class="lineNum">     219</span>                 :<span class="tlaGNC">    10358735 :             uint64_t gen = Impl().rand64();</span></span>
+<span id="L220"><span class="lineNum">     220</span>                 :<span class="tlaGNC">    10358735 :             ret = (gen &lt;&lt; bitbuf_size) | bitbuf;</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaGNC">    10358735 :             bitbuf = gen &gt;&gt; (bits - bitbuf_size);</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaGNC">    10358735 :             bitbuf_size = 64 + bitbuf_size - bits;</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :         }</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :         // Return the bottom bits bits of ret.</span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaGNC">    66710080 :         return ret &amp; ((uint64_t{1} &lt;&lt; bits) - 1);</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     }</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : </span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     /** Same as above, but with compile-time fixed bits count. */</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     template&lt;int Bits&gt;</span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaGNC">   915124491 :     uint64_t randbits() noexcept</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :     {</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :         static_assert(Bits &gt;= 0 &amp;&amp; Bits &lt;= 64);</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :         if constexpr (Bits == 64) {</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :             return Impl().rand64();</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :         } else {</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :             uint64_t ret;</span>
+<span id="L237"><span class="lineNum">     237</span>         [<span class="tlaGBC" title="Branch 0 was taken 899375081 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 15749410 times"> + </span>]:<span class="tlaGNC">   915124491 :             if (Bits &lt;= bitbuf_size) {</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">   899375081 :                 ret = bitbuf;</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :<span class="tlaGNC">   899375081 :                 bitbuf &gt;&gt;= Bits;</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :<span class="tlaGNC">   899375081 :                 bitbuf_size -= Bits;</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :             } else {</span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaGNC">    15749410 :                 uint64_t gen = Impl().rand64();</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaGNC">    15749410 :                 ret = (gen &lt;&lt; bitbuf_size) | bitbuf;</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaGNC">    15749410 :                 bitbuf = gen &gt;&gt; (Bits - bitbuf_size);</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">    15749410 :                 bitbuf_size = 64 + bitbuf_size - Bits;</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :             }</span>
+<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaGNC">   915124491 :             constexpr uint64_t MASK = (uint64_t{1} &lt;&lt; Bits) - 1;</span></span>
+<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaGNC">   915124491 :             return ret &amp; MASK;</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :         }</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :     }</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :     /** Generate a random integer in the range [0..range), with range &gt; 0. */</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     template&lt;std::integral I&gt;</span>
+<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaGNC">    49962736 :     I randrange(I range) noexcept</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :     {</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :         static_assert(std::numeric_limits&lt;I&gt;::max() &lt;= std::numeric_limits&lt;uint64_t&gt;::max());</span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">    49962736 :         Assume(range &gt; 0);</span></span>
+<span id="L258"><span class="lineNum">     258</span>         [<span class="tlaGBC" title="Branch 0 was taken 48538101 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1424635 times"> + </span>]:<span class="tlaGNC">    49962736 :         uint64_t maxval = range - 1U;</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">    49962736 :         int bits = std::bit_width(maxval);</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :         while (true) {</span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">    66637707 :             uint64_t ret = Impl().randbits(bits);</span></span>
+<span id="L262"><span class="lineNum">     262</span>         [<span class="tlaGBC" title="Branch 0 was taken 16674971 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 49962736 times"> + </span>]:<span class="tlaGNC">    66637707 :             if (ret &lt;= maxval) return ret;</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :         }</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :     }</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             : </span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :     /** Fill a span with random bytes. */</span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">     2404963 :     void fillrand(std::span&lt;std::byte&gt; span) noexcept</span></span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     {</span>
+<span id="L269"><span class="lineNum">     269</span>         [<span class="tlaGBC" title="Branch 0 was taken 913260150 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2404963 times"> + </span>]:<span class="tlaGNC">   915665113 :         while (span.size() &gt;= 8) {</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :<span class="tlaGNC">   913260150 :             uint64_t gen = Impl().rand64();</span></span>
+<span id="L271"><span class="lineNum">     271</span>                 :<span class="tlaGNC">   913260150 :             WriteLE64(span.data(), gen);</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaGNC">   913260150 :             span = span.subspan(8);</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :         }</span>
+<span id="L274"><span class="lineNum">     274</span>         [<span class="tlaGBC" title="Branch 0 was taken 205522 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2199441 times"> + </span>]:<span class="tlaGNC">     2404963 :         if (span.size() &gt;= 4) {</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">      411044 :             uint32_t gen = Impl().rand32();</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">      205522 :             WriteLE32(span.data(), gen);</span></span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">      205522 :             span = span.subspan(4);</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :         }</span>
+<span id="L279"><span class="lineNum">     279</span>         [<span class="tlaGBC" title="Branch 0 was taken 1670033 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2404963 times"> + </span>]:<span class="tlaGNC">     4074996 :         while (span.size()) {</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :<span class="tlaGNC">     1670033 :             span[0] = std::byte(Impl().template randbits&lt;8&gt;());</span></span>
+<span id="L281"><span class="lineNum">     281</span>                 :<span class="tlaGNC">     1670033 :             span = span.subspan(1);</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :         }</span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">     2404963 :     }</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :             : </span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :     /** Generate a random integer in its entire (non-negative) range. */</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :     template&lt;std::integral I&gt;</span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaGNC">      170692 :     I rand() noexcept</span></span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :     {</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :         static_assert(std::numeric_limits&lt;I&gt;::max() &lt;= std::numeric_limits&lt;uint64_t&gt;::max());</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :         static constexpr auto BITS = std::bit_width(uint64_t(std::numeric_limits&lt;I&gt;::max()));</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :         static_assert(std::numeric_limits&lt;I&gt;::max() == std::numeric_limits&lt;uint64_t&gt;::max() &gt;&gt; (64 - BITS));</span>
+<span id="L292"><span class="lineNum">     292</span>                 :<span class="tlaGNC">      170692 :         return I(Impl().template randbits&lt;BITS&gt;());</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :     }</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             : </span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :     /** Generate random bytes. */</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :     template &lt;BasicByte B = unsigned char&gt;</span>
+<span id="L297"><span class="lineNum">     297</span>                 :<span class="tlaGNC">    12888851 :     std::vector&lt;B&gt; randbytes(size_t len) noexcept</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :     {</span>
+<span id="L299"><span class="lineNum">     299</span>                 :<span class="tlaGNC">    12888851 :         std::vector&lt;B&gt; ret(len);</span></span>
+<span id="L300"><span class="lineNum">     300</span>                 :<span class="tlaGNC">    12888851 :         Impl().fillrand(MakeWritableByteSpan(ret));</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :<span class="tlaGNC">    12888851 :         return ret;</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     }</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : </span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :     /** Generate fixed-size random bytes. */</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :     template &lt;size_t N, BasicByte B = std::byte&gt;</span>
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">        4937 :     std::array&lt;B, N&gt; randbytes() noexcept</span></span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :     {</span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :         std::array&lt;B, N&gt; ret;</span>
+<span id="L309"><span class="lineNum">     309</span>                 :<span class="tlaGNC">        4937 :         Impl().fillrand(MakeWritableByteSpan(ret));</span></span>
+<span id="L310"><span class="lineNum">     310</span>                 :<span class="tlaGNC">        4937 :         return ret;</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :     }</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             : </span>
+<span id="L313"><span class="lineNum">     313</span>                 :             :     /** Generate a random 32-bit integer. */</span>
+<span id="L314"><span class="lineNum">     314</span>         [<span class="tlaGBC" title="Branch 0 was taken 238063 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      444445 :     uint32_t rand32() noexcept { return Impl().template randbits&lt;32&gt;(); }</span></span>
+<span id="L315"><span class="lineNum">     315</span>                 :             : </span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :     /** generate a random uint256. */</span>
+<span id="L317"><span class="lineNum">     317</span>                 :<span class="tlaGNC">       13607 :     uint256 rand256() noexcept</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :     {</span>
+<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">       13607 :         uint256 ret;</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :<span class="tlaGNC">       13607 :         Impl().fillrand(MakeWritableByteSpan(ret));</span></span>
+<span id="L321"><span class="lineNum">     321</span>                 :<span class="tlaGNC">       13607 :         return ret;</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :     }</span>
+<span id="L323"><span class="lineNum">     323</span>                 :             : </span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :     /** Generate a random boolean. */</span>
+<span id="L325"><span class="lineNum">     325</span>   [<span class="tlaGBC" title="Branch 0 was taken 10302543 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3823 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 6930 times"> + </span> :<span class="tlaGNC">   912729771 :     bool randbool() noexcept { return Impl().template randbits&lt;1&gt;(); }</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 2719 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 4506 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 3423 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 8490 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 1114112 times"> + </span> 
+<span class="lineNum">        </span>     <span class="tlaUNC" title="Branch 9 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 118 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 144 times"> + </span>]
+<span id="L326"><span class="lineNum">     326</span>                 :             : </span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :     /** Return the time point advanced by a uniform random duration. */</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             :     template &lt;typename Tp&gt;</span>
+<span id="L329"><span class="lineNum">     329</span>                 :<span class="tlaGNC">      173388 :     Tp rand_uniform_delay(const Tp&amp; time, typename Tp::duration range) noexcept</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     {</span>
+<span id="L331"><span class="lineNum">     331</span>                 :<span class="tlaGNC">      173388 :         return time + Impl().template rand_uniform_duration&lt;Tp&gt;(range);</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :     }</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             : </span>
+<span id="L334"><span class="lineNum">     334</span>                 :             :     /** Generate a uniform random duration in the range from 0 (inclusive) to range (exclusive). */</span>
+<span id="L335"><span class="lineNum">     335</span>                 :             :     template &lt;typename Chrono&gt; requires StdChronoDuration&lt;typename Chrono::duration&gt;</span>
+<span id="L336"><span class="lineNum">     336</span>         [<span class="tlaGBC" title="Branch 0 was taken 173388 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      173388 :     typename Chrono::duration rand_uniform_duration(typename Chrono::duration range) noexcept</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :             :     {</span>
+<span id="L338"><span class="lineNum">     338</span>                 :             :         using Dur = typename Chrono::duration;</span>
+<span id="L339"><span class="lineNum">     339</span>         [<span class="tlaGBC" title="Branch 0 was taken 173388 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      173388 :         return range.count() &gt; 0 ? /* interval [0..range) */ Dur{Impl().randrange(range.count())} :</span></span>
+<span id="L340"><span class="lineNum">     340</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                range.count() &lt; 0 ? /* interval (range..0] */ -Dur{Impl().randrange(-range.count())} :</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :<span class="tlaGNC">      173388 :                                    /* interval [0..0] */ Dur{0};</span></span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :     };</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             : </span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :     /** Generate a uniform random duration in the range [0..max). Precondition: max.count() &gt; 0 */</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             :     template &lt;StdChronoDuration Dur&gt;</span>
+<span id="L346"><span class="lineNum">     346</span>                 :<span class="tlaGNC">        1458 :     Dur randrange(std::common_type_t&lt;Dur&gt; range) noexcept</span></span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :     // Having the compiler infer the template argument from the function argument</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :     // is dangerous, because the desired return value generally has a different</span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :     // type than the function argument. So std::common_type is used to force the</span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :     // call site to specify the type of the return value.</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :     {</span>
+<span id="L352"><span class="lineNum">     352</span>                 :<span class="tlaGNC">        1458 :         return Dur{Impl().randrange(range.count())};</span></span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :     }</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             : </span>
+<span id="L355"><span class="lineNum">     355</span>                 :             :     /**</span>
+<span id="L356"><span class="lineNum">     356</span>                 :             :      * Return a duration sampled from an exponential distribution</span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :      * (https://en.wikipedia.org/wiki/Exponential_distribution). Successive events</span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :      * whose intervals are distributed according to this form a memoryless Poisson</span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :      * process. This should be used for repeated network events (e.g. sending a</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :      * certain type of message) to minimize leaking information to observers.</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :      *</span>
+<span id="L362"><span class="lineNum">     362</span>                 :             :      * The probability of an event occurring before time x is 1 - e^-(x/a) where a</span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :      * is the average interval between events.</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             :      * */</span>
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">       21030 :     std::chrono::microseconds rand_exp_duration(std::chrono::microseconds mean) noexcept</span></span>
+<span id="L366"><span class="lineNum">     366</span>                 :             :     {</span>
+<span id="L367"><span class="lineNum">     367</span>                 :             :         using namespace std::chrono_literals;</span>
+<span id="L368"><span class="lineNum">     368</span>                 :<span class="tlaGNC">       21030 :         auto unscaled = MakeExponentiallyDistributed(Impl().rand64());</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :<span class="tlaGNC">       21030 :         return std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(unscaled * mean + 0.5us);</span></span>
+<span id="L370"><span class="lineNum">     370</span>                 :             :     }</span>
+<span id="L371"><span class="lineNum">     371</span>                 :             : </span>
+<span id="L372"><span class="lineNum">     372</span>                 :             :     // Compatibility with the UniformRandomBitGenerator concept</span>
+<span id="L373"><span class="lineNum">     373</span>                 :             :     typedef uint64_t result_type;</span>
+<span id="L374"><span class="lineNum">     374</span>                 :             :     static constexpr uint64_t min() noexcept { return 0; }</span>
+<span id="L375"><span class="lineNum">     375</span>                 :             :     static constexpr uint64_t max() noexcept { return std::numeric_limits&lt;uint64_t&gt;::max(); }</span>
+<span id="L376"><span class="lineNum">     376</span>                 :<span class="tlaGNC">     1231653 :     inline uint64_t operator()() noexcept { return Impl().rand64(); }</span></span>
+<span id="L377"><span class="lineNum">     377</span>                 :             : };</span>
+<span id="L378"><span class="lineNum">     378</span>                 :             : </span>
+<span id="L379"><span class="lineNum">     379</span>                 :             : /**</span>
+<span id="L380"><span class="lineNum">     380</span>                 :             :  * Fast randomness source. This is seeded once with secure random data, but</span>
+<span id="L381"><span class="lineNum">     381</span>                 :             :  * is completely deterministic and does not gather more entropy after that.</span>
+<span id="L382"><span class="lineNum">     382</span>                 :             :  *</span>
+<span id="L383"><span class="lineNum">     383</span>                 :             :  * This class is not thread-safe.</span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :  */</span>
+<span id="L385"><span class="lineNum">     385</span> [<span class="tlaGBC" title="Branch 0 was taken 229892 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 848809 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 14239 times"> + </span> :<span class="tlaGNC">    37774135 : class FastRandomContext : public RandomMixin&lt;FastRandomContext&gt;</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L386"><span class="lineNum">     386</span>                 :             : {</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             : private:</span>
+<span id="L388"><span class="lineNum">     388</span>                 :             :     bool requires_seed;</span>
+<span id="L389"><span class="lineNum">     389</span>                 :             :     ChaCha20 rng;</span>
+<span id="L390"><span class="lineNum">     390</span>                 :             : </span>
+<span id="L391"><span class="lineNum">     391</span>                 :             :     void RandomSeed() noexcept;</span>
+<span id="L392"><span class="lineNum">     392</span>                 :             : </span>
+<span id="L393"><span class="lineNum">     393</span>                 :             : public:</span>
+<span id="L394"><span class="lineNum">     394</span>                 :             :     /** Construct a FastRandomContext with GetRandHash()-based entropy (or zero key if fDeterministic). */</span>
+<span id="L395"><span class="lineNum">     395</span>                 :             :     explicit FastRandomContext(bool fDeterministic = false) noexcept;</span>
+<span id="L396"><span class="lineNum">     396</span>                 :             : </span>
+<span id="L397"><span class="lineNum">     397</span>                 :             :     /** Initialize with explicit seed (only for testing) */</span>
+<span id="L398"><span class="lineNum">     398</span>                 :             :     explicit FastRandomContext(const uint256&amp; seed) noexcept;</span>
+<span id="L399"><span class="lineNum">     399</span>                 :             : </span>
+<span id="L400"><span class="lineNum">     400</span>                 :             :     /** Reseed with explicit seed (only for testing). */</span>
+<span id="L401"><span class="lineNum">     401</span>                 :             :     void Reseed(const uint256&amp; seed) noexcept;</span>
+<span id="L402"><span class="lineNum">     402</span>                 :             : </span>
+<span id="L403"><span class="lineNum">     403</span>                 :             :     /** Generate a random 64-bit integer. */</span>
+<span id="L404"><span class="lineNum">     404</span>                 :<span class="tlaGNC">    61806391 :     uint64_t rand64() noexcept</span></span>
+<span id="L405"><span class="lineNum">     405</span>                 :             :     {</span>
+<span id="L406"><span class="lineNum">     406</span>         [<span class="tlaGBC" title="Branch 0 was taken 36652291 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 25154100 times"> + </span>]:<span class="tlaGNC">    61806391 :         if (requires_seed) RandomSeed();</span></span>
+<span id="L407"><span class="lineNum">     407</span>                 :<span class="tlaGNC">    61806391 :         std::array&lt;std::byte, 8&gt; buf;</span></span>
+<span id="L408"><span class="lineNum">     408</span>                 :<span class="tlaGNC">    61806391 :         rng.Keystream(buf);</span></span>
+<span id="L409"><span class="lineNum">     409</span>                 :<span class="tlaGNC">    61806391 :         return ReadLE64(buf.data());</span></span>
+<span id="L410"><span class="lineNum">     410</span>                 :             :     }</span>
+<span id="L411"><span class="lineNum">     411</span>                 :             : </span>
+<span id="L412"><span class="lineNum">     412</span>                 :             :     /** Fill a byte span with random bytes. This overrides the RandomMixin version. */</span>
+<span id="L413"><span class="lineNum">     413</span>                 :             :     void fillrand(std::span&lt;std::byte&gt; output) noexcept;</span>
+<span id="L414"><span class="lineNum">     414</span>                 :             : };</span>
+<span id="L415"><span class="lineNum">     415</span>                 :             : </span>
+<span id="L416"><span class="lineNum">     416</span>                 :             : /** xoroshiro128++ PRNG. Extremely fast, not appropriate for cryptographic purposes.</span>
+<span id="L417"><span class="lineNum">     417</span>                 :             :  *</span>
+<span id="L418"><span class="lineNum">     418</span>                 :             :  * Memory footprint is very small, period is 2^128 - 1.</span>
+<span id="L419"><span class="lineNum">     419</span>                 :             :  * This class is not thread-safe.</span>
+<span id="L420"><span class="lineNum">     420</span>                 :             :  *</span>
+<span id="L421"><span class="lineNum">     421</span>                 :             :  * Reference implementation available at https://prng.di.unimi.it/xoroshiro128plusplus.c</span>
+<span id="L422"><span class="lineNum">     422</span>                 :             :  * See https://prng.di.unimi.it/</span>
+<span id="L423"><span class="lineNum">     423</span>                 :             :  */</span>
+<span id="L424"><span class="lineNum">     424</span>                 :             : class InsecureRandomContext : public RandomMixin&lt;InsecureRandomContext&gt;</span>
+<span id="L425"><span class="lineNum">     425</span>                 :             : {</span>
+<span id="L426"><span class="lineNum">     426</span>                 :             :     uint64_t m_s0;</span>
+<span id="L427"><span class="lineNum">     427</span>                 :             :     uint64_t m_s1;</span>
+<span id="L428"><span class="lineNum">     428</span>                 :             : </span>
+<span id="L429"><span class="lineNum">     429</span>                 :<span class="tlaGNC">     4032852 :     [[nodiscard]] constexpr static uint64_t SplitMix64(uint64_t&amp; seedval) noexcept</span></span>
+<span id="L430"><span class="lineNum">     430</span>                 :             :     {</span>
+<span id="L431"><span class="lineNum">     431</span>                 :<span class="tlaGNC">     4032852 :         uint64_t z = (seedval += 0x9e3779b97f4a7c15);</span></span>
+<span id="L432"><span class="lineNum">     432</span>                 :<span class="tlaGNC">     4032852 :         z = (z ^ (z &gt;&gt; 30)) * 0xbf58476d1ce4e5b9;</span></span>
+<span id="L433"><span class="lineNum">     433</span>                 :<span class="tlaGNC">     4032852 :         z = (z ^ (z &gt;&gt; 27)) * 0x94d049bb133111eb;</span></span>
+<span id="L434"><span class="lineNum">     434</span>                 :<span class="tlaGNC">     4032852 :         return z ^ (z &gt;&gt; 31);</span></span>
+<span id="L435"><span class="lineNum">     435</span>                 :             :     }</span>
+<span id="L436"><span class="lineNum">     436</span>                 :             : </span>
+<span id="L437"><span class="lineNum">     437</span>                 :             : public:</span>
+<span id="L438"><span class="lineNum">     438</span>                 :<span class="tlaGNC">     2016426 :     constexpr explicit InsecureRandomContext(uint64_t seedval) noexcept</span></span>
+<span id="L439"><span class="lineNum">     439</span>                 :<span class="tlaGNC">     2016426 :         : m_s0(SplitMix64(seedval)), m_s1(SplitMix64(seedval)) {}</span></span>
+<span id="L440"><span class="lineNum">     440</span>                 :             : </span>
+<span id="L441"><span class="lineNum">     441</span>                 :             :     constexpr void Reseed(uint64_t seedval) noexcept</span>
+<span id="L442"><span class="lineNum">     442</span>                 :             :     {</span>
+<span id="L443"><span class="lineNum">     443</span>                 :             :         FlushCache();</span>
+<span id="L444"><span class="lineNum">     444</span>                 :             :         m_s0 = SplitMix64(seedval);</span>
+<span id="L445"><span class="lineNum">     445</span>                 :             :         m_s1 = SplitMix64(seedval);</span>
+<span id="L446"><span class="lineNum">     446</span>                 :             :     }</span>
+<span id="L447"><span class="lineNum">     447</span>                 :             : </span>
+<span id="L448"><span class="lineNum">     448</span>                 :<span class="tlaGNC">   915867842 :     constexpr uint64_t rand64() noexcept</span></span>
+<span id="L449"><span class="lineNum">     449</span>                 :             :     {</span>
+<span id="L450"><span class="lineNum">     450</span>                 :<span class="tlaGNC">   915867842 :         uint64_t s0 = m_s0, s1 = m_s1;</span></span>
+<span id="L451"><span class="lineNum">     451</span>                 :<span class="tlaGNC">   915867842 :         const uint64_t result = std::rotl(s0 + s1, 17) + s0;</span></span>
+<span id="L452"><span class="lineNum">     452</span>                 :<span class="tlaGNC">   915867842 :         s1 ^= s0;</span></span>
+<span id="L453"><span class="lineNum">     453</span>                 :<span class="tlaGNC">   915867842 :         m_s0 = std::rotl(s0, 49) ^ s1 ^ (s1 &lt;&lt; 21);</span></span>
+<span id="L454"><span class="lineNum">     454</span>                 :<span class="tlaGNC">   915867842 :         m_s1 = std::rotl(s1, 28);</span></span>
+<span id="L455"><span class="lineNum">     455</span>                 :<span class="tlaGNC">   915867842 :         return result;</span></span>
+<span id="L456"><span class="lineNum">     456</span>                 :             :     }</span>
+<span id="L457"><span class="lineNum">     457</span>                 :             : };</span>
+<span id="L458"><span class="lineNum">     458</span>                 :             : </span>
+<span id="L459"><span class="lineNum">     459</span>                 :             : </span>
+<span id="L460"><span class="lineNum">     460</span>                 :             : /* ==================== CONVENIENCE FUNCTIONS FOR COMMONLY USED RANDOMNESS ==================== */</span>
+<span id="L461"><span class="lineNum">     461</span>                 :             : </span>
+<span id="L462"><span class="lineNum">     462</span>                 :             : /** Generate a random uint256. */</span>
+<span id="L463"><span class="lineNum">     463</span>                 :<span class="tlaGNC">    36668677 : inline uint256 GetRandHash() noexcept</span></span>
+<span id="L464"><span class="lineNum">     464</span>                 :             : {</span>
+<span id="L465"><span class="lineNum">     465</span>                 :<span class="tlaGNC">    36668677 :     uint256 hash;</span></span>
+<span id="L466"><span class="lineNum">     466</span>                 :<span class="tlaGNC">    36668677 :     GetRandBytes(hash);</span></span>
+<span id="L467"><span class="lineNum">     467</span>   [<span class="tlaGBC" title="Branch 0 was taken 4927 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaGNC">    36668677 :     return hash;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2729 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]
+<span id="L468"><span class="lineNum">     468</span>                 :             : }</span>
+<span id="L469"><span class="lineNum">     469</span>                 :             : </span>
+<span id="L470"><span class="lineNum">     470</span>                 :             : /* ============================= MISCELLANEOUS TEST-ONLY FUNCTIONS ============================= */</span>
+<span id="L471"><span class="lineNum">     471</span>                 :             : </span>
+<span id="L472"><span class="lineNum">     472</span>                 :             : /** Check that OS randomness is available and returning the requested number</span>
+<span id="L473"><span class="lineNum">     473</span>                 :             :  * of bytes.</span>
+<span id="L474"><span class="lineNum">     474</span>                 :             :  */</span>
+<span id="L475"><span class="lineNum">     475</span>                 :             : bool Random_SanityCheck();</span>
+<span id="L476"><span class="lineNum">     476</span>                 :             : </span>
+<span id="L477"><span class="lineNum">     477</span>                 :             : #endif // BITCOIN_RANDOM_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

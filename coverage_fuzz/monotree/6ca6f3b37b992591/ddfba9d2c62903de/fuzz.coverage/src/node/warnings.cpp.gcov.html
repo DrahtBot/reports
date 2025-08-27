@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/node/warnings.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/node">src/node</a> - warnings.cpp<span style="font-size: 80%;"> (source / <a href="warnings.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">90.9&nbsp;%</td>
+            <td class="headerCovTableEntry">33</td>
+            <td class="headerCovTableEntry">30</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-08-27 16:35:37</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">52.3&nbsp;%</td>
+            <td class="headerCovTableEntry">44</td>
+            <td class="headerCovTableEntry">23</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;bitcoin-build-config.h&gt; // IWYU pragma: keep</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;node/warnings.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : </span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;common/system.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;node/interface_ui.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;sync.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;univalue.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;util/translation.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : namespace node {</span>
+<span id="L20"><span class="lineNum">      20</span>         [<span class="tlaGBC" title="Branch 0 was taken 18441 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       18441 : Warnings::Warnings()</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : {</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :     // Pre-release build warning</span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">       18441 :     if (!CLIENT_VERSION_IS_RELEASE) {</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">       18441 :         m_warnings.insert(</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">       18441 :             {Warning::PRE_RELEASE_TEST_BUILD,</span></span>
+<span id="L26"><span class="lineNum">      26</span>         [<span class="tlaGBC" title="Branch 0 was taken 18441 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       18441 :              _(&quot;This is a pre-release test build - use at your own risk - do not use for mining or merchant applications&quot;)});</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     }</span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">       18441 : }</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">       90399 : bool Warnings::Set(warning_type id, bilingual_str message)</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : {</span>
+<span id="L31"><span class="lineNum">      31</span>   [<span class="tlaGBC" title="Branch 0 was taken 1491 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 88908 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 90399 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      361596 :     const auto&amp; [_, inserted]{WITH_LOCK(m_mutex, return m_warnings.insert({id, std::move(message)}))};</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 90399 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L32"><span class="lineNum">      32</span>         [<span class="tlaGBC" title="Branch 0 was taken 1491 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 88908 times"> + </span>]:<span class="tlaGNC">       90399 :     if (inserted) uiInterface.NotifyAlertChanged();</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">       90399 :     return inserted;</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : }</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">       91988 : bool Warnings::Unset(warning_type id)</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : {</span>
+<span id="L38"><span class="lineNum">      38</span>         [<span class="tlaGBC" title="Branch 0 was taken 91988 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      183976 :     auto success{WITH_LOCK(m_mutex, return m_warnings.erase(id))};</span></span>
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaGBC" title="Branch 0 was taken 1264 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 90724 times"> + </span>]:<span class="tlaGNC">       91988 :     if (success) uiInterface.NotifyAlertChanged();</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">       91988 :     return success;</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : }</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">          13 : std::vector&lt;bilingual_str&gt; Warnings::GetMessages() const</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : {</span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">          13 :     LOCK(m_mutex);</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">          13 :     std::vector&lt;bilingual_str&gt; messages;</span></span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 13 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          13 :     messages.reserve(m_warnings.size());</span></span>
+<span id="L48"><span class="lineNum">      48</span>   [<span class="tlaGBC" title="Branch 0 was taken 13 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 13 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13 times"> + </span>]:<span class="tlaGNC">          26 :     for (const auto&amp; [id, msg] : m_warnings) {</span></span>
+<span id="L49"><span class="lineNum">      49</span>         [<span class="tlaGBC" title="Branch 0 was taken 13 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          13 :         messages.push_back(msg);</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     }</span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaGBC" title="Branch 0 was taken 13 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          13 :     return messages;</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">          13 : }</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">          13 : UniValue GetWarningsForRpc(const Warnings&amp; warnings, bool use_deprecated)</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : {</span>
+<span id="L56"><span class="lineNum">      56</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">          13 :     if (use_deprecated) {</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaUNC">           0 :         const auto all_messages{warnings.GetMessages()};</span></span>
+<span id="L58"><span class="lineNum">      58</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         return all_messages.empty() ? &quot;&quot; : all_messages.back().original;</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : </span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">          13 :     UniValue messages{UniValue::VARR};</span></span>
+<span id="L62"><span class="lineNum">      62</span>   [<span class="tlaGBC" title="Branch 0 was taken 13 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 13 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 13 times"> + </span>]:<span class="tlaGNC">          26 :     for (auto&amp;&amp; message : warnings.GetMessages()) {</span></span>
+<span id="L63"><span class="lineNum">      63</span>   [<span class="tlaGBC" title="Branch 0 was taken 13 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 13 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">          13 :         messages.push_back(std::move(message.original));</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">          13 :     }</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">          13 :     return messages;</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">          13 : }</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : } // namespace node</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
