@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/scriptnum_ops.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - scriptnum_ops.cpp<span style="font-size: 80%;"> (source / <a href="scriptnum_ops.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">66</td>
+            <td class="headerCovTableEntry">66</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-09-02 14:23:13</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">15</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryHi">98.0&nbsp;%</td>
+            <td class="headerCovTableEntry">50</td>
+            <td class="headerCovTableEntry">49</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020-2021 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;script/script.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : </span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;cassert&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : namespace {</span>
+<span id="L16"><span class="lineNum">      16</span>                 :<span class="tlaGNC">      367091 : bool IsValidAddition(const CScriptNum&amp; lhs, const CScriptNum&amp; rhs)</span></span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : {</span>
+<span id="L18"><span class="lineNum">      18</span>   [<span class="tlaGBC" title="Branch 0 was taken 360221 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6870 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 77306 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 282915 times"> + </span> :<span class="tlaGNC">      367091 :     return rhs == 0 || (rhs &gt; 0 &amp;&amp; lhs &lt;= CScriptNum{std::numeric_limits&lt;int64_t&gt;::max()} - rhs) || (rhs &lt; 0 &amp;&amp; lhs &gt;= CScriptNum{std::numeric_limits&lt;int64_t&gt;::min()} - rhs);</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 13534 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 63772 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 282915 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 13534 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 146505 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 9 was taken 136410 times"> + </span>]
+<span id="L19"><span class="lineNum">      19</span>                 :             : }</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">      396421 : bool IsValidSubtraction(const CScriptNum&amp; lhs, const CScriptNum&amp; rhs)</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : {</span>
+<span id="L23"><span class="lineNum">      23</span>   [<span class="tlaGBC" title="Branch 0 was taken 390145 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6276 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 98564 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 291581 times"> + </span> :<span class="tlaGNC">      396421 :     return rhs == 0 || (rhs &gt; 0 &amp;&amp; lhs &gt;= CScriptNum{std::numeric_limits&lt;int64_t&gt;::min()} + rhs) || (rhs &lt; 0 &amp;&amp; lhs &lt;= CScriptNum{std::numeric_limits&lt;int64_t&gt;::max()} + rhs);</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 49971 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 48593 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 291581 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 49971 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 166677 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 9 was taken 124904 times"> + </span>]
+<span id="L24"><span class="lineNum">      24</span>                 :             : }</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : } // namespace</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>         [<span class="tlaGBC" title="Branch 0 was taken 228 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         699 : FUZZ_TARGET(scriptnum_ops)</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : {</span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         243 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">         243 :     CScriptNum script_num = ConsumeScriptNum(fuzzed_data_provider);</span></span>
+<span id="L31"><span class="lineNum">      31</span>   [<span class="tlaGBC" title="Branch 0 was taken 2713043 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 241 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 2713041 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2 times"> + </span>]:<span class="tlaGNC">     2713284 :     LIMITED_WHILE(fuzzed_data_provider.remaining_bytes() &gt; 0, 1000000) {</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">     2713041 :         CallOneOf(</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :             fuzzed_data_provider,</span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">      261672 :             [&amp;] {</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">      261672 :                 const int64_t i = fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;();</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">      261672 :                 assert((script_num == i) != (script_num != i));</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">      261672 :                 assert((script_num &lt;= i) != (script_num &gt; i));</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">      261672 :                 assert((script_num &gt;= i) != (script_num &lt; i));</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :                 // Avoid signed integer overflow:</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :                 // script/script.h:264:93: runtime error: signed integer overflow: -2261405121394637306 + -9223372036854775802 cannot be represented in type 'long'</span>
+<span id="L41"><span class="lineNum">      41</span>         [<span class="tlaGBC" title="Branch 0 was taken 137176 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 124496 times"> + </span>]:<span class="tlaGNC">      261672 :                 if (IsValidAddition(script_num, CScriptNum{i})) {</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">      137176 :                     assert((script_num + i) - i == script_num);</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :                 }</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :                 // Avoid signed integer overflow:</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :                 // script/script.h:265:93: runtime error: signed integer overflow: 9223371895120855039 - -9223372036854710486 cannot be represented in type 'long'</span>
+<span id="L46"><span class="lineNum">      46</span>         [<span class="tlaGBC" title="Branch 0 was taken 145302 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 116370 times"> + </span>]:<span class="tlaGNC">      261672 :                 if (IsValidSubtraction(script_num, CScriptNum{i})) {</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">      145302 :                     assert((script_num - i) + i == script_num);</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :                 }</span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">      261672 :             },</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">       20665 :             [&amp;] {</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">       20665 :                 const CScriptNum random_script_num = ConsumeScriptNum(fuzzed_data_provider);</span></span>
+<span id="L52"><span class="lineNum">      52</span>         [<span class="tlaGBC" title="Branch 0 was taken 13977 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6688 times"> + </span>]:<span class="tlaGNC">       20665 :                 assert((script_num == random_script_num) != (script_num != random_script_num));</span></span>
+<span id="L53"><span class="lineNum">      53</span>         [<span class="tlaGBC" title="Branch 0 was taken 13977 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6688 times"> + </span>]:<span class="tlaGNC">       20665 :                 assert((script_num &lt;= random_script_num) != (script_num &gt; random_script_num));</span></span>
+<span id="L54"><span class="lineNum">      54</span>         [<span class="tlaGBC" title="Branch 0 was taken 13977 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6688 times"> + </span>]:<span class="tlaGNC">       20665 :                 assert((script_num &gt;= random_script_num) != (script_num &lt; random_script_num));</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :                 // Avoid signed integer overflow:</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :                 // script/script.h:264:93: runtime error: signed integer overflow: -9223126527765971126 + -9223372036854756825 cannot be represented in type 'long'</span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaGBC" title="Branch 0 was taken 13977 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6688 times"> + </span>]:<span class="tlaGNC">       20665 :                 if (IsValidAddition(script_num, random_script_num)) {</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">       13977 :                     assert((script_num + random_script_num) - random_script_num == script_num);</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :                 }</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :                 // Avoid signed integer overflow:</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :                 // script/script.h:265:93: runtime error: signed integer overflow: 6052837899185946624 - -9223372036854775808 cannot be represented in type 'long'</span>
+<span id="L62"><span class="lineNum">      62</span>         [<span class="tlaGBC" title="Branch 0 was taken 14961 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5704 times"> + </span>]:<span class="tlaGNC">       20665 :                 if (IsValidSubtraction(script_num, random_script_num)) {</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">       14961 :                     assert((script_num - random_script_num) + random_script_num == script_num);</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :                 }</span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">       20665 :             },</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">       52201 :             [&amp;] {</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">       52201 :                 const CScriptNum random_script_num = ConsumeScriptNum(fuzzed_data_provider);</span></span>
+<span id="L68"><span class="lineNum">      68</span>         [<span class="tlaGBC" title="Branch 0 was taken 40527 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11674 times"> + </span>]:<span class="tlaGNC">       52201 :                 if (!IsValidAddition(script_num, random_script_num)) {</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :                     // Avoid assertion failure:</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :                     // ./script/script.h:292: CScriptNum &amp;CScriptNum::operator+=(const int64_t &amp;): Assertion `rhs == 0 || (rhs &gt; 0 &amp;&amp; m_value &lt;= std::numeric_limits&lt;int64_t&gt;::max() - rhs) || (rhs &lt; 0 &amp;&amp; m_value &gt;= std::numeric_limits&lt;int64_t&gt;::min() - rhs)' failed.</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :                     return;</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :                 }</span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">       40527 :                 script_num += random_script_num;</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :             },</span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">       82823 :             [&amp;] {</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">       82823 :                 const CScriptNum random_script_num = ConsumeScriptNum(fuzzed_data_provider);</span></span>
+<span id="L77"><span class="lineNum">      77</span>         [<span class="tlaGBC" title="Branch 0 was taken 39054 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 43769 times"> + </span>]:<span class="tlaGNC">       82823 :                 if (!IsValidSubtraction(script_num, random_script_num)) {</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :                     // Avoid assertion failure:</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :                     // ./script/script.h:300: CScriptNum &amp;CScriptNum::operator-=(const int64_t &amp;): Assertion `rhs == 0 || (rhs &gt; 0 &amp;&amp; m_value &gt;= std::numeric_limits&lt;int64_t&gt;::min() + rhs) || (rhs &lt; 0 &amp;&amp; m_value &lt;= std::numeric_limits&lt;int64_t&gt;::max() + rhs)' failed.</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :                     return;</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :                 }</span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">       39054 :                 script_num -= random_script_num;</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :             },</span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">       21542 :             [&amp;] {</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">       21542 :                 script_num = script_num &amp; fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;();</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :<span class="tlaGNC">       21542 :             },</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaGNC">       24699 :             [&amp;] {</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">       24699 :                 script_num = script_num &amp; ConsumeScriptNum(fuzzed_data_provider);</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">       24699 :             },</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaGNC">       24695 :             [&amp;] {</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">       24695 :                 script_num &amp;= ConsumeScriptNum(fuzzed_data_provider);</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">       24695 :             },</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">     2119798 :             [&amp;] {</span></span>
+<span id="L94"><span class="lineNum">      94</span>         [<span class="tlaGBC" title="Branch 0 was taken 2115906 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3892 times"> + </span>]:<span class="tlaGNC">     2119798 :                 if (script_num == CScriptNum{std::numeric_limits&lt;int64_t&gt;::min()}) {</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :                     // Avoid assertion failure:</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :                     // ./script/script.h:279: CScriptNum CScriptNum::operator-() const: Assertion `m_value != std::numeric_limits&lt;int64_t&gt;::min()' failed.</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :                     return;</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :                 }</span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC">     2115906 :                 script_num = -script_num;</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :             },</span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">       29695 :             [&amp;] {</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">       29695 :                 script_num = fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;();</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">       29695 :             },</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">       32553 :             [&amp;] {</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">       32553 :                 const int64_t random_integer = fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;();</span></span>
+<span id="L106"><span class="lineNum">     106</span>         [<span class="tlaGBC" title="Branch 0 was taken 25467 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7086 times"> + </span>]:<span class="tlaGNC">       32553 :                 if (!IsValidAddition(script_num, CScriptNum{random_integer})) {</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :                     // Avoid assertion failure:</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :                     // ./script/script.h:292: CScriptNum &amp;CScriptNum::operator+=(const int64_t &amp;): Assertion `rhs == 0 || (rhs &gt; 0 &amp;&amp; m_value &lt;= std::numeric_limits&lt;int64_t&gt;::max() - rhs) || (rhs &lt; 0 &amp;&amp; m_value &gt;= std::numeric_limits&lt;int64_t&gt;::min() - rhs)' failed.</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :                     return;</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :                 }</span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">       25467 :                 script_num += random_integer;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :             },</span>
+<span id="L113"><span class="lineNum">     113</span>                 :<span class="tlaGNC">       31261 :             [&amp;] {</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">       31261 :                 const int64_t random_integer = fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;();</span></span>
+<span id="L115"><span class="lineNum">     115</span>         [<span class="tlaGBC" title="Branch 0 was taken 22229 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9032 times"> + </span>]:<span class="tlaGNC">       31261 :                 if (!IsValidSubtraction(script_num, CScriptNum{random_integer})) {</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :                     // Avoid assertion failure:</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :                     // ./script/script.h:300: CScriptNum &amp;CScriptNum::operator-=(const int64_t &amp;): Assertion `rhs == 0 || (rhs &gt; 0 &amp;&amp; m_value &gt;= std::numeric_limits&lt;int64_t&gt;::min() + rhs) || (rhs &lt; 0 &amp;&amp; m_value &lt;= std::numeric_limits&lt;int64_t&gt;::max() + rhs)' failed.</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :                     return;</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :                 }</span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">       22229 :                 script_num -= random_integer;</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :             },</span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">       11437 :             [&amp;] {</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">       11437 :                 script_num &amp;= fuzzed_data_provider.ConsumeIntegral&lt;int64_t&gt;();</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">       11437 :             });</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">     2713041 :         (void)script_num.getint();</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaGNC">     2713041 :         (void)script_num.getvch();</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     }</span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">         243 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

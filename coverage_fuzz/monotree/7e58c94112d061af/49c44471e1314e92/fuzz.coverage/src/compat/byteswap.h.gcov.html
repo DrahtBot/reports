@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/compat/byteswap.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/compat">src/compat</a> - byteswap.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-09-02 14:23:13</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">66.7&nbsp;%</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">20</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2014-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_COMPAT_BYTESWAP_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_COMPAT_BYTESWAP_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #ifdef _MSC_VER</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;cstdlib&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #endif</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : // All internal_bswap_* functions can be replaced with std::byteswap once we</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : // require c++23. Both libstdc++ and libc++ implement std::byteswap via these</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : // builtins.</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #ifndef DISABLE_BUILTIN_BSWAPS</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #  if defined __has_builtin</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #    if __has_builtin(__builtin_bswap16)</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #      define bitcoin_builtin_bswap16(x) __builtin_bswap16(x)</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #    endif</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #    if __has_builtin(__builtin_bswap32)</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #      define bitcoin_builtin_bswap32(x) __builtin_bswap32(x)</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #    endif</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #    if __has_builtin(__builtin_bswap64)</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #      define bitcoin_builtin_bswap64(x) __builtin_bswap64(x)</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : #    endif</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #  elif defined(_MSC_VER)</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : #      define bitcoin_builtin_bswap16(x) _byteswap_ushort(x)</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : #      define bitcoin_builtin_bswap32(x) _byteswap_ulong(x)</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : #      define bitcoin_builtin_bswap64(x) _byteswap_uint64(x)</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : #  endif</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : #endif</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : // MSVC's _byteswap_* functions are not constexpr</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : #ifndef _MSC_VER</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : #define BSWAP_CONSTEXPR constexpr</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : #else</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : #define BSWAP_CONSTEXPR</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : #endif</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : </span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">     1057000 : inline BSWAP_CONSTEXPR uint16_t internal_bswap_16(uint16_t x)</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : {</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : #ifdef bitcoin_builtin_bswap16</span>
+<span id="L47"><span class="lineNum">      47</span> [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 482 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 77 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> :<span class="tlaGNC">     1056448 :     return bitcoin_builtin_bswap16(x);</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 103 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 24 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 74 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 6 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 7 was taken 17 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 17 times"> + </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 24 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 11 was taken 23 times"> + </span>]
+<span id="L48"><span class="lineNum">      48</span>                 :             : #else</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     return (x &gt;&gt; 8) | (x &lt;&lt; 8);</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : #endif</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : }</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">  5255867075 : inline BSWAP_CONSTEXPR uint32_t internal_bswap_32(uint32_t x)</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : {</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : #ifdef bitcoin_builtin_bswap32</span>
+<span id="L56"><span class="lineNum">      56</span> [<span class="tlaGBC" title="Branch 0 was taken 492807 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 109186701 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 107 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> :<span class="tlaGNC">   255010940 :     return bitcoin_builtin_bswap32(x);</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 76 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 196 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 255 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 77 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 17 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]
+<span id="L57"><span class="lineNum">      57</span>                 :             : #else</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     return (((x &amp; 0xff000000U) &gt;&gt; 24) | ((x &amp; 0x00ff0000U) &gt;&gt;  8) |</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :             ((x &amp; 0x0000ff00U) &lt;&lt;  8) | ((x &amp; 0x000000ffU) &lt;&lt; 24));</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : #endif</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : }</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">  2048956441 : inline BSWAP_CONSTEXPR uint64_t internal_bswap_64(uint64_t x)</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : {</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : #ifdef bitcoin_builtin_bswap64</span>
+<span id="L66"><span class="lineNum">      66</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 55 times"> + </span>]:<span class="tlaGNC">    79358169 :     return bitcoin_builtin_bswap64(x);</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : #else</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :      return (((x &amp; 0xff00000000000000ull) &gt;&gt; 56)</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :           | ((x &amp; 0x00ff000000000000ull) &gt;&gt; 40)</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :           | ((x &amp; 0x0000ff0000000000ull) &gt;&gt; 24)</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :           | ((x &amp; 0x000000ff00000000ull) &gt;&gt; 8)</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :           | ((x &amp; 0x00000000ff000000ull) &lt;&lt; 8)</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :           | ((x &amp; 0x0000000000ff0000ull) &lt;&lt; 24)</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :           | ((x &amp; 0x000000000000ff00ull) &lt;&lt; 40)</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :           | ((x &amp; 0x00000000000000ffull) &lt;&lt; 56));</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : #endif</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : }</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : #endif // BITCOIN_COMPAT_BYTESWAP_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
