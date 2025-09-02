@@ -1,0 +1,363 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/headerssync.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - headerssync.h<span style="font-size: 80%;"> (source / <a href="headerssync.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntry">23</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-09-02 15:26:03</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">70.0&nbsp;%</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">7</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2022-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_HEADERSSYNC_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_HEADERSSYNC_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;arith_uint256.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;chain.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;consensus/params.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;net.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;primitives/block.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;util/bitdeque.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;util/hasher.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;deque&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : // A compressed CBlockHeader, which leaves out the prevhash</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : struct CompressedHeader {</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :     // header</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     int32_t nVersion{0};</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     uint256 hashMerkleRoot;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     uint32_t nTime{0};</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     uint32_t nBits{0};</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     uint32_t nNonce{0};</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : </span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     CompressedHeader()</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     {</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :         hashMerkleRoot.SetNull();</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     }</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">        7003 :     CompressedHeader(const CBlockHeader&amp; header)</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">        7003 :     {</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">        7003 :         nVersion = header.nVersion;</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">        7003 :         hashMerkleRoot = header.hashMerkleRoot;</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">        7003 :         nTime = header.nTime;</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">        7003 :         nBits = header.nBits;</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">        7003 :         nNonce = header.nNonce;</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">        7003 :     }</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">        2619 :     CBlockHeader GetFullHeader(const uint256&amp; hash_prev_block) {</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">        2619 :         CBlockHeader ret;</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">        2619 :         ret.nVersion = nVersion;</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">        2619 :         ret.hashPrevBlock = hash_prev_block;</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">        2619 :         ret.hashMerkleRoot = hashMerkleRoot;</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">        2619 :         ret.nTime = nTime;</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">        2619 :         ret.nBits = nBits;</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">        2619 :         ret.nNonce = nNonce;</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaGBC" title="Branch 0 was taken 2619 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2619 :         return ret;</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     };</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : };</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : /** HeadersSyncState:</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :  *</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :  * We wish to download a peer's headers chain in a DoS-resistant way.</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :  *</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :  * The Bitcoin protocol does not offer an easy way to determine the work on a</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :  * peer's chain. Currently, we can query a peer's headers by using a GETHEADERS</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :  * message, and our peer can return a set of up to 2000 headers that connect to</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :  * something we know. If a peer's chain has more than 2000 blocks, then we need</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :  * a way to verify that the chain actually has enough work on it to be useful to</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :  * us -- by being above our anti-DoS minimum-chain-work threshold -- before we</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :  * commit to storing those headers in memory. Otherwise, it would be cheap for</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :  * an attacker to waste all our memory by serving us low-work headers</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :  * (particularly for a new node coming online for the first time).</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :  *</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :  * To prevent memory-DoS with low-work headers, while still always being</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :  * able to reorg to whatever the most-work chain is, we require that a chain</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :  * meet a work threshold before committing it to memory. We can do this by</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :  * downloading a peer's headers twice, whenever we are not sure that the chain</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :  * has sufficient work:</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  *</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :  * - In the first download phase, called pre-synchronization, we can calculate</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :  * the work on the chain as we go (just by checking the nBits value on each</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :  * header, and validating the proof-of-work).</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :  *</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :  * - Once we have reached a header where the cumulative chain work is</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :  * sufficient, we switch to downloading the headers a second time, this time</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :  * processing them fully, and possibly storing them in memory.</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :  *</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :  * To prevent an attacker from using (eg) the honest chain to convince us that</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :  * they have a high-work chain, but then feeding us an alternate set of</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :  * low-difficulty headers in the second phase, we store commitments to the</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :  * chain we see in the first download phase that we check in the second phase,</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :  * as follows:</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :  *</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :  * - In phase 1 (presync), store 1 bit (using a salted hash function) for every</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :  * N headers that we see. With a reasonable choice of N, this uses relatively</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :  * little memory even for a very long chain.</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :  *</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :  * - In phase 2 (redownload), keep a lookahead buffer and only accept headers</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :  * from that buffer into the block index (permanent memory usage) once they</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :  * have some target number of verified commitments on top of them. With this</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :  * parametrization, we can achieve a given security target for potential</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :  * permanent memory usage, while choosing N to minimize memory use during the</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :  * sync (temporary, per-peer storage).</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :  */</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : class HeadersSyncState {</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : public:</span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">        1244 :     ~HeadersSyncState() = default;</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : </span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :     enum class State {</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :         /** PRESYNC means the peer has not yet demonstrated their chain has</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :          * sufficient work and we're only building commitments to the chain they</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :          * serve us. */</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :         PRESYNC,</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :         /** REDOWNLOAD means the peer has given us a high-enough-work chain,</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :          * and now we're redownloading the headers we saw before and trying to</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :          * accept them */</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :         REDOWNLOAD,</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :         /** We're done syncing with this peer and can discard any remaining state */</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :         FINAL</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     };</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : </span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     /** Return the current state of our download */</span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaGBC" title="Branch 0 was taken 845 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 329900 times"> + </span>]:<span class="tlaGNC">      330745 :     State GetState() const { return m_download_state; }</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : </span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :     /** Return the height reached during the PRESYNC phase */</span>
+<span id="L122"><span class="lineNum">     122</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8899 times"> + </span>]:<span class="tlaGNC">        8899 :     int64_t GetPresyncHeight() const { return m_current_height; }</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : </span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     /** Return the block timestamp of the last header received during the PRESYNC phase. */</span>
+<span id="L125"><span class="lineNum">     125</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 8899 times"> + </span>]:<span class="tlaGNC">        8899 :     uint32_t GetPresyncTime() const { return m_last_header_received.nTime; }</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : </span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     /** Return the amount of work in the chain received during the PRESYNC phase. */</span>
+<span id="L128"><span class="lineNum">     128</span>         [<span class="tlaGBC" title="Branch 0 was taken 71192 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 8899 times"> + </span>]:<span class="tlaGNC">       88990 :     arith_uint256 GetPresyncWork() const { return m_current_chain_work; }</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :     /** Construct a HeadersSyncState object representing a headers sync via this</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :      *  download-twice mechanism).</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :      *</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :      * id: node id (for logging)</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :      * consensus_params: parameters needed for difficulty adjustment validation</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :      * chain_start: best known fork point that the peer's headers branch from</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :      * minimum_required_work: amount of chain work required to accept the chain</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :      */</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     HeadersSyncState(NodeId id, const Consensus::Params&amp; consensus_params,</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :             const CBlockIndex* chain_start, const arith_uint256&amp; minimum_required_work);</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : </span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     /** Result data structure for ProcessNextHeaders. */</span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">      331171 :     struct ProcessingResult {</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :         std::vector&lt;CBlockHeader&gt; pow_validated_headers;</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :         bool success{false};</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :         bool request_more{false};</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :     };</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     /** Process a batch of headers, once a sync via this mechanism has started</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :      *</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :      * received_headers: headers that were received over the network for processing.</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :      *                   Assumes the caller has already verified the headers</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :      *                   are continuous, and has checked that each header</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :      *                   satisfies the proof-of-work target included in the</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :      *                   header (but not necessarily verified that the</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :      *                   proof-of-work target is correct and passes consensus</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :      *                   rules).</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :      * full_headers_message: true if the message was at max capacity,</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :      *                       indicating more headers may be available</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :      * ProcessingResult.pow_validated_headers: will be filled in with any</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :      *                       headers that the caller can fully process and</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :      *                       validate now (because these returned headers are</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :      *                       on a chain with sufficient work)</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :      * ProcessingResult.success: set to false if an error is detected and the sync is</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :      *                       aborted; true otherwise.</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :      * ProcessingResult.request_more: if true, the caller is suggested to call</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :      *                       NextHeadersRequestLocator and send a getheaders message using it.</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :      */</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     ProcessingResult ProcessNextHeaders(const std::vector&lt;CBlockHeader&gt;&amp;</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :             received_headers, bool full_headers_message);</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             : </span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     /** Issue the next GETHEADERS message to our peer.</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :      *</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :      * This will return a locator appropriate for the current sync object, to continue the</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :      * synchronization phase it is in.</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :      */</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     CBlockLocator NextHeadersRequestLocator() const;</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : </span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : protected:</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     /** The (secret) offset on the heights for which to create commitments.</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :      *</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :      * m_header_commitments entries are created at any height h for which</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :      * (h % HEADER_COMMITMENT_PERIOD) == m_commit_offset. */</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     const unsigned m_commit_offset;</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             : </span>
+<span id="L185"><span class="lineNum">     185</span>                 :             : private:</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     /** Clear out all download state that might be in progress (freeing any used</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :      * memory), and mark this object as no longer usable.</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :      */</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :     void Finalize();</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :     /**</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :      *  Only called in PRESYNC.</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :      *  Validate the work on the headers we received from the network, and</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :      *  store commitments for later. Update overall state with successfully</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :      *  processed headers.</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :      *  On failure, this invokes Finalize() and returns false.</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :      */</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     bool ValidateAndStoreHeadersCommitments(const std::vector&lt;CBlockHeader&gt;&amp; headers);</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : </span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     /** In PRESYNC, process and update state for a single header */</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     bool ValidateAndProcessSingleHeader(const CBlockHeader&amp; current);</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : </span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     /** In REDOWNLOAD, check a header's commitment (if applicable) and add to</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :      * buffer for later processing */</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :     bool ValidateAndStoreRedownloadedHeader(const CBlockHeader&amp; header);</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : </span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :     /** Return a set of headers that satisfy our proof-of-work threshold */</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :     std::vector&lt;CBlockHeader&gt; PopHeadersReadyForAcceptance();</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             : </span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : private:</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :     /** NodeId of the peer (used for log messages) **/</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :     const NodeId m_id;</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :     /** We use the consensus params in our anti-DoS calculations */</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :     const Consensus::Params&amp; m_consensus_params;</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             : </span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :     /** Store the last block in our block index that the peer's chain builds from */</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :     const CBlockIndex* m_chain_start{nullptr};</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : </span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     /** Minimum work that we're looking for on this chain. */</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :     const arith_uint256 m_minimum_required_work;</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : </span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :     /** Work that we've seen so far on the peer's chain */</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :     arith_uint256 m_current_chain_work;</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             : </span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     /** m_hasher is a salted hasher for making our 1-bit commitments to headers we've seen. */</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :     const SaltedUint256Hasher m_hasher;</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             : </span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     /** A queue of commitment bits, created during the 1st phase, and verified during the 2nd. */</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     bitdeque&lt;&gt; m_header_commitments;</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : </span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :     /** m_max_commitments is a bound we calculate on how long an honest peer's chain could be,</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :      * given the MTP rule.</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :      *</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :      * Any peer giving us more headers than this will have its sync aborted. This serves as a</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :      * memory bound on m_header_commitments. */</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :     uint64_t m_max_commitments{0};</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             : </span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :     /** Store the latest header received while in PRESYNC (initialized to m_chain_start) */</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     CBlockHeader m_last_header_received;</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             : </span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :     /** Height of m_last_header_received */</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :     int64_t m_current_height{0};</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : </span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :     /** During phase 2 (REDOWNLOAD), we buffer redownloaded headers in memory</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :      *  until enough commitments have been verified; those are stored in</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :      *  m_redownloaded_headers */</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :     std::deque&lt;CompressedHeader&gt; m_redownloaded_headers;</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             : </span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :     /** Height of last header in m_redownloaded_headers */</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :     int64_t m_redownload_buffer_last_height{0};</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             : </span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     /** Hash of last header in m_redownloaded_headers (initialized to</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :      * m_chain_start). We have to cache it because we don't have hashPrevBlock</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :      * available in a CompressedHeader.</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :      */</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :     uint256 m_redownload_buffer_last_hash;</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             : </span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :     /** The hashPrevBlock entry for the first header in m_redownloaded_headers</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :      * We need this to reconstruct the full header when it's time for</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :      * processing.</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :      */</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :     uint256 m_redownload_buffer_first_prev_hash;</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             : </span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :     /** The accumulated work on the redownloaded chain. */</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :     arith_uint256 m_redownload_chain_work;</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             : </span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     /** Set this to true once we encounter the target blockheader during phase</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :      * 2 (REDOWNLOAD). At this point, we can process and store all remaining</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :      * headers still in m_redownloaded_headers.</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :      */</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :     bool m_process_all_remaining_headers{false};</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             : </span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :     /** Current state of our headers sync. */</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :     State m_download_state{State::PRESYNC};</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             : };</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             : </span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : #endif // BITCOIN_HEADERSSYNC_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
