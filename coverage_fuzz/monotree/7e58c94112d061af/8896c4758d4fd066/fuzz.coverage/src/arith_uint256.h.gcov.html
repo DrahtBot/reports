@@ -1,0 +1,438 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/arith_uint256.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - arith_uint256.h<span style="font-size: 80%;"> (source / <a href="arith_uint256.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">55.8&nbsp;%</td>
+            <td class="headerCovTableEntry">113</td>
+            <td class="headerCovTableEntry">63</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-09-07 10:26:08</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">68.6&nbsp;%</td>
+            <td class="headerCovTableEntry">35</td>
+            <td class="headerCovTableEntry">24</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">58.8&nbsp;%</td>
+            <td class="headerCovTableEntry">374</td>
+            <td class="headerCovTableEntry">220</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_ARITH_UINT256_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_ARITH_UINT256_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;compare&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;cstring&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;stdexcept&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;string&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : class uint256;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : class uint_error : public std::runtime_error {</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : public:</span>
+<span id="L20"><span class="lineNum">      20</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 155322 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      155322 :     explicit uint_error(const std::string&amp; str) : std::runtime_error(str) {}</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : };</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : /** Template base class for unsigned big integers. */</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : template&lt;unsigned int BITS&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : class base_uint</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : {</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : protected:</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     static_assert(BITS / 32 &gt; 0 &amp;&amp; BITS % 32 == 0, &quot;Template parameter BITS must be a positive multiple of 32.&quot;);</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     static constexpr int WIDTH = BITS / 32;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     /** Big integer represented with 32-bit digits, least-significant first. */</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     uint32_t pn[WIDTH];</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : public:</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">    44304820 :     base_uint()</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     {</span>
+<span id="L36"><span class="lineNum">      36</span>         [<span class="tlaGBC" title="Branch 0 was taken 41250600 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5156325 times"> + </span>]:<span class="tlaGNC">   439907676 :         for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 66296904 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3198869 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 16784328 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2066738 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 3712 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 464 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 76000 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 9500 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 4 was taken 76000 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 9500 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1165920 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 145740 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 4176 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 522 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 4176 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 522 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 4176 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 7 was taken 522 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 4104 times"> + </span><span class="tlaGBC" title="Branch 9 was taken 513 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 4104 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 513 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 12 was taken 2236360 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 279545 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 216960 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1130 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 14921944 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1865243 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 2534664 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 7 was taken 316833 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 12 was taken 236642520 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 29580315 times"> + </span><span class="tlaGBC" title="Branch 14 was taken 13376208 times"> + </span><span class="tlaGBC" title="Branch 15 was taken 1672026 times"> + </span><span class="tlaUNC" title="Branch 16 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 17 was not taken"> - </span>]
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">   395602856 :             pn[i] = 0;</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">   120511397 :     base_uint(const base_uint&amp; b)</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     {</span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaGBC" title="Branch 0 was taken 21988912 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2735619 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaGNC">  1158993814 :         for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 3136 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 392 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 3136 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 392 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 2534664 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 316833 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 2534664 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 316833 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 15612448 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 9 was taken 1951556 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 14369872 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 1796234 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 31497256 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 3937157 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 31497256 times"> + </span><span class="tlaGBC" title="Branch 15 was taken 3937157 times"> + </span><span class="tlaGBC" title="Branch 16 was taken 2685864 times"> + </span><span class="tlaGBC" title="Branch 17 was taken 335733 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 2817296 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 19 was taken 352162 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 142248 times"> + </span><span class="tlaGBC" title="Branch 21 was taken 17781 times"> + </span><span class="tlaGBC" title="Branch 22 was taken 142696 times"> + </span><span class="tlaGBC" title="Branch 23 was taken 17837 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 24 was taken 142680 times"> + </span><span class="tlaGBC" title="Branch 25 was taken 17835 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1096944 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 7 was taken 137118 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 11232 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1404 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 11232 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 3 was taken 1404 times"> + </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 13 was not executed"> # </span><span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 17040 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 2130 times"> + </span><span class="tlaGBC" title="Branch 14 was taken 76000 times"> + </span><span class="tlaGBC" title="Branch 15 was taken 9500 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 16 was taken 156176 times"> + </span><span class="tlaGBC" title="Branch 17 was taken 19522 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 156176 times"> + </span><span class="tlaGBC" title="Branch 19 was taken 19522 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 156176 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 21 was taken 19522 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 26024 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 3 was taken 3253 times"> + </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 93984 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 11748 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 93984 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 13 was taken 11748 times"> + </span><span class="tlaUNC" title="Branch 14 was not taken"> - </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 3369952 times"> + </span><span class="tlaGBC" title="Branch 9 was taken 421244 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 3395976 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 11 was taken 424497 times"> + </span><span class="tlaUNC" title="Branch 12 was not taken"> - </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaUNC" title="Branch 12 was not taken"> - </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span><span class="tlaUNC" title="Branch 14 was not taken"> - </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 16 was taken 667848 times"> + </span><span class="tlaGBC" title="Branch 17 was taken 83481 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 1565616 times"> + </span><span class="tlaGBC" title="Branch 19 was taken 195702 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 990888 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 21 was taken 123861 times"> + </span><span class="tlaGBC" title="Branch 22 was taken 13234392 times"> + </span><span class="tlaGBC" title="Branch 23 was taken 1654299 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 80652288 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 1 was taken 420064 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 95424 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 497 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 11666904 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1458363 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 6 was taken 11666904 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 1458363 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 108480 times"> + </span><span class="tlaGBC" title="Branch 9 was taken 565 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 108480 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 11 was taken 565 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 11666904 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 1458363 times"> + </span><span class="tlaUNC" title="Branch 14 was not taken"> - </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 16 was not taken"> - </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 17857088 times"> + </span><span class="tlaGBC" title="Branch 19 was taken 2232136 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 17857088 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 21 was taken 2232136 times"> + </span><span class="tlaGBC" title="Branch 22 was taken 705179056 times"> + </span><span class="tlaGBC" title="Branch 23 was taken 88147382 times"> + </span><span class="tlaGBC" title="Branch 24 was taken 32885000 times"> + </span><span class="tlaGBC" title="Branch 25 was taken 4110625 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 26 was not taken"> - </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span>]
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">  1040835384 :             pn[i] = b.pn[i];</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : </span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">     3234164 :     base_uint&amp; operator=(const base_uint&amp; b)</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     {</span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaGNC">      740548 :         if (this != &amp;b) {</span></span>
+<span id="L49"><span class="lineNum">      49</span>   [<span class="tlaGBC" title="Branch 0 was taken 142920 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 17865 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaGNC">    36206579 :             for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 1096944 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 137118 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 4532520 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 566565 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 821248 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 102656 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1641616 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 205202 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 4 was taken 1270928 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 158866 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 216960 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1130 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 1714200 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 214275 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 18234728 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 2279341 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 2534664 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="Branch 7 was taken 316833 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span>]
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">    32206728 :                 pn[i] = b.pn[i];</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :         }</span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     }</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">     6897988 :     base_uint(uint64_t b)</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :     {</span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">     6897988 :         pn[0] = (unsigned int)b;</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">     6897988 :         pn[1] = (unsigned int)(b &gt;&gt; 32);</span></span>
+<span id="L59"><span class="lineNum">      59</span>   [<span class="tlaGBC" title="Branch 0 was taken 660 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 110 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 408 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 68 times"> + </span> :<span class="tlaGNC">    46631617 :         for (int i = 2; i &lt; WIDTH; i++)</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 336 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 56 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 5418 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 903 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 3846 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 9 was taken 641 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1395144 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 232524 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 13785486 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 3 was taken 2297581 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 1783632 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 297272 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 1792230 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 298705 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 2583600 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 430600 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 9946590 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1657765 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 9925794 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 1654299 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 19518 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3253 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 145266 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 24211 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">    41387928 :             pn[i] = 0;</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">     1672026 :     base_uint operator~() const</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     {</span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">    15048234 :         base_uint ret;</span></span>
+<span id="L66"><span class="lineNum">      66</span>         [<span class="tlaGBC" title="Branch 0 was taken 13376208 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1672026 times"> + </span>]:<span class="tlaGNC">    15048234 :         for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">    13376208 :             ret.pn[i] = ~pn[i];</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">     1672026 :         return ret;</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     }</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : </span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">    29801543 :     base_uint operator-() const</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     {</span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">   308919839 :         base_uint ret;</span></span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaGBC" title="Branch 0 was taken 279118296 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 29801543 times"> + </span>]:<span class="tlaGNC">   308919839 :         for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">   279118296 :             ret.pn[i] = ~pn[i];</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">    29801543 :         ++ret;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">    29801543 :         return ret;</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     }</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     double getdouble() const;</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : </span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">     2232701 :     base_uint&amp; operator=(uint64_t b)</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     {</span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">     2232701 :         pn[0] = (unsigned int)b;</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">     2232701 :         pn[1] = (unsigned int)(b &gt;&gt; 32);</span></span>
+<span id="L86"><span class="lineNum">      86</span>   [<span class="tlaGBC" title="Branch 0 was taken 107350 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 565 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 13392816 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2232136 times"> + </span> :<span class="tlaGNC">    15732867 :         for (int i = 2; i &lt; WIDTH; i++)</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 9 was not taken"> - </span>]
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaGNC">    13500166 :             pn[i] = 0;</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     }</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : </span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaUNC">           0 :     base_uint&amp; operator^=(const base_uint&amp; b)</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     {</span>
+<span id="L93"><span class="lineNum">      93</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaUNC">           0 :             pn[i] ^= b.pn[i];</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :     }</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :<span class="tlaUNC">           0 :     base_uint&amp; operator&amp;=(const base_uint&amp; b)</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     {</span>
+<span id="L100"><span class="lineNum">     100</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaUNC">           0 :             pn[i] &amp;= b.pn[i];</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :     }</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : </span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaUNC">           0 :     base_uint&amp; operator|=(const base_uint&amp; b)</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     {</span>
+<span id="L107"><span class="lineNum">     107</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :<span class="tlaUNC">           0 :             pn[i] |= b.pn[i];</span></span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     }</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : </span>
+<span id="L112"><span class="lineNum">     112</span>                 :<span class="tlaUNC">           0 :     base_uint&amp; operator^=(uint64_t b)</span></span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     {</span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaUNC">           0 :         pn[0] ^= (unsigned int)b;</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :<span class="tlaUNC">           0 :         pn[1] ^= (unsigned int)(b &gt;&gt; 32);</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     }</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : </span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaUNC">           0 :     base_uint&amp; operator|=(uint64_t b)</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     {</span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaUNC">           0 :         pn[0] |= (unsigned int)b;</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaUNC">           0 :         pn[1] |= (unsigned int)(b &gt;&gt; 32);</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     }</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     base_uint&amp; operator&lt;&lt;=(unsigned int shift);</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     base_uint&amp; operator&gt;&gt;=(unsigned int shift);</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             : </span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">    34671851 :     base_uint&amp; operator+=(const base_uint&amp; b)</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :     {</span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">    34671851 :         uint64_t carry = 0;</span></span>
+<span id="L132"><span class="lineNum">     132</span>         [<span class="tlaGBC" title="Branch 0 was taken 318080760 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 34671851 times"> + </span>]:<span class="tlaGNC">   352752611 :         for (int i = 0; i &lt; WIDTH; i++)</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :         {</span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">   318080760 :             uint64_t n = carry + pn[i] + b.pn[i];</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">   318080760 :             pn[i] = n &amp; 0xffffffff;</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">   318080760 :             carry = n &gt;&gt; 32;</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :         }</span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">    34671851 :         return *this;</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     }</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : </span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">    29801543 :     base_uint&amp; operator-=(const base_uint&amp; b)</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     {</span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">    29801543 :         *this += -b;</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">    29801543 :         return *this;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     }</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : </span>
+<span id="L147"><span class="lineNum">     147</span>                 :<span class="tlaUNC">           0 :     base_uint&amp; operator+=(uint64_t b64)</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     {</span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaUNC">           0 :         base_uint b;</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaUNC">           0 :         b = b64;</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaUNC">           0 :         *this += b;</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :     }</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : </span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaUNC">           0 :     base_uint&amp; operator-=(uint64_t b64)</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     {</span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaUNC">           0 :         base_uint b;</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaUNC">           0 :         b = b64;</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaUNC">           0 :         *this += -b;</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :     }</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             : </span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :     base_uint&amp; operator*=(uint32_t b32);</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :     base_uint&amp; operator*=(const base_uint&amp; b);</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :     base_uint&amp; operator/=(const base_uint&amp; b);</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             : </span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">    29801543 :     base_uint&amp; operator++()</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     {</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :         // prefix operator</span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">    29801543 :         int i = 0;</span></span>
+<span id="L171"><span class="lineNum">     171</span>   [<span class="tlaGBC" title="Branch 0 was taken 90586440 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 29231 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 60814128 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 29772312 times"> + </span>]:<span class="tlaGNC">    90615671 :         while (i &lt; WIDTH &amp;&amp; ++pn[i] == 0)</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">    60814128 :             i++;</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaGNC">    29801543 :         return *this;</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     }</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             : </span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaUNC">           0 :     base_uint operator++(int)</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     {</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :         // postfix operator</span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaUNC">           0 :         const base_uint ret = *this;</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaUNC">           0 :         ++(*this);</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaUNC">           0 :         return ret;</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :     }</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             : </span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaUNC">           0 :     base_uint&amp; operator--()</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :     {</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :         // prefix operator</span>
+<span id="L187"><span class="lineNum">     187</span>                 :<span class="tlaUNC">           0 :         int i = 0;</span></span>
+<span id="L188"><span class="lineNum">     188</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         while (i &lt; WIDTH &amp;&amp; --pn[i] == std::numeric_limits&lt;uint32_t&gt;::max())</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaUNC">           0 :             i++;</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :<span class="tlaUNC">           0 :         return *this;</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :     }</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : </span>
+<span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaUNC">           0 :     base_uint operator--(int)</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :     {</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :         // postfix operator</span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaUNC">           0 :         const base_uint ret = *this;</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :<span class="tlaUNC">           0 :         --(*this);</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaUNC">           0 :         return ret;</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :     }</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             : </span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     /** Numeric ordering (unlike \ref base_blob::Compare) */</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     int CompareTo(const base_uint&amp; b) const;</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     bool EqualTo(uint64_t b) const;</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             : </span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">     7874314 :     friend inline base_uint operator+(const base_uint&amp; a, const base_uint&amp; b) { return base_uint(a) += b; }</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :<span class="tlaGNC">      668870 :     friend inline base_uint operator-(const base_uint&amp; a, const base_uint&amp; b) { return base_uint(a) -= b; }</span></span>
+<span id="L207"><span class="lineNum">     207</span>                 :<span class="tlaGNC">      633666 :     friend inline base_uint operator*(const base_uint&amp; a, const base_uint&amp; b) { return base_uint(a) *= b; }</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :<span class="tlaGNC">     3903112 :     friend inline base_uint operator/(const base_uint&amp; a, const base_uint&amp; b) { return base_uint(a) /= b; }</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     friend inline base_uint operator|(const base_uint&amp; a, const base_uint&amp; b) { return base_uint(a) |= b; }</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :     friend inline base_uint operator&amp;(const base_uint&amp; a, const base_uint&amp; b) { return base_uint(a) &amp;= b; }</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :     friend inline base_uint operator^(const base_uint&amp; a, const base_uint&amp; b) { return base_uint(a) ^= b; }</span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">     2916726 :     friend inline base_uint operator&gt;&gt;(const base_uint&amp; a, int shift) { return base_uint(a) &gt;&gt;= shift; }</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">         784 :     friend inline base_uint operator&lt;&lt;(const base_uint&amp; a, int shift) { return base_uint(a) &lt;&lt;= shift; }</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">       23496 :     friend inline base_uint operator*(const base_uint&amp; a, uint32_t b) { return base_uint(a) *= b; }</span></span>
+<span id="L215"><span class="lineNum">     215</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 101 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 74 times"> + </span>]:<span class="tlaGNC">       18531 :     friend inline bool operator==(const base_uint&amp; a, const base_uint&amp; b) { return memcmp(a.pn, b.pn, sizeof(a.pn)) == 0; }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 315 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 2 was taken 313 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 313 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 17727 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span id="L216"><span class="lineNum">     216</span>   [<span class="tlaGBC" title="Branch 0 was taken 731591835 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10395512 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 485410955 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 246180880 times"> + </span>]:<span class="tlaGNC">   741987347 :     friend inline std::strong_ordering operator&lt;=&gt;(const base_uint&amp; a, const base_uint&amp; b) { return a.CompareTo(b) &lt;=&gt; 0; }</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :<span class="tlaGNC">     1859345 :     friend inline bool operator==(const base_uint&amp; a, uint64_t b) { return a.EqualTo(b); }</span></span>
+<span id="L218"><span class="lineNum">     218</span>                 :             : </span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :     /** Hex encoding of the number (with the most significant digits first). */</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     std::string GetHex() const;</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :     std::string ToString() const;</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : </span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaUNC">           0 :     unsigned int size() const</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :     {</span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaUNC">           0 :         return sizeof(pn);</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     }</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : </span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     /**</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :      * Returns the position of the highest bit set plus one, or zero if the</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :      * value is zero.</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :      */</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :     unsigned int bits() const;</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             : </span>
+<span id="L234"><span class="lineNum">     234</span>                 :<span class="tlaGNC">     1705217 :     uint64_t GetLow64() const</span></span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :     {</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :         static_assert(WIDTH &gt;= 2, &quot;Assertion WIDTH &gt;= 2 failed (WIDTH = BITS / 32). BITS is a template parameter.&quot;);</span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">     1705217 :         return pn[0] | (uint64_t)pn[1] &lt;&lt; 32;</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :     }</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : };</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             : </span>
+<span id="L241"><span class="lineNum">     241</span>                 :             : /** 256-bit unsigned big integer. */</span>
+<span id="L242"><span class="lineNum">     242</span>   [<span class="tlaGBC" title="Branch 0 was taken 20298 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 93727 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 9500 times"> + </span> :<span class="tlaGNC">    10179339 : class arith_uint256 : public base_uint&lt;256&gt; {</span></span>
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 351393 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 2 was taken 2421406 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 2914797 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 282499 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 138 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L243"><span class="lineNum">     243</span>                 :             : public:</span>
+<span id="L244"><span class="lineNum">     244</span>         [<span class="tlaGBC" title="Branch 0 was taken 14931806 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2144788 times"> + </span>]:<span class="tlaGNC">    32091795 :     arith_uint256() = default;</span></span>
+<span id="L245"><span class="lineNum">     245</span>         [<span class="tlaGBC" title="Branch 0 was taken 154845 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    10069745 :     arith_uint256(const base_uint&lt;256&gt;&amp; b) : base_uint&lt;256&gt;(b) {}</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 19522 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 580673 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 19522 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 667848 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 83481 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1565616 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 195702 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 990888 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 123861 times"> + </span>]
+<span id="L246"><span class="lineNum">     246</span>         [<span class="tlaGBC" title="Branch 0 was taken 17727 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     6509026 :     arith_uint256(uint64_t b) : base_uint&lt;256&gt;(b) {}</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 214275 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2279341 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]
+<span id="L247"><span class="lineNum">     247</span>                 :             : </span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :     /**</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :      * The &quot;compact&quot; format is a representation of a whole</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :      * number N using an unsigned 32bit number similar to a</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :      * floating point format.</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :      * The most significant 8 bits are the unsigned exponent of base 256.</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :      * This exponent can be thought of as &quot;number of bytes of N&quot;.</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :      * The lower 23 bits are the mantissa.</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :      * Bit number 24 (0x800000) represents the sign of N.</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :      * N = (-1^sign) * mantissa * 256^(exponent-3)</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :      *</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :      * Satoshi's original implementation used BN_bn2mpi() and BN_mpi2bn().</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :      * MPI uses the most significant bit of the first byte as sign.</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :      * Thus 0x1234560000 is compact (0x05123456)</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :      * and  0xc0de000000 is compact (0x0600c0de)</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :      *</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :      * Bitcoin only uses this &quot;compact&quot; format for encoding difficulty</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :      * targets, which are unsigned 256bit quantities.  Thus, all the</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :      * complexities of the sign bit and using base 256 are probably an</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :      * implementation accident.</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :      */</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     arith_uint256&amp; SetCompact(uint32_t nCompact, bool *pfNegative = nullptr, bool *pfOverflow = nullptr);</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :     uint32_t GetCompact(bool fNegative = false) const;</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             : </span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     friend uint256 ArithToUint256(const arith_uint256 &amp;);</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :     friend arith_uint256 UintToArith256(const uint256 &amp;);</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             : };</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             : </span>
+<span id="L275"><span class="lineNum">     275</span>                 :             : uint256 ArithToUint256(const arith_uint256 &amp;);</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             : arith_uint256 UintToArith256(const uint256 &amp;);</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             : </span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : extern template class base_uint&lt;256&gt;;</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             : </span>
+<span id="L280"><span class="lineNum">     280</span>                 :             : #endif // BITCOIN_ARITH_UINT256_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
