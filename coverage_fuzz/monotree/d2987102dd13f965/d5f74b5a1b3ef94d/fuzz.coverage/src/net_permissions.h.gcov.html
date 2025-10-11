@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/net_permissions.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - net_permissions.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">15</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-10-11 07:42:08</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">49.0&nbsp;%</td>
+            <td class="headerCovTableEntry">102</td>
+            <td class="headerCovTableEntry">50</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;netaddress.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;netbase.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;string&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;type_traits&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #ifndef BITCOIN_NET_PERMISSIONS_H</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #define BITCOIN_NET_PERMISSIONS_H</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : struct bilingual_str;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : extern const std::vector&lt;std::string&gt; NET_PERMISSIONS_DOC;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : /** Default for -whitelistrelay. */</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : constexpr bool DEFAULT_WHITELISTRELAY = true;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : /** Default for -whitelistforcerelay. */</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : constexpr bool DEFAULT_WHITELISTFORCERELAY = false;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : enum class NetPermissionFlags : uint32_t {</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     None = 0,</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     // Can query bloomfilter even if -peerbloomfilters is false</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     BloomFilter = (1U &lt;&lt; 1),</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     // Relay and accept transactions from this peer, even if -blocksonly is true</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     // This peer is also not subject to limits on how many transaction INVs are tracked</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     Relay = (1U &lt;&lt; 3),</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     // Always relay transactions from this peer, even if already in mempool</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     // Keep parameter interaction: forcerelay implies relay</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     ForceRelay = (1U &lt;&lt; 2) | Relay,</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     // Allow getheaders during IBD and block-download after maxuploadtarget limit</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     Download = (1U &lt;&lt; 6),</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     // Can't be banned/disconnected/discouraged for misbehavior</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     NoBan = (1U &lt;&lt; 4) | Download,</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     // Can query the mempool</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     Mempool = (1U &lt;&lt; 5),</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     // Can request addrs without hitting a privacy-preserving cache, and send us</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     // unlimited amounts of addrs.</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     Addr = (1U &lt;&lt; 7),</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : </span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :     // True if the user did not specifically set fine-grained permissions with</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     // the -whitebind or -whitelist configuration options.</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     Implicit = (1U &lt;&lt; 31),</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     All = BloomFilter | ForceRelay | Relay | NoBan | Mempool | Download | Addr,</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : };</span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">        3989 : static inline constexpr NetPermissionFlags operator|(NetPermissionFlags a, NetPermissionFlags b)</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : {</span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">        3989 :     using t = std::underlying_type_t&lt;NetPermissionFlags&gt;;</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">        3989 :     return static_cast&lt;NetPermissionFlags&gt;(static_cast&lt;t&gt;(a) | static_cast&lt;t&gt;(b));</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : }</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : class NetPermissions</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : {</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : public:</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     NetPermissionFlags m_flags;</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     static std::vector&lt;std::string&gt; ToStrings(NetPermissionFlags flags);</span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">      364653 :     static inline bool HasFlag(NetPermissionFlags flags, NetPermissionFlags f)</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     {</span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">      364653 :         using t = std::underlying_type_t&lt;NetPermissionFlags&gt;;</span></span>
+<span id="L63"><span class="lineNum">      63</span>   [<span class="tlaGBC" title="Branch 0 was taken 84 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 2 was taken 8293 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 75 times"> + </span> :<span class="tlaGNC">      363917 :         return (static_cast&lt;t&gt;(flags) &amp; static_cast&lt;t&gt;(f)) == static_cast&lt;t&gt;(f);</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 8293 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 75 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 276404 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span><span class="tlaUNC" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 14 was not executed"> # </span><span class="tlaUNC" title="Branch 15 was not executed"> # </span><span class="tlaUNC" title="Branch 16 was not executed"> # </span><span class="tlaUNC" title="Branch 17 was not executed"> # </span><span class="tlaUNC" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not executed"> # </span><span class="tlaUNC" title="Branch 20 was not executed"> # </span><span class="tlaUNC" title="Branch 21 was not executed"> # </span><span class="tlaUNC" title="Branch 22 was not executed"> # </span><span class="tlaUNC" title="Branch 23 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 24 was not executed"> # </span><span class="tlaUNC" title="Branch 25 was not executed"> # </span><span class="tlaUNC" title="Branch 26 was not executed"> # </span><span class="tlaUNC" title="Branch 27 was not executed"> # </span><span class="tlaUNC" title="Branch 28 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not executed"> # </span><span class="tlaUNC" title="Branch 30 was not executed"> # </span><span class="tlaUNC" title="Branch 31 was not executed"> # </span><span class="tlaUNC" title="Branch 32 was not executed"> # </span><span class="tlaUNC" title="Branch 33 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 34 was not executed"> # </span><span class="tlaUNC" title="Branch 35 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 5341 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 20890 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span><span class="tlaGBC" title="Branch 4 was taken 1226 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 2895 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 7 was taken 1412 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1199 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 4562 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 12 was taken 7652 times"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span><span class="tlaUNC" title="Branch 14 was not taken"> - </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 68 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 17 was taken 271 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 28 times"> + </span><span class="tlaGBC" title="Branch 19 was taken 131 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 17 times"> + </span><span class="tlaGBC" title="Branch 21 was taken 20 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 22 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 23 was taken 14 times"> + </span><span class="tlaUNC" title="Branch 24 was not taken"> - </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaUNC" title="Branch 26 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1898 times"> + </span><span class="tlaGBC" title="Branch 29 was taken 459 times"> + </span><span class="tlaUNC" title="Branch 30 was not taken"> - </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 32 was taken 4263 times"> + </span><span class="tlaGBC" title="Branch 33 was taken 131 times"> + </span><span class="tlaGBC" title="Branch 34 was taken 4352 times"> + </span><span class="tlaGBC" title="Branch 35 was taken 10292 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 32 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 132 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 56 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 108 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 27 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 137 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 47 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 117 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 42 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 9 was taken 122 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 64 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 100 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 42 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 13 was taken 122 times"> + </span>]
+<span id="L64"><span class="lineNum">      64</span>                 :             :     }</span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">        4467 :     static inline void AddFlag(NetPermissionFlags&amp; flags, NetPermissionFlags f)</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     {</span>
+<span id="L67"><span class="lineNum">      67</span>   [<span class="tlaGBC" title="Branch 0 was taken 14 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 68 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         575 :         flags = flags | f;</span></span>
+<span class="lineNum">        </span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">        3892 :     }</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     //! ClearFlag is only called with `f` == NetPermissionFlags::Implicit.</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     //! If that should change in the future, be aware that ClearFlag should not</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     //! be called with a subflag of a multiflag, e.g. NetPermissionFlags::Relay</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     //! or NetPermissionFlags::Download, as that would leave `flags` in an</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :     //! invalid state corresponding to none of the existing flags.</span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">          97 :     static inline void ClearFlag(NetPermissionFlags&amp; flags, NetPermissionFlags f)</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     {</span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">          97 :         assert(f == NetPermissionFlags::Implicit);</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">          97 :         using t = std::underlying_type_t&lt;NetPermissionFlags&gt;;</span></span>
+<span id="L78"><span class="lineNum">      78</span>   [<span class="tlaGBC" title="Branch 0 was taken 14 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 68 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">          97 :         flags = static_cast&lt;NetPermissionFlags&gt;(static_cast&lt;t&gt;(flags) &amp; ~static_cast&lt;t&gt;(f));</span></span>
+<span class="lineNum">        </span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 15 times"> + </span>]
+<span id="L79"><span class="lineNum">      79</span>                 :             :     }</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : };</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : </span>
+<span id="L82"><span class="lineNum">      82</span>         [<span class="tlaGBC" title="Branch 0 was taken 737 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1474 : class NetWhitebindPermissions : public NetPermissions</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : {</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : public:</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     static bool TryParse(const std::string&amp; str, NetWhitebindPermissions&amp; output, bilingual_str&amp; error);</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     CService m_service;</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : };</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>         [<span class="tlaGBC" title="Branch 0 was taken 399 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         798 : class NetWhitelistPermissions : public NetPermissions</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : {</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : public:</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     static bool TryParse(const std::string&amp; str, NetWhitelistPermissions&amp; output, ConnectionDirection&amp; output_connection_direction, bilingual_str&amp; error);</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :     CSubNet m_subnet;</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : };</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : </span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : #endif // BITCOIN_NET_PERMISSIONS_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

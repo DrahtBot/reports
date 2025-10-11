@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/kernel/coinstats.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/kernel">src/kernel</a> - coinstats.h<span style="font-size: 80%;"> (source / <a href="coinstats.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-10-11 07:42:08</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : // Copyright (c) 2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>              : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>              : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>              : </span>
+<span id="L5"><span class="lineNum">       5</span>              : #ifndef BITCOIN_KERNEL_COINSTATS_H</span>
+<span id="L6"><span class="lineNum">       6</span>              : #define BITCOIN_KERNEL_COINSTATS_H</span>
+<span id="L7"><span class="lineNum">       7</span>              : </span>
+<span id="L8"><span class="lineNum">       8</span>              : #include &lt;arith_uint256.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>              : #include &lt;consensus/amount.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>              : #include &lt;crypto/muhash.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>              : #include &lt;streams.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>              : #include &lt;uint256.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>              : </span>
+<span id="L14"><span class="lineNum">      14</span>              : #include &lt;cstdint&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>              : #include &lt;functional&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>              : #include &lt;optional&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>              : </span>
+<span id="L18"><span class="lineNum">      18</span>              : class CCoinsView;</span>
+<span id="L19"><span class="lineNum">      19</span>              : class Coin;</span>
+<span id="L20"><span class="lineNum">      20</span>              : class COutPoint;</span>
+<span id="L21"><span class="lineNum">      21</span>              : class CScript;</span>
+<span id="L22"><span class="lineNum">      22</span>              : namespace node {</span>
+<span id="L23"><span class="lineNum">      23</span>              : class BlockManager;</span>
+<span id="L24"><span class="lineNum">      24</span>              : } // namespace node</span>
+<span id="L25"><span class="lineNum">      25</span>              : </span>
+<span id="L26"><span class="lineNum">      26</span>              : namespace kernel {</span>
+<span id="L27"><span class="lineNum">      27</span>              : enum class CoinStatsHashType {</span>
+<span id="L28"><span class="lineNum">      28</span>              :     HASH_SERIALIZED,</span>
+<span id="L29"><span class="lineNum">      29</span>              :     MUHASH,</span>
+<span id="L30"><span class="lineNum">      30</span>              :     NONE,</span>
+<span id="L31"><span class="lineNum">      31</span>              : };</span>
+<span id="L32"><span class="lineNum">      32</span>              : </span>
+<span id="L33"><span class="lineNum">      33</span>              : struct CCoinsStats {</span>
+<span id="L34"><span class="lineNum">      34</span>              :     int nHeight{0};</span>
+<span id="L35"><span class="lineNum">      35</span>              :     uint256 hashBlock{};</span>
+<span id="L36"><span class="lineNum">      36</span>              :     uint64_t nTransactions{0};</span>
+<span id="L37"><span class="lineNum">      37</span>              :     uint64_t nTransactionOutputs{0};</span>
+<span id="L38"><span class="lineNum">      38</span>              :     uint64_t nBogoSize{0};</span>
+<span id="L39"><span class="lineNum">      39</span>              :     uint256 hashSerialized{};</span>
+<span id="L40"><span class="lineNum">      40</span>              :     uint64_t nDiskSize{0};</span>
+<span id="L41"><span class="lineNum">      41</span>              :     //! The total amount, or nullopt if an overflow occurred calculating it</span>
+<span id="L42"><span class="lineNum">      42</span>              :     std::optional&lt;CAmount&gt; total_amount{0};</span>
+<span id="L43"><span class="lineNum">      43</span>              : </span>
+<span id="L44"><span class="lineNum">      44</span>              :     //! The number of coins contained.</span>
+<span id="L45"><span class="lineNum">      45</span>              :     uint64_t coins_count{0};</span>
+<span id="L46"><span class="lineNum">      46</span>              : </span>
+<span id="L47"><span class="lineNum">      47</span>              :     //! Signals if the coinstatsindex was used to retrieve the statistics.</span>
+<span id="L48"><span class="lineNum">      48</span>              :     bool index_used{false};</span>
+<span id="L49"><span class="lineNum">      49</span>              : </span>
+<span id="L50"><span class="lineNum">      50</span>              :     // Following values are only available from coinstats index</span>
+<span id="L51"><span class="lineNum">      51</span>              : </span>
+<span id="L52"><span class="lineNum">      52</span>              :     //! Total cumulative amount of block subsidies up to and including this block</span>
+<span id="L53"><span class="lineNum">      53</span>              :     CAmount total_subsidy{0};</span>
+<span id="L54"><span class="lineNum">      54</span>              :     //! The unspendable coinbase amount from the genesis block</span>
+<span id="L55"><span class="lineNum">      55</span>              :     CAmount total_unspendables_genesis_block{0};</span>
+<span id="L56"><span class="lineNum">      56</span>              :     //! The two unspendable coinbase outputs total amount caused by BIP30</span>
+<span id="L57"><span class="lineNum">      57</span>              :     CAmount total_unspendables_bip30{0};</span>
+<span id="L58"><span class="lineNum">      58</span>              :     //! Total cumulative amount of outputs sent to unspendable scripts (OP_RETURN for example) up to and including this block</span>
+<span id="L59"><span class="lineNum">      59</span>              :     CAmount total_unspendables_scripts{0};</span>
+<span id="L60"><span class="lineNum">      60</span>              :     //! Total cumulative amount of coins lost due to unclaimed miner rewards up to and including this block</span>
+<span id="L61"><span class="lineNum">      61</span>              :     CAmount total_unspendables_unclaimed_rewards{0};</span>
+<span id="L62"><span class="lineNum">      62</span>              : </span>
+<span id="L63"><span class="lineNum">      63</span>              :     // Despite containing amounts the following values use a uint256 type to prevent overflowing</span>
+<span id="L64"><span class="lineNum">      64</span>              : </span>
+<span id="L65"><span class="lineNum">      65</span>              :     //! Total cumulative amount of prevouts spent up to and including this block</span>
+<span id="L66"><span class="lineNum">      66</span>              :     arith_uint256 total_prevout_spent_amount{0};</span>
+<span id="L67"><span class="lineNum">      67</span>              :     //! Total cumulative amount of outputs created up to and including this block</span>
+<span id="L68"><span class="lineNum">      68</span>              :     arith_uint256 total_new_outputs_ex_coinbase_amount{0};</span>
+<span id="L69"><span class="lineNum">      69</span>              :     //! Total cumulative amount of coinbase outputs up to and including this block</span>
+<span id="L70"><span class="lineNum">      70</span>              :     arith_uint256 total_coinbase_amount{0};</span>
+<span id="L71"><span class="lineNum">      71</span>              : </span>
+<span id="L72"><span class="lineNum">      72</span> <span class="tlaGNC">        3093 :     CCoinsStats() = default;</span></span>
+<span id="L73"><span class="lineNum">      73</span>              :     CCoinsStats(int block_height, const uint256&amp; block_hash);</span>
+<span id="L74"><span class="lineNum">      74</span>              : };</span>
+<span id="L75"><span class="lineNum">      75</span>              : </span>
+<span id="L76"><span class="lineNum">      76</span>              : uint64_t GetBogoSize(const CScript&amp; script_pub_key);</span>
+<span id="L77"><span class="lineNum">      77</span>              : </span>
+<span id="L78"><span class="lineNum">      78</span>              : void ApplyCoinHash(MuHash3072&amp; muhash, const COutPoint&amp; outpoint, const Coin&amp; coin);</span>
+<span id="L79"><span class="lineNum">      79</span>              : void RemoveCoinHash(MuHash3072&amp; muhash, const COutPoint&amp; outpoint, const Coin&amp; coin);</span>
+<span id="L80"><span class="lineNum">      80</span>              : </span>
+<span id="L81"><span class="lineNum">      81</span>              : std::optional&lt;CCoinsStats&gt; ComputeUTXOStats(CoinStatsHashType hash_type, CCoinsView* view, node::BlockManager&amp; blockman, const std::function&lt;void()&gt;&amp; interruption_point = {});</span>
+<span id="L82"><span class="lineNum">      82</span>              : } // namespace kernel</span>
+<span id="L83"><span class="lineNum">      83</span>              : </span>
+<span id="L84"><span class="lineNum">      84</span>              : #endif // BITCOIN_KERNEL_COINSTATS_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
