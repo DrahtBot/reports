@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/policy/ephemeral_policy.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/policy">src/policy</a> - ephemeral_policy.cpp<span style="font-size: 80%;"> (source / <a href="ephemeral_policy.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntry">37</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-10-11 08:22:02</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">70.8&nbsp;%</td>
+            <td class="headerCovTableEntry">72</td>
+            <td class="headerCovTableEntry">51</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2024-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;consensus/validation.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;policy/ephemeral_policy.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;policy/feerate.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;policy/packages.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;policy/policy.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;txmempool.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/hasher.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;map&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;unordered_set&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">      313880 : bool PreCheckEphemeralTx(const CTransaction&amp; tx, CFeeRate dust_relay_rate, CAmount base_fee, CAmount mod_fee, TxValidationState&amp; state)</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : {</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     // We never want to give incentives to mine this transaction alone</span>
+<span id="L26"><span class="lineNum">      26</span>   [<span class="tlaGBC" title="Branch 0 was taken 293207 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 20673 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 66491 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 226716 times"> + </span> :<span class="tlaGNC">      607087 :     if ((base_fee != 0 || mod_fee != 0) &amp;&amp; !GetDust(tx, dust_relay_rate).empty()) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 66491 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 247389 times"> + </span>]
+<span id="L27"><span class="lineNum">      27</span>   [<span class="tlaGBC" title="Branch 0 was taken 66491 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 66491 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">       66491 :         return state.Invalid(TxValidationResult::TX_NOT_STANDARD, &quot;dust&quot;, &quot;tx with dust output must be 0-fee&quot;);</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     }</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : </span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     return true;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : }</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">      161330 : bool CheckEphemeralSpends(const Package&amp; package, CFeeRate dust_relay_rate, const CTxMemPool&amp; tx_pool, TxValidationState&amp; out_child_state, Wtxid&amp; out_child_wtxid)</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : {</span>
+<span id="L35"><span class="lineNum">      35</span>   [<span class="tlaGBC" title="Branch 0 was taken 163649 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 161330 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">      324979 :     if (!Assume(std::ranges::all_of(package, [](const auto&amp; tx){return tx != nullptr;}))) {</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :         // Bail out of spend checks if caller gave us an invalid package</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :         return true;</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     }</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">      161330 :     std::map&lt;Txid, CTransactionRef&gt; map_txid_ref;</span></span>
+<span id="L41"><span class="lineNum">      41</span>         [<span class="tlaGBC" title="Branch 0 was taken 163649 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 161330 times"> + </span>]:<span class="tlaGNC">      324979 :     for (const auto&amp; tx : package) {</span></span>
+<span id="L42"><span class="lineNum">      42</span>         [<span class="tlaGBC" title="Branch 0 was taken 163649 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      163649 :         map_txid_ref[tx-&gt;GetHash()] = tx;</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     }</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>         [<span class="tlaGBC" title="Branch 0 was taken 163649 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 158070 times"> + </span>]:<span class="tlaGNC">      321719 :     for (const auto&amp; tx : package) {</span></span>
+<span id="L46"><span class="lineNum">      46</span>         [<span class="tlaGBC" title="Branch 0 was taken 163649 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      163649 :         std::unordered_set&lt;Txid, SaltedTxidHasher&gt; processed_parent_set;</span></span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 163649 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      163649 :         std::unordered_set&lt;COutPoint, SaltedOutpointHasher&gt; unspent_parent_dust;</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>         [<span class="tlaGBC" title="Branch 0 was taken 303816 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 163649 times"> + </span>]:<span class="tlaGNC">      467465 :         for (const auto&amp; tx_input : tx-&gt;vin) {</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">      303816 :             const Txid&amp; parent_txid{tx_input.prevout.hash};</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :             // Skip parents we've already checked dust for</span>
+<span id="L52"><span class="lineNum">      52</span>   [<span class="tlaGBC" title="Branch 0 was taken 303816 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 13304 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 290512 times"> + </span>]:<span class="tlaGNC">      303816 :             if (processed_parent_set.contains(parent_txid)) continue;</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :             // We look for an in-package or in-mempool dependency</span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">      290512 :             CTransactionRef parent_ref = nullptr;</span></span>
+<span id="L56"><span class="lineNum">      56</span>         [<span class="tlaGBC" title="Branch 0 was taken 2319 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 288193 times"> + </span>]:<span class="tlaGNC">      290512 :             if (auto it = map_txid_ref.find(parent_txid); it != map_txid_ref.end()) {</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">        2319 :                 parent_ref = it-&gt;second;</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :             } else {</span>
+<span id="L59"><span class="lineNum">      59</span>   [<span class="tlaGBC" title="Branch 0 was taken 288193 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 288193 times"> + </span>]:<span class="tlaGNC">      576386 :                 parent_ref = tx_pool.get(parent_txid);</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :             }</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :             // Check for dust on parents</span>
+<span id="L63"><span class="lineNum">      63</span>         [<span class="tlaGBC" title="Branch 0 was taken 91719 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 198793 times"> + </span>]:<span class="tlaGNC">      290512 :             if (parent_ref) {</span></span>
+<span id="L64"><span class="lineNum">      64</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 382067 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 290348 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 91719 times"> + </span>]:<span class="tlaGNC">      382067 :                 for (uint32_t out_index = 0; out_index &lt; parent_ref-&gt;vout.size(); out_index++) {</span></span>
+<span id="L65"><span class="lineNum">      65</span>         [<span class="tlaGBC" title="Branch 0 was taken 290348 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      290348 :                     const auto&amp; tx_output = parent_ref-&gt;vout[out_index];</span></span>
+<span id="L66"><span class="lineNum">      66</span>   [<span class="tlaGBC" title="Branch 0 was taken 290348 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 6329 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 284019 times"> + </span>]:<span class="tlaGNC">      290348 :                     if (IsDust(tx_output, dust_relay_rate)) {</span></span>
+<span id="L67"><span class="lineNum">      67</span>         [<span class="tlaGBC" title="Branch 0 was taken 6329 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        6329 :                         unspent_parent_dust.insert(COutPoint(parent_txid, out_index));</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :                     }</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :                 }</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :             }</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : </span>
+<span id="L72"><span class="lineNum">      72</span>   [<span class="tlaGBC" title="Branch 0 was taken 290512 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 91719 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 198793 times"> + </span>]:<span class="tlaGNC">      290512 :             processed_parent_set.insert(parent_txid);</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">      290512 :         }</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : </span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaGBC" title="Branch 0 was taken 158309 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5340 times"> + </span>]:<span class="tlaGNC">      163649 :         if (unspent_parent_dust.empty()) {</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">      158309 :             continue;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :         }</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :         // Now that we have gathered parents' dust, make sure it's spent</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :         // by the child</span>
+<span id="L81"><span class="lineNum">      81</span>         [<span class="tlaGBC" title="Branch 0 was taken 10926 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5340 times"> + </span>]:<span class="tlaGNC">       16266 :         for (const auto&amp; tx_input : tx-&gt;vin) {</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">       10926 :             unspent_parent_dust.erase(tx_input.prevout);</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :         }</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : </span>
+<span id="L85"><span class="lineNum">      85</span>         [<span class="tlaGBC" title="Branch 0 was taken 3260 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2080 times"> + </span>]:<span class="tlaGNC">        5340 :         if (!unspent_parent_dust.empty()) {</span></span>
+<span id="L86"><span class="lineNum">      86</span>         [<span class="tlaGBC" title="Branch 0 was taken 3260 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3260 :             const Txid&amp; out_child_txid = tx-&gt;GetHash();</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaGNC">        3260 :             out_child_wtxid = tx-&gt;GetWitnessHash();</span></span>
+<span id="L88"><span class="lineNum">      88</span>   [<span class="tlaGBC" title="Branch 0 was taken 3260 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3260 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        9780 :             out_child_state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, &quot;missing-ephemeral-spends&quot;,</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 3260 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L89"><span class="lineNum">      89</span>   [<span class="tlaGBC" title="Branch 0 was taken 3260 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3260 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        6520 :                                 strprintf(&quot;tx %s (wtxid=%s) did not spend parent's ephemeral dust&quot;, out_child_txid.ToString(), out_child_wtxid.ToString()));</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaGNC">        3260 :             return false;</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :         }</span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">      163649 :     }</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : </span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     return true;</span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">      161330 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/init/common.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/init">src/init</a> - common.cpp<span style="font-size: 80%;"> (source / <a href="common.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">62.2&nbsp;%</td>
+            <td class="headerCovTableEntry">82</td>
+            <td class="headerCovTableEntry">51</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-10-11 08:22:02</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryMed">85.7&nbsp;%</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">6</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">30.7&nbsp;%</td>
+            <td class="headerCovTableEntry">264</td>
+            <td class="headerCovTableEntry">81</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021-2022 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;bitcoin-build-config.h&gt; // IWYU pragma: keep</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;clientversion.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;common/args.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;logging.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;node/interface_ui.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;tinyformat.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/fs.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/fs_helpers.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;util/result.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;util/string.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;util/time.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;util/translation.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;filesystem&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;string&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : using util::SplitString;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : namespace init {</span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">         918 : void AddLoggingArgs(ArgsManager&amp; argsman)</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : {</span>
+<span id="L29"><span class="lineNum">      29</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-debuglogfile=&lt;file&gt;&quot;, strprintf(&quot;Specify location of debug log file (default: %s). Relative paths will be prefixed by a net-specific datadir location. Pass -nodebuglogfile to disable writing the log to a file.&quot;, DEFAULT_DEBUGLOGFILE), ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);</span></span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-debug=&lt;category&gt;&quot;, &quot;Output debug and trace logging (default: -nodebug, supplying &lt;category&gt; is optional). &quot;</span></span>
+<span id="L31"><span class="lineNum">      31</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        2754 :         &quot;If &lt;category&gt; is not supplied or if &lt;category&gt; is 1 or \&quot;all\&quot;, output all debug logging. If &lt;category&gt; is 0 or \&quot;none\&quot;, any other categories are ignored. Other valid values for &lt;category&gt; are: &quot; + LogInstance().LogCategoriesString() + &quot;. This option can be specified multiple times to output multiple categories.&quot;,</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">         918 :         ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L33"><span class="lineNum">      33</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-debugexclude=&lt;category&gt;&quot;, &quot;Exclude debug and trace logging for a category. Can be used in conjunction with -debug=1 to output debug and trace logging for all categories except the specified category. This option can be specified multiple times to exclude multiple categories. This takes priority over \&quot;-debug\&quot;&quot;, ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L34"><span class="lineNum">      34</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-logips&quot;, strprintf(&quot;Include IP addresses in debug output (default: %u)&quot;, DEFAULT_LOGIPS), ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L35"><span class="lineNum">      35</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-loglevel=&lt;level&gt;|&lt;category&gt;:&lt;level&gt;&quot;, strprintf(&quot;Set the global or per-category severity level for logging categories enabled with the -debug configuration option or the logging RPC. Possible values are %s (default=%s). The following levels are always logged: error, warning, info. If &lt;category&gt;:&lt;level&gt; is supplied, the setting will override the global one and may be specified multiple times to set multiple category-specific levels. &lt;category&gt; can be: %s.&quot;, LogInstance().LogLevelsString(), LogInstance().LogLevelToStr(BCLog::DEFAULT_LOG_LEVEL), LogInstance().LogCategoriesString()), ArgsManager::DISALLOW_NEGATION | ArgsManager::DISALLOW_ELISION | ArgsManager::DEBUG_ONLY, OptionsCategory::DEBUG_TEST);</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 918 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 918 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 13 was not taken"> - </span>]
+<span id="L36"><span class="lineNum">      36</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-logtimestamps&quot;, strprintf(&quot;Prepend debug output with timestamp (default: %u)&quot;, DEFAULT_LOGTIMESTAMPS), ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L37"><span class="lineNum">      37</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-logthreadnames&quot;, strprintf(&quot;Prepend debug output with name of the originating thread (default: %u)&quot;, DEFAULT_LOGTHREADNAMES), ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L38"><span class="lineNum">      38</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-logsourcelocations&quot;, strprintf(&quot;Prepend debug output with name of the originating source location (source file, line number and function name) (default: %u)&quot;, DEFAULT_LOGSOURCELOCATIONS), ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L39"><span class="lineNum">      39</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-logtimemicros&quot;, strprintf(&quot;Add microsecond precision to debug timestamps (default: %u)&quot;, DEFAULT_LOGTIMEMICROS), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L40"><span class="lineNum">      40</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-loglevelalways&quot;, strprintf(&quot;Always prepend a category and level (default: %u)&quot;, DEFAULT_LOGLEVELALWAYS), ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L41"><span class="lineNum">      41</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-logratelimit&quot;, strprintf(&quot;Apply rate limiting to unconditional logging to mitigate disk-filling attacks (default: %u)&quot;, BCLog::DEFAULT_LOGRATELIMIT), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L42"><span class="lineNum">      42</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-printtoconsole&quot;, &quot;Send trace/debug info to console (default: 1 when no -daemon. To disable logging to file, set -nodebuglogfile)&quot;, ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L43"><span class="lineNum">      43</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        1836 :     argsman.AddArg(&quot;-shrinkdebugfile&quot;, &quot;Shrink debug.log file on client startup (default: 1 when no -debug)&quot;, ArgsManager::ALLOW_ANY, OptionsCategory::DEBUG_TEST);</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">         918 : }</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : </span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">         918 : void SetLoggingOptions(const ArgsManager&amp; args)</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : {</span>
+<span id="L48"><span class="lineNum">      48</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         918 :     LogInstance().m_print_to_file = !args.IsArgNegated(&quot;-debuglogfile&quot;);</span></span>
+<span id="L49"><span class="lineNum">      49</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        2754 :     LogInstance().m_file_path = AbsPathForConfigVal(args, args.GetPathArg(&quot;-debuglogfile&quot;, DEFAULT_DEBUGLOGFILE));</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L50"><span class="lineNum">      50</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">         918 :     LogInstance().m_print_to_console = args.GetBoolArg(&quot;-printtoconsole&quot;, !args.GetBoolArg(&quot;-daemon&quot;, false));</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L51"><span class="lineNum">      51</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         918 :     LogInstance().m_log_timestamps = args.GetBoolArg(&quot;-logtimestamps&quot;, DEFAULT_LOGTIMESTAMPS);</span></span>
+<span id="L52"><span class="lineNum">      52</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         918 :     LogInstance().m_log_time_micros = args.GetBoolArg(&quot;-logtimemicros&quot;, DEFAULT_LOGTIMEMICROS);</span></span>
+<span id="L53"><span class="lineNum">      53</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         918 :     LogInstance().m_log_threadnames = args.GetBoolArg(&quot;-logthreadnames&quot;, DEFAULT_LOGTHREADNAMES);</span></span>
+<span id="L54"><span class="lineNum">      54</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         918 :     LogInstance().m_log_sourcelocations = args.GetBoolArg(&quot;-logsourcelocations&quot;, DEFAULT_LOGSOURCELOCATIONS);</span></span>
+<span id="L55"><span class="lineNum">      55</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         918 :     LogInstance().m_always_print_category_level = args.GetBoolArg(&quot;-loglevelalways&quot;, DEFAULT_LOGLEVELALWAYS);</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : </span>
+<span id="L57"><span class="lineNum">      57</span>         [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         918 :     fLogIPs = args.GetBoolArg(&quot;-logips&quot;, DEFAULT_LOGIPS);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">         918 : }</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : </span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">         918 : util::Result&lt;void&gt; SetLoggingLevel(const ArgsManager&amp; args)</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : {</span>
+<span id="L62"><span class="lineNum">      62</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 918 times"> + </span>]:<span class="tlaGNC">        1836 :         for (const std::string&amp; level_str : args.GetArgs(&quot;-loglevel&quot;)) {</span></span>
+<span id="L63"><span class="lineNum">      63</span>         [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         918 :             if (level_str.find_first_of(':', 3) == std::string::npos) {</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :                 // user passed a global log level, i.e. -loglevel=&lt;level&gt;</span>
+<span id="L65"><span class="lineNum">      65</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 918 times"> + </span> :<span class="tlaGNC">         918 :                 if (!LogInstance().SetLogLevel(level_str)) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 918 times"> + </span>]
+<span id="L66"><span class="lineNum">      66</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :                     return util::Error{strprintf(_(&quot;Unsupported global logging level %s=%s. Valid values: %s.&quot;), &quot;-loglevel&quot;, level_str, LogInstance().LogLevelsString())};</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L67"><span class="lineNum">      67</span>                 :             :                 }</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :             } else {</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :                 // user passed a category-specific log level, i.e. -loglevel=&lt;category&gt;:&lt;level&gt;</span>
+<span id="L70"><span class="lineNum">      70</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 const auto&amp; toks = SplitString(level_str, ':');</span></span>
+<span id="L71"><span class="lineNum">      71</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :                 if (!(toks.size() == 2 &amp;&amp; LogInstance().SetCategoryLogLevel(toks[0], toks[1]))) {</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 13 was not executed"> # </span>]
+<span id="L72"><span class="lineNum">      72</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :                     return util::Error{strprintf(_(&quot;Unsupported category-specific logging level %1$s=%2$s. Expected %1$s=&lt;category&gt;:&lt;loglevel&gt;. Valid categories: %3$s. Valid loglevels: %4$s.&quot;), &quot;-loglevel&quot;, level_str, LogInstance().LogCategoriesString(), LogInstance().LogLevelsString())};</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 9 was not executed"> # </span>]
+<span id="L73"><span class="lineNum">      73</span>                 :             :                 }</span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaUNC">           0 :             }</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">         918 :         }</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">         918 :     return {};</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : }</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">         918 : util::Result&lt;void&gt; SetLoggingCategories(const ArgsManager&amp; args)</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : {</span>
+<span id="L81"><span class="lineNum">      81</span>         [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         918 :         const std::vector&lt;std::string&gt; categories = args.GetArgs(&quot;-debug&quot;);</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : </span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :         // Special-case: Disregard any debugging categories appearing before -debug=0/none</span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">         918 :         const auto last_negated = std::find_if(categories.rbegin(), categories.rend(),</span></span>
+<span id="L85"><span class="lineNum">      85</span>   [<span class="tlaGBC" title="Branch 0 was taken 831 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 831 times"> + </span>]:<span class="tlaGNC">        1749 :                                                [](const std::string&amp; cat) { return cat == &quot;0&quot; || cat == &quot;none&quot;; });</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : </span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         918 :         const auto categories_to_process = (last_negated == categories.rend()) ? categories : std::ranges::subrange(last_negated.base(), categories.end());</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>         [<span class="tlaGBC" title="Branch 0 was taken 831 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 918 times"> + </span>]:<span class="tlaGNC">        1749 :         for (const auto&amp; cat : categories_to_process) {</span></span>
+<span id="L90"><span class="lineNum">      90</span>   [<span class="tlaGBC" title="Branch 0 was taken 831 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 831 times"> + </span> :<span class="tlaGNC">         831 :             if (!LogInstance().EnableCategory(cat)) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 831 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 831 times"> + </span>]
+<span id="L91"><span class="lineNum">      91</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 return util::Error{strprintf(_(&quot;Unsupported logging category %s=%s.&quot;), &quot;-debug&quot;, cat)};</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :             }</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :         }</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : </span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     // Now remove the logging categories which were explicitly excluded</span>
+<span id="L96"><span class="lineNum">      96</span>   [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        2754 :     for (const std::string&amp; cat : args.GetArgs(&quot;-debugexclude&quot;)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1836 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 918 times"> + </span>]
+<span id="L97"><span class="lineNum">      97</span>   [<span class="tlaGBC" title="Branch 0 was taken 1836 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 1836 times"> + </span> :<span class="tlaGNC">        1836 :         if (!LogInstance().DisableCategory(cat)) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 1836 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 1836 times"> + </span>]
+<span id="L98"><span class="lineNum">      98</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             return util::Error{strprintf(_(&quot;Unsupported logging category %s=%s.&quot;), &quot;-debugexclude&quot;, cat)};</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :         }</span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">         918 :     }</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">         918 :     return {};</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">         918 : }</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaUNC">           0 : bool StartLogging(const ArgsManager&amp; args)</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : {</span>
+<span id="L106"><span class="lineNum">     106</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (LogInstance().m_print_to_file) {</span></span>
+<span id="L107"><span class="lineNum">     107</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (args.GetBoolArg(&quot;-shrinkdebugfile&quot;, LogInstance().DefaultShrinkDebugFile())) {</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :             // Do this first since it both loads a bunch of debug.log into memory,</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :             // and because this needs to happen before any other debug.log printing</span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaUNC">           0 :             LogInstance().ShrinkDebugFile();</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :         }</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     }</span>
+<span id="L113"><span class="lineNum">     113</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!LogInstance().StartLogging()) {</span></span>
+<span id="L114"><span class="lineNum">     114</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             return InitError(Untranslated(strprintf(&quot;Could not open debug log file %s&quot;,</span></span>
+<span id="L115"><span class="lineNum">     115</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 fs::PathToString(LogInstance().m_file_path))));</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     }</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : </span>
+<span id="L118"><span class="lineNum">     118</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!LogInstance().m_log_timestamps) {</span></span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogInfo(&quot;Startup time: %s&quot;, FormatISO8601DateTime(GetTime()));</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     }</span>
+<span id="L121"><span class="lineNum">     121</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     LogInfo(&quot;Default data directory %s&quot;, fs::PathToString(GetDefaultDataDir()));</span></span>
+<span id="L122"><span class="lineNum">     122</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     LogInfo(&quot;Using data directory %s&quot;, fs::PathToString(gArgs.GetDataDirNet()));</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : </span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     // Only log conf file usage message if conf file actually exists.</span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaUNC">           0 :     fs::path config_file_path = args.GetConfigFilePath();</span></span>
+<span id="L126"><span class="lineNum">     126</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     if (args.IsArgNegated(&quot;-conf&quot;)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L127"><span class="lineNum">     127</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogInfo(&quot;Config file: &lt;disabled&gt;&quot;);</span></span>
+<span id="L128"><span class="lineNum">     128</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     } else if (fs::is_directory(config_file_path)) {</span></span>
+<span id="L129"><span class="lineNum">     129</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogWarning(&quot;Config file: %s (is directory, not file)&quot;, fs::PathToString(config_file_path));</span></span>
+<span id="L130"><span class="lineNum">     130</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     } else if (fs::exists(config_file_path)) {</span></span>
+<span id="L131"><span class="lineNum">     131</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogInfo(&quot;Config file: %s&quot;, fs::PathToString(config_file_path));</span></span>
+<span id="L132"><span class="lineNum">     132</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     } else if (args.IsArgSet(&quot;-conf&quot;)) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L133"><span class="lineNum">     133</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :         InitWarning(strprintf(_(&quot;The specified config file %s does not exist&quot;), fs::PathToString(config_file_path)));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span>]
+<span id="L134"><span class="lineNum">     134</span>                 :             :     } else {</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :         // Not categorizing as &quot;Warning&quot; because it's the default behavior</span>
+<span id="L136"><span class="lineNum">     136</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         LogInfo(&quot;Config file: %s (not found, skipping)&quot;, fs::PathToString(config_file_path));</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :     }</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             : </span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     // Log the config arguments to debug.log</span>
+<span id="L140"><span class="lineNum">     140</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     args.LogArgs();</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : </span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaUNC">           0 :     return true;</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">         918 : void LogPackageVersion()</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : {</span>
+<span id="L147"><span class="lineNum">     147</span>                 :<span class="tlaGNC">         918 :     std::string version_string = FormatFullVersion();</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : #ifdef DEBUG</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     version_string += &quot; (debug build)&quot;;</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : #else</span>
+<span id="L151"><span class="lineNum">     151</span>         [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         918 :     version_string += &quot; (release build)&quot;;</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : #endif</span>
+<span id="L153"><span class="lineNum">     153</span>         [<span class="tlaGBC" title="Branch 0 was taken 918 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         918 :     LogInfo(CLIENT_NAME &quot; version %s&quot;, version_string);</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">         918 : }</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : } // namespace init</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
