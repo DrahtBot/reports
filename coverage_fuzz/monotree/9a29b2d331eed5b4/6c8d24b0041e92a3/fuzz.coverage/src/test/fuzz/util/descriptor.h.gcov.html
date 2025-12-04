@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/util/descriptor.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz/util">src/test/fuzz/util</a> - descriptor.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-12-04 11:41:38</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+                  <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2023-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_TEST_FUZZ_UTIL_DESCRIPTOR_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_TEST_FUZZ_UTIL_DESCRIPTOR_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;key_io.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/strencodings.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;script/descriptor.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : /**</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             :  * Converts a mocked descriptor string to a valid one. Every key in a mocked descriptor key is</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             :  * represented by 2 hex characters preceded by the '%' character. We parse the two hex characters</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :  * as an index in a list of pre-generated keys. This list contains keys of the various types</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :  * accepted in descriptor keys expressions.</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :  */</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : class MockedDescriptorConverter {</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : private:</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     //! Types are raw (un)compressed pubkeys, raw xonly pubkeys, raw privkeys (WIF), xpubs, xprvs.</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     static constexpr uint8_t KEY_TYPES_COUNT{6};</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     //! How many keys we'll generate in total.</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     static constexpr size_t TOTAL_KEYS_GENERATED{std::numeric_limits&lt;uint8_t&gt;::max() + 1};</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     //! 256 keys of various types.</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     std::array&lt;std::string, TOTAL_KEYS_GENERATED&gt; keys_str;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : </span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : public:</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     // We derive the type of key to generate from the 1-byte id parsed from hex.</span>
+<span id="L32"><span class="lineNum">      32</span>         [<span class="tlaGBC" title="Branch 0 was taken 426 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 86 times"> + </span>]:<span class="tlaGNC">         512 :     bool IdIsCompPubKey(uint8_t idx) const { return idx % KEY_TYPES_COUNT == 0; }</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     bool IdIsUnCompPubKey(uint8_t idx) const { return idx % KEY_TYPES_COUNT == 1; }</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     bool IdIsXOnlyPubKey(uint8_t idx) const { return idx % KEY_TYPES_COUNT == 2; }</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     bool IdIsConstPrivKey(uint8_t idx) const { return idx % KEY_TYPES_COUNT == 3; }</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     bool IdIsXpub(uint8_t idx) const { return idx % KEY_TYPES_COUNT == 4; }</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     bool IdIsXprv(uint8_t idx) const { return idx % KEY_TYPES_COUNT == 5; }</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : </span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     //! When initializing the target, populate the list of keys.</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     void Init();</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : </span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     //! Parse an id in the keys vectors from a 2-characters hex string.</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     std::optional&lt;uint8_t&gt; IdxFromHex(std::string_view hex_characters) const;</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     //! Get an actual descriptor string from a descriptor string whose keys were mocked.</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     std::optional&lt;std::string&gt; GetDescriptor(std::string_view mocked_desc) const;</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : };</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : //! Default maximum number of derivation indexes in a single derivation path when limiting its depth.</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : constexpr int MAX_DEPTH{2};</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : /**</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :  * Whether the buffer, if it represents a valid descriptor, contains a derivation path deeper than</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :  * a given maximum depth. Note this may also be hit for deriv paths in origins.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :  */</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : bool HasDeepDerivPath(const FuzzBufferType&amp; buff, const int max_depth = MAX_DEPTH);</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : </span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : //! Default maximum number of sub-fragments.</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : constexpr int MAX_SUBS{1'000};</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : //! Maximum number of nested sub-fragments we'll allow in a descriptor.</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : constexpr size_t MAX_NESTED_SUBS{10'000};</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : /**</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :  * Whether the buffer, if it represents a valid descriptor, contains a fragment with more</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :  * sub-fragments than the given maximum.</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :  */</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : bool HasTooManySubFrag(const FuzzBufferType&amp; buff, const int max_subs = MAX_SUBS,</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :                        const size_t max_nested_subs = MAX_NESTED_SUBS);</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : </span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : //! Default maximum number of wrappers per fragment.</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : constexpr int MAX_WRAPPERS{100};</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : /**</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  * Whether the buffer, if it represents a valid descriptor, contains a fragment with more</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :  * wrappers than the given maximum.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :  */</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : bool HasTooManyWrappers(const FuzzBufferType&amp; buff, const int max_wrappers = MAX_WRAPPERS);</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : #endif // BITCOIN_TEST_FUZZ_UTIL_DESCRIPTOR_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
