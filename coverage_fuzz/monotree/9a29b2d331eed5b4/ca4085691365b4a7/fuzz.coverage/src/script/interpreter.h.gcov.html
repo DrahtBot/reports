@@ -1,0 +1,474 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/script/interpreter.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/script">src/script</a> - interpreter.h<span style="font-size: 80%;"> (source / <a href="interpreter.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryMed">85.2&nbsp;%</td>
+            <td class="headerCovTableEntry">27</td>
+            <td class="headerCovTableEntry">23</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-12-04 10:14:01</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryMed">86.7&nbsp;%</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">13</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">61.5&nbsp;%</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntry">16</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #ifndef BITCOIN_SCRIPT_INTERPRETER_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #define BITCOIN_SCRIPT_INTERPRETER_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;consensus/amount.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;hash.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;script/script_error.h&gt; // IWYU pragma: export</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;script/verify_flags.h&gt; // IWYU pragma: export</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;cstddef&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : class CPubKey;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : class CScript;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : class CScriptNum;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : class XOnlyPubKey;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : struct CScriptWitness;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : </span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : /** Signature hash types/flags */</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : enum</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : {</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     SIGHASH_ALL = 1,</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     SIGHASH_NONE = 2,</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     SIGHASH_SINGLE = 3,</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     SIGHASH_ANYONECANPAY = 0x80,</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     SIGHASH_DEFAULT = 0, //!&lt; Taproot only; implied when sighash byte is missing, and equivalent to SIGHASH_ALL</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     SIGHASH_OUTPUT_MASK = 3,</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     SIGHASH_INPUT_MASK = 0x80,</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : };</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : /** Script verification flags.</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :  *</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :  *  All flags are intended to be soft forks: the set of acceptable scripts under</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :  *  flags (A | B) is a subset of the acceptable scripts under flag (A).</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :  */</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : static constexpr script_verify_flags SCRIPT_VERIFY_NONE{0};</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : enum class script_verify_flag_name : uint8_t {</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     // Evaluate P2SH subscripts (BIP16).</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     SCRIPT_VERIFY_P2SH,</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     // Passing a non-strict-DER signature or one with undefined hashtype to a checksig operation causes script failure.</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     // Evaluating a pubkey that is not (0x04 + 64 bytes) or (0x02 or 0x03 + 32 bytes) by checksig causes script failure.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     // (not used or intended as a consensus rule).</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :     SCRIPT_VERIFY_STRICTENC,</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : </span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     // Passing a non-strict-DER signature to a checksig operation causes script failure (BIP62 rule 1)</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     SCRIPT_VERIFY_DERSIG,</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : </span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     // Passing a non-strict-DER signature or one with S &gt; order/2 to a checksig operation causes script failure</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     // (BIP62 rule 5).</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     SCRIPT_VERIFY_LOW_S,</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : </span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     // verify dummy stack item consumed by CHECKMULTISIG is of zero-length (BIP62 rule 7).</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     SCRIPT_VERIFY_NULLDUMMY,</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : </span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     // Using a non-push operator in the scriptSig causes script failure (BIP62 rule 2).</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     SCRIPT_VERIFY_SIGPUSHONLY,</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : </span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     // Require minimal encodings for all push operations (OP_0... OP_16, OP_1NEGATE where possible, direct</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     // pushes up to 75 bytes, OP_PUSHDATA up to 255 bytes, OP_PUSHDATA2 for anything larger). Evaluating</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :     // any other push causes the script to fail (BIP62 rule 3).</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     // In addition, whenever a stack element is interpreted as a number, it must be of minimal length (BIP62 rule 4).</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     SCRIPT_VERIFY_MINIMALDATA,</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : </span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :     // Discourage use of NOPs reserved for upgrades (NOP1-10)</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     //</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :     // Provided so that nodes can avoid accepting or mining transactions</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     // containing executed NOP's whose meaning may change after a soft-fork,</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     // thus rendering the script invalid; with this flag set executing</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     // discouraged NOPs fails the script. This verification flag will never be</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     // a mandatory flag applied to scripts in a block. NOPs that are not</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     // executed, e.g.  within an unexecuted IF ENDIF block, are *not* rejected.</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     // NOPs that have associated forks to give them new meaning (CLTV, CSV)</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     // are not subject to this rule.</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS,</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     // Require that only a single stack element remains after evaluation. This changes the success criterion from</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     // &quot;At least one stack element must remain, and when interpreted as a boolean, it must be true&quot; to</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :     // &quot;Exactly one stack element must remain, and when interpreted as a boolean, it must be true&quot;.</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     // (BIP62 rule 6)</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :     // Note: CLEANSTACK should never be used without P2SH or WITNESS.</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     // Note: WITNESS_V0 and TAPSCRIPT script execution have behavior similar to CLEANSTACK as part of their</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     //       consensus rules. It is automatic there and does not need this flag.</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :     SCRIPT_VERIFY_CLEANSTACK,</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     // Verify CHECKLOCKTIMEVERIFY</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     //</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     // See BIP65 for details.</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :     SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY,</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             : </span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :     // support CHECKSEQUENCEVERIFY opcode</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :     //</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :     // See BIP112 for details</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     SCRIPT_VERIFY_CHECKSEQUENCEVERIFY,</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : </span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     // Support segregated witness</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     //</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     SCRIPT_VERIFY_WITNESS,</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : </span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     // Making v1-v16 witness program non-standard</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     //</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : </span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     // Segwit script only: Require the argument of OP_IF/NOTIF to be exactly 0x01 or empty vector</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     //</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     // Note: TAPSCRIPT script execution has behavior similar to MINIMALIF as part of its consensus</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :     //       rules. It is automatic there and does not depend on this flag.</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     SCRIPT_VERIFY_MINIMALIF,</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             : </span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     // Signature(s) must be empty vector if a CHECK(MULTI)SIG operation failed</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :     //</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     SCRIPT_VERIFY_NULLFAIL,</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     // Public keys in segregated witness scripts must be compressed</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     //</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :     SCRIPT_VERIFY_WITNESS_PUBKEYTYPE,</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :     // Making OP_CODESEPARATOR and FindAndDelete fail any non-segwit scripts</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :     //</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     SCRIPT_VERIFY_CONST_SCRIPTCODE,</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : </span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     // Taproot/Tapscript validation (BIPs 341 &amp; 342)</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :     //</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :     SCRIPT_VERIFY_TAPROOT,</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     // Making unknown Taproot leaf versions non-standard</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     //</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :     SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_TAPROOT_VERSION,</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : </span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     // Making unknown OP_SUCCESS non-standard</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     SCRIPT_VERIFY_DISCOURAGE_OP_SUCCESS,</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     // Making unknown public key versions (in BIP 342 scripts) non-standard</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :     SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_PUBKEYTYPE,</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     // Constants to point to the highest flag in use. Add new flags above this line.</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     //</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :     SCRIPT_VERIFY_END_MARKER</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : };</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : using enum script_verify_flag_name;</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : static constexpr int MAX_SCRIPT_VERIFY_FLAGS_BITS = static_cast&lt;int&gt;(SCRIPT_VERIFY_END_MARKER);</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :             : // assert there is still a spare bit</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : static_assert(0 &lt; MAX_SCRIPT_VERIFY_FLAGS_BITS &amp;&amp; MAX_SCRIPT_VERIFY_FLAGS_BITS &lt;= 63);</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             : </span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : static constexpr script_verify_flags::value_type MAX_SCRIPT_VERIFY_FLAGS = ((script_verify_flags::value_type{1} &lt;&lt; MAX_SCRIPT_VERIFY_FLAGS_BITS) - 1);</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             : </span>
+<span id="L161"><span class="lineNum">     161</span>                 :             : bool CheckSignatureEncoding(const std::vector&lt;unsigned char&gt; &amp;vchSig, script_verify_flags flags, ScriptError* serror);</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             : </span>
+<span id="L163"><span class="lineNum">     163</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaGNC">      420584 : struct PrecomputedTransactionData</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : {</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :     // BIP341 precomputed data.</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :     // These are single-SHA256, see https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki#cite_note-16.</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :     uint256 m_prevouts_single_hash;</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     uint256 m_sequences_single_hash;</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :     uint256 m_outputs_single_hash;</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :     uint256 m_spent_amounts_single_hash;</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     uint256 m_spent_scripts_single_hash;</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :     //! Whether the 5 fields above are initialized.</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     bool m_bip341_taproot_ready = false;</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             : </span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     // BIP143 precomputed data (double-SHA256).</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     uint256 hashPrevouts, hashSequence, hashOutputs;</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     //! Whether the 3 fields above are initialized.</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     bool m_bip143_segwit_ready = false;</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : </span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     std::vector&lt;CTxOut&gt; m_spent_outputs;</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :     //! Whether m_spent_outputs is initialized.</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :     bool m_spent_outputs_ready = false;</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             : </span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">     2497379 :     PrecomputedTransactionData() = default;</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :             : </span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     /** Initialize this PrecomputedTransactionData with transaction data.</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :      *</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :      * @param[in]   tx             The transaction for which data is being precomputed.</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :      * @param[in]   spent_outputs  The CTxOuts being spent, one for each tx.vin, in order.</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :      * @param[in]   force          Whether to precompute data for all optional features,</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :      *                             regardless of what is in the inputs (used at signing</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :      *                             time, when the inputs aren't filled in yet). */</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     template &lt;class T&gt;</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :     void Init(const T&amp; tx, std::vector&lt;CTxOut&gt;&amp;&amp; spent_outputs, bool force = false);</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             : </span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :     template &lt;class T&gt;</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :     explicit PrecomputedTransactionData(const T&amp; tx);</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             : };</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : </span>
+<span id="L200"><span class="lineNum">     200</span>                 :             : enum class SigVersion</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             : {</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     BASE = 0,        //!&lt; Bare scripts and BIP16 P2SH-wrapped redeemscripts</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     WITNESS_V0 = 1,  //!&lt; Witness v0 (P2WPKH and P2WSH); see BIP 141</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :     TAPROOT = 2,     //!&lt; Witness v1 with 32-byte program, not BIP16 P2SH-wrapped, key path spending; see BIP 341</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :     TAPSCRIPT = 3,   //!&lt; Witness v1 with 32-byte program, not BIP16 P2SH-wrapped, script path spending, leaf version 0xc0; see BIP 342</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : };</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : </span>
+<span id="L208"><span class="lineNum">     208</span>         [<span class="tlaGBC" title="Branch 0 was taken 601248 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 37059 times"> + </span>]:<span class="tlaGNC">     3889760 : struct ScriptExecutionData</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :             : {</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :     //! Whether m_tapleaf_hash is initialized.</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :     bool m_tapleaf_hash_init = false;</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :     //! The tapleaf hash.</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :     uint256 m_tapleaf_hash;</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : </span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :     //! Whether m_codeseparator_pos is initialized.</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :     bool m_codeseparator_pos_init = false;</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :     //! Opcode position of the last executed OP_CODESEPARATOR (or 0xFFFFFFFF if none executed).</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :     uint32_t m_codeseparator_pos;</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : </span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     //! Whether m_annex_present and (when needed) m_annex_hash are initialized.</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :     bool m_annex_init = false;</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :     //! Whether an annex is present.</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :     bool m_annex_present;</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :     //! Hash of the annex data.</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :     uint256 m_annex_hash;</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             : </span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :     //! Whether m_validation_weight_left is initialized.</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     bool m_validation_weight_left_init = false;</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     //! How much validation weight is left (decremented for every successful non-empty signature check).</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     int64_t m_validation_weight_left;</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : </span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :     //! The hash of the corresponding output</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :     std::optional&lt;uint256&gt; m_output_hash;</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             : };</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             : </span>
+<span id="L236"><span class="lineNum">     236</span>                 :             : /** Signature hash sizes */</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             : static constexpr size_t WITNESS_V0_SCRIPTHASH_SIZE = 32;</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             : static constexpr size_t WITNESS_V0_KEYHASH_SIZE = 20;</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : static constexpr size_t WITNESS_V1_TAPROOT_SIZE = 32;</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             : </span>
+<span id="L241"><span class="lineNum">     241</span>                 :             : static constexpr uint8_t TAPROOT_LEAF_MASK = 0xfe;</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             : static constexpr uint8_t TAPROOT_LEAF_TAPSCRIPT = 0xc0;</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             : static constexpr size_t TAPROOT_CONTROL_BASE_SIZE = 33;</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : static constexpr size_t TAPROOT_CONTROL_NODE_SIZE = 32;</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             : static constexpr size_t TAPROOT_CONTROL_MAX_NODE_COUNT = 128;</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             : static constexpr size_t TAPROOT_CONTROL_MAX_SIZE = TAPROOT_CONTROL_BASE_SIZE + TAPROOT_CONTROL_NODE_SIZE * TAPROOT_CONTROL_MAX_NODE_COUNT;</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             : </span>
+<span id="L248"><span class="lineNum">     248</span>                 :             : extern const HashWriter HASHER_TAPSIGHASH; //!&lt; Hasher with tag &quot;TapSighash&quot; pre-fed to it.</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             : extern const HashWriter HASHER_TAPLEAF;    //!&lt; Hasher with tag &quot;TapLeaf&quot; pre-fed to it.</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             : extern const HashWriter HASHER_TAPBRANCH;  //!&lt; Hasher with tag &quot;TapBranch&quot; pre-fed to it.</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             : /** Data structure to cache SHA256 midstates for the ECDSA sighash calculations</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :  *  (bare, P2SH, P2WPKH, P2WSH). */</span>
+<span id="L254"><span class="lineNum">     254</span>   [<span class="tlaGBC" title="Branch 0 was taken 2826 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 471 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">     1616332 : class SigHashCache</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : {</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :     /** For each sighash mode (ALL, SINGLE, NONE, ALL|ANYONE, SINGLE|ANYONE, NONE|ANYONE),</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :      *  optionally store a scriptCode which the hash is for, plus a midstate for the SHA256</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :      *  computation just before adding the hash_type itself. */</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :     std::optional&lt;std::pair&lt;CScript, HashWriter&gt;&gt; m_cache_entries[6];</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             : </span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :     /** Given a hash_type, find which of the 6 cache entries is to be used. */</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :     int CacheIndex(int32_t hash_type) const noexcept;</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             : </span>
+<span id="L264"><span class="lineNum">     264</span>                 :             : public:</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :     /** Load into writer the SHA256 midstate if found in this cache. */</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :     [[nodiscard]] bool Load(int32_t hash_type, const CScript&amp; script_code, HashWriter&amp; writer) const noexcept;</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :     /** Store into this cache object the provided SHA256 midstate. */</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     void Store(int32_t hash_type, const CScript&amp; script_code, const HashWriter&amp; writer) noexcept;</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             : };</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             : </span>
+<span id="L271"><span class="lineNum">     271</span>                 :             : template &lt;class T&gt;</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : uint256 SignatureHash(const CScript&amp; scriptCode, const T&amp; txTo, unsigned int nIn, int32_t nHashType, const CAmount&amp; amount, SigVersion sigversion, const PrecomputedTransactionData* cache = nullptr, SigHashCache* sighash_cache = nullptr);</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             : </span>
+<span id="L274"><span class="lineNum">     274</span>   [<span class="tlaGBC" title="Branch 0 was taken 2351 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1835 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">     1617221 : class BaseSignatureChecker</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :             : {</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             : public:</span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">       20969 :     virtual bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :     {</span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">       20969 :         return false;</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :     }</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             : </span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaUNC">           0 :     virtual bool CheckSchnorrSignature(std::span&lt;const unsigned char&gt; sig, std::span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :     {</span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaUNC">           0 :         return false;</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :     }</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             : </span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaGNC">          19 :     virtual bool CheckLockTime(const CScriptNum&amp; nLockTime) const</span></span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :     {</span>
+<span id="L289"><span class="lineNum">     289</span>                 :<span class="tlaGNC">          19 :          return false;</span></span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     }</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             : </span>
+<span id="L292"><span class="lineNum">     292</span>                 :<span class="tlaGNC">          34 :     virtual bool CheckSequence(const CScriptNum&amp; nSequence) const</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :     {</span>
+<span id="L294"><span class="lineNum">     294</span>                 :<span class="tlaGNC">          34 :          return false;</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :     }</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             : </span>
+<span id="L297"><span class="lineNum">     297</span>         [<span class="tlaGBC" title="Branch 0 was taken 2351 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     1051329 :     virtual ~BaseSignatureChecker() = default;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 110 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 16 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 5121 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 866 times"> + </span>]
+<span id="L298"><span class="lineNum">     298</span>                 :             : };</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             : </span>
+<span id="L300"><span class="lineNum">     300</span>                 :             : /** Enum to specify what *TransactionSignatureChecker's behavior should be</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :  *  when dealing with missing transaction data.</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :  */</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : enum class MissingDataBehavior</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             : {</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :     ASSERT_FAIL,  //!&lt; Abort execution through assertion failure (for consensus code)</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :     FAIL,         //!&lt; Just act as if the signature was invalid</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             : };</span>
+<span id="L308"><span class="lineNum">     308</span>                 :             : </span>
+<span id="L309"><span class="lineNum">     309</span>                 :             : template&lt;typename T&gt;</span>
+<span id="L310"><span class="lineNum">     310</span>                 :             : bool SignatureHashSchnorr(uint256&amp; hash_out, ScriptExecutionData&amp; execdata, const T&amp; tx_to, uint32_t in_pos, uint8_t hash_type, SigVersion sigversion, const PrecomputedTransactionData&amp; cache, MissingDataBehavior mdb);</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             : </span>
+<span id="L312"><span class="lineNum">     312</span>                 :             : template &lt;class T&gt;</span>
+<span id="L313"><span class="lineNum">     313</span>         [<span class="tlaGBC" title="Branch 0 was taken 477353 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 14579 times"> + </span>]:<span class="tlaGNC">     1613035 : class GenericTransactionSignatureChecker : public BaseSignatureChecker</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : {</span>
+<span id="L315"><span class="lineNum">     315</span>                 :             : private:</span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :     const T* txTo;</span>
+<span id="L317"><span class="lineNum">     317</span>                 :             :     const MissingDataBehavior m_mdb;</span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :     unsigned int nIn;</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :     const CAmount amount;</span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :     const PrecomputedTransactionData* txdata;</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :     mutable SigHashCache m_sighash_cache;</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             : </span>
+<span id="L323"><span class="lineNum">     323</span>                 :             : protected:</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :     virtual bool VerifyECDSASignature(const std::vector&lt;unsigned char&gt;&amp; vchSig, const CPubKey&amp; vchPubKey, const uint256&amp; sighash) const;</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             :     virtual bool VerifySchnorrSignature(std::span&lt;const unsigned char&gt; sig, const XOnlyPubKey&amp; pubkey, const uint256&amp; sighash) const;</span>
+<span id="L326"><span class="lineNum">     326</span>                 :             : </span>
+<span id="L327"><span class="lineNum">     327</span>                 :             : public:</span>
+<span id="L328"><span class="lineNum">     328</span>         [<span class="tlaGBC" title="Branch 0 was taken 297935 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      297935 :     GenericTransactionSignatureChecker(const T* txToIn, unsigned int nInIn, const CAmount&amp; amountIn, MissingDataBehavior mdb) : txTo(txToIn), m_mdb(mdb), nIn(nInIn), amount(amountIn), txdata(nullptr) {}</span></span>
+<span id="L329"><span class="lineNum">     329</span>         [<span class="tlaGBC" title="Branch 0 was taken 997984 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     1311703 :     GenericTransactionSignatureChecker(const T* txToIn, unsigned int nInIn, const CAmount&amp; amountIn, const PrecomputedTransactionData&amp; txdataIn, MissingDataBehavior mdb) : txTo(txToIn), m_mdb(mdb), nIn(nInIn), amount(amountIn), txdata(&amp;txdataIn) {}</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override;</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             :     bool CheckSchnorrSignature(std::span&lt;const unsigned char&gt; sig, std::span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const override;</span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :     bool CheckLockTime(const CScriptNum&amp; nLockTime) const override;</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :     bool CheckSequence(const CScriptNum&amp; nSequence) const override;</span>
+<span id="L334"><span class="lineNum">     334</span>                 :             : };</span>
+<span id="L335"><span class="lineNum">     335</span>                 :             : </span>
+<span id="L336"><span class="lineNum">     336</span>                 :             : using TransactionSignatureChecker = GenericTransactionSignatureChecker&lt;CTransaction&gt;;</span>
+<span id="L337"><span class="lineNum">     337</span>                 :             : using MutableTransactionSignatureChecker = GenericTransactionSignatureChecker&lt;CMutableTransaction&gt;;</span>
+<span id="L338"><span class="lineNum">     338</span>                 :             : </span>
+<span id="L339"><span class="lineNum">     339</span>                 :<span class="tlaGNC">      294729 : class DeferringSignatureChecker : public BaseSignatureChecker</span></span>
+<span id="L340"><span class="lineNum">     340</span>                 :             : {</span>
+<span id="L341"><span class="lineNum">     341</span>                 :             : protected:</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :     const BaseSignatureChecker&amp; m_checker;</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             : </span>
+<span id="L344"><span class="lineNum">     344</span>                 :             : public:</span>
+<span id="L345"><span class="lineNum">     345</span>         [<span class="tlaGBC" title="Branch 0 was taken 294729 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      294729 :     DeferringSignatureChecker(const BaseSignatureChecker&amp; checker) : m_checker(checker) {}</span></span>
+<span id="L346"><span class="lineNum">     346</span>                 :             : </span>
+<span id="L347"><span class="lineNum">     347</span>                 :<span class="tlaUNC">           0 :     bool CheckECDSASignature(const std::vector&lt;unsigned char&gt;&amp; scriptSig, const std::vector&lt;unsigned char&gt;&amp; vchPubKey, const CScript&amp; scriptCode, SigVersion sigversion) const override</span></span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :     {</span>
+<span id="L349"><span class="lineNum">     349</span>                 :<span class="tlaUNC">           0 :         return m_checker.CheckECDSASignature(scriptSig, vchPubKey, scriptCode, sigversion);</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :     }</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             : </span>
+<span id="L352"><span class="lineNum">     352</span>                 :<span class="tlaGNC">        1707 :     bool CheckSchnorrSignature(std::span&lt;const unsigned char&gt; sig, std::span&lt;const unsigned char&gt; pubkey, SigVersion sigversion, ScriptExecutionData&amp; execdata, ScriptError* serror = nullptr) const override</span></span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :     {</span>
+<span id="L354"><span class="lineNum">     354</span>                 :<span class="tlaGNC">        1707 :         return m_checker.CheckSchnorrSignature(sig, pubkey, sigversion, execdata, serror);</span></span>
+<span id="L355"><span class="lineNum">     355</span>                 :             :     }</span>
+<span id="L356"><span class="lineNum">     356</span>                 :             : </span>
+<span id="L357"><span class="lineNum">     357</span>                 :<span class="tlaGNC">       22777 :     bool CheckLockTime(const CScriptNum&amp; nLockTime) const override</span></span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :     {</span>
+<span id="L359"><span class="lineNum">     359</span>                 :<span class="tlaGNC">       22777 :         return m_checker.CheckLockTime(nLockTime);</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :     }</span>
+<span id="L361"><span class="lineNum">     361</span>                 :<span class="tlaGNC">       19749 :     bool CheckSequence(const CScriptNum&amp; nSequence) const override</span></span>
+<span id="L362"><span class="lineNum">     362</span>                 :             :     {</span>
+<span id="L363"><span class="lineNum">     363</span>                 :<span class="tlaGNC">       19749 :         return m_checker.CheckSequence(nSequence);</span></span>
+<span id="L364"><span class="lineNum">     364</span>                 :             :     }</span>
+<span id="L365"><span class="lineNum">     365</span>                 :             : };</span>
+<span id="L366"><span class="lineNum">     366</span>                 :             : </span>
+<span id="L367"><span class="lineNum">     367</span>                 :             : /** Compute the BIP341 tapleaf hash from leaf version &amp; script. */</span>
+<span id="L368"><span class="lineNum">     368</span>                 :             : uint256 ComputeTapleafHash(uint8_t leaf_version, std::span&lt;const unsigned char&gt; script);</span>
+<span id="L369"><span class="lineNum">     369</span>                 :             : /** Compute the BIP341 tapbranch hash from two branches.</span>
+<span id="L370"><span class="lineNum">     370</span>                 :             :   * Spans must be 32 bytes each. */</span>
+<span id="L371"><span class="lineNum">     371</span>                 :             : uint256 ComputeTapbranchHash(std::span&lt;const unsigned char&gt; a, std::span&lt;const unsigned char&gt; b);</span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : /** Compute the BIP341 taproot script tree Merkle root from control block and leaf hash.</span>
+<span id="L373"><span class="lineNum">     373</span>                 :             :  *  Requires control block to have valid length (33 + k*32, with k in {0,1,..,128}). */</span>
+<span id="L374"><span class="lineNum">     374</span>                 :             : uint256 ComputeTaprootMerkleRoot(std::span&lt;const unsigned char&gt; control, const uint256&amp; tapleaf_hash);</span>
+<span id="L375"><span class="lineNum">     375</span>                 :             : </span>
+<span id="L376"><span class="lineNum">     376</span>                 :             : bool EvalScript(std::vector&lt;std::vector&lt;unsigned char&gt; &gt;&amp; stack, const CScript&amp; script, script_verify_flags flags, const BaseSignatureChecker&amp; checker, SigVersion sigversion, ScriptExecutionData&amp; execdata, ScriptError* error = nullptr);</span>
+<span id="L377"><span class="lineNum">     377</span>                 :             : bool EvalScript(std::vector&lt;std::vector&lt;unsigned char&gt; &gt;&amp; stack, const CScript&amp; script, script_verify_flags flags, const BaseSignatureChecker&amp; checker, SigVersion sigversion, ScriptError* error = nullptr);</span>
+<span id="L378"><span class="lineNum">     378</span>                 :             : bool VerifyScript(const CScript&amp; scriptSig, const CScript&amp; scriptPubKey, const CScriptWitness* witness, script_verify_flags flags, const BaseSignatureChecker&amp; checker, ScriptError* serror = nullptr);</span>
+<span id="L379"><span class="lineNum">     379</span>                 :             : </span>
+<span id="L380"><span class="lineNum">     380</span>                 :             : size_t CountWitnessSigOps(const CScript&amp; scriptSig, const CScript&amp; scriptPubKey, const CScriptWitness&amp; witness, script_verify_flags flags);</span>
+<span id="L381"><span class="lineNum">     381</span>                 :             : </span>
+<span id="L382"><span class="lineNum">     382</span>                 :             : int FindAndDelete(CScript&amp; script, const CScript&amp; b);</span>
+<span id="L383"><span class="lineNum">     383</span>                 :             : </span>
+<span id="L384"><span class="lineNum">     384</span>                 :             : const std::map&lt;std::string, script_verify_flag_name&gt;&amp; ScriptFlagNamesToEnum();</span>
+<span id="L385"><span class="lineNum">     385</span>                 :             : </span>
+<span id="L386"><span class="lineNum">     386</span>                 :             : std::vector&lt;std::string&gt; GetScriptFlagNames(script_verify_flags flags);</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             : </span>
+<span id="L388"><span class="lineNum">     388</span>                 :             : #endif // BITCOIN_SCRIPT_INTERPRETER_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

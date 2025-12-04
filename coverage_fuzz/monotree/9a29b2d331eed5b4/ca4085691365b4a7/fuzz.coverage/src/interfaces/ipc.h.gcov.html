@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/interfaces/ipc.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/interfaces">src/interfaces</a> - ipc.h<span style="font-size: 80%;"> (source / <a href="ipc.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-12-04 10:14:01</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2021 The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_INTERFACES_IPC_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_INTERFACES_IPC_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;typeindex&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : namespace ipc {</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : struct Context;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : } // namespace ipc</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : namespace interfaces {</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : class Init;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : //! Interface providing access to interprocess-communication (IPC)</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : //! functionality. The IPC implementation is responsible for establishing</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : //! connections between a controlling process and a process being controlled.</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : //! When a connection is established, the process being controlled returns an</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : //! interfaces::Init pointer to the controlling process, which the controlling</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : //! process can use to get access to other interfaces and functionality.</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : //!</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : //! When spawning a new process, the steps are:</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : //!</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : //! 1. The controlling process calls interfaces::Ipc::spawnProcess(), which</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : //!    calls ipc::Process::spawn(), which spawns a new process and returns a</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : //!    socketpair file descriptor for communicating with it.</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : //!    interfaces::Ipc::spawnProcess() then calls ipc::Protocol::connect()</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : //!    passing the socketpair descriptor, which returns a local proxy</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : //!    interfaces::Init implementation calling remote interfaces::Init methods.</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : //! 2. The spawned process calls interfaces::Ipc::startSpawnProcess(), which</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : //!    calls ipc::Process::checkSpawned() to read command line arguments and</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : //!    determine whether it is a spawned process and what socketpair file</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : //!    descriptor it should use. It then calls ipc::Protocol::serve() to handle</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : //!    incoming requests from the socketpair and invoke interfaces::Init</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : //!    interface methods, and exit when the socket is closed.</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : //! 3. The controlling process calls local proxy interfaces::Init object methods</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : //!    to make other proxy objects calling other remote interfaces. It can also</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : //!    destroy the initial interfaces::Init object to close the connection and</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : //!    shut down the spawned process.</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : //!</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : //! When connecting to an existing process, the steps are similar to spawning a</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : //! new process, except a socket is created instead of a socketpair, and</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : //! destroying an Init interface doesn't end the process, since there can be</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : //! multiple connections.</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : class Ipc</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : {</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : public:</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     virtual ~Ipc() = default;</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     //! Spawn a child process returning pointer to its Init interface.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     virtual std::unique_ptr&lt;Init&gt; spawnProcess(const char* exe_name) = 0;</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : </span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     //! If this is a spawned process, block and handle requests from the parent</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     //! process by forwarding them to this process's Init interface, then return</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     //! true. If this is not a spawned child process, return false.</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     virtual bool startSpawnedProcess(int argc, char* argv[], int&amp; exit_status) = 0;</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     //! Connect to a socket address and return a pointer to its Init interface.</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     //! Returns a non-null pointer if the connection was established, returns</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     //! null if address is empty (&quot;&quot;) or disabled (&quot;0&quot;) or if a connection was</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     //! refused but not required (&quot;auto&quot;), and throws an exception if there was</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     //! an unexpected error.</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :     virtual std::unique_ptr&lt;Init&gt; connectAddress(std::string&amp; address) = 0;</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : </span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     //! Listen on a socket address exposing this process's init interface to</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     //! clients. Throws an exception if there was an error.</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     virtual void listenAddress(std::string&amp; address) = 0;</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :     //! Disconnect any incoming connections that are still connected.</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     virtual void disconnectIncoming() = 0;</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : </span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     //! Add cleanup callback to remote interface that will run when the</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :     //! interface is deleted.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     template&lt;typename Interface&gt;</span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaUNC">           0 :     void addCleanup(Interface&amp; iface, std::function&lt;void()&gt; cleanup)</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     {</span>
+<span id="L81"><span class="lineNum">      81</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         addCleanup(typeid(Interface), &amp;iface, std::move(cleanup));</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : </span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :     //! IPC context struct accessor (see struct definition for more description).</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     virtual ipc::Context&amp; context() = 0;</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : </span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : protected:</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     //! Internal implementation of public addCleanup method (above) as a</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     //! type-erased virtual function, since template functions can't be virtual.</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     virtual void addCleanup(std::type_index type, void* iface, std::function&lt;void()&gt; cleanup) = 0;</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : };</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : </span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : //! Return implementation of Ipc interface.</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : std::unique_ptr&lt;Ipc&gt; MakeIpc(const char* exe_name, const char* process_argv0, Init&amp; init);</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : } // namespace interfaces</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : #endif // BITCOIN_INTERFACES_IPC_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

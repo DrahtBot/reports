@@ -1,0 +1,495 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/p2p_transport_serialization.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - p2p_transport_serialization.cpp<span style="font-size: 80%;"> (source / <a href="p2p_transport_serialization.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">99.0&nbsp;%</td>
+            <td class="headerCovTableEntry">210</td>
+            <td class="headerCovTableEntry">208</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-12-04 10:14:01</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">18</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">66.6&nbsp;%</td>
+            <td class="headerCovTableEntry">290</td>
+            <td class="headerCovTableEntry">193</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2019-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;chainparams.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;hash.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;net.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;netmessagemaker.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;protocol.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/chaintype.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;algorithm&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;cassert&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;limits&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : namespace {</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : auto g_all_messages = ALL_NET_MESSAGE_TYPES;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">           4 : void initialize_p2p_transport_serialization()</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : {</span>
+<span id="L28"><span class="lineNum">      28</span>   [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           4 :     static ECC_Context ecc_context{};</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">           4 :     SelectParams(ChainType::REGTEST);</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">           4 :     std::sort(g_all_messages.begin(), g_all_messages.end());</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaGNC">           4 : }</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : } // namespace</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : </span>
+<span id="L35"><span class="lineNum">      35</span>         [<span class="tlaGBC" title="Branch 0 was taken 228 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         826 : FUZZ_TARGET(p2p_transport_serialization, .init = initialize_p2p_transport_serialization)</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : {</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     // Construct transports for both sides, with dummy NodeIds.</span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">         370 :     V1Transport recv_transport{NodeId{0}};</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">         370 :     V1Transport send_transport{NodeId{1}};</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">         370 :     FuzzedDataProvider fuzzed_data_provider{buffer.data(), buffer.size()};</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">         370 :     auto checksum_assist = fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">         370 :     auto magic_bytes_assist = fuzzed_data_provider.ConsumeBool();</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">         370 :     std::vector&lt;uint8_t&gt; mutable_msg_bytes;</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">         370 :     auto header_bytes_remaining = CMessageHeader::HEADER_SIZE;</span></span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaGBC" title="Branch 0 was taken 291 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 79 times"> + </span>]:<span class="tlaGNC">         370 :     if (magic_bytes_assist) {</span></span>
+<span id="L49"><span class="lineNum">      49</span>         [<span class="tlaGBC" title="Branch 0 was taken 291 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         291 :         auto msg_start = Params().MessageStart();</span></span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaGBC" title="Branch 0 was taken 1164 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 291 times"> + </span>]:<span class="tlaGNC">        1455 :         for (size_t i = 0; i &lt; CMessageHeader::MESSAGE_SIZE_SIZE; ++i) {</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaGBC" title="Branch 0 was taken 1164 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1164 :             mutable_msg_bytes.push_back(msg_start[i]);</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :         }</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :         header_bytes_remaining -= CMessageHeader::MESSAGE_SIZE_SIZE;</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     }</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : </span>
+<span id="L56"><span class="lineNum">      56</span>         [<span class="tlaGBC" title="Branch 0 was taken 155 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 215 times"> + </span>]:<span class="tlaGNC">         370 :     if (checksum_assist) {</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">         155 :         header_bytes_remaining -= CMessageHeader::CHECKSUM_SIZE;</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     }</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : </span>
+<span id="L60"><span class="lineNum">      60</span>         [<span class="tlaGBC" title="Branch 0 was taken 370 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         370 :     auto header_random_bytes = fuzzed_data_provider.ConsumeBytes&lt;uint8_t&gt;(header_bytes_remaining);</span></span>
+<span id="L61"><span class="lineNum">      61</span>         [<span class="tlaGBC" title="Branch 0 was taken 370 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         370 :     mutable_msg_bytes.insert(mutable_msg_bytes.end(), header_random_bytes.begin(), header_random_bytes.end());</span></span>
+<span id="L62"><span class="lineNum">      62</span>         [<span class="tlaGBC" title="Branch 0 was taken 370 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         370 :     auto payload_bytes = fuzzed_data_provider.ConsumeRemainingBytes&lt;uint8_t&gt;();</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : </span>
+<span id="L64"><span class="lineNum">      64</span>   [<span class="tlaGBC" title="Branch 0 was taken 155 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 215 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 151 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4 times"> + </span>]:<span class="tlaGNC">         525 :     if (checksum_assist &amp;&amp; mutable_msg_bytes.size() == CMessageHeader::CHECKSUM_OFFSET) {</span></span>
+<span id="L65"><span class="lineNum">      65</span>         [<span class="tlaGBC" title="Branch 0 was taken 151 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         151 :         CHash256 hasher;</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">         151 :         unsigned char hsh[32];</span></span>
+<span id="L67"><span class="lineNum">      67</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 151 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 151 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">         151 :         hasher.Write(payload_bytes);</span></span>
+<span id="L68"><span class="lineNum">      68</span>         [<span class="tlaGBC" title="Branch 0 was taken 151 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         151 :         hasher.Finalize(hsh);</span></span>
+<span id="L69"><span class="lineNum">      69</span>         [<span class="tlaGBC" title="Branch 0 was taken 604 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 151 times"> + </span>]:<span class="tlaGNC">         755 :         for (size_t i = 0; i &lt; CMessageHeader::CHECKSUM_SIZE; ++i) {</span></span>
+<span id="L70"><span class="lineNum">      70</span>         [<span class="tlaGBC" title="Branch 0 was taken 604 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         604 :            mutable_msg_bytes.push_back(hsh[i]);</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :         }</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     }</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : </span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaGBC" title="Branch 0 was taken 370 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         370 :     mutable_msg_bytes.insert(mutable_msg_bytes.end(), payload_bytes.begin(), payload_bytes.end());</span></span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 370 times"> + </span>]:<span class="tlaGNC">         370 :     std::span&lt;const uint8_t&gt; msg_bytes{mutable_msg_bytes};</span></span>
+<span id="L76"><span class="lineNum">      76</span>         [<span class="tlaGBC" title="Branch 0 was taken 130377 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 246 times"> + </span>]:<span class="tlaGNC">      130993 :     while (msg_bytes.size() &gt; 0) {</span></span>
+<span id="L77"><span class="lineNum">      77</span>   [<span class="tlaGBC" title="Branch 0 was taken 130377 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 130253 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 124 times"> + </span>]:<span class="tlaGNC">      130377 :         if (!recv_transport.ReceivedBytes(msg_bytes)) {</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :             break;</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :         }</span>
+<span id="L80"><span class="lineNum">      80</span>   [<span class="tlaGBC" title="Branch 0 was taken 130253 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 100350 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 29903 times"> + </span>]:<span class="tlaGNC">      130253 :         if (recv_transport.ReceivedMessageComplete()) {</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">      100350 :             const std::chrono::microseconds m_time{std::numeric_limits&lt;int64_t&gt;::max()};</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      100350 :             bool reject_message{false};</span></span>
+<span id="L83"><span class="lineNum">      83</span>         [<span class="tlaGBC" title="Branch 0 was taken 100350 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      100350 :             CNetMessage msg = recv_transport.GetReceivedMessage(m_time, reject_message);</span></span>
+<span id="L84"><span class="lineNum">      84</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 100350 times"> + </span>]:<span class="tlaGNC">      100350 :             assert(msg.m_type.size() &lt;= CMessageHeader::MESSAGE_TYPE_SIZE);</span></span>
+<span id="L85"><span class="lineNum">      85</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 100350 times"> + </span>]:<span class="tlaGNC">      100350 :             assert(msg.m_raw_message_size &lt;= mutable_msg_bytes.size());</span></span>
+<span id="L86"><span class="lineNum">      86</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span>]:<span class="tlaGNC">      100350 :             assert(msg.m_raw_message_size == CMessageHeader::HEADER_SIZE + msg.m_message_size);</span></span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span>]:<span class="tlaGNC">      100350 :             assert(msg.m_time == m_time);</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">      100350 :             std::vector&lt;unsigned char&gt; header;</span></span>
+<span id="L90"><span class="lineNum">      90</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 100350 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">      200700 :             auto msg2 = NetMsg::Make(msg.m_type, std::span{msg.m_recv});</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 100350 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">      100350 :             bool queued = send_transport.SetMessageToSend(msg2);</span></span>
+<span id="L92"><span class="lineNum">      92</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span>]:<span class="tlaGNC">      100350 :             assert(queued);</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">      100350 :             std::optional&lt;bool&gt; known_more;</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">      360502 :             while (true) {</span></span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaGBC" title="Branch 0 was taken 130076 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span>]:<span class="tlaGNC">      230426 :                 const auto&amp; [to_send, more, _msg_type] = send_transport.GetBytesToSend(false);</span></span>
+<span id="L96"><span class="lineNum">      96</span>   [<span class="tlaGBC" title="Branch 0 was taken 130076 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 130076 times"> + </span>]:<span class="tlaGNC">      230426 :                 if (known_more) assert(!to_send.empty() == *known_more);</span></span>
+<span id="L97"><span class="lineNum">      97</span>         [<span class="tlaGBC" title="Branch 0 was taken 130076 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 100350 times"> + </span>]:<span class="tlaGNC">      230426 :                 if (to_send.empty()) break;</span></span>
+<span id="L98"><span class="lineNum">      98</span>                 :<span class="tlaGNC">      130076 :                 send_transport.MarkBytesSent(to_send.size());</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC">      130076 :                 known_more = more;</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">      130076 :             }</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">      200700 :         }</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :     }</span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">         370 : }</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : </span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : namespace {</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : </span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : template&lt;RandomNumberGenerator R&gt;</span>
+<span id="L108"><span class="lineNum">     108</span>                 :<span class="tlaGNC">        2720 : void SimulationTest(Transport&amp; initiator, Transport&amp; responder, R&amp; rng, FuzzedDataProvider&amp; provider)</span></span>
+<span id="L109"><span class="lineNum">     109</span>                 :             : {</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     // Simulation test with two Transport objects, which send messages to each other, with</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     // sending and receiving fragmented into multiple pieces that may be interleaved. It primarily</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     // verifies that the sending and receiving side are compatible with each other, plus a few</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     // sanity checks. It does not attempt to introduce errors in the communicated data.</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             : </span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     // Put the transports in an array for by-index access.</span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">        2720 :     const std::array&lt;Transport*, 2&gt; transports = {&amp;initiator, &amp;responder};</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :             : </span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     // Two vectors representing in-flight bytes. inflight[i] is from transport[i] to transport[!i].</span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">        2720 :     std::array&lt;std::vector&lt;uint8_t&gt;, 2&gt; in_flight;</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :             : </span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :     // Two queues with expected messages. expected[i] is expected to arrive in transport[!i].</span>
+<span id="L122"><span class="lineNum">     122</span>         [<span class="tlaGBC" title="Branch 0 was taken 2720 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2720 :     std::array&lt;std::deque&lt;CSerializedNetMsg&gt;, 2&gt; expected;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : </span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     // Vectors with bytes last returned by GetBytesToSend() on transport[i].</span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">        2720 :     std::array&lt;std::vector&lt;uint8_t&gt;, 2&gt; to_send;</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : </span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     // Last returned 'more' values (if still relevant) by transport[i]-&gt;GetBytesToSend(), for</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :     // both have_next_message false and true.</span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">        2720 :     std::array&lt;std::optional&lt;bool&gt;, 2&gt; last_more, last_more_next;</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : </span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :     // Whether more bytes to be sent are expected on transport[i], before and after</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     // SetMessageToSend().</span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">        2720 :     std::array&lt;std::optional&lt;bool&gt;, 2&gt; expect_more, expect_more_next;</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : </span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :     // Function to consume a message type.</span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">       79842 :     auto msg_type_fn = [&amp;]() {</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaGNC">       77122 :         uint8_t v = provider.ConsumeIntegral&lt;uint8_t&gt;();</span></span>
+<span id="L138"><span class="lineNum">     138</span>         [<span class="tlaGBC" title="Branch 0 was taken 12158 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 64964 times"> + </span>]:<span class="tlaGNC">       77122 :         if (v == 0xFF) {</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :             // If v is 0xFF, construct a valid (but possibly unknown) message type from the fuzz</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :             // data.</span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">       12158 :             std::string ret;</span></span>
+<span id="L142"><span class="lineNum">     142</span>         [<span class="tlaGBC" title="Branch 0 was taken 50422 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1386 times"> + </span>]:<span class="tlaGNC">       51808 :             while (ret.size() &lt; CMessageHeader::MESSAGE_TYPE_SIZE) {</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">       50422 :                 char c = provider.ConsumeIntegral&lt;char&gt;();</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :                 // Match the allowed characters in CMessageHeader::IsMessageTypeValid(). Any other</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :                 // character is interpreted as end.</span>
+<span id="L146"><span class="lineNum">     146</span>         [<span class="tlaGBC" title="Branch 0 was taken 39650 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10772 times"> + </span>]:<span class="tlaGNC">       50422 :                 if (c &lt; ' ' || c &gt; 0x7E) break;</span></span>
+<span id="L147"><span class="lineNum">     147</span>   [<span class="tlaGBC" title="Branch 0 was taken 39650 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 51808 times"> + </span>]:<span class="tlaGNC">       91458 :                 ret += c;</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :             }</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :             return ret;</span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaUNC">           0 :         } else {</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :             // Otherwise, use it as index into the list of known messages.</span>
+<span id="L152"><span class="lineNum">     152</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 64964 times"> + </span>]:<span class="tlaGNC">       64964 :             return g_all_messages[v % g_all_messages.size()];</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :         }</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :     };</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     // Function to construct a CSerializedNetMsg to send.</span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaGBC" title="Branch 0 was taken 5440 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 77122 times"> + </span>]:<span class="tlaGNC">       82562 :     auto make_msg_fn = [&amp;](bool first) {</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">       82562 :         CSerializedNetMsg msg;</span></span>
+<span id="L159"><span class="lineNum">     159</span>         [<span class="tlaGBC" title="Branch 0 was taken 5440 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 77122 times"> + </span>]:<span class="tlaGNC">       82562 :         if (first) {</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :             // Always send a &quot;version&quot; message as first one.</span>
+<span id="L161"><span class="lineNum">     161</span>         [<span class="tlaGBC" title="Branch 0 was taken 5440 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        5440 :             msg.m_type = &quot;version&quot;;</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :         } else {</span>
+<span id="L163"><span class="lineNum">     163</span>         [<span class="tlaGBC" title="Branch 0 was taken 77122 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       77122 :             msg.m_type = msg_type_fn();</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :         }</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :         // Determine size of message to send (limited to 75 kB for performance reasons).</span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">       82562 :         size_t size = provider.ConsumeIntegralInRange&lt;uint32_t&gt;(0, 75000);</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :         // Get payload of message from RNG.</span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">       82562 :         msg.data = rng.randbytes(size);</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :         // Return.</span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">       82562 :         return msg;</span></span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaUNC">           0 :     };</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :             : </span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     // The next message to be sent (initially version messages, but will be replaced once sent).</span>
+<span id="L174"><span class="lineNum">     174</span>   [<span class="tlaGBC" title="Branch 0 was taken 2720 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2720 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        2720 :     std::array&lt;CSerializedNetMsg, 2&gt; next_msg = {</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L175"><span class="lineNum">     175</span>                 :             :         make_msg_fn(/*first=*/true),</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :         make_msg_fn(/*first=*/true)</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     };</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : </span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     // Wrapper around transport[i]-&gt;GetBytesToSend() that performs sanity checks.</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">     1248567 :     auto bytes_to_send_fn = [&amp;](int side) -&gt; Transport::BytesToSend {</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :         // Invoke GetBytesToSend twice (for have_next_message = {false, true}). This function does</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :         // not modify state (it's const), and only the &quot;more&quot; return value should differ between</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :         // the calls.</span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">     1245847 :         const auto&amp; [bytes, more_nonext, msg_type] = transports[side]-&gt;GetBytesToSend(false);</span></span>
+<span id="L185"><span class="lineNum">     185</span>         [<span class="tlaGBC" title="Branch 0 was taken 522494 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 723353 times"> + </span>]:<span class="tlaGNC">     1245847 :         const auto&amp; [bytes_next, more_next, msg_type_next] = transports[side]-&gt;GetBytesToSend(true);</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :         // Compare with expected more.</span>
+<span id="L187"><span class="lineNum">     187</span>   [<span class="tlaGBC" title="Branch 0 was taken 522494 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 723353 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 522494 times"> + </span>]:<span class="tlaGNC">     1245847 :         if (expect_more[side].has_value()) assert(!bytes.empty() == *expect_more[side]);</span></span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :         // Verify consistency between the two results.</span>
+<span id="L189"><span class="lineNum">     189</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1245847 times"> + </span>]:<span class="tlaGNC">     1245847 :         assert(std::ranges::equal(bytes, bytes_next));</span></span>
+<span id="L190"><span class="lineNum">     190</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1245847 times"> + </span>]:<span class="tlaGNC">     1245847 :         assert(msg_type == msg_type_next);</span></span>
+<span id="L191"><span class="lineNum">     191</span>   [<span class="tlaGBC" title="Branch 0 was taken 147085 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1098762 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 147085 times"> + </span>]:<span class="tlaGNC">     1245847 :         if (more_nonext) assert(more_next);</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :         // Compare with previously reported output.</span>
+<span id="L193"><span class="lineNum">     193</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1245847 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 1245847 times"> + </span>]:<span class="tlaGNC">     1245847 :         assert(to_send[side].size() &lt;= bytes.size());</span></span>
+<span id="L194"><span class="lineNum">     194</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1245847 times"> + </span>]:<span class="tlaGNC">     1245847 :         assert(std::ranges::equal(to_send[side], std::span{bytes}.first(to_send[side].size())));</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">     1245847 :         to_send[side].resize(bytes.size());</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaGNC">     1245847 :         std::copy(bytes.begin(), bytes.end(), to_send[side].begin());</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :         // Remember 'more' results.</span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">     1245847 :         last_more[side] = {more_nonext};</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :<span class="tlaGNC">     1245847 :         last_more_next[side] = {more_next};</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :         // Return.</span>
+<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">     1245847 :         return {bytes, more_nonext, msg_type};</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     };</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             : </span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :     // Function to make side send a new message.</span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">      348009 :     auto new_msg_fn = [&amp;](int side) {</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :         // Don't do anything if there are too many unreceived messages already.</span>
+<span id="L207"><span class="lineNum">     207</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 345289 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 341086 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4203 times"> + </span>]:<span class="tlaGNC">      345289 :         if (expected[side].size() &gt;= 16) return;</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :         // Try to send (a copy of) the message in next_msg[side].</span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">      341086 :         CSerializedNetMsg msg = next_msg[side].Copy();</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :<span class="tlaGNC">      341086 :         bool queued = transports[side]-&gt;SetMessageToSend(msg);</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :         // Update expected more data.</span>
+<span id="L212"><span class="lineNum">     212</span>         [<span class="tlaGBC" title="Branch 0 was taken 81459 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 259627 times"> + </span>]:<span class="tlaGNC">      341086 :         expect_more[side] = expect_more_next[side];</span></span>
+<span id="L213"><span class="lineNum">     213</span>         [<span class="tlaGBC" title="Branch 0 was taken 81459 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 259627 times"> + </span>]:<span class="tlaGNC">      341086 :         expect_more_next[side] = std::nullopt;</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :         // Verify consistency of GetBytesToSend after SetMessageToSend</span>
+<span id="L215"><span class="lineNum">     215</span>         [<span class="tlaGBC" title="Branch 0 was taken 341086 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      341086 :         bytes_to_send_fn(/*side=*/side);</span></span>
+<span id="L216"><span class="lineNum">     216</span>         [<span class="tlaGBC" title="Branch 0 was taken 77122 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 263964 times"> + </span>]:<span class="tlaGNC">      341086 :         if (queued) {</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :             // Remember that this message is now expected by the receiver.</span>
+<span id="L218"><span class="lineNum">     218</span>         [<span class="tlaGBC" title="Branch 0 was taken 77122 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       77122 :             expected[side].emplace_back(std::move(next_msg[side]));</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :             // Construct a new next message to send.</span>
+<span id="L220"><span class="lineNum">     220</span>         [<span class="tlaGBC" title="Branch 0 was taken 77122 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      154244 :             next_msg[side] = make_msg_fn(/*first=*/false);</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :         }</span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaGNC">      341086 :     };</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :             : </span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :     // Function to make side send out bytes (if any).</span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaGNC">      451184 :     auto send_fn = [&amp;](int side, bool everything = false) {</span></span>
+<span id="L226"><span class="lineNum">     226</span>         [<span class="tlaGBC" title="Branch 0 was taken 333829 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 114635 times"> + </span>]:<span class="tlaGNC">      448464 :         const auto&amp; [bytes, more, msg_type] = bytes_to_send_fn(/*side=*/side);</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :         // Don't do anything if no bytes to send.</span>
+<span id="L228"><span class="lineNum">     228</span>         [<span class="tlaGBC" title="Branch 0 was taken 333829 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 114635 times"> + </span>]:<span class="tlaGNC">      448464 :         if (bytes.empty()) return false;</span></span>
+<span id="L229"><span class="lineNum">     229</span>         [<span class="tlaGBC" title="Branch 0 was taken 328132 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5697 times"> + </span>]:<span class="tlaGNC">      333829 :         size_t send_now = everything ? bytes.size() : provider.ConsumeIntegralInRange&lt;size_t&gt;(0, bytes.size());</span></span>
+<span id="L230"><span class="lineNum">     230</span>         [<span class="tlaGBC" title="Branch 0 was taken 284204 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 49625 times"> + </span>]:<span class="tlaGNC">      333829 :         if (send_now == 0) return false;</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :         // Add bytes to the in-flight queue, and mark those bytes as consumed.</span>
+<span id="L232"><span class="lineNum">     232</span>                 :<span class="tlaGNC">      284204 :         in_flight[side].insert(in_flight[side].end(), bytes.begin(), bytes.begin() + send_now);</span></span>
+<span id="L233"><span class="lineNum">     233</span>         [<span class="tlaGBC" title="Branch 0 was taken 94902 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 189302 times"> + </span>]:<span class="tlaGNC">      284204 :         transports[side]-&gt;MarkBytesSent(send_now);</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :         // If all to-be-sent bytes were sent, move last_more data to expect_more data.</span>
+<span id="L235"><span class="lineNum">     235</span>         [<span class="tlaGBC" title="Branch 0 was taken 94902 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 189302 times"> + </span>]:<span class="tlaGNC">      284204 :         if (send_now == bytes.size()) {</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaGNC">       94902 :             expect_more[side] = last_more[side];</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">       94902 :             expect_more_next[side] = last_more_next[side];</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :         }</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :         // Remove the bytes from the last reported to-be-sent vector.</span>
+<span id="L240"><span class="lineNum">     240</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 284204 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 284204 times"> + </span>]:<span class="tlaGNC">      284204 :         assert(to_send[side].size() &gt;= send_now);</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaGNC">      284204 :         to_send[side].erase(to_send[side].begin(), to_send[side].begin() + send_now);</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :         // Verify that GetBytesToSend gives a result consistent with earlier.</span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaGNC">      284204 :         bytes_to_send_fn(/*side=*/side);</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :         // Return whether anything was sent.</span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">      284204 :         return send_now &gt; 0;</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :     };</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             : </span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :     // Function to make !side receive bytes (if any).</span>
+<span id="L249"><span class="lineNum">     249</span>                 :<span class="tlaGNC">      139546 :     auto recv_fn = [&amp;](int side, bool everything = false) {</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :         // Don't do anything if no bytes in flight.</span>
+<span id="L251"><span class="lineNum">     251</span>         [<span class="tlaGBC" title="Branch 0 was taken 101181 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 35645 times"> + </span>]:<span class="tlaGNC">      136826 :         if (in_flight[side].empty()) return false;</span></span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :         // Decide span to receive</span>
+<span id="L253"><span class="lineNum">     253</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 101181 times"> + </span>]:<span class="tlaGNC">      101181 :         size_t to_recv_len = in_flight[side].size();</span></span>
+<span id="L254"><span class="lineNum">     254</span>         [<span class="tlaGBC" title="Branch 0 was taken 95206 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5975 times"> + </span>]:<span class="tlaGNC">      101181 :         if (!everything) to_recv_len = provider.ConsumeIntegralInRange&lt;size_t&gt;(0, to_recv_len);</span></span>
+<span id="L255"><span class="lineNum">     255</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 101181 times"> + </span>]:<span class="tlaGNC">      101181 :         std::span&lt;const uint8_t&gt; to_recv = std::span{in_flight[side]}.first(to_recv_len);</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :         // Process those bytes</span>
+<span id="L257"><span class="lineNum">     257</span>         [<span class="tlaGBC" title="Branch 0 was taken 172093 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 101181 times"> + </span>]:<span class="tlaGNC">      273274 :         while (!to_recv.empty()) {</span></span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">      172093 :             size_t old_len = to_recv.size();</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">      172093 :             bool ret = transports[!side]-&gt;ReceivedBytes(to_recv);</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :             // Bytes must always be accepted, as this test does not introduce any errors in</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :             // communication.</span>
+<span id="L262"><span class="lineNum">     262</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 172093 times"> + </span>]:<span class="tlaGNC">      172093 :             assert(ret);</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :             // Clear cached expected 'more' information: if certainly no more data was to be sent</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :             // before, receiving bytes makes this uncertain.</span>
+<span id="L265"><span class="lineNum">     265</span>         [<span class="tlaGBC" title="Branch 0 was taken 26957 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 145136 times"> + </span>]:<span class="tlaGNC">      180182 :             if (expect_more[!side] == false) expect_more[!side] = std::nullopt;</span></span>
+<span id="L266"><span class="lineNum">     266</span>         [<span class="tlaGBC" title="Branch 0 was taken 26453 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 145640 times"> + </span>]:<span class="tlaGNC">      172694 :             if (expect_more_next[!side] == false) expect_more_next[!side] = std::nullopt;</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :             // Verify consistency of GetBytesToSend after ReceivedBytes</span>
+<span id="L268"><span class="lineNum">     268</span>                 :<span class="tlaGNC">      172093 :             bytes_to_send_fn(/*side=*/!side);</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">      172093 :             bool progress = to_recv.size() &lt; old_len;</span></span>
+<span id="L270"><span class="lineNum">     270</span>         [<span class="tlaGBC" title="Branch 0 was taken 77122 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 94971 times"> + </span>]:<span class="tlaGNC">      172093 :             if (transports[!side]-&gt;ReceivedMessageComplete()) {</span></span>
+<span id="L271"><span class="lineNum">     271</span>                 :<span class="tlaGNC">       77122 :                 bool reject{false};</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaGNC">       77122 :                 auto received = transports[!side]-&gt;GetReceivedMessage({}, reject);</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :                 // Receiving must succeed.</span>
+<span id="L274"><span class="lineNum">     274</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 77122 times"> + </span>]:<span class="tlaGNC">       77122 :                 assert(!reject);</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :                 // There must be a corresponding expected message.</span>
+<span id="L276"><span class="lineNum">     276</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 77122 times"> + </span>]:<span class="tlaGNC">       77122 :                 assert(!expected[side].empty());</span></span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :                 // The m_message_size field must be correct.</span>
+<span id="L278"><span class="lineNum">     278</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 77122 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 77122 times"> + </span>]:<span class="tlaGNC">       77122 :                 assert(received.m_message_size == received.m_recv.size());</span></span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :                 // The m_type must match what is expected.</span>
+<span id="L280"><span class="lineNum">     280</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 77122 times"> + </span>]:<span class="tlaGNC">       77122 :                 assert(received.m_type == expected[side].front().m_type);</span></span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :                 // The data must match what is expected.</span>
+<span id="L282"><span class="lineNum">     282</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 77122 times"> + </span>]:<span class="tlaGNC">       77122 :                 assert(std::ranges::equal(received.m_recv, MakeByteSpan(expected[side].front().data)));</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">       77122 :                 expected[side].pop_front();</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaGNC">       77122 :                 progress = true;</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :<span class="tlaGNC">       77122 :             }</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :             // Progress must be made (by processing incoming bytes and/or returning complete</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :             // messages) until all received bytes are processed.</span>
+<span id="L288"><span class="lineNum">     288</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 172093 times"> + </span>]:<span class="tlaGNC">      172093 :             assert(progress);</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :         }</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :         // Remove the processed bytes from the in_flight buffer.</span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaGNC">      101181 :         in_flight[side].erase(in_flight[side].begin(), in_flight[side].begin() + to_recv_len);</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :         // Return whether anything was received.</span>
+<span id="L293"><span class="lineNum">     293</span>                 :<span class="tlaGNC">      101181 :         return to_recv_len &gt; 0;</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :     };</span>
+<span id="L295"><span class="lineNum">     295</span>                 :             : </span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :     // Main loop, interleaving new messages, sends, and receives.</span>
+<span id="L297"><span class="lineNum">     297</span>   [<span class="tlaGBC" title="Branch 0 was taken 903641 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2378 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 903299 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 342 times"> + </span>]:<span class="tlaGNC">      906019 :     LIMITED_WHILE(provider.remaining_bytes(), 1000) {</span></span>
+<span id="L298"><span class="lineNum">     298</span>         [<span class="tlaGBC" title="Branch 0 was taken 903299 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">      903299 :         CallOneOf(provider,</span></span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :             // (Try to) give the next message to the transport.</span>
+<span id="L300"><span class="lineNum">     300</span>                 :<span class="tlaGNC">      238314 :             [&amp;] { new_msg_fn(/*side=*/0); },</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :<span class="tlaGNC">      106975 :             [&amp;] { new_msg_fn(/*side=*/1); },</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :             // (Try to) send some bytes from the transport to the network.</span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">      139724 :             [&amp;] { send_fn(/*side=*/0); },</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">      295100 :             [&amp;] { send_fn(/*side=*/1); },</span></span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :             // (Try to) receive bytes from the network, converting to messages.</span>
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">       65041 :             [&amp;] { recv_fn(/*side=*/0); },</span></span>
+<span id="L307"><span class="lineNum">     307</span>                 :<span class="tlaGNC">       58145 :             [&amp;] { recv_fn(/*side=*/1); }</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :         );</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             :     }</span>
+<span id="L310"><span class="lineNum">     310</span>                 :             : </span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :     // When we're done, perform sends and receives of existing messages to flush anything already</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :     // in flight.</span>
+<span id="L313"><span class="lineNum">     313</span>                 :             :     while (true) {</span>
+<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaGNC">        6820 :         bool any = false;</span></span>
+<span id="L315"><span class="lineNum">     315</span>   [<span class="tlaGBC" title="Branch 0 was taken 6820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3283 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3537 times"> + </span>]:<span class="tlaGNC">        6820 :         if (send_fn(/*side=*/0, /*everything=*/true)) any = true;</span></span>
+<span id="L316"><span class="lineNum">     316</span>   [<span class="tlaGBC" title="Branch 0 was taken 6820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2414 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4406 times"> + </span>]:<span class="tlaGNC">        6820 :         if (send_fn(/*side=*/1, /*everything=*/true)) any = true;</span></span>
+<span id="L317"><span class="lineNum">     317</span>   [<span class="tlaGBC" title="Branch 0 was taken 6820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3390 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 3430 times"> + </span>]:<span class="tlaGNC">        6820 :         if (recv_fn(/*side=*/0, /*everything=*/true)) any = true;</span></span>
+<span id="L318"><span class="lineNum">     318</span>   [<span class="tlaGBC" title="Branch 0 was taken 6820 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2585 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4235 times"> + </span>]:<span class="tlaGNC">        6820 :         if (recv_fn(/*side=*/1, /*everything=*/true)) any = true;</span></span>
+<span id="L319"><span class="lineNum">     319</span>         [<span class="tlaGBC" title="Branch 0 was taken 4100 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2720 times"> + </span>]:<span class="tlaGNC">        6820 :         if (!any) break;</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :     }</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             : </span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :     // Make sure nothing is left in flight.</span>
+<span id="L323"><span class="lineNum">     323</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2720 times"> + </span>]:<span class="tlaGNC">        2720 :     assert(in_flight[0].empty());</span></span>
+<span id="L324"><span class="lineNum">     324</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2720 times"> + </span>]:<span class="tlaGNC">        2720 :     assert(in_flight[1].empty());</span></span>
+<span id="L325"><span class="lineNum">     325</span>                 :             : </span>
+<span id="L326"><span class="lineNum">     326</span>                 :             :     // Make sure all expected messages were received.</span>
+<span id="L327"><span class="lineNum">     327</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2720 times"> + </span>]:<span class="tlaGNC">        2720 :     assert(expected[0].empty());</span></span>
+<span id="L328"><span class="lineNum">     328</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2720 times"> + </span>]:<span class="tlaGNC">        2720 :     assert(expected[1].empty());</span></span>
+<span id="L329"><span class="lineNum">     329</span>                 :             : </span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     // Compare session IDs.</span>
+<span id="L331"><span class="lineNum">     331</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2720 times"> + </span>]:<span class="tlaGNC">        2720 :     assert(transports[0]-&gt;GetInfo().session_id == transports[1]-&gt;GetInfo().session_id);</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :<span class="tlaGNC">       10880 : }</span></span>
+<span id="L333"><span class="lineNum">     333</span>                 :             : </span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">        1866 : std::unique_ptr&lt;Transport&gt; MakeV1Transport(NodeId nodeid) noexcept</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :             : {</span>
+<span id="L336"><span class="lineNum">     336</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1866 times"> + </span>]:<span class="tlaGNC">        1866 :     return std::make_unique&lt;V1Transport&gt;(nodeid);</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :             : }</span>
+<span id="L338"><span class="lineNum">     338</span>                 :             : </span>
+<span id="L339"><span class="lineNum">     339</span>                 :             : template&lt;RandomNumberGenerator RNG&gt;</span>
+<span id="L340"><span class="lineNum">     340</span>                 :<span class="tlaGNC">        4098 : std::unique_ptr&lt;Transport&gt; MakeV2Transport(NodeId nodeid, bool initiator, RNG&amp; rng, FuzzedDataProvider&amp; provider)</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :             : {</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :     // Retrieve key</span>
+<span id="L343"><span class="lineNum">     343</span>         [<span class="tlaGBC" title="Branch 0 was taken 275 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3823 times"> + </span>]:<span class="tlaGNC">        4098 :     auto key = ConsumePrivateKey(provider);</span></span>
+<span id="L344"><span class="lineNum">     344</span>         [<span class="tlaGBC" title="Branch 0 was taken 275 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3823 times"> + </span>]:<span class="tlaGNC">        4098 :     if (!key.IsValid()) return {};</span></span>
+<span id="L345"><span class="lineNum">     345</span>                 :             :     // Construct garbage</span>
+<span id="L346"><span class="lineNum">     346</span>                 :<span class="tlaGNC">        3823 :     size_t garb_len = provider.ConsumeIntegralInRange&lt;size_t&gt;(0, V2Transport::MAX_GARBAGE_LEN);</span></span>
+<span id="L347"><span class="lineNum">     347</span>                 :<span class="tlaGNC">        3823 :     std::vector&lt;uint8_t&gt; garb;</span></span>
+<span id="L348"><span class="lineNum">     348</span>         [<span class="tlaGBC" title="Branch 0 was taken 1291 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2532 times"> + </span>]:<span class="tlaGNC">        3823 :     if (garb_len &lt;= 64) {</span></span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :         // When the garbage length is up to 64 bytes, read it directly from the fuzzer input.</span>
+<span id="L350"><span class="lineNum">     350</span>         [<span class="tlaGBC" title="Branch 0 was taken 1291 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2582 :         garb = provider.ConsumeBytes&lt;uint8_t&gt;(garb_len);</span></span>
+<span id="L351"><span class="lineNum">     351</span>         [<span class="tlaGBC" title="Branch 0 was taken 1291 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1291 :         garb.resize(garb_len);</span></span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :     } else {</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :         // If it's longer, generate it from the RNG. This avoids having large amounts of</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             :         // (hopefully) irrelevant data needing to be stored in the fuzzer data.</span>
+<span id="L355"><span class="lineNum">     355</span>                 :<span class="tlaGNC">        2532 :         garb = rng.randbytes(garb_len);</span></span>
+<span id="L356"><span class="lineNum">     356</span>                 :             :     }</span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :     // Retrieve entropy</span>
+<span id="L358"><span class="lineNum">     358</span>         [<span class="tlaGBC" title="Branch 0 was taken 3823 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3823 :     auto ent = provider.ConsumeBytes&lt;std::byte&gt;(32);</span></span>
+<span id="L359"><span class="lineNum">     359</span>         [<span class="tlaGBC" title="Branch 0 was taken 3823 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3823 :     ent.resize(32);</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :     // Use as entropy SHA256(ent || garbage). This prevents a situation where the fuzzer manages to</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :     // include the garbage terminator (which is a function of both ellswift keys) in the garbage.</span>
+<span id="L362"><span class="lineNum">     362</span>                 :             :     // This is extremely unlikely (~2^-116) with random keys/garbage, but the fuzzer can choose</span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     // both non-randomly and dependently. Since the entropy is hashed anyway inside the ellswift</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             :     // computation, no coverage should be lost by using a hash as entropy, and it removes the</span>
+<span id="L365"><span class="lineNum">     365</span>                 :             :     // possibility of garbage that happens to contain what is effectively a hash of the keys.</span>
+<span id="L366"><span class="lineNum">     366</span>   [<span class="tlaGBC" title="Branch 0 was taken 3823 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3823 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">        7646 :     CSHA256().Write(UCharCast(ent.data()), ent.size())</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 3823 times"> + </span>]
+<span id="L367"><span class="lineNum">     367</span>   [<span class="tlaGBC" title="Branch 0 was taken 3823 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3823 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">        3823 :              .Write(garb.data(), garb.size())</span></span>
+<span id="L368"><span class="lineNum">     368</span>         [<span class="tlaGBC" title="Branch 0 was taken 3823 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        3823 :              .Finalize(UCharCast(ent.data()));</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :             : </span>
+<span id="L370"><span class="lineNum">     370</span>   [<span class="tlaGBC" title="Branch 0 was taken 3823 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 3823 times"> + </span>]:<span class="tlaGNC">        3823 :     return std::make_unique&lt;V2Transport&gt;(nodeid, initiator, key, ent, std::move(garb));</span></span>
+<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaGNC">        7921 : }</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : </span>
+<span id="L373"><span class="lineNum">     373</span>                 :             : } // namespace</span>
+<span id="L374"><span class="lineNum">     374</span>                 :             : </span>
+<span id="L375"><span class="lineNum">     375</span>         [<span class="tlaGBC" title="Branch 0 was taken 228 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         933 : FUZZ_TARGET(p2p_transport_bidirectional, .init = initialize_p2p_transport_serialization)</span></span>
+<span id="L376"><span class="lineNum">     376</span>                 :             : {</span>
+<span id="L377"><span class="lineNum">     377</span>                 :             :     // Test with two V1 transports talking to each other.</span>
+<span id="L378"><span class="lineNum">     378</span>                 :<span class="tlaGNC">         477 :     FuzzedDataProvider provider{buffer.data(), buffer.size()};</span></span>
+<span id="L379"><span class="lineNum">     379</span>                 :<span class="tlaGNC">         477 :     InsecureRandomContext rng(provider.ConsumeIntegral&lt;uint64_t&gt;());</span></span>
+<span id="L380"><span class="lineNum">     380</span>                 :<span class="tlaGNC">         477 :     auto t1 = MakeV1Transport(NodeId{0});</span></span>
+<span id="L381"><span class="lineNum">     381</span>                 :<span class="tlaGNC">         477 :     auto t2 = MakeV1Transport(NodeId{1});</span></span>
+<span id="L382"><span class="lineNum">     382</span>   [<span class="tlaGBC" title="Branch 0 was taken 477 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 477 times"> + </span>]:<span class="tlaGNC">         477 :     if (!t1 || !t2) return;</span></span>
+<span id="L383"><span class="lineNum">     383</span>         [<span class="tlaGBC" title="Branch 0 was taken 477 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         477 :     SimulationTest(*t1, *t2, rng, provider);</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :<span class="tlaGNC">         477 : }</span></span>
+<span id="L385"><span class="lineNum">     385</span>                 :             : </span>
+<span id="L386"><span class="lineNum">     386</span>         [<span class="tlaGBC" title="Branch 0 was taken 228 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        2049 : FUZZ_TARGET(p2p_transport_bidirectional_v2, .init = initialize_p2p_transport_serialization)</span></span>
+<span id="L387"><span class="lineNum">     387</span>                 :             : {</span>
+<span id="L388"><span class="lineNum">     388</span>                 :             :     // Test with two V2 transports talking to each other.</span>
+<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaGNC">        1593 :     FuzzedDataProvider provider{buffer.data(), buffer.size()};</span></span>
+<span id="L390"><span class="lineNum">     390</span>                 :<span class="tlaGNC">        1593 :     InsecureRandomContext rng(provider.ConsumeIntegral&lt;uint64_t&gt;());</span></span>
+<span id="L391"><span class="lineNum">     391</span>                 :<span class="tlaGNC">        1593 :     auto t1 = MakeV2Transport(NodeId{0}, true, rng, provider);</span></span>
+<span id="L392"><span class="lineNum">     392</span>         [<span class="tlaGBC" title="Branch 0 was taken 1593 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1593 :     auto t2 = MakeV2Transport(NodeId{1}, false, rng, provider);</span></span>
+<span id="L393"><span class="lineNum">     393</span>   [<span class="tlaGBC" title="Branch 0 was taken 1573 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 20 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 224 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1349 times"> + </span>]:<span class="tlaGNC">        1593 :     if (!t1 || !t2) return;</span></span>
+<span id="L394"><span class="lineNum">     394</span>         [<span class="tlaGBC" title="Branch 0 was taken 1349 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1349 :     SimulationTest(*t1, *t2, rng, provider);</span></span>
+<span id="L395"><span class="lineNum">     395</span>                 :<span class="tlaGNC">        1593 : }</span></span>
+<span id="L396"><span class="lineNum">     396</span>                 :             : </span>
+<span id="L397"><span class="lineNum">     397</span>         [<span class="tlaGBC" title="Branch 0 was taken 228 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">        1368 : FUZZ_TARGET(p2p_transport_bidirectional_v1v2, .init = initialize_p2p_transport_serialization)</span></span>
+<span id="L398"><span class="lineNum">     398</span>                 :             : {</span>
+<span id="L399"><span class="lineNum">     399</span>                 :             :     // Test with a V1 initiator talking to a V2 responder.</span>
+<span id="L400"><span class="lineNum">     400</span>                 :<span class="tlaGNC">         912 :     FuzzedDataProvider provider{buffer.data(), buffer.size()};</span></span>
+<span id="L401"><span class="lineNum">     401</span>                 :<span class="tlaGNC">         912 :     InsecureRandomContext rng(provider.ConsumeIntegral&lt;uint64_t&gt;());</span></span>
+<span id="L402"><span class="lineNum">     402</span>                 :<span class="tlaGNC">         912 :     auto t1 = MakeV1Transport(NodeId{0});</span></span>
+<span id="L403"><span class="lineNum">     403</span>         [<span class="tlaGBC" title="Branch 0 was taken 912 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         912 :     auto t2 = MakeV2Transport(NodeId{1}, false, rng, provider);</span></span>
+<span id="L404"><span class="lineNum">     404</span>   [<span class="tlaGBC" title="Branch 0 was taken 912 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 18 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 894 times"> + </span>]:<span class="tlaGNC">         912 :     if (!t1 || !t2) return;</span></span>
+<span id="L405"><span class="lineNum">     405</span>         [<span class="tlaGBC" title="Branch 0 was taken 894 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         894 :     SimulationTest(*t1, *t2, rng, provider);</span></span>
+<span id="L406"><span class="lineNum">     406</span>                 :<span class="tlaGNC">         912 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
