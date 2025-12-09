@@ -1,0 +1,441 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - test_bitcoin_coverage.info - src/test/headers_sync_chainwork_tests.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test">src/test</a> - headers_sync_chainwork_tests.cpp<span style="font-size: 80%;"> (source / <a href="headers_sync_chainwork_tests.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">test_bitcoin_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">98.3&nbsp;%</td>
+            <td class="headerCovTableEntry">59</td>
+            <td class="headerCovTableEntry">58</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-12-09 11:38:50</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">12</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">50.9&nbsp;%</td>
+            <td class="headerCovTableEntry">540</td>
+            <td class="headerCovTableEntry">275</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2022-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;chain.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;chainparams.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;consensus/params.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;headerssync.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;net_processing.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;pow.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;test/util/setup_common.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;validation.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;cstddef&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;boost/test/unit_test.hpp&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : using State = HeadersSyncState::State;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : </span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : // Standard set of checks common to all scenarios. Macro keeps failure lines at the call-site.</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #define CHECK_RESULT(result_expression, hss, exp_state, exp_success, exp_request_more,                   \</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :                      exp_headers_size, exp_pow_validated_prev, exp_locator_hash)                         \</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     do {                                                                                                 \</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :         const auto result{result_expression};                                                            \</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :         BOOST_REQUIRE_EQUAL(hss.GetState(), exp_state);                                                  \</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :         BOOST_CHECK_EQUAL(result.success, exp_success);                                                  \</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :         BOOST_CHECK_EQUAL(result.request_more, exp_request_more);                                        \</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :         BOOST_CHECK_EQUAL(result.pow_validated_headers.size(), exp_headers_size);                        \</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :         const std::optional&lt;uint256&gt; pow_validated_prev_opt{exp_pow_validated_prev};                     \</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :         if (pow_validated_prev_opt) {                                                                    \</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :             BOOST_CHECK_EQUAL(result.pow_validated_headers.at(0).hashPrevBlock, pow_validated_prev_opt); \</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :         } else {                                                                                         \</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :             BOOST_CHECK_EQUAL(exp_headers_size, 0);                                                      \</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :         }                                                                                                \</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :         const std::optional&lt;uint256&gt; locator_hash_opt{exp_locator_hash};                                 \</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :         if (locator_hash_opt) {                                                                          \</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :             BOOST_CHECK_EQUAL(hss.NextHeadersRequestLocator().vHave.at(0), locator_hash_opt);            \</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :         } else {                                                                                         \</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :             BOOST_CHECK_EQUAL(exp_state, State::FINAL);                                                  \</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :         }                                                                                                \</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     } while (false)</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : </span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : constexpr size_t TARGET_BLOCKS{15'000};</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : constexpr arith_uint256 CHAIN_WORK{TARGET_BLOCKS * 2};</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : // Subtract MAX_HEADERS_RESULTS (2000 headers/message) + an arbitrary smaller</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : // value (123) so our redownload buffer is well below the number of blocks</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : // required to reach the CHAIN_WORK threshold, to behave similarly to mainnet.</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : constexpr size_t REDOWNLOAD_BUFFER_SIZE{TARGET_BLOCKS - (MAX_HEADERS_RESULTS + 123)};</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : constexpr size_t COMMITMENT_PERIOD{600}; // Somewhat close to mainnet.</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">           6 : struct HeadersGeneratorSetup : public RegTestingSetup {</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     const CBlock&amp; genesis{Params().GenesisBlock()};</span>
+<span id="L55"><span class="lineNum">      55</span>   [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           6 :     const CBlockIndex* chain_start{WITH_LOCK(::cs_main, return m_node.chainman-&gt;m_blockman.LookupBlockIndex(genesis.GetHash()))};</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span>]
+<span id="L56"><span class="lineNum">      56</span>                 :             : </span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     // Generate headers for two different chains (using differing merkle roots</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     // to ensure the headers are different).</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">           2 :     const std::vector&lt;CBlockHeader&gt;&amp; FirstChain()</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     {</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :         // Block header hash target is half of max uint256 (2**256 / 2), expressible</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :         // roughly as the coefficient 0x7fffff with the exponent 0x20 (32 bytes).</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :         // This implies around every 2nd hash attempt should succeed, which</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :         // is why CHAIN_WORK == TARGET_BLOCKS * 2.</span>
+<span id="L65"><span class="lineNum">      65</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           2 :         assert(genesis.nBits == 0x207fffff);</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : </span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :         // Subtract 1 since the genesis block also contributes work so we reach</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :         // the CHAIN_WORK target.</span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">           2 :         static const auto first_chain{GenerateHeaders(/*count=*/TARGET_BLOCKS - 1, genesis.GetHash(),</span></span>
+<span id="L70"><span class="lineNum">      70</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           3 :                 genesis.nVersion, genesis.nTime, /*merkle_root=*/uint256::ZERO, genesis.nBits)};</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">           2 :         return first_chain;</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :     }</span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">           2 :     const std::vector&lt;CBlockHeader&gt;&amp; SecondChain()</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :     {</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :         // Subtract 2 to keep total work below the target.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">           2 :         static const auto second_chain{GenerateHeaders(/*count=*/TARGET_BLOCKS - 2, genesis.GetHash(),</span></span>
+<span id="L77"><span class="lineNum">      77</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           3 :                 genesis.nVersion, genesis.nTime, /*merkle_root=*/uint256::ONE, genesis.nBits)};</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span>]
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">           2 :         return second_chain;</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :     }</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : </span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">           4 :     HeadersSyncState CreateState()</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     {</span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">           4 :         return {/*id=*/0,</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">           4 :                 Params().GetConsensus(),</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">           4 :                 HeadersSyncParams{</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :                     .commitment_period = COMMITMENT_PERIOD,</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :                     .redownload_buffer_size = REDOWNLOAD_BUFFER_SIZE,</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :                 },</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :                 chain_start,</span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaGNC">           4 :                 /*minimum_required_work=*/CHAIN_WORK};</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :     }</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : </span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : private:</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     /** Search for a nonce to meet (regtest) proof of work */</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     void FindProofOfWork(CBlockHeader&amp; starting_header);</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :     /**</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :      * Generate headers in a chain that build off a given starting hash, using</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :      * the given nVersion, advancing time by 1 second from the starting</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :      * prev_time, and with a fixed merkle root hash.</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :      */</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :     std::vector&lt;CBlockHeader&gt; GenerateHeaders(size_t count,</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :             uint256 prev_hash, int32_t nVersion, uint32_t prev_time,</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :             const uint256&amp; merkle_root, uint32_t nBits);</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : };</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : </span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">       29997 : void HeadersGeneratorSetup::FindProofOfWork(CBlockHeader&amp; starting_header)</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : {</span>
+<span id="L108"><span class="lineNum">     108</span>         [<span class="tlaGBC" title="Branch 0 was taken 29960 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 29997 times"> + </span>]:<span class="tlaGNC">       59957 :     while (!CheckProofOfWork(starting_header.GetHash(), starting_header.nBits, Params().GetConsensus())) {</span></span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">       29960 :         ++starting_header.nNonce;</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     }</span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">       29997 : }</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : </span>
+<span id="L113"><span class="lineNum">     113</span>                 :<span class="tlaGNC">           2 : std::vector&lt;CBlockHeader&gt; HeadersGeneratorSetup::GenerateHeaders(</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :         const size_t count, uint256 prev_hash, const int32_t nVersion,</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :         uint32_t prev_time, const uint256&amp; merkle_root, const uint32_t nBits)</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             : {</span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">           2 :     std::vector&lt;CBlockHeader&gt; headers(count);</span></span>
+<span id="L118"><span class="lineNum">     118</span>         [<span class="tlaGBC" title="Branch 0 was taken 29997 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">       29999 :     for (auto&amp; next_header : headers) {</span></span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">       29997 :         next_header.nVersion = nVersion;</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">       29997 :         next_header.hashPrevBlock = prev_hash;</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">       29997 :         next_header.hashMerkleRoot = merkle_root;</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">       29997 :         next_header.nTime = ++prev_time;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">       29997 :         next_header.nBits = nBits;</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             : </span>
+<span id="L125"><span class="lineNum">     125</span>         [<span class="tlaGBC" title="Branch 0 was taken 29997 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       29997 :         FindProofOfWork(next_header);</span></span>
+<span id="L126"><span class="lineNum">     126</span>         [<span class="tlaGBC" title="Branch 0 was taken 29997 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       29997 :         prev_hash = next_header.GetHash();</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     }</span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">           2 :     return headers;</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : </span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : // In this test, we construct two sets of headers from genesis, one with</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : // sufficient proof of work and one without.</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : // 1. We deliver the first set of headers and verify that the headers sync state</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : //    updates to the REDOWNLOAD phase successfully.</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             : //    Then we deliver the second set of headers and verify that they fail</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             : //    processing (presumably due to commitments not matching).</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : // 2. Verify that repeating with the first set of headers in both phases is</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             : //    successful.</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             : // 3. Repeat the second set of headers in both phases to demonstrate behavior</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : //    when the chain a peer provides has too little work.</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : BOOST_FIXTURE_TEST_SUITE(headers_sync_chainwork_tests, HeadersGeneratorSetup)</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : </span>
+<span id="L143"><span class="lineNum">     143</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           7 : BOOST_AUTO_TEST_CASE(sneaky_redownload)</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 9 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaUNC" title="Branch 22 was not taken"> - </span><span class="tlaGBC" title="Branch 23 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 34 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 35 was not taken"> - </span><span class="tlaUNC" title="Branch 36 was not taken"> - </span><span class="tlaGBC" title="Branch 37 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 39 was not taken"> - </span><span class="tlaGBC" title="Branch 40 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span><span class="tlaGBC" title="Branch 42 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 44 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 45 was not taken"> - </span><span class="tlaGBC" title="Branch 46 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 47 was not taken"> - </span><span class="tlaGBC" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 49 was not taken"> - </span><span class="tlaGBC" title="Branch 50 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 51 was not taken"> - </span><span class="tlaUNC" title="Branch 52 was not taken"> - </span><span class="tlaGBC" title="Branch 53 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 54 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 55 was not taken"> - </span><span class="tlaGBC" title="Branch 56 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 57 was not taken"> - </span><span class="tlaGBC" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 59 was not taken"> - </span><span class="tlaGBC" title="Branch 60 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 61 was not taken"> - </span><span class="tlaGBC" title="Branch 62 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 63 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 64 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 65 was not taken"> - </span><span class="tlaUNC" title="Branch 66 was not taken"> - </span><span class="tlaGBC" title="Branch 67 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 68 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 69 was not taken"> - </span>]
+<span id="L144"><span class="lineNum">     144</span>                 :             : {</span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">           1 :     const auto&amp; first_chain{FirstChain()};</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">           1 :     const auto&amp; second_chain{SecondChain()};</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :     // Feed the first chain to HeadersSyncState, by delivering 1 header</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     // initially and then the rest.</span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaGNC">           1 :     HeadersSyncState hss{CreateState()};</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :             : </span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :     // Just feed one header and check state.</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :     // Pretend the message is still &quot;full&quot;, so we don't abort.</span>
+<span id="L154"><span class="lineNum">     154</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     CHECK_RESULT(hss.ProcessNextHeaders({{first_chain.front()}}, /*full_headers_message=*/true),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaUNC" title="Branch 16 was not taken"> - </span><span class="tlaGBC" title="Branch 17 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span>]
+<span id="L155"><span class="lineNum">     155</span>                 :             :         hss, /*exp_state=*/State::PRESYNC,</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :         /*exp_success*/true, /*exp_request_more=*/true,</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :         /*exp_headers_size=*/0, /*exp_pow_validated_prev=*/std::nullopt,</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :         /*exp_locator_hash=*/first_chain.front().GetHash());</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     // This chain should look valid, and we should have met the proof-of-work</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :     // requirement during PRESYNC and transitioned to REDOWNLOAD.</span>
+<span id="L162"><span class="lineNum">     162</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     CHECK_RESULT(hss.ProcessNextHeaders(std::span{first_chain}.subspan(1), true),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaUNC" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 19 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 33 was not taken"> - </span>]
+<span id="L163"><span class="lineNum">     163</span>                 :             :         hss, /*exp_state=*/State::REDOWNLOAD,</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :         /*exp_success*/true, /*exp_request_more=*/true,</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :         /*exp_headers_size=*/0, /*exp_pow_validated_prev=*/std::nullopt,</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :         /*exp_locator_hash=*/genesis.GetHash());</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : </span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     // Below is the number of commitment bits that must randomly match between</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :     // the two chains for this test to spuriously fail. 1 / 2^25 =</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :     // 1 in 33'554'432 (somewhat less due to HeadersSyncState::m_commit_offset).</span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaGNC">           1 :     static_assert(TARGET_BLOCKS / COMMITMENT_PERIOD == 25);</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :             : </span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     // Try to sneakily feed back the second chain during REDOWNLOAD.</span>
+<span id="L174"><span class="lineNum">     174</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           1 :     CHECK_RESULT(hss.ProcessNextHeaders(second_chain, true),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaUNC" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 19 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 29 was not taken"> - </span>]
+<span id="L175"><span class="lineNum">     175</span>                 :             :         hss, /*exp_state=*/State::FINAL,</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :         /*exp_success*/false, // Foiled! We detected mismatching headers.</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :         /*exp_request_more=*/false,</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :         /*exp_headers_size=*/0, /*exp_pow_validated_prev=*/std::nullopt,</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :         /*exp_locator_hash=*/std::nullopt);</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : </span>
+<span id="L182"><span class="lineNum">     182</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           7 : BOOST_AUTO_TEST_CASE(happy_path)</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 9 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaUNC" title="Branch 22 was not taken"> - </span><span class="tlaGBC" title="Branch 23 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 34 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 35 was not taken"> - </span><span class="tlaUNC" title="Branch 36 was not taken"> - </span><span class="tlaGBC" title="Branch 37 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 39 was not taken"> - </span><span class="tlaGBC" title="Branch 40 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span><span class="tlaGBC" title="Branch 42 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 44 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 45 was not taken"> - </span><span class="tlaGBC" title="Branch 46 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 47 was not taken"> - </span><span class="tlaGBC" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 49 was not taken"> - </span><span class="tlaGBC" title="Branch 50 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 51 was not taken"> - </span><span class="tlaUNC" title="Branch 52 was not taken"> - </span><span class="tlaGBC" title="Branch 53 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 54 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 55 was not taken"> - </span><span class="tlaGBC" title="Branch 56 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 57 was not taken"> - </span><span class="tlaGBC" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 59 was not taken"> - </span><span class="tlaGBC" title="Branch 60 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 61 was not taken"> - </span><span class="tlaGBC" title="Branch 62 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 63 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 64 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 65 was not taken"> - </span><span class="tlaUNC" title="Branch 66 was not taken"> - </span><span class="tlaGBC" title="Branch 67 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 68 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 69 was not taken"> - </span>]
+<span id="L183"><span class="lineNum">     183</span>                 :             : {</span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">           1 :     const auto&amp; first_chain{FirstChain()};</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :             : </span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     // Headers message that moves us to the next state doesn't need to be full.</span>
+<span id="L187"><span class="lineNum">     187</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :     for (const bool full_headers_message : {false, true}) {</span></span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :         // This time we feed the first chain twice.</span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">           2 :         HeadersSyncState hss{CreateState()};</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :         // Sufficient work transitions us from PRESYNC to REDOWNLOAD:</span>
+<span id="L192"><span class="lineNum">     192</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 :         const auto genesis_hash{genesis.GetHash()};</span></span>
+<span id="L193"><span class="lineNum">     193</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           4 :         CHECK_RESULT(hss.ProcessNextHeaders(first_chain, full_headers_message),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 2 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaUNC" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 19 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 2 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span>]
+<span id="L194"><span class="lineNum">     194</span>                 :             :             hss, /*exp_state=*/State::REDOWNLOAD,</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :             /*exp_success*/true, /*exp_request_more=*/true,</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :             /*exp_headers_size=*/0, /*exp_pow_validated_prev=*/std::nullopt,</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :             /*exp_locator_hash=*/genesis_hash);</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             : </span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :         // Process only so that the internal threshold isn't exceeded, meaning</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :         // validated headers shouldn't be returned yet:</span>
+<span id="L201"><span class="lineNum">     201</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           4 :         CHECK_RESULT(hss.ProcessNextHeaders({first_chain.begin(), REDOWNLOAD_BUFFER_SIZE}, true),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 2 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaUNC" title="Branch 16 was not taken"> - </span><span class="tlaGBC" title="Branch 17 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 2 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 2 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span>]
+<span id="L202"><span class="lineNum">     202</span>                 :             :             hss, /*exp_state=*/State::REDOWNLOAD,</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :             /*exp_success*/true, /*exp_request_more=*/true,</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :             /*exp_headers_size=*/0, /*exp_pow_validated_prev=*/std::nullopt,</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :             /*exp_locator_hash=*/first_chain[REDOWNLOAD_BUFFER_SIZE - 1].GetHash());</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : </span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :         // We start receiving headers for permanent storage before completing:</span>
+<span id="L208"><span class="lineNum">     208</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           4 :         CHECK_RESULT(hss.ProcessNextHeaders({{first_chain[REDOWNLOAD_BUFFER_SIZE]}}, true),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 2 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaUNC" title="Branch 16 was not taken"> - </span><span class="tlaGBC" title="Branch 17 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 2 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 2 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 2 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 33 was not taken"> - </span>]
+<span id="L209"><span class="lineNum">     209</span>                 :             :             hss, /*exp_state=*/State::REDOWNLOAD,</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :             /*exp_success*/true, /*exp_request_more=*/true,</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :             /*exp_headers_size=*/1, /*exp_pow_validated_prev=*/genesis_hash,</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :             /*exp_locator_hash=*/first_chain[REDOWNLOAD_BUFFER_SIZE].GetHash());</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :         // Feed in remaining headers, meeting the work threshold again and</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :         // completing the REDOWNLOAD phase:</span>
+<span id="L216"><span class="lineNum">     216</span>   [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :         CHECK_RESULT(hss.ProcessNextHeaders({first_chain.begin() + REDOWNLOAD_BUFFER_SIZE + 1, first_chain.end()}, full_headers_message),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 2 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaUNC" title="Branch 16 was not taken"> - </span><span class="tlaGBC" title="Branch 17 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 19 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 2 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 2 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 33 was not taken"> - </span>]
+<span id="L217"><span class="lineNum">     217</span>                 :             :             hss, /*exp_state=*/State::FINAL,</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :             /*exp_success*/true, /*exp_request_more=*/false,</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :             // All headers except the one already returned above:</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :             /*exp_headers_size=*/first_chain.size() - 1, /*exp_pow_validated_prev=*/first_chain.front().GetHash(),</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :             /*exp_locator_hash=*/std::nullopt);</span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaGNC">           2 :     }</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : </span>
+<span id="L225"><span class="lineNum">     225</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           7 : BOOST_AUTO_TEST_CASE(too_little_work)</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 9 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaUNC" title="Branch 22 was not taken"> - </span><span class="tlaGBC" title="Branch 23 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span><span class="tlaGBC" title="Branch 32 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 34 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 35 was not taken"> - </span><span class="tlaUNC" title="Branch 36 was not taken"> - </span><span class="tlaGBC" title="Branch 37 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 39 was not taken"> - </span><span class="tlaGBC" title="Branch 40 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span><span class="tlaGBC" title="Branch 42 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 44 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 45 was not taken"> - </span><span class="tlaGBC" title="Branch 46 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 47 was not taken"> - </span><span class="tlaGBC" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 49 was not taken"> - </span><span class="tlaGBC" title="Branch 50 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 51 was not taken"> - </span><span class="tlaUNC" title="Branch 52 was not taken"> - </span><span class="tlaGBC" title="Branch 53 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 54 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 55 was not taken"> - </span><span class="tlaGBC" title="Branch 56 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 57 was not taken"> - </span><span class="tlaGBC" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 59 was not taken"> - </span><span class="tlaGBC" title="Branch 60 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 61 was not taken"> - </span><span class="tlaGBC" title="Branch 62 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 63 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 64 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 65 was not taken"> - </span><span class="tlaUNC" title="Branch 66 was not taken"> - </span><span class="tlaGBC" title="Branch 67 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 68 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 69 was not taken"> - </span>]
+<span id="L226"><span class="lineNum">     226</span>                 :             : {</span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">           1 :     const auto&amp; second_chain{SecondChain()};</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :             : </span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     // Verify that just trying to process the second chain would not succeed</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     // (too little work).</span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaGNC">           1 :     HeadersSyncState hss{CreateState()};</span></span>
+<span id="L232"><span class="lineNum">     232</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">           1 :     BOOST_REQUIRE_EQUAL(hss.GetState(), State::PRESYNC);</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :             : </span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :     // Pretend just the first message is &quot;full&quot;, so we don't abort.</span>
+<span id="L235"><span class="lineNum">     235</span>   [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           2 :     CHECK_RESULT(hss.ProcessNextHeaders({{second_chain.front()}}, true),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaUNC" title="Branch 16 was not taken"> - </span><span class="tlaGBC" title="Branch 17 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 19 was not taken"> - </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 31 was not taken"> - </span>]
+<span id="L236"><span class="lineNum">     236</span>                 :             :         hss, /*exp_state=*/State::PRESYNC,</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :         /*exp_success*/true, /*exp_request_more=*/true,</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :         /*exp_headers_size=*/0, /*exp_pow_validated_prev=*/std::nullopt,</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :         /*exp_locator_hash=*/second_chain.front().GetHash());</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             : </span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :     // Tell the sync logic that the headers message was not full, implying no</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :     // more headers can be requested. For a low-work-chain, this should cause</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :     // the sync to end with no headers for acceptance.</span>
+<span id="L244"><span class="lineNum">     244</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 2 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">           1 :     CHECK_RESULT(hss.ProcessNextHeaders(std::span{second_chain}.subspan(1), false),</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaGBC" title="Branch 6 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 7 was not taken"> - </span><span class="tlaGBC" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaGBC" title="Branch 10 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 11 was not taken"> - </span><span class="tlaGBC" title="Branch 12 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 15 was not taken"> - </span><span class="tlaGBC" title="Branch 16 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 17 was not taken"> - </span><span class="tlaUNC" title="Branch 18 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 19 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 20 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaGBC" title="Branch 26 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 27 was not taken"> - </span><span class="tlaGBC" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 29 was not taken"> - </span>]
+<span id="L245"><span class="lineNum">     245</span>                 :             :         hss, /*exp_state=*/State::FINAL,</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :         // Nevertheless, no validation errors should have been detected with the</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :         // chain:</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :         /*exp_success*/true,</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :         /*exp_request_more=*/false,</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :         /*exp_headers_size=*/0, /*exp_pow_validated_prev=*/std::nullopt,</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :         /*exp_locator_hash=*/std::nullopt);</span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L253"><span class="lineNum">     253</span>                 :             : </span>
+<span id="L254"><span class="lineNum">     254</span>                 :             : BOOST_AUTO_TEST_SUITE_END()</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
