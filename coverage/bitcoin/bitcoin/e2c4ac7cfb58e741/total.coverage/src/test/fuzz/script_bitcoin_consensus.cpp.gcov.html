@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/test/fuzz/script_bitcoin_consensus.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/test/fuzz</a> - script_bitcoin_consensus.cpp<span style="font-size: 80%;"> (source / <a href="script_bitcoin_consensus.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2000-01-01 12:00:00</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2020 The Bitcoin Core developers</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : #include &lt;script/bitcoinconsensus.h&gt;</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #include &lt;script/interpreter.h&gt;</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #include &lt;test/fuzz/fuzz.h&gt;</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;test/fuzz/util.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : </a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #include &lt;cstdint&gt;</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : #include &lt;string&gt;</a>
+<a name="13"><span class="lineNum">      13 </span>                :            : #include &lt;vector&gt;</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : </a>
+<a name="15"><span class="lineNum">      15 </span>                :<span class="lineNoCov">          0 : FUZZ_TARGET(script_bitcoin_consensus)</span></a>
+<a name="16"><span class="lineNum">      16 </span>                :            : {</a>
+<a name="17"><span class="lineNum">      17 </span>                :<span class="lineNoCov">          0 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></a>
+<a name="18"><span class="lineNum">      18 </span>                :<span class="lineNoCov">          0 :     const std::vector&lt;uint8_t&gt; random_bytes_1 = ConsumeRandomLengthByteVector(fuzzed_data_provider);</span></a>
+<a name="19"><span class="lineNum">      19 </span>                :<span class="lineNoCov">          0 :     const std::vector&lt;uint8_t&gt; random_bytes_2 = ConsumeRandomLengthByteVector(fuzzed_data_provider);</span></a>
+<a name="20"><span class="lineNum">      20 </span>                :<span class="lineNoCov">          0 :     const CAmount money = ConsumeMoney(fuzzed_data_provider);</span></a>
+<a name="21"><span class="lineNum">      21 </span>                :<span class="lineNoCov">          0 :     bitcoinconsensus_error err;</span></a>
+<a name="22"><span class="lineNum">      22 </span>                :<span class="lineNoCov">          0 :     bitcoinconsensus_error* err_p = fuzzed_data_provider.ConsumeBool() ? &amp;err : nullptr;</span></a>
+<a name="23"><span class="lineNum">      23 </span>                :<span class="lineNoCov">          0 :     const unsigned int n_in = fuzzed_data_provider.ConsumeIntegral&lt;unsigned int&gt;();</span></a>
+<a name="24"><span class="lineNum">      24 </span>                :<span class="lineNoCov">          0 :     const unsigned int flags = fuzzed_data_provider.ConsumeIntegral&lt;unsigned int&gt;();</span></a>
+<a name="25"><span class="lineNum">      25 </span>                :<span class="lineNoCov">          0 :     assert(bitcoinconsensus_version() == BITCOINCONSENSUS_API_VER);</span></a>
+<a name="26"><span class="lineNum">      26 </span>                :<span class="lineNoCov">          0 :     if ((flags &amp; SCRIPT_VERIFY_WITNESS) != 0 &amp;&amp; (flags &amp; SCRIPT_VERIFY_P2SH) == 0) {</span></a>
+<a name="27"><span class="lineNum">      27 </span>                :<span class="lineNoCov">          0 :         return;</span></a>
+<a name="28"><span class="lineNum">      28 </span>                :            :     }</a>
+<a name="29"><span class="lineNum">      29 </span>                :<span class="lineNoCov">          0 :     (void)bitcoinconsensus_verify_script(random_bytes_1.data(), random_bytes_1.size(), random_bytes_2.data(), random_bytes_2.size(), n_in, flags, err_p);</span></a>
+<a name="30"><span class="lineNum">      30 </span>                :<span class="lineNoCov">          0 :     (void)bitcoinconsensus_verify_script_with_amount(random_bytes_1.data(), random_bytes_1.size(), money, random_bytes_2.data(), random_bytes_2.size(), n_in, flags, err_p);</span></a>
+<a name="31"><span class="lineNum">      31 </span>                :            : }</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

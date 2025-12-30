@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/wallet/fees.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/wallet</a> - fees.cpp<span style="font-size: 80%;"> (source / <a href="fees.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryHi">94.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2000-01-01 12:00:00</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntry">44</td>
+            <td class="headerCovTableEntryMed">88.6 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2009-2010 Satoshi Nakamoto</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Copyright (c) 2009-2019 The Bitcoin Core developers</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="5"><span class="lineNum">       5 </span>                :            : </a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #include &lt;wallet/fees.h&gt;</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #include &lt;wallet/coincontrol.h&gt;</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;wallet/wallet.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : </a>
+<a name="11"><span class="lineNum">      11 </span>                :            : </a>
+<a name="12"><span class="lineNum">      12 </span>                :<span class="lineCov">          9 : CAmount GetRequiredFee(const CWallet&amp; wallet, unsigned int nTxBytes)</span></a>
+<a name="13"><span class="lineNum">      13 </span>                :            : {</a>
+<a name="14"><span class="lineNum">      14 </span>                :<span class="lineCov">          9 :     return GetRequiredFeeRate(wallet).GetFee(nTxBytes);</span></a>
+<a name="15"><span class="lineNum">      15 </span>                :            : }</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : </a>
+<a name="17"><span class="lineNum">      17 </span>                :            : </a>
+<a name="18"><span class="lineNum">      18 </span>                :<span class="lineCov">       3262 : CAmount GetMinimumFee(const CWallet&amp; wallet, unsigned int nTxBytes, const CCoinControl&amp; coin_control, FeeCalculation* feeCalc)</span></a>
+<a name="19"><span class="lineNum">      19 </span>                :            : {</a>
+<a name="20"><span class="lineNum">      20 </span>                :<span class="lineCov">       3262 :     return GetMinimumFeeRate(wallet, coin_control, feeCalc).GetFee(nTxBytes);</span></a>
+<a name="21"><span class="lineNum">      21 </span>                :            : }</a>
+<a name="22"><span class="lineNum">      22 </span>                :            : </a>
+<a name="23"><span class="lineNum">      23 </span>                :<span class="lineCov">      23065 : CFeeRate GetRequiredFeeRate(const CWallet&amp; wallet)</span></a>
+<a name="24"><span class="lineNum">      24 </span>                :            : {</a>
+<a name="25"><span class="lineNum">      25 </span>        [<span class="branchCov" title="Branch 0 was taken 18 times"> + </span><span class="branchCov" title="Branch 1 was taken 23047 times"> + </span>]:<span class="lineCov">      23065 :     return std::max(wallet.m_min_fee, wallet.chain().relayMinFee());</span></a>
+<a name="26"><span class="lineNum">      26 </span>                :            : }</a>
+<a name="27"><span class="lineNum">      27 </span>                :            : </a>
+<a name="28"><span class="lineNum">      28 </span>                :<span class="lineCov">      23314 : CFeeRate GetMinimumFeeRate(const CWallet&amp; wallet, const CCoinControl&amp; coin_control, FeeCalculation* feeCalc)</span></a>
+<a name="29"><span class="lineNum">      29 </span>                :            : {</a>
+<a name="30"><span class="lineNum">      30 </span>                :            :     /* User control of how to calculate fee uses the following parameter precedence:</a>
+<a name="31"><span class="lineNum">      31 </span>                :            :        1. coin_control.m_feerate</a>
+<a name="32"><span class="lineNum">      32 </span>                :            :        2. coin_control.m_confirm_target</a>
+<a name="33"><span class="lineNum">      33 </span>                :            :        3. m_pay_tx_fee (user-set member variable of wallet)</a>
+<a name="34"><span class="lineNum">      34 </span>                :            :        4. m_confirm_target (user-set member variable of wallet)</a>
+<a name="35"><span class="lineNum">      35 </span>                :            :        The first parameter that is set is used.</a>
+<a name="36"><span class="lineNum">      36 </span>                :            :     */</a>
+<a name="37"><span class="lineNum">      37 </span>        [<span class="branchCov" title="Branch 0 was taken 697 times"> + </span><span class="branchCov" title="Branch 1 was taken 22617 times"> + </span>]:<span class="lineCov">      23314 :     CFeeRate feerate_needed;</span></a>
+<a name="38"><span class="lineNum">      38 </span>        [<span class="branchCov" title="Branch 0 was taken 697 times"> + </span><span class="branchCov" title="Branch 1 was taken 22617 times"> + </span>]:<span class="lineCov">      23314 :     if (coin_control.m_feerate) { // 1.</span></a>
+<a name="39"><span class="lineNum">      39 </span>                :<span class="lineCov">        697 :         feerate_needed = *(coin_control.m_feerate);</span></a>
+<a name="40"><span class="lineNum">      40 </span>        [<span class="branchCov" title="Branch 0 was taken 685 times"> + </span><span class="branchCov" title="Branch 1 was taken 12 times"> + </span>]:<span class="lineCov">        697 :         if (feeCalc) feeCalc-&gt;reason = FeeReason::PAYTXFEE;</span></a>
+<a name="41"><span class="lineNum">      41 </span>                :            :         // Allow to override automatic min/max check over coin control instance</a>
+<a name="42"><span class="lineNum">      42 </span>        [<span class="branchCov" title="Branch 0 was taken 130 times"> + </span><span class="branchCov" title="Branch 1 was taken 567 times"> + </span>]:<span class="lineCov">        697 :         if (coin_control.fOverrideFeeRate) return feerate_needed;</span></a>
+<a name="43"><span class="lineNum">      43 </span>                :            :     }</a>
+<a name="44"><span class="lineNum">      44 </span>  [<span class="branchCov" title="Branch 0 was taken 5385 times"> + </span><span class="branchCov" title="Branch 1 was taken 17232 times"> + </span><span class="branchCov" title="Branch 2 was taken 491 times"> + </span><span class="branchCov" title="Branch 3 was taken 4894 times"> + </span>]:<span class="lineCov">      22617 :     else if (!coin_control.m_confirm_target &amp;&amp; wallet.m_pay_tx_fee != CFeeRate(0)) { // 3. TODO: remove magic value of 0 for wallet member m_pay_tx_fee</span></a>
+<a name="45"><span class="lineNum">      45 </span>                :<span class="lineCov">        491 :         feerate_needed = wallet.m_pay_tx_fee;</span></a>
+<a name="46"><span class="lineNum">      46 </span>        [<span class="branchCov" title="Branch 0 was taken 486 times"> + </span><span class="branchCov" title="Branch 1 was taken 5 times"> + </span>]:<span class="lineCov">        491 :         if (feeCalc) feeCalc-&gt;reason = FeeReason::PAYTXFEE;</span></a>
+<a name="47"><span class="lineNum">      47 </span>                :            :     }</a>
+<a name="48"><span class="lineNum">      48 </span>                :            :     else { // 2. or 4.</a>
+<a name="49"><span class="lineNum">      49 </span>                :            :         // We will use smart fee estimation</a>
+<a name="50"><span class="lineNum">      50 </span>        [<span class="branchCov" title="Branch 0 was taken 17232 times"> + </span><span class="branchCov" title="Branch 1 was taken 4894 times"> + </span>]:<span class="lineCov">      22126 :         unsigned int target = coin_control.m_confirm_target ? *coin_control.m_confirm_target : wallet.m_confirm_target;</span></a>
+<a name="51"><span class="lineNum">      51 </span>                :            :         // By default estimates are economical iff we are signaling opt-in-RBF</a>
+<a name="52"><span class="lineNum">      52 </span>        [<span class="branchCov" title="Branch 0 was taken 193 times"> + </span><span class="branchCov" title="Branch 1 was taken 21933 times"> + </span>]:<span class="lineCov">      22126 :         bool conservative_estimate = !coin_control.m_signal_bip125_rbf.get_value_or(wallet.m_signal_rbf);</span></a>
+<a name="53"><span class="lineNum">      53 </span>                :            :         // Allow to override the default fee estimate mode over the CoinControl instance</a>
+<a name="54"><span class="lineNum">      54 </span>        [<span class="branchCov" title="Branch 0 was taken 22126 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      22126 :         if (coin_control.m_fee_mode == FeeEstimateMode::CONSERVATIVE) conservative_estimate = true;</span></a>
+<a name="55"><span class="lineNum">      55 </span>        [<span class="branchCov" title="Branch 0 was taken 8 times"> + </span><span class="branchCov" title="Branch 1 was taken 22118 times"> + </span>]:<span class="lineCov">      22126 :         else if (coin_control.m_fee_mode == FeeEstimateMode::ECONOMICAL) conservative_estimate = false;</span></a>
+<a name="56"><span class="lineNum">      56 </span>                :            : </a>
+<a name="57"><span class="lineNum">      57 </span>                :<span class="lineCov">      22126 :         feerate_needed = wallet.chain().estimateSmartFee(target, conservative_estimate, feeCalc);</span></a>
+<a name="58"><span class="lineNum">      58 </span>        [<span class="branchCov" title="Branch 0 was taken 13653 times"> + </span><span class="branchCov" title="Branch 1 was taken 8473 times"> + </span>]:<span class="lineCov">      22126 :         if (feerate_needed == CFeeRate(0)) {</span></a>
+<a name="59"><span class="lineNum">      59 </span>                :            :             // if we don't have enough data for estimateSmartFee, then use fallback fee</a>
+<a name="60"><span class="lineNum">      60 </span>                :<span class="lineCov">      13653 :             feerate_needed = wallet.m_fallback_fee;</span></a>
+<a name="61"><span class="lineNum">      61 </span>        [<span class="branchCov" title="Branch 0 was taken 13566 times"> + </span><span class="branchCov" title="Branch 1 was taken 87 times"> + </span>]:<span class="lineCov">      13653 :             if (feeCalc) feeCalc-&gt;reason = FeeReason::FALLBACK;</span></a>
+<a name="62"><span class="lineNum">      62 </span>                :            : </a>
+<a name="63"><span class="lineNum">      63 </span>                :            :             // directly return if fallback fee is disabled (feerate 0 == disabled)</a>
+<a name="64"><span class="lineNum">      64 </span>        [<span class="branchCov" title="Branch 0 was taken 128 times"> + </span><span class="branchCov" title="Branch 1 was taken 13525 times"> + </span>]:<span class="lineCov">      13653 :             if (wallet.m_fallback_fee == CFeeRate(0)) return feerate_needed;</span></a>
+<a name="65"><span class="lineNum">      65 </span>                :            :         }</a>
+<a name="66"><span class="lineNum">      66 </span>                :            :         // Obey mempool min fee when using smart fee estimation</a>
+<a name="67"><span class="lineNum">      67 </span>                :<span class="lineCov">      21998 :         CFeeRate min_mempool_feerate = wallet.chain().mempoolMinFee();</span></a>
+<a name="68"><span class="lineNum">      68 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 21998 times"> + </span>]:<span class="lineCov">      21998 :         if (feerate_needed &lt; min_mempool_feerate) {</span></a>
+<a name="69"><span class="lineNum">      69 </span>                :<span class="lineNoCov">          0 :             feerate_needed = min_mempool_feerate;</span></a>
+<a name="70"><span class="lineNum">      70 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :             if (feeCalc) feeCalc-&gt;reason = FeeReason::MEMPOOL_MIN;</span></a>
+<a name="71"><span class="lineNum">      71 </span>                :            :         }</a>
+<a name="72"><span class="lineNum">      72 </span>                :            :     }</a>
+<a name="73"><span class="lineNum">      73 </span>                :            : </a>
+<a name="74"><span class="lineNum">      74 </span>                :            :     // prevent user from paying a fee below the required fee rate</a>
+<a name="75"><span class="lineNum">      75 </span>                :<span class="lineCov">      23056 :     CFeeRate required_feerate = GetRequiredFeeRate(wallet);</span></a>
+<a name="76"><span class="lineNum">      76 </span>        [<span class="branchCov" title="Branch 0 was taken 38 times"> + </span><span class="branchCov" title="Branch 1 was taken 23018 times"> + </span>]:<span class="lineCov">      23056 :     if (required_feerate &gt; feerate_needed) {</span></a>
+<a name="77"><span class="lineNum">      77 </span>                :<span class="lineCov">         38 :         feerate_needed = required_feerate;</span></a>
+<a name="78"><span class="lineNum">      78 </span>        [<span class="branchCov" title="Branch 0 was taken 38 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         38 :         if (feeCalc) feeCalc-&gt;reason = FeeReason::REQUIRED;</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :            :     }</a>
+<a name="80"><span class="lineNum">      80 </span>                :<span class="lineCov">      23056 :     return feerate_needed;</span></a>
+<a name="81"><span class="lineNum">      81 </span>                :            : }</a>
+<a name="82"><span class="lineNum">      82 </span>                :            : </a>
+<a name="83"><span class="lineNum">      83 </span>                :<span class="lineCov">      19968 : CFeeRate GetDiscardRate(const CWallet&amp; wallet)</span></a>
+<a name="84"><span class="lineNum">      84 </span>                :            : {</a>
+<a name="85"><span class="lineNum">      85 </span>                :<span class="lineCov">      19968 :     unsigned int highest_target = wallet.chain().estimateMaxBlocks();</span></a>
+<a name="86"><span class="lineNum">      86 </span>                :<span class="lineCov">      19968 :     CFeeRate discard_rate = wallet.chain().estimateSmartFee(highest_target, false /* conservative */);</span></a>
+<a name="87"><span class="lineNum">      87 </span>                :            :     // Don't let discard_rate be greater than longest possible fee estimate if we get a valid fee estimate</a>
+<a name="88"><span class="lineNum">      88 </span>  [<span class="branchCov" title="Branch 0 was taken 12432 times"> + </span><span class="branchCov" title="Branch 1 was taken 7536 times"> + </span><span class="branchCov" title="Branch 2 was taken 7086 times"> + </span><span class="branchCov" title="Branch 3 was taken 450 times"> + </span>]:<span class="lineCov">      19968 :     discard_rate = (discard_rate == CFeeRate(0)) ? wallet.m_discard_rate : std::min(discard_rate, wallet.m_discard_rate);</span></a>
+<a name="89"><span class="lineNum">      89 </span>                :            :     // Discard rate must be at least dustRelayFee</a>
+<a name="90"><span class="lineNum">      90 </span>        [<span class="branchCov" title="Branch 0 was taken 354 times"> + </span><span class="branchCov" title="Branch 1 was taken 19614 times"> + </span>]:<span class="lineCov">      19968 :     discard_rate = std::max(discard_rate, wallet.chain().relayDustFee());</span></a>
+<a name="91"><span class="lineNum">      91 </span>                :<span class="lineCov">      19968 :     return discard_rate;</span></a>
+<a name="92"><span class="lineNum">      92 </span>                :            : }</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - total_coverage.info - src/chainparams.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - chainparams.h<span style="font-size: 80%;"> (source / <a href="chainparams.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">total_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryHi">95.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2000-01-01 12:00:00</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">84</td>
+            <td class="headerCovTableEntry">138</td>
+            <td class="headerCovTableEntryLo">60.9 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2009-2010 Satoshi Nakamoto</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Copyright (c) 2009-2020 The Bitcoin Core developers</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="5"><span class="lineNum">       5 </span>                :            : </a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #ifndef BITCOIN_CHAINPARAMS_H</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : #define BITCOIN_CHAINPARAMS_H</a>
+<a name="8"><span class="lineNum">       8 </span>                :            : </a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;chainparamsbase.h&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;consensus/params.h&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #include &lt;primitives/block.h&gt;</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : #include &lt;protocol.h&gt;</a>
+<a name="13"><span class="lineNum">      13 </span>                :            : </a>
+<a name="14"><span class="lineNum">      14 </span>                :            : #include &lt;memory&gt;</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : #include &lt;vector&gt;</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : </a>
+<a name="17"><span class="lineNum">      17 </span>                :            : struct SeedSpec6 {</a>
+<a name="18"><span class="lineNum">      18 </span>                :            :     uint8_t addr[16];</a>
+<a name="19"><span class="lineNum">      19 </span>                :            :     uint16_t port;</a>
+<a name="20"><span class="lineNum">      20 </span>                :            : };</a>
+<a name="21"><span class="lineNum">      21 </span>                :            : </a>
+<a name="22"><span class="lineNum">      22 </span>                :            : typedef std::map&lt;int, uint256&gt; MapCheckpoints;</a>
+<a name="23"><span class="lineNum">      23 </span>                :            : </a>
+<a name="24"><span class="lineNum">      24 </span>        [<span class="branchCov" title="Branch 0 was taken 1767 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">       4674 : struct CCheckpointData {</span></a>
+<a name="25"><span class="lineNum">      25 </span>                :            :     MapCheckpoints mapCheckpoints;</a>
+<a name="26"><span class="lineNum">      26 </span>                :            : </a>
+<a name="27"><span class="lineNum">      27 </span>                :<span class="lineCov">       1070 :     int GetHeight() const {</span></a>
+<a name="28"><span class="lineNum">      28 </span>                :<span class="lineCov">       1070 :         const auto&amp; final_checkpoint = mapCheckpoints.rbegin();</span></a>
+<a name="29"><span class="lineNum">      29 </span>                :<span class="lineCov">       1070 :         return final_checkpoint-&gt;first /* height */;</span></a>
+<a name="30"><span class="lineNum">      30 </span>                :            :     }</a>
+<a name="31"><span class="lineNum">      31 </span>                :            : };</a>
+<a name="32"><span class="lineNum">      32 </span>                :            : </a>
+<a name="33"><span class="lineNum">      33 </span>                :            : /**</a>
+<a name="34"><span class="lineNum">      34 </span>                :            :  * Holds various statistics on transactions within a chain. Used to estimate</a>
+<a name="35"><span class="lineNum">      35 </span>                :            :  * verification progress during chain sync.</a>
+<a name="36"><span class="lineNum">      36 </span>                :            :  *</a>
+<a name="37"><span class="lineNum">      37 </span>                :            :  * See also: CChainParams::TxData, GuessVerificationProgress.</a>
+<a name="38"><span class="lineNum">      38 </span>                :            :  */</a>
+<a name="39"><span class="lineNum">      39 </span>                :            : struct ChainTxData {</a>
+<a name="40"><span class="lineNum">      40 </span>                :            :     int64_t nTime;    //!&lt; UNIX timestamp of last known number of transactions</a>
+<a name="41"><span class="lineNum">      41 </span>                :            :     int64_t nTxCount; //!&lt; total number of transactions between genesis and that timestamp</a>
+<a name="42"><span class="lineNum">      42 </span>                :            :     double dTxRate;   //!&lt; estimated number of transactions per second after that timestamp</a>
+<a name="43"><span class="lineNum">      43 </span>                :            : };</a>
+<a name="44"><span class="lineNum">      44 </span>                :            : </a>
+<a name="45"><span class="lineNum">      45 </span>                :            : /**</a>
+<a name="46"><span class="lineNum">      46 </span>                :            :  * CChainParams defines various tweakable parameters of a given instance of the</a>
+<a name="47"><span class="lineNum">      47 </span>                :            :  * Bitcoin system. There are three: the main network on which people trade goods</a>
+<a name="48"><span class="lineNum">      48 </span>                :            :  * and services, the public test network which gets reset from time to time and</a>
+<a name="49"><span class="lineNum">      49 </span>                :            :  * a regression test mode which is intended for private networks only. It has</a>
+<a name="50"><span class="lineNum">      50 </span>                :            :  * minimal difficulty to ensure that blocks can be found instantly.</a>
+<a name="51"><span class="lineNum">      51 </span>                :            :  */</a>
+<a name="52"><span class="lineNum">      52 </span>                :            : class CChainParams</a>
+<a name="53"><span class="lineNum">      53 </span>                :            : {</a>
+<a name="54"><span class="lineNum">      54 </span>                :            : public:</a>
+<a name="55"><span class="lineNum">      55 </span>                :            :     enum Base58Type {</a>
+<a name="56"><span class="lineNum">      56 </span>                :            :         PUBKEY_ADDRESS,</a>
+<a name="57"><span class="lineNum">      57 </span>                :            :         SCRIPT_ADDRESS,</a>
+<a name="58"><span class="lineNum">      58 </span>                :            :         SECRET_KEY,</a>
+<a name="59"><span class="lineNum">      59 </span>                :            :         EXT_PUBLIC_KEY,</a>
+<a name="60"><span class="lineNum">      60 </span>                :            :         EXT_SECRET_KEY,</a>
+<a name="61"><span class="lineNum">      61 </span>                :            : </a>
+<a name="62"><span class="lineNum">      62 </span>                :            :         MAX_BASE58_TYPES</a>
+<a name="63"><span class="lineNum">      63 </span>                :            :     };</a>
+<a name="64"><span class="lineNum">      64 </span>                :            : </a>
+<a name="65"><span class="lineNum">      65 </span>  [<span class="branchCov" title="Branch 0 was taken 123321 times"> + </span><span class="branchCov" title="Branch 1 was taken 10 times"> + </span><span class="branchCov" title="Branch 2 was taken 33097 times"> + </span><span class="branchCov" title="Branch 3 was taken 22 times"> + </span> :<span class="lineCov">    8037175 :     const Consensus::Params&amp; GetConsensus() const { return consensus; }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 609246 times"> + </span><span class="branchCov" title="Branch 5 was taken 1423 times"> + </span><span class="branchCov" title="Branch 6 was taken 21318 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 35532 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 87683 times"> + </span><span class="branchCov" title="Branch 11 was taken 1547 times"> + </span><span class="branchCov" title="Branch 12 was taken 55446 times"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 5776 times"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 19974 times"> + </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 17272 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 19 was not taken"> - </span><span class="branchCov" title="Branch 20 was taken 39970 times"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span><span class="branchCov" title="Branch 22 was taken 2895 times"> + </span><span class="branchNoCov" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 24 was taken 207 times"> + </span><span class="branchNoCov" title="Branch 25 was not taken"> - </span><span class="branchCov" title="Branch 26 was taken 20267 times"> + </span><span class="branchNoCov" title="Branch 27 was not taken"> - </span><span class="branchCov" title="Branch 28 was taken 20262 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 29 was not taken"> - </span><span class="branchCov" title="Branch 30 was taken 64427 times"> + </span><span class="branchNoCov" title="Branch 31 was not taken"> - </span><span class="branchCov" title="Branch 32 was taken 51956 times"> + </span><span class="branchNoCov" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 34 was taken 34905 times"> + </span><span class="branchNoCov" title="Branch 35 was not taken"> - </span><span class="branchCov" title="Branch 36 was taken 100439 times"> + </span><span class="branchCov" title="Branch 37 was taken 11 times"> + </span><span class="branchCov" title="Branch 38 was taken 62 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 39 was not taken"> - </span><span class="branchCov" title="Branch 40 was taken 44697 times"> + </span><span class="branchNoCov" title="Branch 41 was not taken"> - </span><span class="branchCov" title="Branch 42 was taken 6770 times"> + </span><span class="branchNoCov" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 44 was taken 4764 times"> + </span><span class="branchNoCov" title="Branch 45 was not taken"> - </span><span class="branchCov" title="Branch 46 was taken 1434688 times"> + </span><span class="branchNoCov" title="Branch 47 was not taken"> - </span><span class="branchCov" title="Branch 48 was taken 4192569 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 49 was not taken"> - </span><span class="branchNoCov" title="Branch 50 was not taken"> - </span><span class="branchCov" title="Branch 51 was taken 16746 times"> + </span><span class="branchCov" title="Branch 52 was taken 18728 times"> + </span><span class="branchCov" title="Branch 53 was taken 55135 times"> + </span> 
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 54 was taken 71154 times"> + </span><span class="branchNoCov" title="Branch 55 was not taken"> - </span>]
+<a name="66"><span class="lineNum">      66 </span>  [<span class="branchCov" title="Branch 0 was taken 9274 times"> + </span><span class="branchCov" title="Branch 1 was taken 98497 times"> + </span><span class="branchCov" title="Branch 2 was taken 859 times"> + </span><span class="branchCov" title="Branch 3 was taken 1438 times"> + </span> :<span class="lineCov">     315430 :     const CMessageHeader::MessageStartChars&amp; MessageStart() const { return pchMessageStart; }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 859 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchNoCov" title="Branch 6 was not taken"> - </span><span class="branchCov" title="Branch 7 was taken 238 times"> + </span><span class="branchCov" title="Branch 8 was taken 437 times"> + </span> 
+<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 437 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchNoCov" title="Branch 12 was not taken"> - </span> 
+<span class="lineNum">         </span>            <span class="branchCov" title="Branch 13 was taken 2 times"> + </span>]
+<a name="67"><span class="lineNum">      67 </span>  [<span class="branchCov" title="Branch 0 was taken 1073 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 367 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">       3178 :     int GetDefaultPort() const { return nDefaultPort; }</span></a>
+<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 4 was not taken"> - </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 277 times"> + </span><span class="branchCov" title="Branch 7 was taken 7 times"> + </span>]
+<a name="68"><span class="lineNum">      68 </span>                :            : </a>
+<a name="69"><span class="lineNum">      69 </span>  [<span class="branchCov" title="Branch 0 was taken 642 times"> + </span><span class="branchCov" title="Branch 1 was taken 684 times"> + </span><span class="branchCov" title="Branch 2 was taken 306 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">       1636 :     const CBlock&amp; GenesisBlock() const { return genesis; }</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]
+<a name="70"><span class="lineNum">      70 </span>                :            :     /** Default value for -checkmempool and -checkblockindex argument */</a>
+<a name="71"><span class="lineNum">      71 </span>  [<span class="branchCov" title="Branch 0 was taken 10 times"> + </span><span class="branchCov" title="Branch 1 was taken 544 times"> + </span><span class="branchCov" title="Branch 2 was taken 1052 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">       3746 :     bool DefaultConsistencyChecks() const { return fDefaultConsistencyChecks; }</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 1070 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1070 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="72"><span class="lineNum">      72 </span>                :            :     /** Policy: Filter transactions that do not match well-defined patterns */</a>
+<a name="73"><span class="lineNum">      73 </span>  [<span class="branchCov" title="Branch 0 was taken 1052 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1070 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       2122 :     bool RequireStandard() const { return fRequireStandard; }</span></a>
+<a name="74"><span class="lineNum">      74 </span>                :            :     /** If this chain is exclusively used for testing */</a>
+<a name="75"><span class="lineNum">      75 </span>        [<span class="branchCov" title="Branch 0 was taken 696 times"> + </span><span class="branchCov" title="Branch 1 was taken 620 times"> + </span>]:<span class="lineCov">       1316 :     bool IsTestChain() const { return m_is_test_chain; }</span></a>
+<a name="76"><span class="lineNum">      76 </span>                :            :     /** If this chain allows time to be mocked */</a>
+<a name="77"><span class="lineNum">      77 </span>  [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 3 was taken 485 times"> + </span>]:<span class="lineCov">        489 :     bool IsMockableChain() const { return m_is_mockable_chain; }</span></a>
+<a name="78"><span class="lineNum">      78 </span>        [<span class="branchCov" title="Branch 0 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">          6 :     uint64_t PruneAfterHeight() const { return nPruneAfterHeight; }</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :            :     /** Minimum free space (in GB) needed for data directory */</a>
+<a name="80"><span class="lineNum">      80 </span>                :            :     uint64_t AssumedBlockchainSize() const { return m_assumed_blockchain_size; }</a>
+<a name="81"><span class="lineNum">      81 </span>                :            :     /** Minimum free space (in GB) needed for data directory when pruned; Does not include prune target*/</a>
+<a name="82"><span class="lineNum">      82 </span>                :            :     uint64_t AssumedChainStateSize() const { return m_assumed_chain_state_size; }</a>
+<a name="83"><span class="lineNum">      83 </span>                :            :     /** Whether it is possible to mine blocks on demand (no retargeting) */</a>
+<a name="84"><span class="lineNum">      84 </span>        [<span class="branchCov" title="Branch 0 was taken 20234 times"> + </span><span class="branchCov" title="Branch 1 was taken 20 times"> + </span>]:<span class="lineCov">      20254 :     bool MineBlocksOnDemand() const { return consensus.fPowNoRetargeting; }</span></a>
+<a name="85"><span class="lineNum">      85 </span>                :            :     /** Return the network string */</a>
+<a name="86"><span class="lineNum">      86 </span>  [<span class="branchCov" title="Branch 0 was taken 6 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 354 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">        360 :     std::string NetworkIDString() const { return strNetworkID; }</span></a>
+<a name="87"><span class="lineNum">      87 </span>                :            :     /** Return the list of hostnames to look up for DNS seeds */</a>
+<a name="88"><span class="lineNum">      88 </span>                :<span class="lineNoCov">          0 :     const std::vector&lt;std::string&gt;&amp; DNSSeeds() const { return vSeeds; }</span></a>
+<a name="89"><span class="lineNum">      89 </span>  [<span class="branchCov" title="Branch 0 was taken 713 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 713 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      61477 :     const std::vector&lt;unsigned char&gt;&amp; Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1714 times"> + </span><span class="branchCov" title="Branch 5 was taken 52 times"> + </span><span class="branchCov" title="Branch 6 was taken 5182 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 1984 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 9 was not taken"> - </span>]
+<a name="90"><span class="lineNum">      90 </span>  [<span class="branchCov" title="Branch 0 was taken 16653 times"> + </span><span class="branchCov" title="Branch 1 was taken 21 times"> + </span><span class="branchCov" title="Branch 2 was taken 22 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">      59527 :     const std::string&amp; Bech32HRP() const { return bech32_hrp; }</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 900 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 41931 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="91"><span class="lineNum">      91 </span>        [<span class="branchCov" title="Branch 0 was taken 30 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         30 :     const std::vector&lt;SeedSpec6&gt;&amp; FixedSeeds() const { return vFixedSeeds; }</span></a>
+<a name="92"><span class="lineNum">      92 </span>        [<span class="branchCov" title="Branch 0 was taken 1070 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">      75859 :     const CCheckpointData&amp; Checkpoints() const { return checkpointData; }</span></a>
+<a name="93"><span class="lineNum">      93 </span>        [<span class="branchCov" title="Branch 0 was taken 78895 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     134941 :     const ChainTxData&amp; TxData() const { return chainTxData; }</span></a>
+<a name="94"><span class="lineNum">      94 </span>                :            : protected:</a>
+<a name="95"><span class="lineNum">      95 </span>        [<span class="branchCov" title="Branch 0 was taken 29065 times"> + </span><span class="branchCov" title="Branch 1 was taken 5813 times"> + </span>]:<span class="lineCov">      34878 :     CChainParams() {}</span></a>
+<a name="96"><span class="lineNum">      96 </span>                :            : </a>
+<a name="97"><span class="lineNum">      97 </span>                :            :     Consensus::Params consensus;</a>
+<a name="98"><span class="lineNum">      98 </span>                :            :     CMessageHeader::MessageStartChars pchMessageStart;</a>
+<a name="99"><span class="lineNum">      99 </span>                :            :     int nDefaultPort;</a>
+<a name="100"><span class="lineNum">     100 </span>                :            :     uint64_t nPruneAfterHeight;</a>
+<a name="101"><span class="lineNum">     101 </span>                :            :     uint64_t m_assumed_blockchain_size;</a>
+<a name="102"><span class="lineNum">     102 </span>                :            :     uint64_t m_assumed_chain_state_size;</a>
+<a name="103"><span class="lineNum">     103 </span>                :            :     std::vector&lt;std::string&gt; vSeeds;</a>
+<a name="104"><span class="lineNum">     104 </span>                :            :     std::vector&lt;unsigned char&gt; base58Prefixes[MAX_BASE58_TYPES];</a>
+<a name="105"><span class="lineNum">     105 </span>                :            :     std::string bech32_hrp;</a>
+<a name="106"><span class="lineNum">     106 </span>                :            :     std::string strNetworkID;</a>
+<a name="107"><span class="lineNum">     107 </span>                :            :     CBlock genesis;</a>
+<a name="108"><span class="lineNum">     108 </span>                :            :     std::vector&lt;SeedSpec6&gt; vFixedSeeds;</a>
+<a name="109"><span class="lineNum">     109 </span>                :            :     bool fDefaultConsistencyChecks;</a>
+<a name="110"><span class="lineNum">     110 </span>                :            :     bool fRequireStandard;</a>
+<a name="111"><span class="lineNum">     111 </span>                :            :     bool m_is_test_chain;</a>
+<a name="112"><span class="lineNum">     112 </span>                :            :     bool m_is_mockable_chain;</a>
+<a name="113"><span class="lineNum">     113 </span>                :            :     CCheckpointData checkpointData;</a>
+<a name="114"><span class="lineNum">     114 </span>                :            :     ChainTxData chainTxData;</a>
+<a name="115"><span class="lineNum">     115 </span>                :            : };</a>
+<a name="116"><span class="lineNum">     116 </span>                :            : </a>
+<a name="117"><span class="lineNum">     117 </span>                :            : /**</a>
+<a name="118"><span class="lineNum">     118 </span>                :            :  * Creates and returns a std::unique_ptr&lt;CChainParams&gt; of the chosen chain.</a>
+<a name="119"><span class="lineNum">     119 </span>                :            :  * @returns a CChainParams* of the chosen chain.</a>
+<a name="120"><span class="lineNum">     120 </span>                :            :  * @throws a std::runtime_error if the chain is not supported.</a>
+<a name="121"><span class="lineNum">     121 </span>                :            :  */</a>
+<a name="122"><span class="lineNum">     122 </span>                :            : std::unique_ptr&lt;const CChainParams&gt; CreateChainParams(const ArgsManager&amp; args, const std::string&amp; chain);</a>
+<a name="123"><span class="lineNum">     123 </span>                :            : </a>
+<a name="124"><span class="lineNum">     124 </span>                :            : /**</a>
+<a name="125"><span class="lineNum">     125 </span>                :            :  * Return the currently selected parameters. This won't change after app</a>
+<a name="126"><span class="lineNum">     126 </span>                :            :  * startup, except for unit tests.</a>
+<a name="127"><span class="lineNum">     127 </span>                :            :  */</a>
+<a name="128"><span class="lineNum">     128 </span>                :            : const CChainParams &amp;Params();</a>
+<a name="129"><span class="lineNum">     129 </span>                :            : </a>
+<a name="130"><span class="lineNum">     130 </span>                :            : /**</a>
+<a name="131"><span class="lineNum">     131 </span>                :            :  * Sets the params returned by Params() to those for the given chain name.</a>
+<a name="132"><span class="lineNum">     132 </span>                :            :  * @throws std::runtime_error when the chain is not supported.</a>
+<a name="133"><span class="lineNum">     133 </span>                :            :  */</a>
+<a name="134"><span class="lineNum">     134 </span>                :            : void SelectParams(const std::string&amp; chain);</a>
+<a name="135"><span class="lineNum">     135 </span>                :            : </a>
+<a name="136"><span class="lineNum">     136 </span>                :            : #endif // BITCOIN_CHAINPARAMS_H</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

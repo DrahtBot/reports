@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/util/tokenpipe.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/util</a> - tokenpipe.h<span style="font-size: 80%;"> (source / <a href="tokenpipe.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-03-30 09:44:32</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2021 The Bitcoin Core developers</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : #ifndef BITCOIN_UTIL_TOKENPIPE_H</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #define BITCOIN_UTIL_TOKENPIPE_H</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #ifndef WIN32</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : </a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;cstdint&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #include &lt;optional&gt;</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : </a>
+<a name="13"><span class="lineNum">      13 </span>                :            : /** One end of a token pipe. */</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : class TokenPipeEnd</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : {</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : private:</a>
+<a name="17"><span class="lineNum">      17 </span>                :            :     int m_fd = -1;</a>
+<a name="18"><span class="lineNum">      18 </span>                :            : </a>
+<a name="19"><span class="lineNum">      19 </span>                :            : public:</a>
+<a name="20"><span class="lineNum">      20 </span>                :            :     TokenPipeEnd(int fd = -1);</a>
+<a name="21"><span class="lineNum">      21 </span>                :            :     ~TokenPipeEnd();</a>
+<a name="22"><span class="lineNum">      22 </span>                :            : </a>
+<a name="23"><span class="lineNum">      23 </span>                :            :     /** Return value constants for TokenWrite and TokenRead. */</a>
+<a name="24"><span class="lineNum">      24 </span>                :            :     enum Status {</a>
+<a name="25"><span class="lineNum">      25 </span>                :            :         TS_ERR = -1, //!&lt; I/O error</a>
+<a name="26"><span class="lineNum">      26 </span>                :            :         TS_EOS = -2, //!&lt; Unexpected end of stream</a>
+<a name="27"><span class="lineNum">      27 </span>                :            :     };</a>
+<a name="28"><span class="lineNum">      28 </span>                :            : </a>
+<a name="29"><span class="lineNum">      29 </span>                :            :     /** Write token to endpoint.</a>
+<a name="30"><span class="lineNum">      30 </span>                :            :      *</a>
+<a name="31"><span class="lineNum">      31 </span>                :            :      * @returns 0       If successful.</a>
+<a name="32"><span class="lineNum">      32 </span>                :            :      *          &lt;0 if error:</a>
+<a name="33"><span class="lineNum">      33 </span>                :            :      *            TS_ERR  If an error happened.</a>
+<a name="34"><span class="lineNum">      34 </span>                :            :      *            TS_EOS  If end of stream happened.</a>
+<a name="35"><span class="lineNum">      35 </span>                :            :      */</a>
+<a name="36"><span class="lineNum">      36 </span>                :            :     int TokenWrite(uint8_t token);</a>
+<a name="37"><span class="lineNum">      37 </span>                :            : </a>
+<a name="38"><span class="lineNum">      38 </span>                :            :     /** Read token from endpoint.</a>
+<a name="39"><span class="lineNum">      39 </span>                :            :      *</a>
+<a name="40"><span class="lineNum">      40 </span>                :            :      * @returns &gt;=0     Token value, if successful.</a>
+<a name="41"><span class="lineNum">      41 </span>                :            :      *          &lt;0 if error:</a>
+<a name="42"><span class="lineNum">      42 </span>                :            :      *            TS_ERR  If an error happened.</a>
+<a name="43"><span class="lineNum">      43 </span>                :            :      *            TS_EOS  If end of stream happened.</a>
+<a name="44"><span class="lineNum">      44 </span>                :            :      */</a>
+<a name="45"><span class="lineNum">      45 </span>                :            :     int TokenRead();</a>
+<a name="46"><span class="lineNum">      46 </span>                :            : </a>
+<a name="47"><span class="lineNum">      47 </span>                :            :     /** Explicit close function.</a>
+<a name="48"><span class="lineNum">      48 </span>                :            :      */</a>
+<a name="49"><span class="lineNum">      49 </span>                :            :     void Close();</a>
+<a name="50"><span class="lineNum">      50 </span>                :            : </a>
+<a name="51"><span class="lineNum">      51 </span>                :            :     /** Return whether endpoint is open.</a>
+<a name="52"><span class="lineNum">      52 </span>                :            :      */</a>
+<a name="53"><span class="lineNum">      53 </span>                :            :     bool IsOpen() { return m_fd != -1; }</a>
+<a name="54"><span class="lineNum">      54 </span>                :            : </a>
+<a name="55"><span class="lineNum">      55 </span>                :            :     // Move-only class.</a>
+<a name="56"><span class="lineNum">      56 </span>                :            :     TokenPipeEnd(TokenPipeEnd&amp;&amp; other)</a>
+<a name="57"><span class="lineNum">      57 </span>                :            :     {</a>
+<a name="58"><span class="lineNum">      58 </span>                :            :         m_fd = other.m_fd;</a>
+<a name="59"><span class="lineNum">      59 </span>                :            :         other.m_fd = -1;</a>
+<a name="60"><span class="lineNum">      60 </span>                :            :     }</a>
+<a name="61"><span class="lineNum">      61 </span>                :<span class="lineNoCov">          0 :     TokenPipeEnd&amp; operator=(TokenPipeEnd&amp;&amp; other)</span></a>
+<a name="62"><span class="lineNum">      62 </span>                :            :     {</a>
+<a name="63"><span class="lineNum">      63 </span>                :<span class="lineNoCov">          0 :         Close();</span></a>
+<a name="64"><span class="lineNum">      64 </span>                :<span class="lineNoCov">          0 :         m_fd = other.m_fd;</span></a>
+<a name="65"><span class="lineNum">      65 </span>                :<span class="lineNoCov">          0 :         other.m_fd = -1;</span></a>
+<a name="66"><span class="lineNum">      66 </span>                :<span class="lineNoCov">          0 :         return *this;</span></a>
+<a name="67"><span class="lineNum">      67 </span>                :            :     }</a>
+<a name="68"><span class="lineNum">      68 </span>                :            :     TokenPipeEnd(const TokenPipeEnd&amp;) = delete;</a>
+<a name="69"><span class="lineNum">      69 </span>                :            :     TokenPipeEnd&amp; operator=(const TokenPipeEnd&amp;) = delete;</a>
+<a name="70"><span class="lineNum">      70 </span>                :            : };</a>
+<a name="71"><span class="lineNum">      71 </span>                :            : </a>
+<a name="72"><span class="lineNum">      72 </span>                :            : /** An interprocess or interthread pipe for sending tokens (one-byte values)</a>
+<a name="73"><span class="lineNum">      73 </span>                :            :  * over.</a>
+<a name="74"><span class="lineNum">      74 </span>                :            :  */</a>
+<a name="75"><span class="lineNum">      75 </span>                :            : class TokenPipe</a>
+<a name="76"><span class="lineNum">      76 </span>                :            : {</a>
+<a name="77"><span class="lineNum">      77 </span>                :            : private:</a>
+<a name="78"><span class="lineNum">      78 </span>                :<span class="lineNoCov">          0 :     int m_fds[2] = {-1, -1};</span></a>
+<a name="79"><span class="lineNum">      79 </span>                :            : </a>
+<a name="80"><span class="lineNum">      80 </span>                :<span class="lineNoCov">          0 :     TokenPipe(int fds[2]) : m_fds{fds[0], fds[1]} {}</span></a>
+<a name="81"><span class="lineNum">      81 </span>                :            : </a>
+<a name="82"><span class="lineNum">      82 </span>                :            : public:</a>
+<a name="83"><span class="lineNum">      83 </span>                :            :     ~TokenPipe();</a>
+<a name="84"><span class="lineNum">      84 </span>                :            : </a>
+<a name="85"><span class="lineNum">      85 </span>                :            :     /** Create a new pipe.</a>
+<a name="86"><span class="lineNum">      86 </span>                :            :      * @returns The created TokenPipe, or an empty std::nullopt in case of error.</a>
+<a name="87"><span class="lineNum">      87 </span>                :            :      */</a>
+<a name="88"><span class="lineNum">      88 </span>                :            :     static std::optional&lt;TokenPipe&gt; Make();</a>
+<a name="89"><span class="lineNum">      89 </span>                :            : </a>
+<a name="90"><span class="lineNum">      90 </span>                :            :     /** Take the read end of this pipe. This can only be called once,</a>
+<a name="91"><span class="lineNum">      91 </span>                :            :      * as the object will be moved out.</a>
+<a name="92"><span class="lineNum">      92 </span>                :            :      */</a>
+<a name="93"><span class="lineNum">      93 </span>                :            :     TokenPipeEnd TakeReadEnd();</a>
+<a name="94"><span class="lineNum">      94 </span>                :            : </a>
+<a name="95"><span class="lineNum">      95 </span>                :            :     /** Take the write end of this pipe. This should only be called once,</a>
+<a name="96"><span class="lineNum">      96 </span>                :            :      * as the object will be moved out.</a>
+<a name="97"><span class="lineNum">      97 </span>                :            :      */</a>
+<a name="98"><span class="lineNum">      98 </span>                :            :     TokenPipeEnd TakeWriteEnd();</a>
+<a name="99"><span class="lineNum">      99 </span>                :            : </a>
+<a name="100"><span class="lineNum">     100 </span>                :            :     /** Close and end of the pipe that hasn't been moved out.</a>
+<a name="101"><span class="lineNum">     101 </span>                :            :      */</a>
+<a name="102"><span class="lineNum">     102 </span>                :            :     void Close();</a>
+<a name="103"><span class="lineNum">     103 </span>                :            : </a>
+<a name="104"><span class="lineNum">     104 </span>                :            :     // Move-only class.</a>
+<a name="105"><span class="lineNum">     105 </span>                :<span class="lineNoCov">          0 :     TokenPipe(TokenPipe&amp;&amp; other)</span></a>
+<a name="106"><span class="lineNum">     106 </span>                :            :     {</a>
+<a name="107"><span class="lineNum">     107 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         for (int i = 0; i &lt; 2; ++i) {</span></a>
+<a name="108"><span class="lineNum">     108 </span>                :<span class="lineNoCov">          0 :             m_fds[i] = other.m_fds[i];</span></a>
+<a name="109"><span class="lineNum">     109 </span>                :<span class="lineNoCov">          0 :             other.m_fds[i] = -1;</span></a>
+<a name="110"><span class="lineNum">     110 </span>                :            :         }</a>
+<a name="111"><span class="lineNum">     111 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="112"><span class="lineNum">     112 </span>                :            :     TokenPipe&amp; operator=(TokenPipe&amp;&amp; other)</a>
+<a name="113"><span class="lineNum">     113 </span>                :            :     {</a>
+<a name="114"><span class="lineNum">     114 </span>                :            :         Close();</a>
+<a name="115"><span class="lineNum">     115 </span>                :            :         for (int i = 0; i &lt; 2; ++i) {</a>
+<a name="116"><span class="lineNum">     116 </span>                :            :             m_fds[i] = other.m_fds[i];</a>
+<a name="117"><span class="lineNum">     117 </span>                :            :             other.m_fds[i] = -1;</a>
+<a name="118"><span class="lineNum">     118 </span>                :            :         }</a>
+<a name="119"><span class="lineNum">     119 </span>                :            :         return *this;</a>
+<a name="120"><span class="lineNum">     120 </span>                :            :     }</a>
+<a name="121"><span class="lineNum">     121 </span>                :            :     TokenPipe(const TokenPipe&amp;) = delete;</a>
+<a name="122"><span class="lineNum">     122 </span>                :            :     TokenPipe&amp; operator=(const TokenPipe&amp;) = delete;</a>
+<a name="123"><span class="lineNum">     123 </span>                :            : };</a>
+<a name="124"><span class="lineNum">     124 </span>                :            : </a>
+<a name="125"><span class="lineNum">     125 </span>                :            : #endif // WIN32</a>
+<a name="126"><span class="lineNum">     126 </span>                :            : </a>
+<a name="127"><span class="lineNum">     127 </span>                :            : #endif // BITCOIN_UTIL_TOKENPIPE_H</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

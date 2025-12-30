@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - test_bitcoin_coverage.info - src/span.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - span.h<span style="font-size: 80%;"> (source / <a href="span.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">test_bitcoin_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryMed">87.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2000-01-01 12:00:00</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntryMed">82.6 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">161</td>
+            <td class="headerCovTableEntry">236</td>
+            <td class="headerCovTableEntryLo">68.2 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2018-2020 The Bitcoin Core developers</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : </a>
+<a name="5"><span class="lineNum">       5 </span>                :            : #ifndef BITCOIN_SPAN_H</a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #define BITCOIN_SPAN_H</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #include &lt;type_traits&gt;</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : #include &lt;cstddef&gt;</a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #include &lt;algorithm&gt;</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #include &lt;assert.h&gt;</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : </a>
+<a name="13"><span class="lineNum">      13 </span>                :            : #ifdef DEBUG</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : #define CONSTEXPR_IF_NOT_DEBUG</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : #define ASSERT_IF_DEBUG(x) assert((x))</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : #else</a>
+<a name="17"><span class="lineNum">      17 </span>                :            : #define CONSTEXPR_IF_NOT_DEBUG constexpr</a>
+<a name="18"><span class="lineNum">      18 </span>                :            : #define ASSERT_IF_DEBUG(x)</a>
+<a name="19"><span class="lineNum">      19 </span>                :            : #endif</a>
+<a name="20"><span class="lineNum">      20 </span>                :            : </a>
+<a name="21"><span class="lineNum">      21 </span>                :            : /** A Span is an object that can refer to a contiguous sequence of objects.</a>
+<a name="22"><span class="lineNum">      22 </span>                :            :  *</a>
+<a name="23"><span class="lineNum">      23 </span>                :            :  * It implements a subset of C++20's std::span.</a>
+<a name="24"><span class="lineNum">      24 </span>                :            :  *</a>
+<a name="25"><span class="lineNum">      25 </span>                :            :  * Things to be aware of when writing code that deals with Spans:</a>
+<a name="26"><span class="lineNum">      26 </span>                :            :  *</a>
+<a name="27"><span class="lineNum">      27 </span>                :            :  * - Similar to references themselves, Spans are subject to reference lifetime</a>
+<a name="28"><span class="lineNum">      28 </span>                :            :  *   issues. The user is responsible for making sure the objects pointed to by</a>
+<a name="29"><span class="lineNum">      29 </span>                :            :  *   a Span live as long as the Span is used. For example:</a>
+<a name="30"><span class="lineNum">      30 </span>                :            :  *</a>
+<a name="31"><span class="lineNum">      31 </span>                :            :  *       std::vector&lt;int&gt; vec{1,2,3,4};</a>
+<a name="32"><span class="lineNum">      32 </span>                :            :  *       Span&lt;int&gt; sp(vec);</a>
+<a name="33"><span class="lineNum">      33 </span>                :            :  *       vec.push_back(5);</a>
+<a name="34"><span class="lineNum">      34 </span>                :            :  *       printf(&quot;%i\n&quot;, sp.front()); // UB!</a>
+<a name="35"><span class="lineNum">      35 </span>                :            :  *</a>
+<a name="36"><span class="lineNum">      36 </span>                :            :  *   may exhibit undefined behavior, as increasing the size of a vector may</a>
+<a name="37"><span class="lineNum">      37 </span>                :            :  *   invalidate references.</a>
+<a name="38"><span class="lineNum">      38 </span>                :            :  *</a>
+<a name="39"><span class="lineNum">      39 </span>                :            :  * - One particular pitfall is that Spans can be constructed from temporaries,</a>
+<a name="40"><span class="lineNum">      40 </span>                :            :  *   but this is unsafe when the Span is stored in a variable, outliving the</a>
+<a name="41"><span class="lineNum">      41 </span>                :            :  *   temporary. For example, this will compile, but exhibits undefined behavior:</a>
+<a name="42"><span class="lineNum">      42 </span>                :            :  *</a>
+<a name="43"><span class="lineNum">      43 </span>                :            :  *       Span&lt;const int&gt; sp(std::vector&lt;int&gt;{1, 2, 3});</a>
+<a name="44"><span class="lineNum">      44 </span>                :            :  *       printf(&quot;%i\n&quot;, sp.front()); // UB!</a>
+<a name="45"><span class="lineNum">      45 </span>                :            :  *</a>
+<a name="46"><span class="lineNum">      46 </span>                :            :  *   The lifetime of the vector ends when the statement it is created in ends.</a>
+<a name="47"><span class="lineNum">      47 </span>                :            :  *   Thus the Span is left with a dangling reference, and using it is undefined.</a>
+<a name="48"><span class="lineNum">      48 </span>                :            :  *</a>
+<a name="49"><span class="lineNum">      49 </span>                :            :  * - Due to Span's automatic creation from range-like objects (arrays, and data</a>
+<a name="50"><span class="lineNum">      50 </span>                :            :  *   types that expose a data() and size() member function), functions that</a>
+<a name="51"><span class="lineNum">      51 </span>                :            :  *   accept a Span as input parameter can be called with any compatible</a>
+<a name="52"><span class="lineNum">      52 </span>                :            :  *   range-like object. For example, this works:</a>
+<a name="53"><span class="lineNum">      53 </span>                :            : *</a>
+<a name="54"><span class="lineNum">      54 </span>                :            :  *       void Foo(Span&lt;const int&gt; arg);</a>
+<a name="55"><span class="lineNum">      55 </span>                :            :  *</a>
+<a name="56"><span class="lineNum">      56 </span>                :            :  *       Foo(std::vector&lt;int&gt;{1, 2, 3}); // Works</a>
+<a name="57"><span class="lineNum">      57 </span>                :            :  *</a>
+<a name="58"><span class="lineNum">      58 </span>                :            :  *   This is very useful in cases where a function truly does not care about the</a>
+<a name="59"><span class="lineNum">      59 </span>                :            :  *   container, and only about having exactly a range of elements. However it</a>
+<a name="60"><span class="lineNum">      60 </span>                :            :  *   may also be surprising to see automatic conversions in this case.</a>
+<a name="61"><span class="lineNum">      61 </span>                :            :  *</a>
+<a name="62"><span class="lineNum">      62 </span>                :            :  *   When a function accepts a Span with a mutable element type, it will not</a>
+<a name="63"><span class="lineNum">      63 </span>                :            :  *   accept temporaries; only variables or other references. For example:</a>
+<a name="64"><span class="lineNum">      64 </span>                :            :  *</a>
+<a name="65"><span class="lineNum">      65 </span>                :            :  *       void FooMut(Span&lt;int&gt; arg);</a>
+<a name="66"><span class="lineNum">      66 </span>                :            :  *</a>
+<a name="67"><span class="lineNum">      67 </span>                :            :  *       FooMut(std::vector&lt;int&gt;{1, 2, 3}); // Does not compile</a>
+<a name="68"><span class="lineNum">      68 </span>                :            :  *       std::vector&lt;int&gt; baz{1, 2, 3};</a>
+<a name="69"><span class="lineNum">      69 </span>                :            :  *       FooMut(baz); // Works</a>
+<a name="70"><span class="lineNum">      70 </span>                :            :  *</a>
+<a name="71"><span class="lineNum">      71 </span>                :            :  *   This is similar to how functions that take (non-const) lvalue references</a>
+<a name="72"><span class="lineNum">      72 </span>                :            :  *   as input cannot accept temporaries. This does not work either:</a>
+<a name="73"><span class="lineNum">      73 </span>                :            :  *</a>
+<a name="74"><span class="lineNum">      74 </span>                :            :  *       void FooVec(std::vector&lt;int&gt;&amp; arg);</a>
+<a name="75"><span class="lineNum">      75 </span>                :            :  *       FooVec(std::vector&lt;int&gt;{1, 2, 3}); // Does not compile</a>
+<a name="76"><span class="lineNum">      76 </span>                :            :  *</a>
+<a name="77"><span class="lineNum">      77 </span>                :            :  *   The idea is that if a function accepts a mutable reference, a meaningful</a>
+<a name="78"><span class="lineNum">      78 </span>                :            :  *   result will be present in that variable after the call. Passing a temporary</a>
+<a name="79"><span class="lineNum">      79 </span>                :            :  *   is useless in that context.</a>
+<a name="80"><span class="lineNum">      80 </span>                :            :  */</a>
+<a name="81"><span class="lineNum">      81 </span>                :            : template&lt;typename C&gt;</a>
+<a name="82"><span class="lineNum">      82 </span>                :            : class Span</a>
+<a name="83"><span class="lineNum">      83 </span>                :            : {</a>
+<a name="84"><span class="lineNum">      84 </span>                :            :     C* m_data;</a>
+<a name="85"><span class="lineNum">      85 </span>                :            :     std::size_t m_size;</a>
+<a name="86"><span class="lineNum">      86 </span>                :            : </a>
+<a name="87"><span class="lineNum">      87 </span>                :            : public:</a>
+<a name="88"><span class="lineNum">      88 </span>                :            :     constexpr Span() noexcept : m_data(nullptr), m_size(0) {}</a>
+<a name="89"><span class="lineNum">      89 </span>                :            : </a>
+<a name="90"><span class="lineNum">      90 </span>                :            :     /** Construct a span from a begin pointer and a size.</a>
+<a name="91"><span class="lineNum">      91 </span>                :            :      *</a>
+<a name="92"><span class="lineNum">      92 </span>                :            :      * This implements a subset of the iterator-based std::span constructor in C++20,</a>
+<a name="93"><span class="lineNum">      93 </span>                :            :      * which is hard to implement without std::address_of.</a>
+<a name="94"><span class="lineNum">      94 </span>                :            :      */</a>
+<a name="95"><span class="lineNum">      95 </span>                :            :     template &lt;typename T, typename std::enable_if&lt;std::is_convertible&lt;T (*)[], C (*)[]&gt;::value, int&gt;::type = 0&gt;</a>
+<a name="96"><span class="lineNum">      96 </span>        [<span class="branchCov" title="Branch 0 was taken 11 times"> + </span><span class="branchCov" title="Branch 1 was taken 10 times"> + </span>]:<span class="lineCov">    1192478 :     constexpr Span(T* begin, std::size_t size) noexcept : m_data(begin), m_size(size) {}</span></a>
+<a name="97"><span class="lineNum">      97 </span>                :            : </a>
+<a name="98"><span class="lineNum">      98 </span>                :            :     /** Construct a span from a begin and end pointer.</a>
+<a name="99"><span class="lineNum">      99 </span>                :            :      *</a>
+<a name="100"><span class="lineNum">     100 </span>                :            :      * This implements a subset of the iterator-based std::span constructor in C++20,</a>
+<a name="101"><span class="lineNum">     101 </span>                :            :      * which is hard to implement without std::address_of.</a>
+<a name="102"><span class="lineNum">     102 </span>                :            :      */</a>
+<a name="103"><span class="lineNum">     103 </span>                :            :     template &lt;typename T, typename std::enable_if&lt;std::is_convertible&lt;T (*)[], C (*)[]&gt;::value, int&gt;::type = 0&gt;</a>
+<a name="104"><span class="lineNum">     104 </span>                :<span class="lineCov">       1234 :     CONSTEXPR_IF_NOT_DEBUG Span(T* begin, T* end) noexcept : m_data(begin), m_size(end - begin)</span></a>
+<a name="105"><span class="lineNum">     105 </span>                :            :     {</a>
+<a name="106"><span class="lineNum">     106 </span>                :            :         ASSERT_IF_DEBUG(end &gt;= begin);</a>
+<a name="107"><span class="lineNum">     107 </span>                :            :     }</a>
+<a name="108"><span class="lineNum">     108 </span>                :            : </a>
+<a name="109"><span class="lineNum">     109 </span>                :            :     /** Implicit conversion of spans between compatible types.</a>
+<a name="110"><span class="lineNum">     110 </span>                :            :      *</a>
+<a name="111"><span class="lineNum">     111 </span>                :            :      *  Specifically, if a pointer to an array of type O can be implicitly converted to a pointer to an array of type</a>
+<a name="112"><span class="lineNum">     112 </span>                :            :      *  C, then permit implicit conversion of Span&lt;O&gt; to Span&lt;C&gt;. This matches the behavior of the corresponding</a>
+<a name="113"><span class="lineNum">     113 </span>                :            :      *  C++20 std::span constructor.</a>
+<a name="114"><span class="lineNum">     114 </span>                :            :      *</a>
+<a name="115"><span class="lineNum">     115 </span>                :            :      *  For example this means that a Span&lt;T&gt; can be converted into a Span&lt;const T&gt;.</a>
+<a name="116"><span class="lineNum">     116 </span>                :            :      */</a>
+<a name="117"><span class="lineNum">     117 </span>                :            :     template &lt;typename O, typename std::enable_if&lt;std::is_convertible&lt;O (*)[], C (*)[]&gt;::value, int&gt;::type = 0&gt;</a>
+<a name="118"><span class="lineNum">     118 </span>                :            :     constexpr Span(const Span&lt;O&gt;&amp; other) noexcept : m_data(other.m_data), m_size(other.m_size) {}</a>
+<a name="119"><span class="lineNum">     119 </span>                :            : </a>
+<a name="120"><span class="lineNum">     120 </span>                :            :     /** Default copy constructor. */</a>
+<a name="121"><span class="lineNum">     121 </span>                :            :     constexpr Span(const Span&amp;) noexcept = default;</a>
+<a name="122"><span class="lineNum">     122 </span>                :            : </a>
+<a name="123"><span class="lineNum">     123 </span>                :            :     /** Default assignment operator. */</a>
+<a name="124"><span class="lineNum">     124 </span>                :            :     Span&amp; operator=(const Span&amp; other) noexcept = default;</a>
+<a name="125"><span class="lineNum">     125 </span>                :            : </a>
+<a name="126"><span class="lineNum">     126 </span>                :            :     /** Construct a Span from an array. This matches the corresponding C++20 std::span constructor. */</a>
+<a name="127"><span class="lineNum">     127 </span>                :            :     template &lt;int N&gt;</a>
+<a name="128"><span class="lineNum">     128 </span>  [<span class="branchCov" title="Branch 0 was taken 58 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 55 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">     162655 :     constexpr Span(C (&amp;a)[N]) noexcept : m_data(a), m_size(N) {}</span></a>
+<a name="129"><span class="lineNum">     129 </span>                :            : </a>
+<a name="130"><span class="lineNum">     130 </span>                :            :     /** Construct a Span for objects with .data() and .size() (std::string, std::array, std::vector, ...).</a>
+<a name="131"><span class="lineNum">     131 </span>                :            :      *</a>
+<a name="132"><span class="lineNum">     132 </span>                :            :      * This implements a subset of the functionality provided by the C++20 std::span range-based constructor.</a>
+<a name="133"><span class="lineNum">     133 </span>                :            :      *</a>
+<a name="134"><span class="lineNum">     134 </span>                :            :      * To prevent surprises, only Spans for constant value types are supported when passing in temporaries.</a>
+<a name="135"><span class="lineNum">     135 </span>                :            :      * Note that this restriction does not exist when converting arrays or other Spans (see above).</a>
+<a name="136"><span class="lineNum">     136 </span>                :            :      */</a>
+<a name="137"><span class="lineNum">     137 </span>                :            :     template &lt;typename V, typename std::enable_if&lt;(std::is_const&lt;C&gt;::value || std::is_lvalue_reference&lt;V&gt;::value) &amp;&amp; std::is_convertible&lt;typename std::remove_pointer&lt;decltype(std::declval&lt;V&amp;&gt;().data())&gt;::type (*)[], C (*)[]&gt;::value &amp;&amp; std::is_convertible&lt;decltype(std::declval&lt;V&amp;&gt;().size()), std::size_t&gt;::value, int&gt;::type = 0&gt;</a>
+<a name="138"><span class="lineNum">     138 </span>  [<span class="branchCov" title="Branch 0 was taken 60237 times"> + </span><span class="branchCov" title="Branch 1 was taken 49337 times"> + </span><span class="branchCov" title="Branch 2 was taken 603 times"> + </span><span class="branchCov" title="Branch 3 was taken 305 times"> + </span> :<span class="lineCov">    1453717 :     constexpr Span(V&amp;&amp; v) noexcept : m_data(v.data()), m_size(v.size()) {}</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 101816 times"> + </span><span class="branchCov" title="Branch 5 was taken 32 times"> + </span><span class="branchCov" title="Branch 6 was taken 101443 times"> + </span><span class="branchCov" title="Branch 7 was taken 65 times"> + </span><span class="branchCov" title="Branch 8 was taken 6623 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 9 was taken 11 times"> + </span><span class="branchCov" title="Branch 10 was taken 168 times"> + </span><span class="branchCov" title="Branch 11 was taken 9 times"> + </span><span class="branchCov" title="Branch 12 was taken 12 times"> + </span><span class="branchCov" title="Branch 13 was taken 6 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 37 times"> + </span><span class="branchCov" title="Branch 15 was taken 9 times"> + </span><span class="branchCov" title="Branch 16 was taken 12 times"> + </span><span class="branchCov" title="Branch 17 was taken 25 times"> + </span><span class="branchCov" title="Branch 18 was taken 35 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 19 was taken 1 time"> + </span><span class="branchCov" title="Branch 20 was taken 5 times"> + </span><span class="branchCov" title="Branch 21 was taken 1 time"> + </span><span class="branchCov" title="Branch 22 was taken 5 times"> + </span><span class="branchCov" title="Branch 23 was taken 2 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 24 was taken 64 times"> + </span><span class="branchNoCov" title="Branch 25 was not taken"> - </span><span class="branchCov" title="Branch 26 was taken 50 times"> + </span><span class="branchCov" title="Branch 27 was taken 1 time"> + </span><span class="branchCov" title="Branch 28 was taken 149 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 29 was taken 1 time"> + </span><span class="branchCov" title="Branch 30 was taken 297 times"> + </span><span class="branchNoCov" title="Branch 31 was not taken"> - </span><span class="branchCov" title="Branch 32 was taken 296 times"> + </span><span class="branchNoCov" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 34 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 35 was not taken"> - </span><span class="branchCov" title="Branch 36 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 37 was not taken"> - </span><span class="branchCov" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 39 was not taken"> - </span><span class="branchCov" title="Branch 40 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 41 was not taken"> - </span><span class="branchCov" title="Branch 42 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 44 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 45 was not taken"> - </span><span class="branchCov" title="Branch 46 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 47 was not taken"> - </span><span class="branchCov" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 49 was not taken"> - </span><span class="branchCov" title="Branch 50 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 51 was not taken"> - </span><span class="branchCov" title="Branch 52 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 53 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 54 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 55 was not taken"> - </span><span class="branchCov" title="Branch 56 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 57 was not taken"> - </span><span class="branchCov" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 59 was not taken"> - </span><span class="branchCov" title="Branch 60 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 61 was not taken"> - </span><span class="branchCov" title="Branch 62 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 63 was not taken"> - </span> 
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 64 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 65 was not taken"> - </span>]
+<a name="139"><span class="lineNum">     139 </span>                :            : </a>
+<a name="140"><span class="lineNum">     140 </span>  [<span class="branchCov" title="Branch 0 was taken 4168 times"> + </span><span class="branchCov" title="Branch 1 was taken 239 times"> + </span><span class="branchCov" title="Branch 2 was taken 355 times"> + </span><span class="branchCov" title="Branch 3 was taken 55257 times"> + </span>]:<span class="lineCov">    1517598 :     constexpr C* data() const noexcept { return m_data; }</span></a>
+<a name="141"><span class="lineNum">     141 </span>  [<span class="branchCov" title="Branch 0 was taken 939 times"> + </span><span class="branchCov" title="Branch 1 was taken 192 times"> + </span><span class="branchCov" title="Branch 2 was taken 558 times"> + </span><span class="branchCov" title="Branch 3 was taken 9 times"> + </span>]:<span class="lineCov">     202395 :     constexpr C* begin() const noexcept { return m_data; }</span></a>
+<a name="142"><span class="lineNum">     142 </span>  [<span class="branchCov" title="Branch 0 was taken 92311 times"> + </span><span class="branchCov" title="Branch 1 was taken 845 times"> + </span><span class="branchCov" title="Branch 2 was taken 74007 times"> + </span><span class="branchCov" title="Branch 3 was taken 314 times"> + </span> :<span class="lineCov">     368338 :     constexpr C* end() const noexcept { return m_data + m_size; }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 46 times"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 280 times"> + </span> 
+<span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 9 was not taken"> - </span>]
+<a name="143"><span class="lineNum">     143 </span>                :<span class="lineNoCov">          0 :     CONSTEXPR_IF_NOT_DEBUG C&amp; front() const noexcept</span></a>
+<a name="144"><span class="lineNum">     144 </span>                :            :     {</a>
+<a name="145"><span class="lineNum">     145 </span>                :            :         ASSERT_IF_DEBUG(size() &gt; 0);</a>
+<a name="146"><span class="lineNum">     146 </span>                :<span class="lineNoCov">          0 :         return m_data[0];</span></a>
+<a name="147"><span class="lineNum">     147 </span>                :            :     }</a>
+<a name="148"><span class="lineNum">     148 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     CONSTEXPR_IF_NOT_DEBUG C&amp; back() const noexcept</span></a>
+<a name="149"><span class="lineNum">     149 </span>                :            :     {</a>
+<a name="150"><span class="lineNum">     150 </span>                :            :         ASSERT_IF_DEBUG(size() &gt; 0);</a>
+<a name="151"><span class="lineNum">     151 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         return m_data[m_size - 1];</span></a>
+<a name="152"><span class="lineNum">     152 </span>                :            :     }</a>
+<a name="153"><span class="lineNum">     153 </span>  [<span class="branchCov" title="Branch 0 was taken 174432 times"> + </span><span class="branchCov" title="Branch 1 was taken 884757 times"> + </span><span class="branchCov" title="Branch 2 was taken 130453 times"> + </span><span class="branchCov" title="Branch 3 was taken 155394 times"> + </span> :<span class="lineCov">    3005815 :     constexpr std::size_t size() const noexcept { return m_size; }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 131674 times"> + </span><span class="branchCov" title="Branch 5 was taken 12597 times"> + </span><span class="branchCov" title="Branch 6 was taken 345 times"> + </span><span class="branchCov" title="Branch 7 was taken 10035 times"> + </span><span class="branchCov" title="Branch 8 was taken 384 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 9 was taken 330 times"> + </span><span class="branchCov" title="Branch 10 was taken 6682 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 6541 times"> + </span><span class="branchCov" title="Branch 13 was taken 878 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 316 times"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 304 times"> + </span><span class="branchCov" title="Branch 17 was taken 46 times"> + </span><span class="branchCov" title="Branch 18 was taken 9 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 19 was taken 12681 times"> + </span><span class="branchCov" title="Branch 20 was taken 253 times"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span><span class="branchCov" title="Branch 22 was taken 221 times"> + </span><span class="branchCov" title="Branch 23 was taken 32 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 24 was taken 35 times"> + </span><span class="branchCov" title="Branch 25 was taken 186 times"> + </span><span class="branchCov" title="Branch 26 was taken 87 times"> + </span><span class="branchNoCov" title="Branch 27 was not taken"> - </span><span class="branchCov" title="Branch 28 was taken 94957 times"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 29 was not taken"> - </span><span class="branchCov" title="Branch 30 was taken 87 times"> + </span><span class="branchNoCov" title="Branch 31 was not taken"> - </span><span class="branchCov" title="Branch 32 was taken 1 time"> + </span><span class="branchCov" title="Branch 33 was taken 94957 times"> + </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 34 was taken 1 time"> + </span><span class="branchCov" title="Branch 35 was taken 85 times"> + </span><span class="branchCov" title="Branch 36 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 37 was not taken"> - </span><span class="branchCov" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 39 was not taken"> - </span><span class="branchCov" title="Branch 40 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 41 was not taken"> - </span><span class="branchCov" title="Branch 42 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 43 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 44 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 45 was not taken"> - </span><span class="branchCov" title="Branch 46 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 47 was not taken"> - </span><span class="branchCov" title="Branch 48 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 49 was not taken"> - </span><span class="branchCov" title="Branch 50 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 51 was not taken"> - </span><span class="branchCov" title="Branch 52 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 53 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 54 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 55 was not taken"> - </span><span class="branchCov" title="Branch 56 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 57 was not taken"> - </span><span class="branchCov" title="Branch 58 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>   <span class="branchNoCov" title="Branch 59 was not taken"> - </span><span class="branchCov" title="Branch 60 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 61 was not taken"> - </span><span class="branchCov" title="Branch 62 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 63 was not taken"> - </span>]
+<a name="154"><span class="lineNum">     154 </span>  [<span class="branchCov" title="Branch 0 was taken 54 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">         56 :     constexpr bool empty() const noexcept { return size() == 0; }</span></a>
+<a name="155"><span class="lineNum">     155 </span>        [<span class="branchCov" title="Branch 0 was taken 32 times"> + </span><span class="branchCov" title="Branch 1 was taken 186 times"> + </span>]:<span class="lineCov">     163358 :     CONSTEXPR_IF_NOT_DEBUG C&amp; operator[](std::size_t pos) const noexcept</span></a>
+<a name="156"><span class="lineNum">     156 </span>                :            :     {</a>
+<a name="157"><span class="lineNum">     157 </span>                :            :         ASSERT_IF_DEBUG(size() &gt; pos);</a>
+<a name="158"><span class="lineNum">     158 </span>  [<span class="branchCov" title="Branch 0 was taken 31620 times"> + </span><span class="branchCov" title="Branch 1 was taken 2388 times"> + </span><span class="branchCov" title="Branch 2 was taken 437 times"> + </span><span class="branchCov" title="Branch 3 was taken 52 times"> + </span> :<span class="lineCov">     163011 :         return m_data[pos];</span></a>
+<span class="lineNum">         </span>         <span class="branchCov" title="Branch 4 was taken 218 times"> + </span><span class="branchCov" title="Branch 5 was taken 32 times"> + </span>]
+<a name="159"><span class="lineNum">     159 </span>                :            :     }</a>
+<a name="160"><span class="lineNum">     160 </span>                :<span class="lineCov">     163392 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; subspan(std::size_t offset) const noexcept</span></a>
+<a name="161"><span class="lineNum">     161 </span>                :            :     {</a>
+<a name="162"><span class="lineNum">     162 </span>                :            :         ASSERT_IF_DEBUG(size() &gt;= offset);</a>
+<a name="163"><span class="lineNum">     163 </span>  [<span class="branchCov" title="Branch 0 was taken 72 times"> + </span><span class="branchCov" title="Branch 1 was taken 72 times"> + </span><span class="branchCov" title="Branch 2 was taken 4152 times"> + </span><span class="branchCov" title="Branch 3 was taken 236 times"> + </span>]:<span class="lineCov">     162850 :         return Span&lt;C&gt;(m_data + offset, m_size - offset);</span></a>
+<a name="164"><span class="lineNum">     164 </span>                :            :     }</a>
+<a name="165"><span class="lineNum">     165 </span>                :<span class="lineCov">        312 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; subspan(std::size_t offset, std::size_t count) const noexcept</span></a>
+<a name="166"><span class="lineNum">     166 </span>                :            :     {</a>
+<a name="167"><span class="lineNum">     167 </span>                :            :         ASSERT_IF_DEBUG(size() &gt;= offset + count);</a>
+<a name="168"><span class="lineNum">     168 </span>        [<span class="branchCov" title="Branch 0 was taken 55 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">        312 :         return Span&lt;C&gt;(m_data + offset, count);</span></a>
+<a name="169"><span class="lineNum">     169 </span>                :            :     }</a>
+<a name="170"><span class="lineNum">     170 </span>                :<span class="lineCov">     104434 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; first(std::size_t count) const noexcept</span></a>
+<a name="171"><span class="lineNum">     171 </span>                :            :     {</a>
+<a name="172"><span class="lineNum">     172 </span>                :            :         ASSERT_IF_DEBUG(size() &gt;= count);</a>
+<a name="173"><span class="lineNum">     173 </span>        [<span class="branchCov" title="Branch 0 was taken 55 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">     104434 :         return Span&lt;C&gt;(m_data, count);</span></a>
+<a name="174"><span class="lineNum">     174 </span>                :            :     }</a>
+<a name="175"><span class="lineNum">     175 </span>                :<span class="lineCov">         58 :     CONSTEXPR_IF_NOT_DEBUG Span&lt;C&gt; last(std::size_t count) const noexcept</span></a>
+<a name="176"><span class="lineNum">     176 </span>                :            :     {</a>
+<a name="177"><span class="lineNum">     177 </span>                :            :          ASSERT_IF_DEBUG(size() &gt;= count);</a>
+<a name="178"><span class="lineNum">     178 </span>        [<span class="branchCov" title="Branch 0 was taken 55 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>]:<span class="lineCov">         58 :          return Span&lt;C&gt;(m_data + m_size - count, count);</span></a>
+<a name="179"><span class="lineNum">     179 </span>                :            :     }</a>
+<a name="180"><span class="lineNum">     180 </span>                :            : </a>
+<a name="181"><span class="lineNum">     181 </span>  [<span class="branchCov" title="Branch 0 was taken 113 times"> + </span><span class="branchCov" title="Branch 1 was taken 190 times"> + </span><span class="branchCov" title="Branch 2 was taken 62 times"> + </span><span class="branchCov" title="Branch 3 was taken 51 times"> + </span>]:<span class="lineCov">        303 :     friend constexpr bool operator==(const Span&amp; a, const Span&amp; b) noexcept { return a.size() == b.size() &amp;&amp; std::equal(a.begin(), a.end(), b.begin()); }</span></a>
+<a name="182"><span class="lineNum">     182 </span>  [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchCov" title="Branch 2 was taken 3 times"> + </span><span class="branchCov" title="Branch 3 was taken 1 time"> + </span>]:<span class="lineCov">          5 :     friend constexpr bool operator!=(const Span&amp; a, const Span&amp; b) noexcept { return !(a == b); }</span></a>
+<a name="183"><span class="lineNum">     183 </span>                :            :     friend constexpr bool operator&lt;(const Span&amp; a, const Span&amp; b) noexcept { return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end()); }</a>
+<a name="184"><span class="lineNum">     184 </span>                :            :     friend constexpr bool operator&lt;=(const Span&amp; a, const Span&amp; b) noexcept { return !(b &lt; a); }</a>
+<a name="185"><span class="lineNum">     185 </span>                :            :     friend constexpr bool operator&gt;(const Span&amp; a, const Span&amp; b) noexcept { return (b &lt; a); }</a>
+<a name="186"><span class="lineNum">     186 </span>                :            :     friend constexpr bool operator&gt;=(const Span&amp; a, const Span&amp; b) noexcept { return !(a &lt; b); }</a>
+<a name="187"><span class="lineNum">     187 </span>                :            : </a>
+<a name="188"><span class="lineNum">     188 </span>                :            :     template &lt;typename O&gt; friend class Span;</a>
+<a name="189"><span class="lineNum">     189 </span>                :            : };</a>
+<a name="190"><span class="lineNum">     190 </span>                :            : </a>
+<a name="191"><span class="lineNum">     191 </span>                :            : // MakeSpan helps constructing a Span of the right type automatically.</a>
+<a name="192"><span class="lineNum">     192 </span>                :            : /** MakeSpan for arrays: */</a>
+<a name="193"><span class="lineNum">     193 </span>                :<span class="lineCov">     102211 : template &lt;typename A, int N&gt; Span&lt;A&gt; constexpr MakeSpan(A (&amp;a)[N]) { return Span&lt;A&gt;(a, N); }</span></a>
+<a name="194"><span class="lineNum">     194 </span>                :            : /** MakeSpan for temporaries / rvalue references, only supporting const output. */</a>
+<a name="195"><span class="lineNum">     195 </span>  [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span> :<span class="lineCov">         20 : template &lt;typename V&gt; constexpr auto MakeSpan(V&amp;&amp; v) -&gt; typename std::enable_if&lt;!std::is_lvalue_reference&lt;V&gt;::value, Span&lt;const typename std::remove_pointer&lt;decltype(v.data())&gt;::type&gt;&gt;::type { return std::forward&lt;V&gt;(v); }</span></a>
+<span class="lineNum">         </span><span class="branchCov" title="Branch 4 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchCov" title="Branch 6 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span><span class="branchCov" title="Branch 8 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 9 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span><span class="branchCov" title="Branch 12 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 13 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 14 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 15 was not taken"> - </span><span class="branchCov" title="Branch 16 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 17 was not taken"> - </span><span class="branchCov" title="Branch 18 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 19 was not taken"> - </span><span class="branchCov" title="Branch 20 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 21 was not taken"> - </span><span class="branchCov" title="Branch 22 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 23 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 24 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 25 was not taken"> - </span><span class="branchCov" title="Branch 26 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 27 was not taken"> - </span><span class="branchCov" title="Branch 28 was taken 1 time"> + </span> 
+<span class="lineNum">         </span><span class="branchNoCov" title="Branch 29 was not taken"> - </span><span class="branchCov" title="Branch 30 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 31 was not taken"> - </span><span class="branchCov" title="Branch 32 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">         </span><span class="branchCov" title="Branch 34 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 35 was not taken"> - </span><span class="branchCov" title="Branch 36 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 37 was not taken"> - </span><span class="branchCov" title="Branch 38 was taken 1 time"> + </span> 
+<span class="lineNum">         </span>            <span class="branchNoCov" title="Branch 39 was not taken"> - </span>]
+<a name="196"><span class="lineNum">     196 </span>                :            : /** MakeSpan for (lvalue) references, supporting mutable output. */</a>
+<a name="197"><span class="lineNum">     197 </span>  [<span class="branchCov" title="Branch 0 was taken 18939 times"> + </span><span class="branchCov" title="Branch 1 was taken 13385 times"> + </span><span class="branchCov" title="Branch 2 was taken 30428 times"> + </span><span class="branchCov" title="Branch 3 was taken 36782 times"> + </span> :<span class="lineCov">     959213 : template &lt;typename V&gt; constexpr auto MakeSpan(V&amp; v) -&gt; Span&lt;typename std::remove_pointer&lt;decltype(v.data())&gt;::type&gt; { return v; }</span></a>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 4 was taken 61 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span><span class="branchNoCov" title="Branch 6 was not taken"> - </span><span class="branchNoCov" title="Branch 7 was not taken"> - </span>]
+<a name="198"><span class="lineNum">     198 </span>                :            : </a>
+<a name="199"><span class="lineNum">     199 </span>                :            : /** Pop the last element off a span, and return a reference to that element. */</a>
+<a name="200"><span class="lineNum">     200 </span>                :            : template &lt;typename T&gt;</a>
+<a name="201"><span class="lineNum">     201 </span>                :<span class="lineCov">       1779 : T&amp; SpanPopBack(Span&lt;T&gt;&amp; span)</span></a>
+<a name="202"><span class="lineNum">     202 </span>                :            : {</a>
+<a name="203"><span class="lineNum">     203 </span>                :<span class="lineCov">       1779 :     size_t size = span.size();</span></a>
+<a name="204"><span class="lineNum">     204 </span>                :            :     ASSERT_IF_DEBUG(size &gt; 0);</a>
+<a name="205"><span class="lineNum">     205 </span>                :<span class="lineCov">       1779 :     T&amp; back = span[size - 1];</span></a>
+<a name="206"><span class="lineNum">     206 </span>                :<span class="lineCov">       1779 :     span = Span&lt;T&gt;(span.data(), size - 1);</span></a>
+<a name="207"><span class="lineNum">     207 </span>                :<span class="lineCov">       1779 :     return back;</span></a>
+<a name="208"><span class="lineNum">     208 </span>                :            : }</a>
+<a name="209"><span class="lineNum">     209 </span>                :            : </a>
+<a name="210"><span class="lineNum">     210 </span>                :            : // Helper functions to safely cast to unsigned char pointers.</a>
+<a name="211"><span class="lineNum">     211 </span>                :<span class="lineNoCov">          0 : inline unsigned char* UCharCast(char* c) { return (unsigned char*)c; }</span></a>
+<a name="212"><span class="lineNum">     212 </span>                :<span class="lineCov">       1562 : inline unsigned char* UCharCast(unsigned char* c) { return c; }</span></a>
+<a name="213"><span class="lineNum">     213 </span>                :<span class="lineCov">      65053 : inline const unsigned char* UCharCast(const char* c) { return (unsigned char*)c; }</span></a>
+<a name="214"><span class="lineNum">     214 </span>                :<span class="lineCov">     856067 : inline const unsigned char* UCharCast(const unsigned char* c) { return c; }</span></a>
+<a name="215"><span class="lineNum">     215 </span>                :            : </a>
+<a name="216"><span class="lineNum">     216 </span>                :            : // Helper function to safely convert a Span to a Span&lt;[const] unsigned char&gt;.</a>
+<a name="217"><span class="lineNum">     217 </span>                :<span class="lineCov">     922682 : template &lt;typename T&gt; constexpr auto UCharSpanCast(Span&lt;T&gt; s) -&gt; Span&lt;typename std::remove_pointer&lt;decltype(UCharCast(s.data()))&gt;::type&gt; { return {UCharCast(s.data()), s.size()}; }</span></a>
+<a name="218"><span class="lineNum">     218 </span>                :            : </a>
+<a name="219"><span class="lineNum">     219 </span>                :            : /** Like MakeSpan, but for (const) unsigned char member types only. Only works for (un)signed char containers. */</a>
+<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">     922682 : template &lt;typename V&gt; constexpr auto MakeUCharSpan(V&amp;&amp; v) -&gt; decltype(UCharSpanCast(MakeSpan(std::forward&lt;V&gt;(v)))) { return UCharSpanCast(MakeSpan(std::forward&lt;V&gt;(v))); }</span></a>
+<a name="221"><span class="lineNum">     221 </span>                :            : </a>
+<a name="222"><span class="lineNum">     222 </span>                :            : #endif</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

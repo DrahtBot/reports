@@ -1,0 +1,561 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/protocol.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">src</a> - protocol.h<span style="font-size: 80%;"> (source / <a href="protocol.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-03-18 16:41:14</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">88</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">82</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright (c) 2009-2010 Satoshi Nakamoto</a>
+<a name="2"><span class="lineNum">       2 </span>                :            : // Copyright (c) 2009-2020 The Bitcoin Core developers</a>
+<a name="3"><span class="lineNum">       3 </span>                :            : // Distributed under the MIT software license, see the accompanying</a>
+<a name="4"><span class="lineNum">       4 </span>                :            : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</a>
+<a name="5"><span class="lineNum">       5 </span>                :            : </a>
+<a name="6"><span class="lineNum">       6 </span>                :            : #ifndef __cplusplus</a>
+<a name="7"><span class="lineNum">       7 </span>                :            : #error This header can only be compiled as C++.</a>
+<a name="8"><span class="lineNum">       8 </span>                :            : #endif</a>
+<a name="9"><span class="lineNum">       9 </span>                :            : </a>
+<a name="10"><span class="lineNum">      10 </span>                :            : #ifndef BITCOIN_PROTOCOL_H</a>
+<a name="11"><span class="lineNum">      11 </span>                :            : #define BITCOIN_PROTOCOL_H</a>
+<a name="12"><span class="lineNum">      12 </span>                :            : </a>
+<a name="13"><span class="lineNum">      13 </span>                :            : #include &lt;netaddress.h&gt;</a>
+<a name="14"><span class="lineNum">      14 </span>                :            : #include &lt;primitives/transaction.h&gt;</a>
+<a name="15"><span class="lineNum">      15 </span>                :            : #include &lt;serialize.h&gt;</a>
+<a name="16"><span class="lineNum">      16 </span>                :            : #include &lt;uint256.h&gt;</a>
+<a name="17"><span class="lineNum">      17 </span>                :            : #include &lt;version.h&gt;</a>
+<a name="18"><span class="lineNum">      18 </span>                :            : </a>
+<a name="19"><span class="lineNum">      19 </span>                :            : #include &lt;stdint.h&gt;</a>
+<a name="20"><span class="lineNum">      20 </span>                :            : #include &lt;string&gt;</a>
+<a name="21"><span class="lineNum">      21 </span>                :            : </a>
+<a name="22"><span class="lineNum">      22 </span>                :            : /** Message header.</a>
+<a name="23"><span class="lineNum">      23 </span>                :            :  * (4) message start.</a>
+<a name="24"><span class="lineNum">      24 </span>                :            :  * (12) command.</a>
+<a name="25"><span class="lineNum">      25 </span>                :            :  * (4) size.</a>
+<a name="26"><span class="lineNum">      26 </span>                :            :  * (4) checksum.</a>
+<a name="27"><span class="lineNum">      27 </span>                :            :  */</a>
+<a name="28"><span class="lineNum">      28 </span>                :            : class CMessageHeader</a>
+<a name="29"><span class="lineNum">      29 </span>                :            : {</a>
+<a name="30"><span class="lineNum">      30 </span>                :            : public:</a>
+<a name="31"><span class="lineNum">      31 </span>                :            :     static constexpr size_t MESSAGE_START_SIZE = 4;</a>
+<a name="32"><span class="lineNum">      32 </span>                :            :     static constexpr size_t COMMAND_SIZE = 12;</a>
+<a name="33"><span class="lineNum">      33 </span>                :            :     static constexpr size_t MESSAGE_SIZE_SIZE = 4;</a>
+<a name="34"><span class="lineNum">      34 </span>                :            :     static constexpr size_t CHECKSUM_SIZE = 4;</a>
+<a name="35"><span class="lineNum">      35 </span>                :            :     static constexpr size_t MESSAGE_SIZE_OFFSET = MESSAGE_START_SIZE + COMMAND_SIZE;</a>
+<a name="36"><span class="lineNum">      36 </span>                :            :     static constexpr size_t CHECKSUM_OFFSET = MESSAGE_SIZE_OFFSET + MESSAGE_SIZE_SIZE;</a>
+<a name="37"><span class="lineNum">      37 </span>                :            :     static constexpr size_t HEADER_SIZE = MESSAGE_START_SIZE + COMMAND_SIZE + MESSAGE_SIZE_SIZE + CHECKSUM_SIZE;</a>
+<a name="38"><span class="lineNum">      38 </span>                :            :     typedef unsigned char MessageStartChars[MESSAGE_START_SIZE];</a>
+<a name="39"><span class="lineNum">      39 </span>                :            : </a>
+<a name="40"><span class="lineNum">      40 </span>                :            :     explicit CMessageHeader();</a>
+<a name="41"><span class="lineNum">      41 </span>                :            : </a>
+<a name="42"><span class="lineNum">      42 </span>                :            :     /** Construct a P2P message header from message-start characters, a command and the size of the message.</a>
+<a name="43"><span class="lineNum">      43 </span>                :            :      * @note Passing in a `pszCommand` longer than COMMAND_SIZE will result in a run-time assertion error.</a>
+<a name="44"><span class="lineNum">      44 </span>                :            :      */</a>
+<a name="45"><span class="lineNum">      45 </span>                :            :     CMessageHeader(const MessageStartChars&amp; pchMessageStartIn, const char* pszCommand, unsigned int nMessageSizeIn);</a>
+<a name="46"><span class="lineNum">      46 </span>                :            : </a>
+<a name="47"><span class="lineNum">      47 </span>                :            :     std::string GetCommand() const;</a>
+<a name="48"><span class="lineNum">      48 </span>                :            :     bool IsCommandValid() const;</a>
+<a name="49"><span class="lineNum">      49 </span>                :            : </a>
+<a name="50"><span class="lineNum">      50 </span>                :<span class="lineNoCov">          0 :     SERIALIZE_METHODS(CMessageHeader, obj) { READWRITE(obj.pchMessageStart, obj.pchCommand, obj.nMessageSize, obj.pchChecksum); }</span></a>
+<a name="51"><span class="lineNum">      51 </span>                :            : </a>
+<a name="52"><span class="lineNum">      52 </span>                :            :     char pchMessageStart[MESSAGE_START_SIZE];</a>
+<a name="53"><span class="lineNum">      53 </span>                :            :     char pchCommand[COMMAND_SIZE];</a>
+<a name="54"><span class="lineNum">      54 </span>                :            :     uint32_t nMessageSize;</a>
+<a name="55"><span class="lineNum">      55 </span>                :            :     uint8_t pchChecksum[CHECKSUM_SIZE];</a>
+<a name="56"><span class="lineNum">      56 </span>                :            : };</a>
+<a name="57"><span class="lineNum">      57 </span>                :            : </a>
+<a name="58"><span class="lineNum">      58 </span>                :            : /**</a>
+<a name="59"><span class="lineNum">      59 </span>                :            :  * Bitcoin protocol message types. When adding new message types, don't forget</a>
+<a name="60"><span class="lineNum">      60 </span>                :            :  * to update allNetMessageTypes in protocol.cpp.</a>
+<a name="61"><span class="lineNum">      61 </span>                :            :  */</a>
+<a name="62"><span class="lineNum">      62 </span>                :            : namespace NetMsgType {</a>
+<a name="63"><span class="lineNum">      63 </span>                :            : </a>
+<a name="64"><span class="lineNum">      64 </span>                :            : /**</a>
+<a name="65"><span class="lineNum">      65 </span>                :            :  * The version message provides information about the transmitting node to the</a>
+<a name="66"><span class="lineNum">      66 </span>                :            :  * receiving node at the beginning of a connection.</a>
+<a name="67"><span class="lineNum">      67 </span>                :            :  */</a>
+<a name="68"><span class="lineNum">      68 </span>                :            : extern const char* VERSION;</a>
+<a name="69"><span class="lineNum">      69 </span>                :            : /**</a>
+<a name="70"><span class="lineNum">      70 </span>                :            :  * The verack message acknowledges a previously-received version message,</a>
+<a name="71"><span class="lineNum">      71 </span>                :            :  * informing the connecting node that it can begin to send other messages.</a>
+<a name="72"><span class="lineNum">      72 </span>                :            :  */</a>
+<a name="73"><span class="lineNum">      73 </span>                :            : extern const char* VERACK;</a>
+<a name="74"><span class="lineNum">      74 </span>                :            : /**</a>
+<a name="75"><span class="lineNum">      75 </span>                :            :  * The addr (IP address) message relays connection information for peers on the</a>
+<a name="76"><span class="lineNum">      76 </span>                :            :  * network.</a>
+<a name="77"><span class="lineNum">      77 </span>                :            :  */</a>
+<a name="78"><span class="lineNum">      78 </span>                :            : extern const char* ADDR;</a>
+<a name="79"><span class="lineNum">      79 </span>                :            : /**</a>
+<a name="80"><span class="lineNum">      80 </span>                :            :  * The addrv2 message relays connection information for peers on the network just</a>
+<a name="81"><span class="lineNum">      81 </span>                :            :  * like the addr message, but is extended to allow gossiping of longer node</a>
+<a name="82"><span class="lineNum">      82 </span>                :            :  * addresses (see BIP155).</a>
+<a name="83"><span class="lineNum">      83 </span>                :            :  */</a>
+<a name="84"><span class="lineNum">      84 </span>                :            : extern const char *ADDRV2;</a>
+<a name="85"><span class="lineNum">      85 </span>                :            : /**</a>
+<a name="86"><span class="lineNum">      86 </span>                :            :  * The sendaddrv2 message signals support for receiving ADDRV2 messages (BIP155).</a>
+<a name="87"><span class="lineNum">      87 </span>                :            :  * It also implies that its sender can encode as ADDRV2 and would send ADDRV2</a>
+<a name="88"><span class="lineNum">      88 </span>                :            :  * instead of ADDR to a peer that has signaled ADDRV2 support by sending SENDADDRV2.</a>
+<a name="89"><span class="lineNum">      89 </span>                :            :  */</a>
+<a name="90"><span class="lineNum">      90 </span>                :            : extern const char *SENDADDRV2;</a>
+<a name="91"><span class="lineNum">      91 </span>                :            : /**</a>
+<a name="92"><span class="lineNum">      92 </span>                :            :  * The inv message (inventory message) transmits one or more inventories of</a>
+<a name="93"><span class="lineNum">      93 </span>                :            :  * objects known to the transmitting peer.</a>
+<a name="94"><span class="lineNum">      94 </span>                :            :  */</a>
+<a name="95"><span class="lineNum">      95 </span>                :            : extern const char* INV;</a>
+<a name="96"><span class="lineNum">      96 </span>                :            : /**</a>
+<a name="97"><span class="lineNum">      97 </span>                :            :  * The getdata message requests one or more data objects from another node.</a>
+<a name="98"><span class="lineNum">      98 </span>                :            :  */</a>
+<a name="99"><span class="lineNum">      99 </span>                :            : extern const char* GETDATA;</a>
+<a name="100"><span class="lineNum">     100 </span>                :            : /**</a>
+<a name="101"><span class="lineNum">     101 </span>                :            :  * The merkleblock message is a reply to a getdata message which requested a</a>
+<a name="102"><span class="lineNum">     102 </span>                :            :  * block using the inventory type MSG_MERKLEBLOCK.</a>
+<a name="103"><span class="lineNum">     103 </span>                :            :  * @since protocol version 70001 as described by BIP37.</a>
+<a name="104"><span class="lineNum">     104 </span>                :            :  */</a>
+<a name="105"><span class="lineNum">     105 </span>                :            : extern const char* MERKLEBLOCK;</a>
+<a name="106"><span class="lineNum">     106 </span>                :            : /**</a>
+<a name="107"><span class="lineNum">     107 </span>                :            :  * The getblocks message requests an inv message that provides block header</a>
+<a name="108"><span class="lineNum">     108 </span>                :            :  * hashes starting from a particular point in the block chain.</a>
+<a name="109"><span class="lineNum">     109 </span>                :            :  */</a>
+<a name="110"><span class="lineNum">     110 </span>                :            : extern const char* GETBLOCKS;</a>
+<a name="111"><span class="lineNum">     111 </span>                :            : /**</a>
+<a name="112"><span class="lineNum">     112 </span>                :            :  * The getheaders message requests a headers message that provides block</a>
+<a name="113"><span class="lineNum">     113 </span>                :            :  * headers starting from a particular point in the block chain.</a>
+<a name="114"><span class="lineNum">     114 </span>                :            :  * @since protocol version 31800.</a>
+<a name="115"><span class="lineNum">     115 </span>                :            :  */</a>
+<a name="116"><span class="lineNum">     116 </span>                :            : extern const char* GETHEADERS;</a>
+<a name="117"><span class="lineNum">     117 </span>                :            : /**</a>
+<a name="118"><span class="lineNum">     118 </span>                :            :  * The tx message transmits a single transaction.</a>
+<a name="119"><span class="lineNum">     119 </span>                :            :  */</a>
+<a name="120"><span class="lineNum">     120 </span>                :            : extern const char* TX;</a>
+<a name="121"><span class="lineNum">     121 </span>                :            : /**</a>
+<a name="122"><span class="lineNum">     122 </span>                :            :  * The headers message sends one or more block headers to a node which</a>
+<a name="123"><span class="lineNum">     123 </span>                :            :  * previously requested certain headers with a getheaders message.</a>
+<a name="124"><span class="lineNum">     124 </span>                :            :  * @since protocol version 31800.</a>
+<a name="125"><span class="lineNum">     125 </span>                :            :  */</a>
+<a name="126"><span class="lineNum">     126 </span>                :            : extern const char* HEADERS;</a>
+<a name="127"><span class="lineNum">     127 </span>                :            : /**</a>
+<a name="128"><span class="lineNum">     128 </span>                :            :  * The block message transmits a single serialized block.</a>
+<a name="129"><span class="lineNum">     129 </span>                :            :  */</a>
+<a name="130"><span class="lineNum">     130 </span>                :            : extern const char* BLOCK;</a>
+<a name="131"><span class="lineNum">     131 </span>                :            : /**</a>
+<a name="132"><span class="lineNum">     132 </span>                :            :  * The getaddr message requests an addr message from the receiving node,</a>
+<a name="133"><span class="lineNum">     133 </span>                :            :  * preferably one with lots of IP addresses of other receiving nodes.</a>
+<a name="134"><span class="lineNum">     134 </span>                :            :  */</a>
+<a name="135"><span class="lineNum">     135 </span>                :            : extern const char* GETADDR;</a>
+<a name="136"><span class="lineNum">     136 </span>                :            : /**</a>
+<a name="137"><span class="lineNum">     137 </span>                :            :  * The mempool message requests the TXIDs of transactions that the receiving</a>
+<a name="138"><span class="lineNum">     138 </span>                :            :  * node has verified as valid but which have not yet appeared in a block.</a>
+<a name="139"><span class="lineNum">     139 </span>                :            :  * @since protocol version 60002.</a>
+<a name="140"><span class="lineNum">     140 </span>                :            :  */</a>
+<a name="141"><span class="lineNum">     141 </span>                :            : extern const char* MEMPOOL;</a>
+<a name="142"><span class="lineNum">     142 </span>                :            : /**</a>
+<a name="143"><span class="lineNum">     143 </span>                :            :  * The ping message is sent periodically to help confirm that the receiving</a>
+<a name="144"><span class="lineNum">     144 </span>                :            :  * peer is still connected.</a>
+<a name="145"><span class="lineNum">     145 </span>                :            :  */</a>
+<a name="146"><span class="lineNum">     146 </span>                :            : extern const char* PING;</a>
+<a name="147"><span class="lineNum">     147 </span>                :            : /**</a>
+<a name="148"><span class="lineNum">     148 </span>                :            :  * The pong message replies to a ping message, proving to the pinging node that</a>
+<a name="149"><span class="lineNum">     149 </span>                :            :  * the ponging node is still alive.</a>
+<a name="150"><span class="lineNum">     150 </span>                :            :  * @since protocol version 60001 as described by BIP31.</a>
+<a name="151"><span class="lineNum">     151 </span>                :            :  */</a>
+<a name="152"><span class="lineNum">     152 </span>                :            : extern const char* PONG;</a>
+<a name="153"><span class="lineNum">     153 </span>                :            : /**</a>
+<a name="154"><span class="lineNum">     154 </span>                :            :  * The notfound message is a reply to a getdata message which requested an</a>
+<a name="155"><span class="lineNum">     155 </span>                :            :  * object the receiving node does not have available for relay.</a>
+<a name="156"><span class="lineNum">     156 </span>                :            :  * @since protocol version 70001.</a>
+<a name="157"><span class="lineNum">     157 </span>                :            :  */</a>
+<a name="158"><span class="lineNum">     158 </span>                :            : extern const char* NOTFOUND;</a>
+<a name="159"><span class="lineNum">     159 </span>                :            : /**</a>
+<a name="160"><span class="lineNum">     160 </span>                :            :  * The filterload message tells the receiving peer to filter all relayed</a>
+<a name="161"><span class="lineNum">     161 </span>                :            :  * transactions and requested merkle blocks through the provided filter.</a>
+<a name="162"><span class="lineNum">     162 </span>                :            :  * @since protocol version 70001 as described by BIP37.</a>
+<a name="163"><span class="lineNum">     163 </span>                :            :  *   Only available with service bit NODE_BLOOM since protocol version</a>
+<a name="164"><span class="lineNum">     164 </span>                :            :  *   70011 as described by BIP111.</a>
+<a name="165"><span class="lineNum">     165 </span>                :            :  */</a>
+<a name="166"><span class="lineNum">     166 </span>                :            : extern const char* FILTERLOAD;</a>
+<a name="167"><span class="lineNum">     167 </span>                :            : /**</a>
+<a name="168"><span class="lineNum">     168 </span>                :            :  * The filteradd message tells the receiving peer to add a single element to a</a>
+<a name="169"><span class="lineNum">     169 </span>                :            :  * previously-set bloom filter, such as a new public key.</a>
+<a name="170"><span class="lineNum">     170 </span>                :            :  * @since protocol version 70001 as described by BIP37.</a>
+<a name="171"><span class="lineNum">     171 </span>                :            :  *   Only available with service bit NODE_BLOOM since protocol version</a>
+<a name="172"><span class="lineNum">     172 </span>                :            :  *   70011 as described by BIP111.</a>
+<a name="173"><span class="lineNum">     173 </span>                :            :  */</a>
+<a name="174"><span class="lineNum">     174 </span>                :            : extern const char* FILTERADD;</a>
+<a name="175"><span class="lineNum">     175 </span>                :            : /**</a>
+<a name="176"><span class="lineNum">     176 </span>                :            :  * The filterclear message tells the receiving peer to remove a previously-set</a>
+<a name="177"><span class="lineNum">     177 </span>                :            :  * bloom filter.</a>
+<a name="178"><span class="lineNum">     178 </span>                :            :  * @since protocol version 70001 as described by BIP37.</a>
+<a name="179"><span class="lineNum">     179 </span>                :            :  *   Only available with service bit NODE_BLOOM since protocol version</a>
+<a name="180"><span class="lineNum">     180 </span>                :            :  *   70011 as described by BIP111.</a>
+<a name="181"><span class="lineNum">     181 </span>                :            :  */</a>
+<a name="182"><span class="lineNum">     182 </span>                :            : extern const char* FILTERCLEAR;</a>
+<a name="183"><span class="lineNum">     183 </span>                :            : /**</a>
+<a name="184"><span class="lineNum">     184 </span>                :            :  * Indicates that a node prefers to receive new block announcements via a</a>
+<a name="185"><span class="lineNum">     185 </span>                :            :  * &quot;headers&quot; message rather than an &quot;inv&quot;.</a>
+<a name="186"><span class="lineNum">     186 </span>                :            :  * @since protocol version 70012 as described by BIP130.</a>
+<a name="187"><span class="lineNum">     187 </span>                :            :  */</a>
+<a name="188"><span class="lineNum">     188 </span>                :            : extern const char* SENDHEADERS;</a>
+<a name="189"><span class="lineNum">     189 </span>                :            : /**</a>
+<a name="190"><span class="lineNum">     190 </span>                :            :  * The feefilter message tells the receiving peer not to inv us any txs</a>
+<a name="191"><span class="lineNum">     191 </span>                :            :  * which do not meet the specified min fee rate.</a>
+<a name="192"><span class="lineNum">     192 </span>                :            :  * @since protocol version 70013 as described by BIP133</a>
+<a name="193"><span class="lineNum">     193 </span>                :            :  */</a>
+<a name="194"><span class="lineNum">     194 </span>                :            : extern const char* FEEFILTER;</a>
+<a name="195"><span class="lineNum">     195 </span>                :            : /**</a>
+<a name="196"><span class="lineNum">     196 </span>                :            :  * Contains a 1-byte bool and 8-byte LE version number.</a>
+<a name="197"><span class="lineNum">     197 </span>                :            :  * Indicates that a node is willing to provide blocks via &quot;cmpctblock&quot; messages.</a>
+<a name="198"><span class="lineNum">     198 </span>                :            :  * May indicate that a node prefers to receive new block announcements via a</a>
+<a name="199"><span class="lineNum">     199 </span>                :            :  * &quot;cmpctblock&quot; message rather than an &quot;inv&quot;, depending on message contents.</a>
+<a name="200"><span class="lineNum">     200 </span>                :            :  * @since protocol version 70014 as described by BIP 152</a>
+<a name="201"><span class="lineNum">     201 </span>                :            :  */</a>
+<a name="202"><span class="lineNum">     202 </span>                :            : extern const char* SENDCMPCT;</a>
+<a name="203"><span class="lineNum">     203 </span>                :            : /**</a>
+<a name="204"><span class="lineNum">     204 </span>                :            :  * Contains a CBlockHeaderAndShortTxIDs object - providing a header and</a>
+<a name="205"><span class="lineNum">     205 </span>                :            :  * list of &quot;short txids&quot;.</a>
+<a name="206"><span class="lineNum">     206 </span>                :            :  * @since protocol version 70014 as described by BIP 152</a>
+<a name="207"><span class="lineNum">     207 </span>                :            :  */</a>
+<a name="208"><span class="lineNum">     208 </span>                :            : extern const char* CMPCTBLOCK;</a>
+<a name="209"><span class="lineNum">     209 </span>                :            : /**</a>
+<a name="210"><span class="lineNum">     210 </span>                :            :  * Contains a BlockTransactionsRequest</a>
+<a name="211"><span class="lineNum">     211 </span>                :            :  * Peer should respond with &quot;blocktxn&quot; message.</a>
+<a name="212"><span class="lineNum">     212 </span>                :            :  * @since protocol version 70014 as described by BIP 152</a>
+<a name="213"><span class="lineNum">     213 </span>                :            :  */</a>
+<a name="214"><span class="lineNum">     214 </span>                :            : extern const char* GETBLOCKTXN;</a>
+<a name="215"><span class="lineNum">     215 </span>                :            : /**</a>
+<a name="216"><span class="lineNum">     216 </span>                :            :  * Contains a BlockTransactions.</a>
+<a name="217"><span class="lineNum">     217 </span>                :            :  * Sent in response to a &quot;getblocktxn&quot; message.</a>
+<a name="218"><span class="lineNum">     218 </span>                :            :  * @since protocol version 70014 as described by BIP 152</a>
+<a name="219"><span class="lineNum">     219 </span>                :            :  */</a>
+<a name="220"><span class="lineNum">     220 </span>                :            : extern const char* BLOCKTXN;</a>
+<a name="221"><span class="lineNum">     221 </span>                :            : /**</a>
+<a name="222"><span class="lineNum">     222 </span>                :            :  * getcfilters requests compact filters for a range of blocks.</a>
+<a name="223"><span class="lineNum">     223 </span>                :            :  * Only available with service bit NODE_COMPACT_FILTERS as described by</a>
+<a name="224"><span class="lineNum">     224 </span>                :            :  * BIP 157 &amp; 158.</a>
+<a name="225"><span class="lineNum">     225 </span>                :            :  */</a>
+<a name="226"><span class="lineNum">     226 </span>                :            : extern const char* GETCFILTERS;</a>
+<a name="227"><span class="lineNum">     227 </span>                :            : /**</a>
+<a name="228"><span class="lineNum">     228 </span>                :            :  * cfilter is a response to a getcfilters request containing a single compact</a>
+<a name="229"><span class="lineNum">     229 </span>                :            :  * filter.</a>
+<a name="230"><span class="lineNum">     230 </span>                :            :  */</a>
+<a name="231"><span class="lineNum">     231 </span>                :            : extern const char* CFILTER;</a>
+<a name="232"><span class="lineNum">     232 </span>                :            : /**</a>
+<a name="233"><span class="lineNum">     233 </span>                :            :  * getcfheaders requests a compact filter header and the filter hashes for a</a>
+<a name="234"><span class="lineNum">     234 </span>                :            :  * range of blocks, which can then be used to reconstruct the filter headers</a>
+<a name="235"><span class="lineNum">     235 </span>                :            :  * for those blocks.</a>
+<a name="236"><span class="lineNum">     236 </span>                :            :  * Only available with service bit NODE_COMPACT_FILTERS as described by</a>
+<a name="237"><span class="lineNum">     237 </span>                :            :  * BIP 157 &amp; 158.</a>
+<a name="238"><span class="lineNum">     238 </span>                :            :  */</a>
+<a name="239"><span class="lineNum">     239 </span>                :            : extern const char* GETCFHEADERS;</a>
+<a name="240"><span class="lineNum">     240 </span>                :            : /**</a>
+<a name="241"><span class="lineNum">     241 </span>                :            :  * cfheaders is a response to a getcfheaders request containing a filter header</a>
+<a name="242"><span class="lineNum">     242 </span>                :            :  * and a vector of filter hashes for each subsequent block in the requested range.</a>
+<a name="243"><span class="lineNum">     243 </span>                :            :  */</a>
+<a name="244"><span class="lineNum">     244 </span>                :            : extern const char* CFHEADERS;</a>
+<a name="245"><span class="lineNum">     245 </span>                :            : /**</a>
+<a name="246"><span class="lineNum">     246 </span>                :            :  * getcfcheckpt requests evenly spaced compact filter headers, enabling</a>
+<a name="247"><span class="lineNum">     247 </span>                :            :  * parallelized download and validation of the headers between them.</a>
+<a name="248"><span class="lineNum">     248 </span>                :            :  * Only available with service bit NODE_COMPACT_FILTERS as described by</a>
+<a name="249"><span class="lineNum">     249 </span>                :            :  * BIP 157 &amp; 158.</a>
+<a name="250"><span class="lineNum">     250 </span>                :            :  */</a>
+<a name="251"><span class="lineNum">     251 </span>                :            : extern const char* GETCFCHECKPT;</a>
+<a name="252"><span class="lineNum">     252 </span>                :            : /**</a>
+<a name="253"><span class="lineNum">     253 </span>                :            :  * cfcheckpt is a response to a getcfcheckpt request containing a vector of</a>
+<a name="254"><span class="lineNum">     254 </span>                :            :  * evenly spaced filter headers for blocks on the requested chain.</a>
+<a name="255"><span class="lineNum">     255 </span>                :            :  */</a>
+<a name="256"><span class="lineNum">     256 </span>                :            : extern const char* CFCHECKPT;</a>
+<a name="257"><span class="lineNum">     257 </span>                :            : /**</a>
+<a name="258"><span class="lineNum">     258 </span>                :            :  * Indicates that a node prefers to relay transactions via wtxid, rather than</a>
+<a name="259"><span class="lineNum">     259 </span>                :            :  * txid.</a>
+<a name="260"><span class="lineNum">     260 </span>                :            :  * @since protocol version 70016 as described by BIP 339.</a>
+<a name="261"><span class="lineNum">     261 </span>                :            :  */</a>
+<a name="262"><span class="lineNum">     262 </span>                :            : extern const char* WTXIDRELAY;</a>
+<a name="263"><span class="lineNum">     263 </span>                :            : }; // namespace NetMsgType</a>
+<a name="264"><span class="lineNum">     264 </span>                :            : </a>
+<a name="265"><span class="lineNum">     265 </span>                :            : /* Get a vector of all valid message types (see above) */</a>
+<a name="266"><span class="lineNum">     266 </span>                :            : const std::vector&lt;std::string&gt;&amp; getAllNetMessageTypes();</a>
+<a name="267"><span class="lineNum">     267 </span>                :            : </a>
+<a name="268"><span class="lineNum">     268 </span>                :            : /** nServices flags */</a>
+<a name="269"><span class="lineNum">     269 </span>                :            : enum ServiceFlags : uint64_t {</a>
+<a name="270"><span class="lineNum">     270 </span>                :            :     // NOTE: When adding here, be sure to update serviceFlagToStr too</a>
+<a name="271"><span class="lineNum">     271 </span>                :            :     // Nothing</a>
+<a name="272"><span class="lineNum">     272 </span>                :            :     NODE_NONE = 0,</a>
+<a name="273"><span class="lineNum">     273 </span>                :            :     // NODE_NETWORK means that the node is capable of serving the complete block chain. It is currently</a>
+<a name="274"><span class="lineNum">     274 </span>                :            :     // set by all Bitcoin Core non pruned nodes, and is unset by SPV clients or other light clients.</a>
+<a name="275"><span class="lineNum">     275 </span>                :            :     NODE_NETWORK = (1 &lt;&lt; 0),</a>
+<a name="276"><span class="lineNum">     276 </span>                :            :     // NODE_BLOOM means the node is capable and willing to handle bloom-filtered connections.</a>
+<a name="277"><span class="lineNum">     277 </span>                :            :     // Bitcoin Core nodes used to support this by default, without advertising this bit,</a>
+<a name="278"><span class="lineNum">     278 </span>                :            :     // but no longer do as of protocol version 70011 (= NO_BLOOM_VERSION)</a>
+<a name="279"><span class="lineNum">     279 </span>                :            :     NODE_BLOOM = (1 &lt;&lt; 2),</a>
+<a name="280"><span class="lineNum">     280 </span>                :            :     // NODE_WITNESS indicates that a node can be asked for blocks and transactions including</a>
+<a name="281"><span class="lineNum">     281 </span>                :            :     // witness data.</a>
+<a name="282"><span class="lineNum">     282 </span>                :            :     NODE_WITNESS = (1 &lt;&lt; 3),</a>
+<a name="283"><span class="lineNum">     283 </span>                :            :     // NODE_COMPACT_FILTERS means the node will service basic block filter requests.</a>
+<a name="284"><span class="lineNum">     284 </span>                :            :     // See BIP157 and BIP158 for details on how this is implemented.</a>
+<a name="285"><span class="lineNum">     285 </span>                :            :     NODE_COMPACT_FILTERS = (1 &lt;&lt; 6),</a>
+<a name="286"><span class="lineNum">     286 </span>                :            :     // NODE_NETWORK_LIMITED means the same as NODE_NETWORK with the limitation of only</a>
+<a name="287"><span class="lineNum">     287 </span>                :            :     // serving the last 288 (2 day) blocks</a>
+<a name="288"><span class="lineNum">     288 </span>                :            :     // See BIP159 for details on how this is implemented.</a>
+<a name="289"><span class="lineNum">     289 </span>                :            :     NODE_NETWORK_LIMITED = (1 &lt;&lt; 10),</a>
+<a name="290"><span class="lineNum">     290 </span>                :            : </a>
+<a name="291"><span class="lineNum">     291 </span>                :            :     // Bits 24-31 are reserved for temporary experiments. Just pick a bit that</a>
+<a name="292"><span class="lineNum">     292 </span>                :            :     // isn't getting used, or one not being used much, and notify the</a>
+<a name="293"><span class="lineNum">     293 </span>                :            :     // bitcoin-development mailing list. Remember that service bits are just</a>
+<a name="294"><span class="lineNum">     294 </span>                :            :     // unauthenticated advertisements, so your code must be robust against</a>
+<a name="295"><span class="lineNum">     295 </span>                :            :     // collisions and other cases where nodes may be advertising a service they</a>
+<a name="296"><span class="lineNum">     296 </span>                :            :     // do not actually support. Other service bits should be allocated via the</a>
+<a name="297"><span class="lineNum">     297 </span>                :            :     // BIP process.</a>
+<a name="298"><span class="lineNum">     298 </span>                :            : };</a>
+<a name="299"><span class="lineNum">     299 </span>                :            : </a>
+<a name="300"><span class="lineNum">     300 </span>                :            : /**</a>
+<a name="301"><span class="lineNum">     301 </span>                :            :  * Convert service flags (a bitmask of NODE_*) to human readable strings.</a>
+<a name="302"><span class="lineNum">     302 </span>                :            :  * It supports unknown service flags which will be returned as &quot;UNKNOWN[...]&quot;.</a>
+<a name="303"><span class="lineNum">     303 </span>                :            :  * @param[in] flags multiple NODE_* bitwise-OR-ed together</a>
+<a name="304"><span class="lineNum">     304 </span>                :            :  */</a>
+<a name="305"><span class="lineNum">     305 </span>                :            : std::vector&lt;std::string&gt; serviceFlagsToStr(uint64_t flags);</a>
+<a name="306"><span class="lineNum">     306 </span>                :            : </a>
+<a name="307"><span class="lineNum">     307 </span>                :            : /**</a>
+<a name="308"><span class="lineNum">     308 </span>                :            :  * Gets the set of service flags which are &quot;desirable&quot; for a given peer.</a>
+<a name="309"><span class="lineNum">     309 </span>                :            :  *</a>
+<a name="310"><span class="lineNum">     310 </span>                :            :  * These are the flags which are required for a peer to support for them</a>
+<a name="311"><span class="lineNum">     311 </span>                :            :  * to be &quot;interesting&quot; to us, ie for us to wish to use one of our few</a>
+<a name="312"><span class="lineNum">     312 </span>                :            :  * outbound connection slots for or for us to wish to prioritize keeping</a>
+<a name="313"><span class="lineNum">     313 </span>                :            :  * their connection around.</a>
+<a name="314"><span class="lineNum">     314 </span>                :            :  *</a>
+<a name="315"><span class="lineNum">     315 </span>                :            :  * Relevant service flags may be peer- and state-specific in that the</a>
+<a name="316"><span class="lineNum">     316 </span>                :            :  * version of the peer may determine which flags are required (eg in the</a>
+<a name="317"><span class="lineNum">     317 </span>                :            :  * case of NODE_NETWORK_LIMITED where we seek out NODE_NETWORK peers</a>
+<a name="318"><span class="lineNum">     318 </span>                :            :  * unless they set NODE_NETWORK_LIMITED and we are out of IBD, in which</a>
+<a name="319"><span class="lineNum">     319 </span>                :            :  * case NODE_NETWORK_LIMITED suffices).</a>
+<a name="320"><span class="lineNum">     320 </span>                :            :  *</a>
+<a name="321"><span class="lineNum">     321 </span>                :            :  * Thus, generally, avoid calling with peerServices == NODE_NONE, unless</a>
+<a name="322"><span class="lineNum">     322 </span>                :            :  * state-specific flags must absolutely be avoided. When called with</a>
+<a name="323"><span class="lineNum">     323 </span>                :            :  * peerServices == NODE_NONE, the returned desirable service flags are</a>
+<a name="324"><span class="lineNum">     324 </span>                :            :  * guaranteed to not change dependent on state - ie they are suitable for</a>
+<a name="325"><span class="lineNum">     325 </span>                :            :  * use when describing peers which we know to be desirable, but for which</a>
+<a name="326"><span class="lineNum">     326 </span>                :            :  * we do not have a confirmed set of service flags.</a>
+<a name="327"><span class="lineNum">     327 </span>                :            :  *</a>
+<a name="328"><span class="lineNum">     328 </span>                :            :  * If the NODE_NONE return value is changed, contrib/seeds/makeseeds.py</a>
+<a name="329"><span class="lineNum">     329 </span>                :            :  * should be updated appropriately to filter for the same nodes.</a>
+<a name="330"><span class="lineNum">     330 </span>                :            :  */</a>
+<a name="331"><span class="lineNum">     331 </span>                :            : ServiceFlags GetDesirableServiceFlags(ServiceFlags services);</a>
+<a name="332"><span class="lineNum">     332 </span>                :            : </a>
+<a name="333"><span class="lineNum">     333 </span>                :            : /** Set the current IBD status in order to figure out the desirable service flags */</a>
+<a name="334"><span class="lineNum">     334 </span>                :            : void SetServiceFlagsIBDCache(bool status);</a>
+<a name="335"><span class="lineNum">     335 </span>                :            : </a>
+<a name="336"><span class="lineNum">     336 </span>                :            : /**</a>
+<a name="337"><span class="lineNum">     337 </span>                :            :  * A shortcut for (services &amp; GetDesirableServiceFlags(services))</a>
+<a name="338"><span class="lineNum">     338 </span>                :            :  * == GetDesirableServiceFlags(services), ie determines whether the given</a>
+<a name="339"><span class="lineNum">     339 </span>                :            :  * set of service flags are sufficient for a peer to be &quot;relevant&quot;.</a>
+<a name="340"><span class="lineNum">     340 </span>                :            :  */</a>
+<a name="341"><span class="lineNum">     341 </span>                :<span class="lineNoCov">          0 : static inline bool HasAllDesirableServiceFlags(ServiceFlags services)</span></a>
+<a name="342"><span class="lineNum">     342 </span>                :            : {</a>
+<a name="343"><span class="lineNum">     343 </span>                :<span class="lineNoCov">          0 :     return !(GetDesirableServiceFlags(services) &amp; (~services));</span></a>
+<a name="344"><span class="lineNum">     344 </span>                :            : }</a>
+<a name="345"><span class="lineNum">     345 </span>                :            : </a>
+<a name="346"><span class="lineNum">     346 </span>                :            : /**</a>
+<a name="347"><span class="lineNum">     347 </span>                :            :  * Checks if a peer with the given service flags may be capable of having a</a>
+<a name="348"><span class="lineNum">     348 </span>                :            :  * robust address-storage DB.</a>
+<a name="349"><span class="lineNum">     349 </span>                :            :  */</a>
+<a name="350"><span class="lineNum">     350 </span>                :<span class="lineNoCov">          0 : static inline bool MayHaveUsefulAddressDB(ServiceFlags services)</span></a>
+<a name="351"><span class="lineNum">     351 </span>                :            : {</a>
+<a name="352"><span class="lineNum">     352 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :     return (services &amp; NODE_NETWORK) || (services &amp; NODE_NETWORK_LIMITED);</span></a>
+<a name="353"><span class="lineNum">     353 </span>                :            : }</a>
+<a name="354"><span class="lineNum">     354 </span>                :            : </a>
+<a name="355"><span class="lineNum">     355 </span>                :            : /** A CService with information about it as peer */</a>
+<a name="356"><span class="lineNum">     356 </span>                :<span class="lineNoCov">          0 : class CAddress : public CService</span></a>
+<a name="357"><span class="lineNum">     357 </span>                :            : {</a>
+<a name="358"><span class="lineNum">     358 </span>                :            :     static constexpr uint32_t TIME_INIT{100000000};</a>
+<a name="359"><span class="lineNum">     359 </span>                :            : </a>
+<a name="360"><span class="lineNum">     360 </span>                :            : public:</a>
+<a name="361"><span class="lineNum">     361 </span>                :<span class="lineNoCov">          0 :     CAddress() : CService{} {};</span></a>
+<a name="362"><span class="lineNum">     362 </span>                :<span class="lineNoCov">          0 :     CAddress(CService ipIn, ServiceFlags nServicesIn) : CService{ipIn}, nServices{nServicesIn} {};</span></a>
+<a name="363"><span class="lineNum">     363 </span>                :<span class="lineNoCov">          0 :     CAddress(CService ipIn, ServiceFlags nServicesIn, uint32_t nTimeIn) : CService{ipIn}, nTime{nTimeIn}, nServices{nServicesIn} {};</span></a>
+<a name="364"><span class="lineNum">     364 </span>                :            : </a>
+<a name="365"><span class="lineNum">     365 </span>                :<span class="lineNoCov">          0 :     SERIALIZE_METHODS(CAddress, obj)</span></a>
+<a name="366"><span class="lineNum">     366 </span>                :            :     {</a>
+<a name="367"><span class="lineNum">     367 </span>                :<span class="lineNoCov">          0 :         SER_READ(obj, obj.nTime = TIME_INIT);</span></a>
+<a name="368"><span class="lineNum">     368 </span>                :<span class="lineNoCov">          0 :         int nVersion = s.GetVersion();</span></a>
+<a name="369"><span class="lineNum">     369 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         if (s.GetType() &amp; SER_DISK) {</span></a>
+<span class="lineNum">         </span><span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span><span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">         </span>   <span class="branchNoExec" title="Branch 9 was not executed"> # </span><span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span><span class="branchNoExec" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">         </span>            <span class="branchNoExec" title="Branch 13 was not executed"> # </span>]
+<a name="370"><span class="lineNum">     370 </span>                :<span class="lineNoCov">          0 :             READWRITE(nVersion);</span></a>
+<a name="371"><span class="lineNum">     371 </span>                :<span class="lineNoCov">          0 :         }</span></a>
+<a name="372"><span class="lineNum">     372 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         if ((s.GetType() &amp; SER_DISK) ||</span></a>
+<span class="lineNum">         </span><span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span><span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">         </span><span class="branchNoExec" title="Branch 9 was not executed"> # </span><span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span><span class="branchNoExec" title="Branch 12 was not executed"> # </span><span class="branchNoExec" title="Branch 13 was not executed"> # </span> 
+<span class="lineNum">         </span><span class="branchNoExec" title="Branch 14 was not executed"> # </span><span class="branchNoExec" title="Branch 15 was not executed"> # </span><span class="branchNoExec" title="Branch 16 was not executed"> # </span><span class="branchNoExec" title="Branch 17 was not executed"> # </span><span class="branchNoExec" title="Branch 18 was not executed"> # </span> 
+<span class="lineNum">         </span><span class="branchNoExec" title="Branch 19 was not executed"> # </span><span class="branchNoExec" title="Branch 20 was not executed"> # </span><span class="branchNoExec" title="Branch 21 was not executed"> # </span><span class="branchNoExec" title="Branch 22 was not executed"> # </span><span class="branchNoExec" title="Branch 23 was not executed"> # </span> 
+<span class="lineNum">         </span>   <span class="branchNoExec" title="Branch 24 was not executed"> # </span><span class="branchNoExec" title="Branch 25 was not executed"> # </span><span class="branchNoExec" title="Branch 26 was not executed"> # </span><span class="branchNoExec" title="Branch 27 was not executed"> # </span>]
+<a name="373"><span class="lineNum">     373 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :             (nVersion != INIT_PROTO_VERSION &amp;&amp; !(s.GetType() &amp; SER_GETHASH))) {</span></a>
+<span class="lineNum">         </span><span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span><span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">         </span>   <span class="branchNoExec" title="Branch 9 was not executed"> # </span><span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span><span class="branchNoExec" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">         </span>            <span class="branchNoExec" title="Branch 13 was not executed"> # </span>]
+<a name="374"><span class="lineNum">     374 </span>                :            :             // The only time we serialize a CAddress object without nTime is in</a>
+<a name="375"><span class="lineNum">     375 </span>                :            :             // the initial VERSION messages which contain two CAddress records.</a>
+<a name="376"><span class="lineNum">     376 </span>                :            :             // At that point, the serialization version is INIT_PROTO_VERSION.</a>
+<a name="377"><span class="lineNum">     377 </span>                :            :             // After the version handshake, serialization version is &gt;=</a>
+<a name="378"><span class="lineNum">     378 </span>                :            :             // MIN_PEER_PROTO_VERSION and all ADDR messages are serialized with</a>
+<a name="379"><span class="lineNum">     379 </span>                :            :             // nTime.</a>
+<a name="380"><span class="lineNum">     380 </span>                :<span class="lineNoCov">          0 :             READWRITE(obj.nTime);</span></a>
+<a name="381"><span class="lineNum">     381 </span>                :<span class="lineNoCov">          0 :         }</span></a>
+<a name="382"><span class="lineNum">     382 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         if (nVersion &amp; ADDRV2_FORMAT) {</span></a>
+<span class="lineNum">         </span><span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span><span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">         </span>   <span class="branchNoExec" title="Branch 9 was not executed"> # </span><span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span><span class="branchNoExec" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">         </span>            <span class="branchNoExec" title="Branch 13 was not executed"> # </span>]
+<a name="383"><span class="lineNum">     383 </span>                :<span class="lineNoCov">          0 :             uint64_t services_tmp;</span></a>
+<a name="384"><span class="lineNum">     384 </span>                :<span class="lineNoCov">          0 :             SER_WRITE(obj, services_tmp = obj.nServices);</span></a>
+<a name="385"><span class="lineNum">     385 </span>                :<span class="lineNoCov">          0 :             READWRITE(Using&lt;CompactSizeFormatter&lt;false&gt;&gt;(services_tmp));</span></a>
+<a name="386"><span class="lineNum">     386 </span>                :<span class="lineNoCov">          0 :             SER_READ(obj, obj.nServices = static_cast&lt;ServiceFlags&gt;(services_tmp));</span></a>
+<a name="387"><span class="lineNum">     387 </span>                :<span class="lineNoCov">          0 :         } else {</span></a>
+<a name="388"><span class="lineNum">     388 </span>                :<span class="lineNoCov">          0 :             READWRITE(Using&lt;CustomUintFormatter&lt;8&gt;&gt;(obj.nServices));</span></a>
+<a name="389"><span class="lineNum">     389 </span>                :            :         }</a>
+<a name="390"><span class="lineNum">     390 </span>                :<span class="lineNoCov">          0 :         READWRITEAS(CService, obj);</span></a>
+<a name="391"><span class="lineNum">     391 </span>                :<span class="lineNoCov">          0 :     }</span></a>
+<a name="392"><span class="lineNum">     392 </span>                :            : </a>
+<a name="393"><span class="lineNum">     393 </span>                :            :     // disk and network only</a>
+<a name="394"><span class="lineNum">     394 </span>                :<span class="lineNoCov">          0 :     uint32_t nTime{TIME_INIT};</span></a>
+<a name="395"><span class="lineNum">     395 </span>                :            : </a>
+<a name="396"><span class="lineNum">     396 </span>                :<span class="lineNoCov">          0 :     ServiceFlags nServices{NODE_NONE};</span></a>
+<a name="397"><span class="lineNum">     397 </span>                :            : };</a>
+<a name="398"><span class="lineNum">     398 </span>                :            : </a>
+<a name="399"><span class="lineNum">     399 </span>                :            : /** getdata message type flags */</a>
+<a name="400"><span class="lineNum">     400 </span>                :            : const uint32_t MSG_WITNESS_FLAG = 1 &lt;&lt; 30;</a>
+<a name="401"><span class="lineNum">     401 </span>                :            : const uint32_t MSG_TYPE_MASK = 0xffffffff &gt;&gt; 2;</a>
+<a name="402"><span class="lineNum">     402 </span>                :            : </a>
+<a name="403"><span class="lineNum">     403 </span>                :            : /** getdata / inv message types.</a>
+<a name="404"><span class="lineNum">     404 </span>                :            :  * These numbers are defined by the protocol. When adding a new value, be sure</a>
+<a name="405"><span class="lineNum">     405 </span>                :            :  * to mention it in the respective BIP.</a>
+<a name="406"><span class="lineNum">     406 </span>                :            :  */</a>
+<a name="407"><span class="lineNum">     407 </span>                :            : enum GetDataMsg : uint32_t {</a>
+<a name="408"><span class="lineNum">     408 </span>                :            :     UNDEFINED = 0,</a>
+<a name="409"><span class="lineNum">     409 </span>                :            :     MSG_TX = 1,</a>
+<a name="410"><span class="lineNum">     410 </span>                :            :     MSG_BLOCK = 2,</a>
+<a name="411"><span class="lineNum">     411 </span>                :            :     MSG_WTX = 5,                                      //!&lt; Defined in BIP 339</a>
+<a name="412"><span class="lineNum">     412 </span>                :            :     // The following can only occur in getdata. Invs always use TX/WTX or BLOCK.</a>
+<a name="413"><span class="lineNum">     413 </span>                :            :     MSG_FILTERED_BLOCK = 3,                           //!&lt; Defined in BIP37</a>
+<a name="414"><span class="lineNum">     414 </span>                :            :     MSG_CMPCT_BLOCK = 4,                              //!&lt; Defined in BIP152</a>
+<a name="415"><span class="lineNum">     415 </span>                :            :     MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!&lt; Defined in BIP144</a>
+<a name="416"><span class="lineNum">     416 </span>                :            :     MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!&lt; Defined in BIP144</a>
+<a name="417"><span class="lineNum">     417 </span>                :            :     // MSG_FILTERED_WITNESS_BLOCK is defined in BIP144 as reserved for future</a>
+<a name="418"><span class="lineNum">     418 </span>                :            :     // use and remains unused.</a>
+<a name="419"><span class="lineNum">     419 </span>                :            :     // MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,</a>
+<a name="420"><span class="lineNum">     420 </span>                :            : };</a>
+<a name="421"><span class="lineNum">     421 </span>                :            : </a>
+<a name="422"><span class="lineNum">     422 </span>                :            : /** inv message data */</a>
+<a name="423"><span class="lineNum">     423 </span>                :            : class CInv</a>
+<a name="424"><span class="lineNum">     424 </span>                :            : {</a>
+<a name="425"><span class="lineNum">     425 </span>                :            : public:</a>
+<a name="426"><span class="lineNum">     426 </span>                :            :     CInv();</a>
+<a name="427"><span class="lineNum">     427 </span>                :            :     CInv(uint32_t typeIn, const uint256&amp; hashIn);</a>
+<a name="428"><span class="lineNum">     428 </span>                :            : </a>
+<a name="429"><span class="lineNum">     429 </span>                :<span class="lineNoCov">          0 :     SERIALIZE_METHODS(CInv, obj) { READWRITE(obj.type, obj.hash); }</span></a>
+<a name="430"><span class="lineNum">     430 </span>                :            : </a>
+<a name="431"><span class="lineNum">     431 </span>                :            :     friend bool operator&lt;(const CInv&amp; a, const CInv&amp; b);</a>
+<a name="432"><span class="lineNum">     432 </span>                :            : </a>
+<a name="433"><span class="lineNum">     433 </span>                :            :     std::string GetCommand() const;</a>
+<a name="434"><span class="lineNum">     434 </span>                :            :     std::string ToString() const;</a>
+<a name="435"><span class="lineNum">     435 </span>                :            : </a>
+<a name="436"><span class="lineNum">     436 </span>                :            :     // Single-message helper methods</a>
+<a name="437"><span class="lineNum">     437 </span>                :<span class="lineNoCov">          0 :     bool IsMsgTx() const { return type == MSG_TX; }</span></a>
+<a name="438"><span class="lineNum">     438 </span>                :<span class="lineNoCov">          0 :     bool IsMsgBlk() const { return type == MSG_BLOCK; }</span></a>
+<a name="439"><span class="lineNum">     439 </span>                :<span class="lineNoCov">          0 :     bool IsMsgWtx() const { return type == MSG_WTX; }</span></a>
+<a name="440"><span class="lineNum">     440 </span>                :<span class="lineNoCov">          0 :     bool IsMsgFilteredBlk() const { return type == MSG_FILTERED_BLOCK; }</span></a>
+<a name="441"><span class="lineNum">     441 </span>                :<span class="lineNoCov">          0 :     bool IsMsgCmpctBlk() const { return type == MSG_CMPCT_BLOCK; }</span></a>
+<a name="442"><span class="lineNum">     442 </span>                :<span class="lineNoCov">          0 :     bool IsMsgWitnessBlk() const { return type == MSG_WITNESS_BLOCK; }</span></a>
+<a name="443"><span class="lineNum">     443 </span>                :            : </a>
+<a name="444"><span class="lineNum">     444 </span>                :            :     // Combined-message helper methods</a>
+<a name="445"><span class="lineNum">     445 </span>                :<span class="lineNoCov">          0 :     bool IsGenTxMsg() const</span></a>
+<a name="446"><span class="lineNum">     446 </span>                :            :     {</a>
+<a name="447"><span class="lineNum">     447 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :         return type == MSG_TX || type == MSG_WTX || type == MSG_WITNESS_TX;</span></a>
+<a name="448"><span class="lineNum">     448 </span>                :            :     }</a>
+<a name="449"><span class="lineNum">     449 </span>                :<span class="lineNoCov">          0 :     bool IsGenBlkMsg() const</span></a>
+<a name="450"><span class="lineNum">     450 </span>                :            :     {</a>
+<a name="451"><span class="lineNum">     451 </span>  [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span> :<span class="lineNoCov">          0 :         return type == MSG_BLOCK || type == MSG_FILTERED_BLOCK || type == MSG_CMPCT_BLOCK || type == MSG_WITNESS_BLOCK;</span></a>
+<span class="lineNum">         </span>         <span class="branchNoExec" title="Branch 4 was not executed"> # </span><span class="branchNoExec" title="Branch 5 was not executed"> # </span>]
+<a name="452"><span class="lineNum">     452 </span>                :            :     }</a>
+<a name="453"><span class="lineNum">     453 </span>                :            : </a>
+<a name="454"><span class="lineNum">     454 </span>                :            :     uint32_t type;</a>
+<a name="455"><span class="lineNum">     455 </span>                :            :     uint256 hash;</a>
+<a name="456"><span class="lineNum">     456 </span>                :            : };</a>
+<a name="457"><span class="lineNum">     457 </span>                :            : </a>
+<a name="458"><span class="lineNum">     458 </span>                :            : /** Convert a TX/WITNESS_TX/WTX CInv to a GenTxid. */</a>
+<a name="459"><span class="lineNum">     459 </span>                :            : GenTxid ToGenTxid(const CInv&amp; inv);</a>
+<a name="460"><span class="lineNum">     460 </span>                :            : </a>
+<a name="461"><span class="lineNum">     461 </span>                :            : #endif // BITCOIN_PROTOCOL_H</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.14</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
