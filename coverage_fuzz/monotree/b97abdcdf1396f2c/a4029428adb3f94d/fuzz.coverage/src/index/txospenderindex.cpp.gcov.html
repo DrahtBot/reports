@@ -1,0 +1,274 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/index/txospenderindex.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/index">src/index</a> - txospenderindex.cpp<span style="font-size: 80%;"> (source / <a href="txospenderindex.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">86</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-03-11 13:38:45</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">104</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;index/txospenderindex.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;common/args.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;crypto/siphash.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;dbwrapper.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;flatfile.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;index/base.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;index/disktxpos.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;interfaces/chain.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;logging.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;node/blockstorage.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;primitives/block.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;primitives/transaction.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;random.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;serialize.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;streams.h&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;tinyformat.h&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;util/fs.h&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;validation.h&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #include &lt;cstdio&gt;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #include &lt;exception&gt;</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : #include &lt;ios&gt;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #include &lt;span&gt;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : #include &lt;string&gt;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : /* The database is used to find the spending transaction of a given utxo.</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :  * For every input of every transaction it stores a key that is a pair(siphash(input outpoint), transaction location on disk) and an empty value.</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :  * To find the spending transaction of an outpoint, we perform a range query on siphash(outpoint), and for each returned key load the transaction</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :  * and return it if it does spend the provided outpoint.</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :  */</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : // LevelDB key prefix. We only have one key for now but it will make it easier to add others if needed.</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : constexpr uint8_t DB_TXOSPENDERINDEX{'s'};</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : std::unique_ptr&lt;TxoSpenderIndex&gt; g_txospenderindex;</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : struct DBKey {</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     uint64_t hash;</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     CDiskTxPos pos;</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaUNC">           0 :     explicit DBKey(const uint64_t&amp; hash_in, const CDiskTxPos&amp; pos_in) : hash(hash_in), pos(pos_in) {}</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : </span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaUNC">           0 :     SERIALIZE_METHODS(DBKey, obj)</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     {</span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaUNC">           0 :         uint8_t prefix{DB_TXOSPENDERINDEX};</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaUNC">           0 :         READWRITE(prefix);</span></span>
+<span id="L55"><span class="lineNum">      55</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (prefix != DB_TXOSPENDERINDEX) {</span></span>
+<span id="L56"><span class="lineNum">      56</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             throw std::ios_base::failure(&quot;Invalid format for spender index DB key&quot;);</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :         }</span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaUNC">           0 :         READWRITE(obj.hash);</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaUNC">           0 :         READWRITE(obj.pos);</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : };</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : </span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaUNC">           0 : TxoSpenderIndex::TxoSpenderIndex(std::unique_ptr&lt;interfaces::Chain&gt; chain, size_t n_cache_size, bool f_memory, bool f_wipe)</span></span>
+<span id="L64"><span class="lineNum">      64</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     : BaseIndex(std::move(chain), &quot;txospenderindex&quot;), m_db{std::make_unique&lt;DB&gt;(gArgs.GetDataDirNet() / &quot;indexes&quot; / &quot;txospenderindex&quot; / &quot;db&quot;, n_cache_size, f_memory, f_wipe)}</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 13 was not executed"> # </span>]
+<span id="L65"><span class="lineNum">      65</span>                 :             : {</span>
+<span id="L66"><span class="lineNum">      66</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!m_db-&gt;Read(&quot;siphash_key&quot;, m_siphash_key)) {</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaUNC">           0 :         FastRandomContext rng(false);</span></span>
+<span id="L68"><span class="lineNum">      68</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         m_siphash_key = {rng.rand64(), rng.rand64()};</span></span>
+<span id="L69"><span class="lineNum">      69</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         m_db-&gt;Write(&quot;siphash_key&quot;, m_siphash_key, /*fSync=*/ true);</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaUNC">           0 : interfaces::Chain::NotifyOptions TxoSpenderIndex::CustomOptions()</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : {</span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaUNC">           0 :     interfaces::Chain::NotifyOptions options;</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaUNC">           0 :     options.disconnect_data = true;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaUNC">           0 :     return options;</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : }</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaUNC">           0 : static uint64_t CreateKeyPrefix(std::pair&lt;uint64_t, uint64_t&gt; siphash_key, const COutPoint&amp; vout)</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : {</span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaUNC">           0 :     return PresaltedSipHasher(siphash_key.first, siphash_key.second)(vout.hash.ToUint256(), vout.n);</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : }</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : </span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaUNC">           0 : static DBKey CreateKey(std::pair&lt;uint64_t, uint64_t&gt; siphash_key, const COutPoint&amp; vout, const CDiskTxPos&amp; pos)</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : {</span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaUNC">           0 :     return DBKey(CreateKeyPrefix(siphash_key, vout), pos);</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : }</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : </span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaUNC">           0 : void TxoSpenderIndex::WriteSpenderInfos(const std::vector&lt;std::pair&lt;COutPoint, CDiskTxPos&gt;&gt;&amp; items)</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : {</span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaUNC">           0 :     CDBBatch batch(*m_db);</span></span>
+<span id="L93"><span class="lineNum">      93</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (const auto&amp; [outpoint, pos] : items) {</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaUNC">           0 :         DBKey key(CreateKey(m_siphash_key, outpoint, pos));</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :         // key is hash(spent outpoint) | disk pos, value is empty</span>
+<span id="L96"><span class="lineNum">      96</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         batch.Write(key, &quot;&quot;);</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :     }</span>
+<span id="L98"><span class="lineNum">      98</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     m_db-&gt;WriteBatch(batch);</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : </span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaUNC">           0 : void TxoSpenderIndex::EraseSpenderInfos(const std::vector&lt;std::pair&lt;COutPoint, CDiskTxPos&gt;&gt;&amp; items)</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : {</span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaUNC">           0 :     CDBBatch batch(*m_db);</span></span>
+<span id="L105"><span class="lineNum">     105</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (const auto&amp; [outpoint, pos] : items) {</span></span>
+<span id="L106"><span class="lineNum">     106</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         batch.Erase(CreateKey(m_siphash_key, outpoint, pos));</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     }</span>
+<span id="L108"><span class="lineNum">     108</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     m_db-&gt;WriteBatch(batch);</span></span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : </span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaUNC">           0 : static std::vector&lt;std::pair&lt;COutPoint, CDiskTxPos&gt;&gt; BuildSpenderPositions(const interfaces::BlockInfo&amp; block)</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : {</span>
+<span id="L113"><span class="lineNum">     113</span>                 :<span class="tlaUNC">           0 :     std::vector&lt;std::pair&lt;COutPoint, CDiskTxPos&gt;&gt; items;</span></span>
+<span id="L114"><span class="lineNum">     114</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     items.reserve(block.data-&gt;vtx.size());</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : </span>
+<span id="L116"><span class="lineNum">     116</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :     CDiskTxPos pos({block.file_number, block.data_pos}, GetSizeOfCompactSize(block.data-&gt;vtx.size()));</span></span>
+<span id="L117"><span class="lineNum">     117</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (const auto&amp; tx : block.data-&gt;vtx) {</span></span>
+<span id="L118"><span class="lineNum">     118</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (!tx-&gt;IsCoinBase()) {</span></span>
+<span id="L119"><span class="lineNum">     119</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             for (const auto&amp; input : tx-&gt;vin) {</span></span>
+<span id="L120"><span class="lineNum">     120</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 items.emplace_back(input.prevout, pos);</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :             }</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :         }</span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaUNC">           0 :         pos.nTxOffset += ::GetSerializeSize(TX_WITH_WITNESS(*tx));</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     }</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaUNC">           0 :     return items;</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :             : </span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaUNC">           0 : bool TxoSpenderIndex::CustomAppend(const interfaces::BlockInfo&amp; block)</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : {</span>
+<span id="L132"><span class="lineNum">     132</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     WriteSpenderInfos(BuildSpenderPositions(block));</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaUNC">           0 :     return true;</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : }</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             : </span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaUNC">           0 : bool TxoSpenderIndex::CustomRemove(const interfaces::BlockInfo&amp; block)</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : {</span>
+<span id="L138"><span class="lineNum">     138</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     EraseSpenderInfos(BuildSpenderPositions(block));</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaUNC">           0 :     return true;</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : }</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : </span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaUNC">           0 : util::Expected&lt;TxoSpender, std::string&gt; TxoSpenderIndex::ReadTransaction(const CDiskTxPos&amp; tx_pos) const</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : {</span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaUNC">           0 :     AutoFile file{m_chainstate-&gt;m_blockman.OpenBlockFile(tx_pos, /*fReadOnly=*/true)};</span></span>
+<span id="L145"><span class="lineNum">     145</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (file.IsNull()) {</span></span>
+<span id="L146"><span class="lineNum">     146</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         return util::Unexpected(&quot;cannot open block&quot;);</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :     }</span>
+<span id="L148"><span class="lineNum">     148</span>                 :<span class="tlaUNC">           0 :     CBlockHeader header;</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaUNC">           0 :     TxoSpender spender;</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaUNC">           0 :     try {</span></span>
+<span id="L151"><span class="lineNum">     151</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         file &gt;&gt; header;</span></span>
+<span id="L152"><span class="lineNum">     152</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         file.seek(tx_pos.nTxOffset, SEEK_CUR);</span></span>
+<span id="L153"><span class="lineNum">     153</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         file &gt;&gt; TX_WITH_WITNESS(spender.tx);</span></span>
+<span id="L154"><span class="lineNum">     154</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         spender.block_hash = header.GetHash();</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaUNC">           0 :         return spender;</span></span>
+<span id="L156"><span class="lineNum">     156</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaUNC">           0 :     } catch (const std::exception&amp; e) {</span></span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaUNC">           0 :         return util::Unexpected(e.what());</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             : </span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaUNC">           0 : util::Expected&lt;std::optional&lt;TxoSpender&gt;, std::string&gt; TxoSpenderIndex::FindSpender(const COutPoint&amp; txo) const</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :             : {</span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaUNC">           0 :     const uint64_t prefix{CreateKeyPrefix(m_siphash_key, txo)};</span></span>
+<span id="L164"><span class="lineNum">     164</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::unique_ptr&lt;CDBIterator&gt; it(m_db-&gt;NewIterator());</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaUNC">           0 :     DBKey key(prefix, CDiskTxPos());</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             : </span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :     // find all keys that start with the outpoint hash, load the transaction at the location specified in the key</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     // and return it if it does spend the provided outpoint</span>
+<span id="L169"><span class="lineNum">     169</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaUNC">           0 :     for (it-&gt;Seek(std::pair{DB_TXOSPENDERINDEX, prefix}); it-&gt;Valid() &amp;&amp; it-&gt;GetKey(key) &amp;&amp; key.hash == prefix; it-&gt;Next()) {</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span>]
+<span id="L170"><span class="lineNum">     170</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (const auto spender{ReadTransaction(key.pos)}) {</span></span>
+<span id="L171"><span class="lineNum">     171</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             for (const auto&amp; input : spender-&gt;tx-&gt;vin) {</span></span>
+<span id="L172"><span class="lineNum">     172</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :                 if (input.prevout == txo) {</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaUNC">           0 :                     return std::optional{*spender};</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :                 }</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :             }</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :         } else {</span>
+<span id="L177"><span class="lineNum">     177</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :             LogError(&quot;Deserialize or I/O error - %s&quot;, spender.error());</span></span>
+<span id="L178"><span class="lineNum">     178</span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaUNC">           0 :             return util::Unexpected{strprintf(&quot;IO error finding spending tx for outpoint %s:%d.&quot;, txo.hash.GetHex(), txo.n)};</span></span>
+<span id="L179"><span class="lineNum">     179</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         }</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     }</span>
+<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaUNC">           0 :     return util::Expected&lt;std::optional&lt;TxoSpender&gt;, std::string&gt;(std::nullopt);</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :             : </span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaUNC">           0 : BaseIndex::DB&amp; TxoSpenderIndex::GetDB() const { return *m_db; }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
