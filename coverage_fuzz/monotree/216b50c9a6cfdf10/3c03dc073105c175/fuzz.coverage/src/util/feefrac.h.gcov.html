@@ -1,0 +1,457 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/util/feefrac.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/util">src/util</a> - feefrac.h<span style="font-size: 80%;"> (source / <a href="feefrac.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">84</td>
+            <td class="headerCovTableEntry">84</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-06-12 03:37:55</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">9</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">67.8&nbsp;%</td>
+            <td class="headerCovTableEntry">314</td>
+            <td class="headerCovTableEntry">213</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_UTIL_FEEFRAC_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_UTIL_FEEFRAC_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/overflow.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;compare&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;concepts&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;span&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : /** Data structure storing a fee and size.</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :  *</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :  * The size of a FeeFrac cannot be zero unless the fee is also zero.</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :  */</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : struct FeeFrac</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : {</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     /** Helper function for 32*64 signed multiplication, returning an unspecified but totally</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :      *  ordered type. This is a fallback version, separate so it can be tested on platforms where</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :      *  it isn't actually needed. */</span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">         122 :     static inline std::pair&lt;int64_t, uint32_t&gt; MulFallback(int64_t a, int32_t b) noexcept</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     {</span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">         122 :         int64_t low = int64_t{static_cast&lt;uint32_t&gt;(a)} * b;</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         122 :         int64_t high = (a &gt;&gt; 32) * b;</span></span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 70 times"> + </span>]:<span class="tlaGNC">         122 :         return {high + (low &gt;&gt; 32), static_cast&lt;uint32_t&gt;(low)};</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     }</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     /** Helper function for 96/32 signed division, rounding towards negative infinity (if</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :      *  round_down) or positive infinity (if !round_down). This is a fallback version, separate so</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :      *  that it can be tested on platforms where it isn't actually needed.</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :      *</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :      * The exact behavior with negative n does not really matter, but this implementation chooses</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :      * to be consistent for testability reasons.</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :      *</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :      * The result must fit in an int64_t, and d must be strictly positive. */</span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">          91 :     static inline int64_t DivFallback(std::pair&lt;int64_t, uint32_t&gt; n, int32_t d, bool round_down) noexcept</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     {</span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 91 times"> + </span>]:<span class="tlaGNC">          91 :         Assume(d &gt; 0);</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :         // Compute quot_high = n.first / d, so the result becomes</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :         // (n.second + (n.first - quot_high * d) * 2**32) / d + (quot_high * 2**32), or</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :         // (n.second + (n.first % d) * 2**32) / d + (quot_high * 2**32).</span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">          91 :         int64_t quot_high = n.first / d;</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :         // Evaluate the parenthesized expression above, so the result becomes</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :         // n_low / d + (quot_high * 2**32)</span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">          91 :         int64_t n_low = ((n.first % d) &lt;&lt; 32) + n.second;</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :         // Evaluate the division so the result becomes quot_low + quot_high * 2**32. It is possible</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :         // that the / operator here rounds in the wrong direction (if n_low is not a multiple of</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :         // size, and is (if round_down) negative, or (if !round_down) positive). If so, make a</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :         // correction.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">          91 :         int64_t quot_low = n_low / d;</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">          91 :         int32_t mod_low = n_low % d;</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">          91 :         quot_low += (mod_low &gt; 0) - (mod_low &amp;&amp; round_down);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :         // Combine and return the result</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">          91 :         return (quot_high &lt;&lt; 32) + quot_low;</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     }</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : #ifdef __SIZEOF_INT128__</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     /** Helper function for 32*64 signed multiplication, returning an unspecified but totally</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :      *  ordered type. This is a version relying on __int128. */</span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">   418907936 :     static inline __int128 Mul(int64_t a, int32_t b) noexcept</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     {</span>
+<span id="L67"><span class="lineNum">      67</span>         [<span class="tlaGBC" title="Branch 0 was taken 65 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">   418751257 :         return __int128{a} * b;</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     }</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : </span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     /** Helper function for 96/32 signed division, rounding towards negative infinity (if</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :      *  round_down), or towards positive infinity (if !round_down). This is a</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :      *  version relying on __int128.</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :      *</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :      * The result must fit in an int64_t, and d must be strictly positive. */</span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">      158704 :     static inline int64_t Div(__int128 n, int32_t d, bool round_down) noexcept</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     {</span>
+<span id="L77"><span class="lineNum">      77</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 158704 times"> + </span>]:<span class="tlaGNC">      158704 :         Assume(d &gt; 0);</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :         // Compute the division.</span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">      158704 :         int64_t quot = n / d;</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">      158704 :         int32_t mod = n % d;</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :         // Correct result if the / operator above rounded in the wrong direction.</span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      158704 :         return quot + ((mod &gt; 0) - (mod &amp;&amp; round_down));</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     }</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : #else</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     static constexpr auto Mul = MulFallback;</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     static constexpr auto Div = DivFallback;</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : #endif</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     int64_t fee;</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     int32_t size;</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     /** Construct an IsEmpty() FeeFrac. */</span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">    16163718 :     constexpr inline FeeFrac() noexcept : fee{0}, size{0} {}</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : </span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     /** Construct a FeeFrac with specified fee and size. */</span>
+<span id="L96"><span class="lineNum">      96</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 132355 times"> + </span>]:<span class="tlaGNC">    75551501 :     constexpr inline FeeFrac(int64_t f, int32_t s) noexcept : fee{f}, size{s} {}</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     constexpr inline FeeFrac(const FeeFrac&amp;) noexcept = default;</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     constexpr inline FeeFrac&amp; operator=(const FeeFrac&amp;) noexcept = default;</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :     /** Check if this is empty (size and fee are 0). */</span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">    84706942 :     bool inline IsEmpty() const noexcept {</span></span>
+<span id="L103"><span class="lineNum">     103</span>   [<span class="tlaGBC" title="Branch 0 was taken 83190 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1462 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 2102 times"> + </span> :<span class="tlaGNC">    84706942 :         return size == 0;</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 6364 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 561 times"> + </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 9 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1274 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 3 was taken 2583 times"> + </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 2085 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 2666 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 754 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaGBC" title="Branch 9 was taken 1155 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2711038 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 561948 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 36447 times"> + </span>]
+<span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 81290764 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2549 times"> + </span>]
+<span id="L104"><span class="lineNum">     104</span>                 :             :     }</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : </span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     /** Add fee and size of another FeeFrac to this one. */</span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">   626490750 :     void inline operator+=(const FeeFrac&amp; other) noexcept</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     {</span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">   626490750 :         fee += other.fee;</span></span>
+<span id="L110"><span class="lineNum">     110</span>   [<span class="tlaGBC" title="Branch 0 was taken 950561 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 679 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 46300 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 810 times"> + </span>]:<span class="tlaGNC">   609117142 :         size += other.size;</span></span>
+<span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 339509 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">     2782066 :     }</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : </span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     /** Subtract fee and size of another FeeFrac from this one. */</span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">     3281448 :     void inline operator-=(const FeeFrac&amp; other) noexcept</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     {</span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">     3281448 :         fee -= other.fee;</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">     3281448 :         size -= other.size;</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     }</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : </span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     /** Sum fee and size. */</span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">    23685970 :     friend inline FeeFrac operator+(const FeeFrac&amp; a, const FeeFrac&amp; b) noexcept</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     {</span>
+<span id="L123"><span class="lineNum">     123</span>         [<span class="tlaGBC" title="Branch 0 was taken 2046 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">    23685970 :         return {a.fee + b.fee, a.size + b.size};</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     }</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     /** Subtract both fee and size. */</span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaGNC">    10879013 :     friend inline FeeFrac operator-(const FeeFrac&amp; a, const FeeFrac&amp; b) noexcept</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :     {</span>
+<span id="L129"><span class="lineNum">     129</span>         [<span class="tlaGBC" title="Branch 0 was taken 26632 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 12315 times"> + </span>]:<span class="tlaGNC">    10879013 :         return {a.fee - b.fee, a.size - b.size};</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5604194 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 5208430 times"> + </span>]
+<span id="L130"><span class="lineNum">     130</span>                 :             :     }</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : </span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     /** Check if two FeeFrac objects are equal (both same fee and same size). */</span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">    17635515 :     friend inline bool operator==(const FeeFrac&amp; a, const FeeFrac&amp; b) noexcept</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     {</span>
+<span id="L135"><span class="lineNum">     135</span>   [<span class="tlaGBC" title="Branch 0 was taken 50780 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 50780 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span> :<span class="tlaGNC">    17635247 :         return a.fee == b.fee &amp;&amp; a.size == b.size;</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 49125 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 49125 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 45351 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 9 was not taken"> - </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span><span class="tlaGBC" title="Branch 11 was taken 45351 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 34778 times"> + </span><span class="tlaGBC" title="Branch 13 was taken 12588 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 14 was taken 5837 times"> + </span><span class="tlaGBC" title="Branch 15 was taken 28941 times"> + </span><span class="tlaGBC" title="Branch 16 was taken 20176 times"> + </span><span class="tlaGBC" title="Branch 17 was taken 12753 times"> + </span><span class="tlaGBC" title="Branch 18 was taken 14810 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 19 was taken 5366 times"> + </span><span class="tlaGBC" title="Branch 20 was taken 11940 times"> + </span><span class="tlaUNC" title="Branch 21 was not taken"> - </span><span class="tlaGBC" title="Branch 22 was taken 1747 times"> + </span><span class="tlaGBC" title="Branch 23 was taken 10193 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 24 was taken 145091 times"> + </span><span class="tlaUNC" title="Branch 25 was not taken"> - </span><span class="tlaUNC" title="Branch 26 was not taken"> - </span><span class="tlaGBC" title="Branch 27 was taken 145091 times"> + </span><span class="tlaGBC" title="Branch 28 was taken 124811 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 29 was not taken"> - </span><span class="tlaGBC" title="Branch 30 was taken 561 times"> + </span><span class="tlaGBC" title="Branch 31 was taken 124250 times"> + </span><span class="tlaGBC" title="Branch 32 was taken 4062 times"> + </span><span class="tlaUNC" title="Branch 33 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 34 was taken 561 times"> + </span><span class="tlaGBC" title="Branch 35 was taken 3501 times"> + </span><span class="tlaGBC" title="Branch 36 was taken 289580 times"> + </span><span class="tlaUNC" title="Branch 37 was not taken"> - </span><span class="tlaUNC" title="Branch 38 was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 39 was taken 289580 times"> + </span><span class="tlaGBC" title="Branch 40 was taken 2932468 times"> + </span><span class="tlaUNC" title="Branch 41 was not taken"> - </span><span class="tlaGBC" title="Branch 42 was taken 25424 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 43 was taken 2907044 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 8168912 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5036805 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 7657625 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 511288 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 334335 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 138 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 334197 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 361825 times"> + </span><span class="tlaUNC" title="Branch 5 was not taken"> - </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 361825 times"> + </span>]
+<span id="L136"><span class="lineNum">     136</span>                 :             :     }</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     /** Swap two FeeFracs. */</span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">     9039377 :     friend inline void swap(FeeFrac&amp; a, FeeFrac&amp; b) noexcept</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :     {</span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">      379654 :         std::swap(a.fee, b.fee);</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">      379654 :         std::swap(a.size, b.size);</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     }</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     /** Compute the fee for a given size `at_size` using this object's feerate.</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :      *</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :      * This effectively corresponds to evaluating (this-&gt;fee * at_size) / this-&gt;size, with the</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :      * result rounded towards negative infinity (if RoundDown) or towards positive infinity</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :      * (if !RoundDown).</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :      *</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :      * Requires this-&gt;size &gt; 0, at_size &gt;= 0, and that the correct result fits in a int64_t. This</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :      * is guaranteed to be the case when 0 &lt;= at_size &lt;= this-&gt;size.</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :      */</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :     template&lt;bool RoundDown&gt;</span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">    83019540 :     int64_t EvaluateFee(int32_t at_size) const noexcept</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     {</span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 83019540 times"> + </span>]:<span class="tlaGNC">    83019540 :         Assume(size &gt; 0);</span></span>
+<span id="L158"><span class="lineNum">     158</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 83019540 times"> + </span>]:<span class="tlaGNC">    83019540 :         Assume(at_size &gt;= 0);</span></span>
+<span id="L159"><span class="lineNum">     159</span>         [<span class="tlaGBC" title="Branch 0 was taken 82860888 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 158652 times"> + </span>]:<span class="tlaGNC">    83019540 :         if (fee &gt;= 0 &amp;&amp; fee &lt; 0x200000000) [[likely]] {</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :             // Common case where (this-&gt;fee * at_size) is guaranteed to fit in a uint64_t.</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :             if constexpr (RoundDown) {</span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaGNC">     1635305 :                 return (uint64_t(fee) * at_size) / uint32_t(size);</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :             } else {</span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">    81225583 :                 return CeilDiv(uint64_t(fee) * at_size, uint32_t(size));</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :             }</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :         } else {</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :             // Otherwise, use Mul and Div.</span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">      158652 :             return Div(Mul(fee, at_size), size, RoundDown);</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :         }</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :     }</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             : </span>
+<span id="L172"><span class="lineNum">     172</span>                 :             : public:</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     /** Compute the fee for a given size `at_size` using this object's feerate, rounding down. */</span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">     1702438 :     int64_t EvaluateFeeDown(int32_t at_size) const noexcept { return EvaluateFee&lt;true&gt;(at_size); }</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     /** Compute the fee for a given size `at_size` using this object's feerate, rounding up. */</span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">    81290796 :     int64_t EvaluateFeeUp(int32_t at_size) const noexcept { return EvaluateFee&lt;false&gt;(at_size); }</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : };</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : </span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : /** Compare the feerate diagrams implied by the provided sorted chunks data.</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :  *</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :  * The implied diagram for each starts at (0, 0), then contains for each chunk the cumulative fee</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :  * and size up to that chunk, and then extends infinitely to the right with a horizontal line.</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :  *</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :  * The caller must guarantee that the sum of the FeeFracs in either of the chunks' data set do not</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :  * overflow (so sum fees &lt; 2^63, and sum sizes &lt; 2^31).</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :  */</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : std::partial_ordering CompareChunks(std::span&lt;const FeeFrac&gt; chunks0, std::span&lt;const FeeFrac&gt; chunks1);</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             : </span>
+<span id="L189"><span class="lineNum">     189</span>                 :             : /** Tagged wrapper around FeeFrac to avoid unit confusion. */</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : template&lt;typename Tag&gt;</span>
+<span id="L191"><span class="lineNum">     191</span>         [<span class="tlaGBC" title="Branch 0 was taken 1424746 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">     6870475 : struct FeePerUnit : public FeeFrac</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : {</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     // Inherit FeeFrac constructors.</span>
+<span id="L194"><span class="lineNum">     194</span>   [<span class="tlaGBC" title="Branch 0 was taken 1214 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span><span class="tlaGBC" title="Branch 2 was taken 1214 times"> + </span><span class="tlaUNC" title="Branch 3 was not taken"> - </span>]:<span class="tlaGNC">    21038011 :     using FeeFrac::FeeFrac;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 5069 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1166 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 3852780 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 43 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 195059 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 108 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 22193 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 515998 times"> + </span>]
+<span id="L195"><span class="lineNum">     195</span>                 :             : </span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :     /** Convert a FeeFrac to a FeePerUnit. */</span>
+<span id="L197"><span class="lineNum">     197</span>                 :<span class="tlaGNC">     7396341 :     static FeePerUnit FromFeeFrac(const FeeFrac&amp; feefrac) noexcept</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     {</span>
+<span id="L199"><span class="lineNum">     199</span>         [<span class="tlaGBC" title="Branch 0 was taken 431065 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 44086 times"> + </span>]:<span class="tlaGNC">     7227646 :         return {feefrac.fee, feefrac.size};</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     }</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             : };</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : </span>
+<span id="L203"><span class="lineNum">     203</span>                 :             : // FeePerUnit instance for satoshi / vbyte.</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             : struct VSizeTag {};</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             : using FeePerVSize = FeePerUnit&lt;VSizeTag&gt;;</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : </span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : // FeePerUnit instance for satoshi / WU.</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : struct WeightTag {};</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             : using FeePerWeight = FeePerUnit&lt;WeightTag&gt;;</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : </span>
+<span id="L211"><span class="lineNum">     211</span>                 :             : /** Wrapper around FeeFrac &amp; derived types, which adds a feerate-based ordering which treats</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :  *  equal-feerate but distinct-size FeeFracs as equals.</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :  *</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :  *  This is not included inside FeeFrac itself, because it is not a total ordering (as would be</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :  *  expected for built-in comparison operators).</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :  */</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : template&lt;std::derived_from&lt;FeeFrac&gt; T&gt;</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             : class ByRatio</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : {</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     const T&amp; m_feefrac;</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             : </span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : public:</span>
+<span id="L223"><span class="lineNum">     223</span>   [<span class="tlaGBC" title="Branch 0 was taken 149517 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 248601 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 46200 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 73812 times"> + </span> :<span class="tlaGNC">   268015772 :     constexpr ByRatio(const T&amp; feefrac) noexcept : m_feefrac{feefrac} {}</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 13551 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 13981 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 63464 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 80559 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 148004 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="Branch 9 was taken 41714 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 656 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 8374 times"> + </span>]
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 1950250 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3294674 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 33 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 17 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 2 was taken 17151 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 41616 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 18 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 29 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 37 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 7 was taken 282 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 12888 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 516102 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 32 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 49 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 3267295 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3555425 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1052309 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 1183136 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 4 was taken 811775 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 15093 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 6527842 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 3518144 times"> + </span><span class="tlaGBC" title="Branch 8 was taken 3518523 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 9 was taken 270237 times"> + </span><span class="tlaGBC" title="Branch 10 was taken 72928 times"> + </span><span class="tlaGBC" title="Branch 11 was taken 134782 times"> + </span><span class="tlaGBC" title="Branch 12 was taken 154424459 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 13 was taken 79093909 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 332 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1445 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1902 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 3 was taken 7354 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 1246 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 1787 times"> + </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span><span class="tlaUNC" title="Branch 12 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 13 was not executed"> # </span>]
+<span id="L224"><span class="lineNum">     224</span>                 :             : </span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaGNC">        2085 :     friend bool operator==(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     {</span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">      136874 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L228"><span class="lineNum">     228</span> [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 135008 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 952 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 43 times"> + </span> :<span class="tlaGNC">      136874 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 2 was taken 417 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 24 times"> + </span><span class="tlaGBC" title="Branch 4 was taken 401 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 16 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span id="L229"><span class="lineNum">     229</span>                 :             :         return cross_a == cross_b;</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     }</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : </span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :     // Note that we can use std::strong_ordering here, because even though FeeFrac{1,2} and</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :     // FeeFrac{2,4} are distinct as FeeFracs, they are indistinguishable from ByRatio's perspective</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :     // (operator== also treats them as equal).</span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaGNC">   264362880 :     friend std::strong_ordering operator&lt;=&gt;(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :     {</span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">   264362880 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">   264362880 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span id="L239"><span class="lineNum">     239</span>   [<span class="tlaGBC" title="Branch 0 was taken 175447050 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 88915830 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 105252967 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 70194083 times"> + </span>]:<span class="tlaGNC">   264362880 :         return cross_a &lt;=&gt; cross_b;</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     }</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             : </span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :     // Specialized versions for efficiency. GCC 15+ and Clang 11+ produce operator&lt;=&gt;-derived</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :     // versions that are equally efficient as this at -O2, but earlier versions do not.</span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaGNC">     9631849 :     friend bool operator&lt;(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :     {</span>
+<span id="L246"><span class="lineNum">     246</span>                 :<span class="tlaGNC">     9631849 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L247"><span class="lineNum">     247</span>   [<span class="tlaGBC" title="Branch 0 was taken 92452 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 113949 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]:<span class="tlaGNC">     9631849 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 5933 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 34688 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 6689 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 23599 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 1812959 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3176119 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 72928 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 134782 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="Branch 4 was taken 1510397 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 2647284 times"> + </span>]
+<span id="L248"><span class="lineNum">     248</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 70 times"> + </span>]:<span class="tlaGNC">          70 :         return cross_a &lt; cross_b;</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     }</span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">    40283497 :     friend bool operator&gt;(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :     {</span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaGNC">    40283497 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L253"><span class="lineNum">     253</span>   [<span class="tlaGBC" title="Branch 0 was taken 29275 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 34326 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 7491 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 12582 times"> + </span> :<span class="tlaGNC">    40283497 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 2644664 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 3154533 times"> + </span><span class="tlaGBC" title="Branch 6 was taken 656 times"> + </span><span class="tlaGBC" title="Branch 7 was taken 5708 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 5810110 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 15765275 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 873329 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 2077717 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 4 was taken 2286972 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 5205636 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 18257 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="Branch 7 was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="Branch 0 was taken 1315934 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 885123 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 155839 times"> + </span>]
+<span id="L254"><span class="lineNum">     254</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 70 times"> + </span>]:<span class="tlaGNC">          70 :         return cross_a &gt; cross_b;</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :     }</span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">     1625034 :     friend bool operator&lt;=(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :     {</span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">     1625034 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L259"><span class="lineNum">     259</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 441 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span> :<span class="tlaGNC">     1625034 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span><span class="tlaUNC" title="Branch 8 was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="Branch 9 was not executed"> # </span><span class="tlaUNC" title="Branch 10 was not executed"> # </span><span class="tlaUNC" title="Branch 11 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="Branch 1 was taken 831807 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 579583 times"> + </span><span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 2666 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 140802 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span><span class="tlaGBC" title="Branch 9 was taken 39137 times"> + </span><span class="tlaUNC" title="Branch 10 was not taken"> - </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="Branch 11 was taken 30598 times"> + </span>]
+<span id="L260"><span class="lineNum">     260</span>                 :             :         return cross_a &lt;= cross_b;</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :     }</span>
+<span id="L262"><span class="lineNum">     262</span>                 :<span class="tlaGNC">     1699611 :     friend bool operator&gt;=(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :     {</span>
+<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">     1699611 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L265"><span class="lineNum">     265</span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 950561 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 46300 times"> + </span>]:<span class="tlaGNC">     1699611 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 702750 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span><span class="tlaUNC" title="Branch 3 was not executed"> # </span>]
+<span id="L266"><span class="lineNum">     266</span>                 :             :         return cross_a &gt;= cross_b;</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :     }</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             : };</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             : </span>
+<span id="L270"><span class="lineNum">     270</span>                 :             : /** Wrapper around FeeFrac &amp; derived types, which adds a total ordering which first sorts by feerate</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :  *  and then by reversed size (i.e., larger sizes come first).</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :  *</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :  *  This is not included inside FeeFrac itself, because it is not the most natural behavior, so it</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :  *  is better to make code using it invoke this explicitly.</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :  *</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :  *  The empty FeeFrac (fee and size both 0) sorts last. So for example, the following FeeFracs are</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :  *  in sorted order:</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :  *</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :  *   - fee=0 size=1 (feerate 0)</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :  *   - fee=1 size=2 (feerate 0.5)</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :  *   - fee=2 size=3 (feerate 0.667...)</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :  *   - fee=2 size=2 (feerate 1)</span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :  *   - fee=1 size=1 (feerate 1)</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :  *   - fee=3 size=2 (feerate 1.5)</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :  *   - fee=2 size=1 (feerate 2)</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :  *   - fee=0 size=0 (undefined feerate)</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :  */</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             : template&lt;std::derived_from&lt;FeeFrac&gt; T&gt;</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : class ByRatioNegSize</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             : {</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :     const T&amp; m_feefrac;</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             : </span>
+<span id="L293"><span class="lineNum">     293</span>                 :             : public:</span>
+<span id="L294"><span class="lineNum">     294</span>   [<span class="tlaGBC" title="Branch 0 was taken 1392 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 475474 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 29590 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 33971545 times"> + </span> :<span class="tlaGNC">    42660303 :     constexpr ByRatioNegSize(const T&amp; feefrac) noexcept : m_feefrac{feefrac} {}</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 4 was not taken"> - </span><span class="tlaGBC" title="Branch 5 was taken 20804 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 29579 times"> + </span><span class="tlaUNC" title="Branch 8 was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="Branch 9 was taken 1771 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 140738 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 272601 times"> + </span><span class="tlaUNC" title="Branch 2 was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="Branch 3 was not executed"> # </span><span class="tlaUNC" title="Branch 4 was not executed"> # </span><span class="tlaUNC" title="Branch 5 was not executed"> # </span><span class="tlaUNC" title="Branch 6 was not executed"> # </span><span class="tlaUNC" title="Branch 7 was not executed"> # </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="Branch 8 was not executed"> # </span><span class="tlaUNC" title="Branch 9 was not executed"> # </span>]
+<span id="L295"><span class="lineNum">     295</span>                 :             : </span>
+<span id="L296"><span class="lineNum">     296</span>                 :<span class="tlaGNC">         140 :     friend bool operator==(const ByRatioNegSize&amp; a, const ByRatioNegSize&amp; b) noexcept</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :     {</span>
+<span id="L298"><span class="lineNum">     298</span>   [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 65 times"> + </span><span class="tlaUNC" title="Branch 2 was not taken"> - </span><span class="tlaGBC" title="Branch 3 was taken 70 times"> + </span> :<span class="tlaGNC">         210 :         return a.m_feefrac == b.m_feefrac;</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="Branch 4 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 5 was taken 65 times"> + </span><span class="tlaUNC" title="Branch 6 was not taken"> - </span><span class="tlaGBC" title="Branch 7 was taken 70 times"> + </span>]
+<span id="L299"><span class="lineNum">     299</span>                 :             :     }</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             : </span>
+<span id="L301"><span class="lineNum">     301</span>                 :<span class="tlaGNC">   101146319 :     friend std::strong_ordering operator&lt;=&gt;(const ByRatioNegSize&amp; a, const ByRatioNegSize&amp; b) noexcept</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     {</span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">   101146319 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">   101146319 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span id="L305"><span class="lineNum">     305</span>   [<span class="tlaGBC" title="Branch 0 was taken 61218744 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 39927575 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 44089641 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 17129103 times"> + </span>]:<span class="tlaGNC">   101146319 :         auto cmp = cross_a &lt;=&gt; cross_b;</span></span>
+<span id="L306"><span class="lineNum">     306</span>         [<span class="tlaGBC" title="Branch 0 was taken 61218744 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 39927575 times"> + </span>]:<span class="tlaGNC">   101146319 :         if (cmp != 0) return cmp;</span></span>
+<span id="L307"><span class="lineNum">     307</span>   [<span class="tlaGBC" title="Branch 0 was taken 6506225 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 33421350 times"> + </span><span class="tlaGBC" title="Branch 2 was taken 1867833 times"> + </span><span class="tlaGBC" title="Branch 3 was taken 4638392 times"> + </span>]:<span class="tlaGNC">    39927575 :         return b.m_feefrac.size &lt;=&gt; a.m_feefrac.size;</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :     }</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             : </span>
+<span id="L310"><span class="lineNum">     310</span>                 :             :     // Support conversion back to underlying FeeFrac, which allows using std::max().</span>
+<span id="L311"><span class="lineNum">     311</span>                 :<span class="tlaGNC">    22752307 :     operator const T&amp;() const noexcept { return m_feefrac; }</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :             : };</span>
+<span id="L313"><span class="lineNum">     313</span>                 :             : </span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : #endif // BITCOIN_UTIL_FEEFRAC_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
