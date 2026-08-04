@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/util/string.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/util">src/util</a> - string.cpp<span style="font-size: 80%;"> (source / <a href="string.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">67.7&nbsp;%</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntry">21</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-04 17:22:14</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">66.7&nbsp;%</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">4</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">57.7&nbsp;%</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntry">15</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2019-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;util/string.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;iterator&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;regex&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;stdexcept&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;string&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : namespace util {</span>
+<span id="L14"><span class="lineNum">      14</span>                 :<span class="tlaGNC">        1477 : void ReplaceAll(std::string&amp; in_out, const std::string&amp; search, const std::string&amp; substitute)</span></span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : {</span>
+<span id="L16"><span class="lineNum">      16</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1477 times"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">        1477 :     if (search.empty()) return;</span></span>
+<span id="L17"><span class="lineNum">      17</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1477 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 9&quot; was not taken"> - </span>]:<span class="tlaGNC">        1477 :     in_out = std::regex_replace(in_out, std::regex(search), substitute);</span></span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : }</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>                 :<span class="tlaGNC">         251 : LineReader::LineReader(std::string_view str, size_t max_line_length)</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">         251 :     : m_str{str}, m_max_line_length{max_line_length}, m_it{str.begin()} {}</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">        4249 : std::optional&lt;std::string_view&gt; LineReader::ReadLine()</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : {</span>
+<span id="L25"><span class="lineNum">      25</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 8 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 14&quot; was taken 4241 times"> + </span>]:<span class="tlaGNC">        4249 :     if (m_it == m_str.end()) {</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">           8 :         return std::nullopt;</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     }</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : </span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     const auto line_start = m_it;</span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="branch &quot;15 -&gt; 4&quot; was taken 66780 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 41 times"> + </span>]:<span class="tlaGNC">       66821 :     while (m_it != m_str.end()) {</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :         // Read a character from the incoming buffer and increment the iterator</span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">       66780 :         const bool new_line{*m_it == '\n'};</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">       66780 :         ++m_it;</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :         // If the character we just consumed was \n, the line is terminated.</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :         // The \n itself does not count against max_line_length.</span>
+<span id="L36"><span class="lineNum">      36</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 4200 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 9&quot; was taken 62580 times"> + </span>]:<span class="tlaGNC">       66780 :         if (new_line) {</span></span>
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 4125 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 8&quot; was taken 75 times"> + </span>]:<span class="tlaGNC">        4200 :             std::string_view line{line_start, m_it - 1};</span></span>
+<span id="L38"><span class="lineNum">      38</span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 4125 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 8&quot; was taken 75 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 556 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 3569 times"> + </span>]:<span class="tlaGNC">        4200 :             if (!line.empty() &amp;&amp; line.back() == '\r')</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">         556 :                 line.remove_suffix(1);</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">        4200 :             return line;</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :         }</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :         // If the character we just consumed gives us a line length greater</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :         // than max_line_length, and we are not at the end of the line (or buffer) yet,</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :         // that means the line we are currently reading is too long, and we throw.</span>
+<span id="L45"><span class="lineNum">      45</span>         [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 62580 times"> + </span><span class="tlaUNC" title="branch &quot;9 -&gt; 11&quot; was not taken"> - </span>]:<span class="tlaGNC">       62580 :         if (static_cast&lt;size_t&gt;(std::distance(line_start, m_it)) &gt; m_max_line_length) {</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :             // Reset iterator</span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaUNC">           0 :             m_it = line_start;</span></span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaUNC" title="fallthrough branch &quot;12 -&gt; 13&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;12 -&gt; 18&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :             throw std::runtime_error(&quot;max_line_length exceeded by LineReader&quot;);</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :         }</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     }</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     // End of buffer reached without finding a \n or exceeding max_line_length.</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     // Reset the iterator so the rest of the buffer can be read granularly</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     // with ReadLength() and return null to indicate a line was not found.</span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">          41 :     m_it = line_start;</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">          41 :     return std::nullopt;</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : }</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : </span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : // Ignores max_line_length but won't overflow</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaUNC">           0 : std::string_view LineReader::ReadLength(size_t len)</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : {</span>
+<span id="L61"><span class="lineNum">      61</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (len == 0) return {};</span></span>
+<span id="L62"><span class="lineNum">      62</span>   [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;7 -&gt; 8&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 11&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (Remaining() &lt; len) throw std::runtime_error(&quot;Not enough data in buffer&quot;);</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaUNC">           0 :     std::string_view out(std::to_address(m_it), len);</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaUNC">           0 :     m_it += len;</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaUNC">           0 :     return out;</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : }</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : </span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaUNC">           0 : size_t LineReader::Remaining() const</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : {</span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaUNC">           0 :     return std::distance(m_it, m_str.end());</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : }</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">        3984 : size_t LineReader::Consumed() const</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : {</span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">        3984 :     return std::distance(m_str.begin(), m_it);</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : }</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : } // namespace util</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
