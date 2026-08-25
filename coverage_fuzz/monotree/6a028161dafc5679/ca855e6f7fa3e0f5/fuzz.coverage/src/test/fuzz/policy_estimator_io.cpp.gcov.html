@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/test/fuzz/policy_estimator_io.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/test/fuzz">src/test/fuzz</a> - policy_estimator_io.cpp<span style="font-size: 80%;"> (source / <a href="policy_estimator_io.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">27</td>
+            <td class="headerCovTableEntry">27</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-25 09:25:44</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">63.0&nbsp;%</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntry">29</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2020-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;policy/fees/block_policy_estimator.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;policy/fees/estimator_args.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;policy/fees/mempool_estimator.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;streams.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;test/fuzz/FuzzedDataProvider.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;test/fuzz/fuzz.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;test/fuzz/util.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;test/util/setup_common.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : namespace {</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : const TestingSetup* g_setup;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : } // namespace</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>                 :<span class="tlaGNC">           1 : void initialize_policy_estimator_io()</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : {</span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">           1 :     static const auto testing_setup{</span></span>
+<span id="L23"><span class="lineNum">      23</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 10&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;4 -&gt; 10&quot; was not taken"> - </span> :<span class="tlaGNC">           3 :         MakeNoLogFileContext&lt;const TestingSetup&gt;(ChainType::REGTEST, TestOpts{.setup_net = false})};</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 11&quot; was not taken"> - </span>]
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">           1 :     g_setup = testing_setup.get();</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 237 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 6&quot; was not taken"> - </span>]:<span class="tlaGNC">         916 : FUZZ_TARGET(policy_estimator_io, .init = initialize_policy_estimator_io)</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : {</span>
+<span id="L29"><span class="lineNum">      29</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 12&quot; was taken 441 times"> + </span>]:<span class="tlaGNC">         442 :     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());</span></span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 12&quot; was taken 441 times"> + </span>]:<span class="tlaGNC">         442 :     FuzzedFileProvider fuzzed_file_provider{fuzzed_data_provider};</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     // Reuse estimators across runs to avoid costly object creation.</span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">         442 :     static CBlockPolicyEstimator block_policy_estimator{</span></span>
+<span id="L33"><span class="lineNum">      33</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 12&quot; was taken 441 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;4 -&gt; 12&quot; was not taken"> - </span> :<span class="tlaGNC">         444 :         BlockPolicyFeeEstPath(*g_setup-&gt;m_node.args), DEFAULT_ACCEPT_STALE_FEE_ESTIMATES};</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 46&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 43&quot; was not taken"> - </span>]
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">         442 :     {</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">         884 :         AutoFile fuzzed_auto_file_block_policy{fuzzed_file_provider.open()};</span></span>
+<span id="L36"><span class="lineNum">      36</span>   [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 442 times"> + </span><span class="tlaUNC" title="exception branch &quot;17 -&gt; 48&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;18 -&gt; 19&quot; was taken 98 times"> + </span><span class="tlaGBC" title="branch &quot;18 -&gt; 20&quot; was taken 344 times"> + </span>]:<span class="tlaGNC">         442 :         if (block_policy_estimator.Read(fuzzed_auto_file_block_policy)) {</span></span>
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaGBC" title="fallthrough branch &quot;19 -&gt; 20&quot; was taken 98 times"> + </span><span class="tlaUNC" title="exception branch &quot;19 -&gt; 48&quot; was not taken"> - </span>]:<span class="tlaGNC">          98 :             block_policy_estimator.Write(fuzzed_auto_file_block_policy);</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :         }</span>
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaGBC" title="fallthrough branch &quot;20 -&gt; 21&quot; was taken 442 times"> + </span><span class="tlaUNC" title="exception branch &quot;20 -&gt; 48&quot; was not taken"> - </span>]:<span class="tlaGNC">         442 :         (void)fuzzed_auto_file_block_policy.fclose();</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">         442 :     }</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">         442 :     static MemPoolFeeRateEstimator mempool_feerate_estimator{</span></span>
+<span id="L42"><span class="lineNum">      42</span>         [<span class="tlaGBC" title="fallthrough branch &quot;25 -&gt; 26&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;25 -&gt; 53&quot; was not taken"> - </span>]:<span class="tlaGNC">           2 :         MempoolPolicyEstimatorPath(*g_setup-&gt;m_node.args),</span></span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaGBC" title="fallthrough branch &quot;26 -&gt; 27&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;26 -&gt; 50&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :         *g_setup-&gt;m_node.mempool,</span></span>
+<span id="L44"><span class="lineNum">      44</span>   [<span class="tlaGBC" title="fallthrough branch &quot;22 -&gt; 23&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;22 -&gt; 32&quot; was taken 441 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;24 -&gt; 25&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;24 -&gt; 32&quot; was not taken"> - </span> :<span class="tlaGNC">         444 :         *g_setup-&gt;m_node.chainman};</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;26 -&gt; 27&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;26 -&gt; 50&quot; was not taken"> - </span>]
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">         442 :     {</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">         884 :         AutoFile fuzzed_auto_file_mempool_policy{fuzzed_file_provider.open()};</span></span>
+<span id="L47"><span class="lineNum">      47</span>   [<span class="tlaGBC" title="fallthrough branch &quot;37 -&gt; 38&quot; was taken 442 times"> + </span><span class="tlaUNC" title="exception branch &quot;37 -&gt; 55&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;38 -&gt; 39&quot; was taken 4 times"> + </span><span class="tlaGBC" title="branch &quot;38 -&gt; 40&quot; was taken 438 times"> + </span>]:<span class="tlaGNC">         442 :         if (mempool_feerate_estimator.Read(fuzzed_auto_file_mempool_policy)) {</span></span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaGBC" title="fallthrough branch &quot;39 -&gt; 40&quot; was taken 4 times"> + </span><span class="tlaUNC" title="exception branch &quot;39 -&gt; 55&quot; was not taken"> - </span>]:<span class="tlaGNC">           4 :             mempool_feerate_estimator.Write(fuzzed_auto_file_mempool_policy);</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :         }</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :         // Write() does not take ownership; close explicitly because it may</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :         // have written to the fuzzed file.</span>
+<span id="L52"><span class="lineNum">      52</span>         [<span class="tlaGBC" title="fallthrough branch &quot;40 -&gt; 41&quot; was taken 442 times"> + </span><span class="tlaUNC" title="exception branch &quot;40 -&gt; 55&quot; was not taken"> - </span>]:<span class="tlaGNC">         442 :         (void)fuzzed_auto_file_mempool_policy.fclose();</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">         442 :     }</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">         442 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
