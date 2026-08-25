@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/ipc/util.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/ipc">src/ipc</a> - util.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-25 10:15:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : // Copyright (c) The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>              : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>              : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>              : </span>
+<span id="L5"><span class="lineNum">       5</span>              : #ifndef BITCOIN_IPC_UTIL_H</span>
+<span id="L6"><span class="lineNum">       6</span>              : #define BITCOIN_IPC_UTIL_H</span>
+<span id="L7"><span class="lineNum">       7</span>              : </span>
+<span id="L8"><span class="lineNum">       8</span>              : #include &lt;tinyformat.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>              : #include &lt;util/strencodings.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>              : </span>
+<span id="L11"><span class="lineNum">      11</span>              : #include &lt;array&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>              : #include &lt;cstdint&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>              : #include &lt;functional&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>              : #include &lt;kj/debug.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>              : #include &lt;mp/proxy-io.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>              : #include &lt;mp/util.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>              : #include &lt;mp/version.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>              : #include &lt;sys/socket.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>              : </span>
+<span id="L20"><span class="lineNum">      20</span>              : namespace mp {</span>
+<span id="L21"><span class="lineNum">      21</span>              : // Definitions that can be deleted when libmultiprocess subtree is updated to</span>
+<span id="L22"><span class="lineNum">      22</span>              : // v14. Having these allows Bitcoin Core changes to be decoupled from</span>
+<span id="L23"><span class="lineNum">      23</span>              : // libmultiprocess changes so they don't have to be reviewed in a single PR.</span>
+<span id="L24"><span class="lineNum">      24</span>              : #if MP_MAJOR_VERSION &lt; 14</span>
+<span id="L25"><span class="lineNum">      25</span>              : class EventLoop;</span>
+<span id="L26"><span class="lineNum">      26</span>              : using ProcessId = int;</span>
+<span id="L27"><span class="lineNum">      27</span>              : using SocketId = int;</span>
+<span id="L28"><span class="lineNum">      28</span>              : inline constexpr SocketId SocketError{-1};</span>
+<span id="L29"><span class="lineNum">      29</span>              : </span>
+<span id="L30"><span class="lineNum">      30</span>              : using Stream = SocketId;</span>
+<span id="L31"><span class="lineNum">      31</span>              : inline Stream MakeStream(EventLoop&amp;, SocketId socket)</span>
+<span id="L32"><span class="lineNum">      32</span>              : {</span>
+<span id="L33"><span class="lineNum">      33</span>              :     return socket;</span>
+<span id="L34"><span class="lineNum">      34</span>              : }</span>
+<span id="L35"><span class="lineNum">      35</span>              : </span>
+<span id="L36"><span class="lineNum">      36</span>              : inline std::array&lt;SocketId, 2&gt; SocketPair()</span>
+<span id="L37"><span class="lineNum">      37</span>              : {</span>
+<span id="L38"><span class="lineNum">      38</span>              :     int pair[2];</span>
+<span id="L39"><span class="lineNum">      39</span>              :     KJ_SYSCALL(socketpair(AF_UNIX, SOCK_STREAM, 0, pair));</span>
+<span id="L40"><span class="lineNum">      40</span>              :     return {pair[0], pair[1]};</span>
+<span id="L41"><span class="lineNum">      41</span>              : }</span>
+<span id="L42"><span class="lineNum">      42</span>              : </span>
+<span id="L43"><span class="lineNum">      43</span>              : inline std::tuple&lt;ProcessId, SocketId&gt; SpawnProcess(const std::function&lt;std::vector&lt;std::string&gt;(std::string)&gt;&amp; spawn_argv)</span>
+<span id="L44"><span class="lineNum">      44</span>              : {</span>
+<span id="L45"><span class="lineNum">      45</span>              :     ProcessId pid;</span>
+<span id="L46"><span class="lineNum">      46</span>              :     SocketId socket = SpawnProcess(pid, [&amp;](int fd) { return spawn_argv(strprintf(&quot;%d&quot;, fd)); });</span>
+<span id="L47"><span class="lineNum">      47</span>              :     return {pid, socket};</span>
+<span id="L48"><span class="lineNum">      48</span>              : }</span>
+<span id="L49"><span class="lineNum">      49</span>              : </span>
+<span id="L50"><span class="lineNum">      50</span>              : inline SocketId StartSpawned(const std::string&amp; connect_info)</span>
+<span id="L51"><span class="lineNum">      51</span>              : {</span>
+<span id="L52"><span class="lineNum">      52</span>              :     auto socket = ToIntegral&lt;SocketId&gt;(connect_info);</span>
+<span id="L53"><span class="lineNum">      53</span>              :     if (!socket) throw std::invalid_argument(strprintf(&quot;Invalid socket descriptor '%s'&quot;, connect_info));</span>
+<span id="L54"><span class="lineNum">      54</span>              :     return *socket;</span>
+<span id="L55"><span class="lineNum">      55</span>              : }</span>
+<span id="L56"><span class="lineNum">      56</span>              : </span>
+<span id="L57"><span class="lineNum">      57</span> <span class="tlaGNC">           1 : inline ThreadContext&amp; CurrentThread()</span></span>
+<span id="L58"><span class="lineNum">      58</span>              : {</span>
+<span id="L59"><span class="lineNum">      59</span> <span class="tlaGNC">           1 :     return g_thread_context;</span></span>
+<span id="L60"><span class="lineNum">      60</span>              : }</span>
+<span id="L61"><span class="lineNum">      61</span>              : #endif</span>
+<span id="L62"><span class="lineNum">      62</span>              : } // namespace mp</span>
+<span id="L63"><span class="lineNum">      63</span>              : </span>
+<span id="L64"><span class="lineNum">      64</span>              : #endif // BITCOIN_IPC_UTIL_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

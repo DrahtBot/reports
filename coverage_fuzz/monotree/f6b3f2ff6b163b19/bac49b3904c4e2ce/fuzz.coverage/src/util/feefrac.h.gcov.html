@@ -1,0 +1,464 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/util/feefrac.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/util">src/util</a> - feefrac.h<span style="font-size: 80%;"> (source / <a href="feefrac.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">84</td>
+            <td class="headerCovTableEntry">84</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-25 10:15:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">9</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">68.7&nbsp;%</td>
+            <td class="headerCovTableEntry">342</td>
+            <td class="headerCovTableEntry">235</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_UTIL_FEEFRAC_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_UTIL_FEEFRAC_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/overflow.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;compare&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;concepts&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;span&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : /** Data structure storing a fee and size.</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :  *</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :  * The size of a FeeFrac cannot be zero unless the fee is also zero.</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :  */</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : struct FeeFrac</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : {</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     /** Helper function for 32*64 signed multiplication, returning an unspecified but totally</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :      *  ordered type. This is a fallback version, separate so it can be tested on platforms where</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :      *  it isn't actually needed. */</span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">         156 :     static inline std::pair&lt;int64_t, uint32_t&gt; MulFallback(int64_t a, int32_t b) noexcept</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     {</span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">         156 :         int64_t low = int64_t{static_cast&lt;uint32_t&gt;(a)} * b;</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         156 :         int64_t high = (a &gt;&gt; 32) * b;</span></span>
+<span id="L30"><span class="lineNum">      30</span>         [<span class="tlaUNC" title="fallthrough branch &quot;24 -&gt; 25&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;24 -&gt; 26&quot; was taken 90 times"> + </span>]:<span class="tlaGNC">         156 :         return {high + (low &gt;&gt; 32), static_cast&lt;uint32_t&gt;(low)};</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     }</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :     /** Helper function for 96/32 signed division, rounding towards negative infinity (if</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :      *  round_down) or positive infinity (if !round_down). This is a fallback version, separate so</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :      *  that it can be tested on platforms where it isn't actually needed.</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :      *</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :      * The exact behavior with negative n does not really matter, but this implementation chooses</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :      * to be consistent for testability reasons.</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :      *</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :      * The result must fit in an int64_t, and d must be strictly positive. */</span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">         111 :     static inline int64_t DivFallback(std::pair&lt;int64_t, uint32_t&gt; n, int32_t d, bool round_down) noexcept</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     {</span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 111 times"> + </span>]:<span class="tlaGNC">         111 :         Assume(d &gt; 0);</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :         // Compute quot_high = n.first / d, so the result becomes</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :         // (n.second + (n.first - quot_high * d) * 2**32) / d + (quot_high * 2**32), or</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :         // (n.second + (n.first % d) * 2**32) / d + (quot_high * 2**32).</span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">         111 :         int64_t quot_high = n.first / d;</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :         // Evaluate the parenthesized expression above, so the result becomes</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :         // n_low / d + (quot_high * 2**32)</span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">         111 :         int64_t n_low = ((n.first % d) &lt;&lt; 32) + n.second;</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :         // Evaluate the division so the result becomes quot_low + quot_high * 2**32. It is possible</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :         // that the / operator here rounds in the wrong direction (if n_low is not a multiple of</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :         // size, and is (if round_down) negative, or (if !round_down) positive). If so, make a</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :         // correction.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">         111 :         int64_t quot_low = n_low / d;</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">         111 :         int32_t mod_low = n_low % d;</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">         111 :         quot_low += (mod_low &gt; 0) - (mod_low &amp;&amp; round_down);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :         // Combine and return the result</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">         111 :         return (quot_high &lt;&lt; 32) + quot_low;</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     }</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : #ifdef __SIZEOF_INT128__</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     /** Helper function for 32*64 signed multiplication, returning an unspecified but totally</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :      *  ordered type. This is a version relying on __int128. */</span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">   520002266 :     static inline __int128 Mul(int64_t a, int32_t b) noexcept</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     {</span>
+<span id="L67"><span class="lineNum">      67</span>         [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 85 times"> + </span><span class="tlaGBC" title="branch &quot;17 -&gt; 21&quot; was taken 5 times"> + </span>]:<span class="tlaGNC">   519896958 :         return __int128{a} * b;</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     }</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : </span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     /** Helper function for 96/32 signed division, rounding towards negative infinity (if</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :      *  round_down), or towards positive infinity (if !round_down). This is a</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :      *  version relying on __int128.</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :      *</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :      * The result must fit in an int64_t, and d must be strictly positive. */</span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">      107274 :     static inline int64_t Div(__int128 n, int32_t d, bool round_down) noexcept</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     {</span>
+<span id="L77"><span class="lineNum">      77</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 107274 times"> + </span>]:<span class="tlaGNC">      107274 :         Assume(d &gt; 0);</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :         // Compute the division.</span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">      107274 :         int64_t quot = n / d;</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">      107274 :         int32_t mod = n % d;</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :         // Correct result if the / operator above rounded in the wrong direction.</span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      107274 :         return quot + ((mod &gt; 0) - (mod &amp;&amp; round_down));</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     }</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : #else</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     static constexpr auto Mul = MulFallback;</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     static constexpr auto Div = DivFallback;</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : #endif</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     int64_t fee;</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     int32_t size;</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : </span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :     /** Construct an IsEmpty() FeeFrac. */</span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">    20159000 :     constexpr inline FeeFrac() noexcept : fee{0}, size{0} {}</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : </span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :     /** Construct a FeeFrac with specified fee and size. */</span>
+<span id="L96"><span class="lineNum">      96</span>         [<span class="tlaUNC" title="fallthrough branch &quot;12 -&gt; 13&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;12 -&gt; 14&quot; was taken 158719 times"> + </span>]:<span class="tlaGNC">    84967401 :     constexpr inline FeeFrac(int64_t f, int32_t s) noexcept : fee{f}, size{s} {}</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     constexpr inline FeeFrac(const FeeFrac&amp;) noexcept = default;</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     constexpr inline FeeFrac&amp; operator=(const FeeFrac&amp;) noexcept = default;</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :     /** Check if this is empty (size and fee are 0). */</span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">   106169664 :     bool inline IsEmpty() const noexcept {</span></span>
+<span id="L103"><span class="lineNum">     103</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 102088164 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 9&quot; was taken 2770 times"> + </span>]:<span class="tlaGNC">   106169664 :         return size == 0;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;5 -&gt; 30&quot; was taken 3282724 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;164 -&gt; 165&quot; was taken 637132 times"> + </span><span class="tlaGBC" title="branch &quot;164 -&gt; 167&quot; was taken 37165 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;47 -&gt; 48&quot; was taken 96415 times"> + </span><span class="tlaGBC" title="branch &quot;47 -&gt; 49&quot; was taken 1686 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;49 -&gt; 50&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;49 -&gt; 51&quot; was taken 2514 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 7915 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 677 times"> + </span>][<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;5 -&gt; 37&quot; was taken 1488 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;151 -&gt; 152&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;151 -&gt; 667&quot; was taken 3055 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;161 -&gt; 162&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;161 -&gt; 667&quot; was taken 2444 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;442 -&gt; 443&quot; was taken 3190 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="branch &quot;442 -&gt; 445&quot; was taken 895 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;487 -&gt; 488&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;487 -&gt; 510&quot; was taken 1430 times"> + </span>]
+<span id="L104"><span class="lineNum">     104</span>                 :             :     }</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : </span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     /** Add fee and size of another FeeFrac to this one. */</span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">   663506612 :     void inline operator+=(const FeeFrac&amp; other) noexcept</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     {</span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">   663506612 :         fee += other.fee;</span></span>
+<span id="L110"><span class="lineNum">     110</span>         [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 5&quot; was taken 376231 times"> + </span><span class="tlaUNC" title="exception branch &quot;13 -&gt; 14&quot; was not taken"> - </span>]:<span class="tlaGNC">   641835979 :         size += other.size;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;109 -&gt; 110&quot; was taken 1113423 times"> + </span><span class="tlaGBC" title="branch &quot;109 -&gt; 114&quot; was taken 796 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;120 -&gt; 121&quot; was taken 52804 times"> + </span><span class="tlaGBC" title="branch &quot;120 -&gt; 125&quot; was taken 952 times"> + </span>]
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">     3390602 :     }</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : </span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     /** Subtract fee and size of another FeeFrac from this one. */</span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">     3934843 :     void inline operator-=(const FeeFrac&amp; other) noexcept</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     {</span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">     3934843 :         fee -= other.fee;</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">     3934843 :         size -= other.size;</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     }</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : </span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     /** Sum fee and size. */</span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">    27120584 :     friend inline FeeFrac operator+(const FeeFrac&amp; a, const FeeFrac&amp; b) noexcept</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     {</span>
+<span id="L123"><span class="lineNum">     123</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 2733 times"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 9&quot; was not taken"> - </span>]:<span class="tlaGNC">    27120584 :         return {a.fee + b.fee, a.size + b.size};</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     }</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     /** Subtract both fee and size. */</span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaGNC">    12471777 :     friend inline FeeFrac operator-(const FeeFrac&amp; a, const FeeFrac&amp; b) noexcept</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :     {</span>
+<span id="L129"><span class="lineNum">     129</span>         [<span class="tlaGBC" title="fallthrough branch &quot;407 -&gt; 408&quot; was taken 30544 times"> + </span><span class="tlaGBC" title="branch &quot;407 -&gt; 409&quot; was taken 17599 times"> + </span>]:<span class="tlaGNC">    12471777 :         return {a.fee - b.fee, a.size - b.size};</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;8 -&gt; 10&quot; was taken 6439965 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;14 -&gt; 16&quot; was taken 5952173 times"> + </span>]
+<span id="L130"><span class="lineNum">     130</span>                 :             :     }</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : </span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     /** Check if two FeeFrac objects are equal (both same fee and same size). */</span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">    20487985 :     friend inline bool operator==(const FeeFrac&amp; a, const FeeFrac&amp; b) noexcept</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     {</span>
+<span id="L135"><span class="lineNum">     135</span>   [<span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 9473229 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 13&quot; was taken 5874130 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 8913258 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 13&quot; was taken 559972 times"> + </span>]:<span class="tlaGNC">    20487650 :         return a.fee == b.fee &amp;&amp; a.size == b.size;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 169 times"> + </span><span class="tlaUNC" title="branch &quot;10 -&gt; 13&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 169 times"> + </span><span class="tlaUNC" title="branch &quot;11 -&gt; 13&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="branch &quot;12 -&gt; 14&quot; was taken 169 times"> + </span><span class="tlaUNC" title="branch &quot;12 -&gt; 15&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;14 -&gt; 16&quot; was taken 169 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 380886 times"> + </span><span class="tlaUNC" title="branch &quot;17 -&gt; 19&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;18 -&gt; 19&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;18 -&gt; 20&quot; was taken 380886 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;53 -&gt; 54&quot; was taken 410874 times"> + </span><span class="tlaUNC" title="branch &quot;53 -&gt; 55&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;54 -&gt; 55&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;54 -&gt; 56&quot; was taken 410874 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 58895 times"> + </span><span class="tlaUNC" title="branch &quot;3 -&gt; 7&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 58895 times"> + </span><span class="tlaUNC" title="branch &quot;4 -&gt; 7&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 57931 times"> + </span><span class="tlaUNC" title="branch &quot;3 -&gt; 6&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 57931 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;145 -&gt; 146&quot; was taken 53514 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="branch &quot;145 -&gt; 147&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;146 -&gt; 147&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;146 -&gt; 148&quot; was taken 53514 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;407 -&gt; 408&quot; was taken 38690 times"> + </span><span class="tlaGBC" title="branch &quot;407 -&gt; 409&quot; was taken 12588 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;408 -&gt; 409&quot; was taken 5837 times"> + </span><span class="tlaGBC" title="branch &quot;408 -&gt; 413&quot; was taken 32853 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;462 -&gt; 463&quot; was taken 20841 times"> + </span><span class="tlaGBC" title="branch &quot;462 -&gt; 464&quot; was taken 12753 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;463 -&gt; 464&quot; was taken 14810 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;463 -&gt; 468&quot; was taken 6031 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;507 -&gt; 508&quot; was taken 13826 times"> + </span><span class="tlaUNC" title="branch &quot;507 -&gt; 509&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;508 -&gt; 509&quot; was taken 2047 times"> + </span><span class="tlaGBC" title="branch &quot;508 -&gt; 510&quot; was taken 11779 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;855 -&gt; 856&quot; was taken 166920 times"> + </span><span class="tlaUNC" title="branch &quot;855 -&gt; 857&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;856 -&gt; 857&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;856 -&gt; 858&quot; was taken 166920 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;865 -&gt; 866&quot; was taken 142468 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="branch &quot;865 -&gt; 867&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;866 -&gt; 867&quot; was taken 677 times"> + </span><span class="tlaGBC" title="branch &quot;866 -&gt; 868&quot; was taken 141791 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;879 -&gt; 880&quot; was taken 4677 times"> + </span><span class="tlaUNC" title="branch &quot;879 -&gt; 881&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;880 -&gt; 881&quot; was taken 677 times"> + </span><span class="tlaGBC" title="branch &quot;880 -&gt; 882&quot; was taken 4000 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;982 -&gt; 983&quot; was taken 332284 times"> + </span><span class="tlaUNC" title="branch &quot;982 -&gt; 984&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;983 -&gt; 984&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="branch &quot;983 -&gt; 985&quot; was taken 332284 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;1050 -&gt; 1051&quot; was taken 3432968 times"> + </span><span class="tlaUNC" title="branch &quot;1050 -&gt; 1052&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;1051 -&gt; 1052&quot; was taken 35053 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="branch &quot;1051 -&gt; 1053&quot; was taken 3397915 times"> + </span>]
+<span id="L136"><span class="lineNum">     136</span>                 :             :     }</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     /** Swap two FeeFracs. */</span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">    10541147 :     friend inline void swap(FeeFrac&amp; a, FeeFrac&amp; b) noexcept</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :     {</span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">      458251 :         std::swap(a.fee, b.fee);</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">      458251 :         std::swap(a.size, b.size);</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     }</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     /** Compute the fee for a given size `at_size` using this object's feerate.</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :      *</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :      * This effectively corresponds to evaluating (this-&gt;fee * at_size) / this-&gt;size, with the</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :      * result rounded towards negative infinity (if RoundDown) or towards positive infinity</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :      * (if !RoundDown).</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :      *</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :      * Requires this-&gt;size &gt; 0, at_size &gt;= 0, and that the correct result fits in a int64_t. This</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :      * is guaranteed to be the case when 0 &lt;= at_size &lt;= this-&gt;size.</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :      */</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :     template&lt;bool RoundDown&gt;</span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">   103299848 :     int64_t EvaluateFee(int32_t at_size) const noexcept</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     {</span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 103299848 times"> + </span>]:<span class="tlaGNC">   103299848 :         Assume(size &gt; 0);</span></span>
+<span id="L158"><span class="lineNum">     158</span>         [<span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 103299848 times"> + </span>]:<span class="tlaGNC">   103299848 :         Assume(at_size &gt;= 0);</span></span>
+<span id="L159"><span class="lineNum">     159</span> [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 102018766 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 69439 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 1173874 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 37769 times"> + </span>]:<span class="tlaGNC">   103299848 :         if (fee &gt;= 0 &amp;&amp; fee &lt; 0x200000000) [[likely]] {</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :             // Common case where (this-&gt;fee * at_size) is guaranteed to fit in a uint64_t.</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :             if constexpr (RoundDown) {</span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaGNC">     1173874 :                 return (uint64_t(fee) * at_size) / uint32_t(size);</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :             } else {</span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">   102018766 :                 return CeilDiv(uint64_t(fee) * at_size, uint32_t(size));</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :             }</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :         } else {</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :             // Otherwise, use Mul and Div.</span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">      107208 :             return Div(Mul(fee, at_size), size, RoundDown);</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :         }</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :     }</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             : </span>
+<span id="L172"><span class="lineNum">     172</span>                 :             : public:</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     /** Compute the fee for a given size `at_size` using this object's feerate, rounding down. */</span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">     1186333 :     int64_t EvaluateFeeDown(int32_t at_size) const noexcept { return EvaluateFee&lt;true&gt;(at_size); }</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     /** Compute the fee for a given size `at_size` using this object's feerate, rounding up. */</span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">   102088205 :     int64_t EvaluateFeeUp(int32_t at_size) const noexcept { return EvaluateFee&lt;false&gt;(at_size); }</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : };</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : </span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : /** Compare the feerate diagrams implied by the provided sorted chunks data.</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :  *</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :  * The implied diagram for each starts at (0, 0), then contains for each chunk the cumulative fee</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :  * and size up to that chunk, and then extends infinitely to the right with a horizontal line.</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :  *</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :  * The caller must guarantee that the sum of the FeeFracs in either of the chunks' data set do not</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :  * overflow (so sum fees &lt; 2^63, and sum sizes &lt; 2^31).</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :  */</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : std::partial_ordering CompareChunks(std::span&lt;const FeeFrac&gt; chunks0, std::span&lt;const FeeFrac&gt; chunks1);</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             : </span>
+<span id="L189"><span class="lineNum">     189</span>                 :             : /** Tagged wrapper around FeeFrac to avoid unit confusion. */</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : template&lt;typename Tag&gt;</span>
+<span id="L191"><span class="lineNum">     191</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1282771 times"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not taken"> - </span>]:<span class="tlaGNC">     7691744 : struct FeePerUnit : public FeeFrac</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : {</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     // Inherit FeeFrac constructors.</span>
+<span id="L194"><span class="lineNum">     194</span> [<span class="tlaUNC" title="fallthrough branch &quot;17 -&gt; 18&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;17 -&gt; 19&quot; was taken 1100 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;58 -&gt; 60&quot; was taken 1426 times"> + </span><span class="tlaUNC" title="exception branch &quot;58 -&gt; 111&quot; was not taken"> - </span>]:<span class="tlaGNC">    18566990 :     using FeeFrac::FeeFrac;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;246 -&gt; 247&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;246 -&gt; 248&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;15 -&gt; 19&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;15 -&gt; 20&quot; was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;267 -&gt; 268&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;267 -&gt; 269&quot; was taken 145 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;296 -&gt; 297&quot; was taken 255813 times"> + </span><span class="tlaUNC" title="exception branch &quot;296 -&gt; 531&quot; was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 4543819 times"> + </span><span class="tlaUNC" title="exception branch &quot;11 -&gt; 19&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;42 -&gt; 5&quot; was taken 25269 times"> + </span><span class="tlaUNC" title="exception branch &quot;42 -&gt; 55&quot; was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 146 times"> + </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 97&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 56 times"> + </span><span class="tlaGBC" title="branch &quot;17 -&gt; 20&quot; was taken 90 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="fallthrough branch &quot;52 -&gt; 53&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;52 -&gt; 54&quot; was taken 8 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;73 -&gt; 74&quot; was taken 146 times"> + </span><span class="tlaUNC" title="exception branch &quot;73 -&gt; 89&quot; was not taken"> - </span>]
+<span id="L195"><span class="lineNum">     195</span>                 :             : </span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :     /** Convert a FeeFrac to a FeePerUnit. */</span>
+<span id="L197"><span class="lineNum">     197</span>                 :<span class="tlaGNC">     9506064 :     static FeePerUnit FromFeeFrac(const FeeFrac&amp; feefrac) noexcept</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     {</span>
+<span id="L199"><span class="lineNum">     199</span>         [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 510428 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 51571 times"> + </span>]:<span class="tlaGNC">     9308121 :         return {feefrac.fee, feefrac.size};</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     }</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             : };</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : </span>
+<span id="L203"><span class="lineNum">     203</span>                 :             : // FeePerUnit instance for satoshi / vbyte.</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             : struct VSizeTag {};</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             : using FeePerVSize = FeePerUnit&lt;VSizeTag&gt;;</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : </span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : // FeePerUnit instance for satoshi / WU.</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : struct WeightTag {};</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             : using FeePerWeight = FeePerUnit&lt;WeightTag&gt;;</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : </span>
+<span id="L211"><span class="lineNum">     211</span>                 :             : /** Wrapper around FeeFrac &amp; derived types, which adds a feerate-based ordering which treats</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :  *  equal-feerate but distinct-size FeeFracs as equals.</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :  *</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :  *  This is not included inside FeeFrac itself, because it is not a total ordering (as would be</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :  *  expected for built-in comparison operators).</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :  */</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : template&lt;std::derived_from&lt;FeeFrac&gt; T&gt;</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             : class ByRatio</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : {</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     const T&amp; m_feefrac;</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             : </span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : public:</span>
+<span id="L223"><span class="lineNum">     223</span>         [<span class="tlaGBC" title="fallthrough branch &quot;229 -&gt; 230&quot; was taken 2222836 times"> + </span><span class="tlaGBC" title="branch &quot;229 -&gt; 231&quot; was taken 3774944 times"> + </span>]:<span class="tlaGNC">   342750123 :     constexpr ByRatio(const T&amp; feefrac) noexcept : m_feefrac{feefrac} {}</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;91 -&gt; 92&quot; was taken 13586 times"> + </span><span class="tlaGBC" title="branch &quot;91 -&gt; 93&quot; was taken 595935 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;32 -&gt; 33&quot; was taken 1367 times"> + </span><span class="tlaGBC" title="branch &quot;32 -&gt; 42&quot; was taken 576 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;37 -&gt; 38&quot; was taken 332 times"> + </span><span class="tlaGBC" title="branch &quot;37 -&gt; 39&quot; was taken 1445 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;64 -&gt; 65&quot; was taken 1902 times"> + </span><span class="tlaGBC" title="branch &quot;64 -&gt; 66&quot; was taken 7354 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="fallthrough branch &quot;58 -&gt; 59&quot; was taken 1696 times"> + </span><span class="tlaGBC" title="branch &quot;58 -&gt; 69&quot; was taken 2481 times"> + </span>][<span class="tlaUNC" title="fallthrough branch &quot;12 -&gt; 13&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;12 -&gt; 14&quot; was taken 8 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;14 -&gt; 16&quot; was taken 8 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;18 -&gt; 19&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;18 -&gt; 20&quot; was taken 8 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="branch &quot;20 -&gt; 22&quot; was taken 8 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 10 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 42 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 17248 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 41899 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 17 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 298 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;29 -&gt; 30&quot; was taken 3 times"> + </span><span class="tlaGBC" title="branch &quot;29 -&gt; 33&quot; was taken 7 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;34 -&gt; 35&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;34 -&gt; 36&quot; was taken 9 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 177044 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 281928 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 53219 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 84382 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 14937 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 10&quot; was taken 15516 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 69645 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 10&quot; was taken 89601 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 162143 times"> + </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 46194 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;443 -&gt; 444&quot; was taken 807 times"> + </span><span class="tlaGBC" title="branch &quot;443 -&gt; 445&quot; was taken 10298 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 5024436 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 4722029 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 1432462 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 1484979 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 1124201 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 21489 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 8604409 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 4476888 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 4495479 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 364705 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;48 -&gt; 49&quot; was taken 93371 times"> + </span><span class="tlaGBC" title="branch &quot;48 -&gt; 50&quot; was taken 130338 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 202927360 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="branch &quot;11 -&gt; 13&quot; was taken 95691290 times"> + </span>]
+<span id="L224"><span class="lineNum">     224</span>                 :             : </span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaGNC">        2040 :     friend bool operator==(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     {</span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">      132386 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L228"><span class="lineNum">     228</span> [<span class="tlaUNC" title="fallthrough branch &quot;50 -&gt; 51&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;50 -&gt; 52&quot; was taken 130423 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 1208 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 14&quot; was taken 52 times"> + </span> :<span class="tlaGNC">      132039 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;24 -&gt; 25&quot; was taken 347 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 27&quot; was taken 1 time"> + </span><span class="tlaGBC" title="fallthrough branch &quot;25 -&gt; 26&quot; was taken 338 times"> + </span><span class="tlaGBC" title="branch &quot;25 -&gt; 27&quot; was taken 9 times"> + </span>]
+<span id="L229"><span class="lineNum">     229</span>                 :             :         return cross_a == cross_b;</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :     }</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : </span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :     // Note that we can use std::strong_ordering here, because even though FeeFrac{1,2} and</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :     // FeeFrac{2,4} are distinct as FeeFracs, they are indistinguishable from ByRatio's perspective</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :     // (operator== also treats them as equal).</span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaGNC">   338539219 :     friend std::strong_ordering operator&lt;=&gt;(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :     {</span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">   338539219 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">   338539219 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span id="L239"><span class="lineNum">     239</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 230734545 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 6&quot; was taken 107804674 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 138346518 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 92388027 times"> + </span>]:<span class="tlaGNC">   338539219 :         return cross_a &lt;=&gt; cross_b;</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     }</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             : </span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :     // Specialized versions for efficiency. GCC 15+ and Clang 11+ produce operator&lt;=&gt;-derived</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :     // versions that are equally efficient as this at -O2, but earlier versions do not.</span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaGNC">    11891378 :     friend bool operator&lt;(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :     {</span>
+<span id="L246"><span class="lineNum">     246</span>                 :<span class="tlaGNC">    11891378 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L247"><span class="lineNum">     247</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 112610 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 33&quot; was taken 125013 times"> + </span>]:<span class="tlaGNC">    11891378 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 7435 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 40015 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;729 -&gt; 730&quot; was taken 8201 times"> + </span><span class="tlaGBC" title="branch &quot;729 -&gt; 732&quot; was taken 27199 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 2402973 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 3700803 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;48 -&gt; 49&quot; was taken 93371 times"> + </span><span class="tlaGBC" title="branch &quot;48 -&gt; 50&quot; was taken 130338 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;16 -&gt; 17&quot; was taken 1983066 times"> + </span><span class="tlaGBC" title="branch &quot;16 -&gt; 18&quot; was taken 3260264 times"> + </span>]
+<span id="L248"><span class="lineNum">     248</span>         [<span class="tlaUNC" title="branch &quot;12 -&gt; 14&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;12 -&gt; 15&quot; was taken 90 times"> + </span>]:<span class="tlaGNC">          90 :         return cross_a &lt; cross_b;</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     }</span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">    50263727 :     friend bool operator&gt;(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :     {</span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaGNC">    50263727 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L253"><span class="lineNum">     253</span>         [<span class="tlaUNC" title="fallthrough branch &quot;234 -&gt; 235&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;234 -&gt; 243&quot; was taken 23447 times"> + </span>]:<span class="tlaGNC">    50263727 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="branch &quot;15 -&gt; 9&quot; was taken 1503972 times"> + </span><span class="tlaGBC" title="branch &quot;15 -&gt; 10&quot; was taken 1015804 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;20 -&gt; 22&quot; was taken 185117 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="branch &quot;28 -&gt; 16&quot; was taken 5884402 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;28 -&gt; 29&quot; was taken 16908204 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1266099 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 2894386 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 2820149 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 9&quot; was taken 6213485 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 1551430 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 9&quot; was taken 3113081 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="branch &quot;35 -&gt; 16&quot; was taken 14894 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;35 -&gt; 36&quot; was taken 84726 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 80691 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 340158 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="branch &quot;28 -&gt; 16&quot; was taken 35503 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;28 -&gt; 29&quot; was taken 41164 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 7878 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 9&quot; was taken 13162 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 2856045 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 3401925 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;42 -&gt; 43&quot; was taken 807 times"> + </span><span class="tlaGBC" title="branch &quot;42 -&gt; 44&quot; was taken 7108 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;4 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="branch &quot;4 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;8 -&gt; 7&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 8&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 7&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;8 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="branch &quot;10 -&gt; 12&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;4 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;4 -&gt; 7&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 7&quot; was not executed"> # </span>]
+<span id="L254"><span class="lineNum">     254</span>         [<span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;15 -&gt; 17&quot; was taken 90 times"> + </span>]:<span class="tlaGNC">          90 :         return cross_a &gt; cross_b;</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :     }</span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">     1845401 :     friend bool operator&lt;=(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :     {</span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">     1845401 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L259"><span class="lineNum">     259</span>         [<span class="tlaUNC" title="fallthrough branch &quot;30 -&gt; 31&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;30 -&gt; 32&quot; was taken 533 times"> + </span>]:<span class="tlaGNC">     1845401 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;410 -&gt; 411&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;410 -&gt; 412&quot; was taken 953451 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;416 -&gt; 417&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;416 -&gt; 418&quot; was taken 648527 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;443 -&gt; 444&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;443 -&gt; 445&quot; was taken 3190 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;842 -&gt; 843&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;842 -&gt; 845&quot; was taken 161964 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;900 -&gt; 901&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="branch &quot;900 -&gt; 902&quot; was taken 44003 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;906 -&gt; 907&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;906 -&gt; 908&quot; was taken 33733 times"> + </span>]
+<span id="L260"><span class="lineNum">     260</span>                 :             :         return cross_a &lt;= cross_b;</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :     }</span>
+<span id="L262"><span class="lineNum">     262</span>                 :<span class="tlaGNC">     1965323 :     friend bool operator&gt;=(const ByRatio&amp; a, const ByRatio&amp; b) noexcept</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :     {</span>
+<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">     1965323 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L265"><span class="lineNum">     265</span>         [<span class="tlaUNC" title="fallthrough branch &quot;165 -&gt; 166&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;165 -&gt; 167&quot; was taken 799096 times"> + </span>]:<span class="tlaGNC">     1965323 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;112 -&gt; 113&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;112 -&gt; 114&quot; was taken 1113423 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;123 -&gt; 124&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;123 -&gt; 125&quot; was taken 52804 times"> + </span>]
+<span id="L266"><span class="lineNum">     266</span>                 :             :         return cross_a &gt;= cross_b;</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :     }</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             : };</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             : </span>
+<span id="L270"><span class="lineNum">     270</span>                 :             : /** Wrapper around FeeFrac &amp; derived types, which adds a total ordering which first sorts by feerate</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :  *  and then by reversed size (i.e., larger sizes come first).</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :  *</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :  *  This is not included inside FeeFrac itself, because it is not the most natural behavior, so it</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :  *  is better to make code using it invoke this explicitly.</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :  *</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :  *  The empty FeeFrac (fee and size both 0) sorts last. So for example, the following FeeFracs are</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :  *  in sorted order:</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :  *</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :  *   - fee=0 size=1 (feerate 0)</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :  *   - fee=1 size=2 (feerate 0.5)</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :  *   - fee=2 size=3 (feerate 0.667...)</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :  *   - fee=2 size=2 (feerate 1)</span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :  *   - fee=1 size=1 (feerate 1)</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :  *   - fee=3 size=2 (feerate 1.5)</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :  *   - fee=2 size=1 (feerate 2)</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :  *   - fee=0 size=0 (undefined feerate)</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :  */</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             : template&lt;std::derived_from&lt;FeeFrac&gt; T&gt;</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : class ByRatioNegSize</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             : {</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :     const T&amp; m_feefrac;</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             : </span>
+<span id="L293"><span class="lineNum">     293</span>                 :             : public:</span>
+<span id="L294"><span class="lineNum">     294</span> [<span class="tlaGBC" title="fallthrough branch &quot;37 -&gt; 38&quot; was taken 169165 times"> + </span><span class="tlaGBC" title="branch &quot;37 -&gt; 39&quot; was taken 349628 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 1678 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 570752 times"> + </span> :<span class="tlaGNC">    45898075 :     constexpr ByRatioNegSize(const T&amp; feefrac) noexcept : m_feefrac{feefrac} {}</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 33762 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 17&quot; was taken 35723595 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;90 -&gt; 91&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;90 -&gt; 92&quot; was taken 20734 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;112 -&gt; 113&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="branch &quot;112 -&gt; 114&quot; was taken 29509 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;45 -&gt; 46&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;45 -&gt; 47&quot; was taken 1999 times"> + </span>][<span class="tlaUNC" title="fallthrough branch &quot;33 -&gt; 34&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;33 -&gt; 35&quot; was taken 90 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;35 -&gt; 36&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;35 -&gt; 37&quot; was taken 90 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;37 -&gt; 38&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;37 -&gt; 39&quot; was taken 90 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="fallthrough branch &quot;39 -&gt; 40&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;39 -&gt; 41&quot; was taken 90 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;41 -&gt; 42&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;41 -&gt; 43&quot; was taken 90 times"> + </span>]
+<span id="L295"><span class="lineNum">     295</span>                 :             : </span>
+<span id="L296"><span class="lineNum">     296</span>                 :<span class="tlaGNC">         180 :     friend bool operator==(const ByRatioNegSize&amp; a, const ByRatioNegSize&amp; b) noexcept</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :     {</span>
+<span id="L298"><span class="lineNum">     298</span>   [<span class="tlaGBC" title="fallthrough branch &quot;43 -&gt; 44&quot; was taken 7 times"> + </span><span class="tlaGBC" title="branch &quot;43 -&gt; 45&quot; was taken 83 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;46 -&gt; 47&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;46 -&gt; 48&quot; was taken 90 times"> + </span> :<span class="tlaGNC">         270 :         return a.m_feefrac == b.m_feefrac;</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;48 -&gt; 49&quot; was taken 7 times"> + </span><span class="tlaGBC" title="branch &quot;48 -&gt; 50&quot; was taken 83 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;51 -&gt; 52&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;51 -&gt; 53&quot; was taken 90 times"> + </span>]
+<span id="L299"><span class="lineNum">     299</span>                 :             :     }</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             : </span>
+<span id="L301"><span class="lineNum">     301</span>                 :<span class="tlaGNC">   115389894 :     friend std::strong_ordering operator&lt;=&gt;(const ByRatioNegSize&amp; a, const ByRatioNegSize&amp; b) noexcept</span></span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     {</span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">   115389894 :         auto cross_a = T::Mul(a.m_feefrac.fee, b.m_feefrac.size);</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">   115389894 :         auto cross_b = T::Mul(b.m_feefrac.fee, a.m_feefrac.size);</span></span>
+<span id="L305"><span class="lineNum">     305</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 69143920 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 6&quot; was taken 46245974 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 48315736 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 20828184 times"> + </span>]:<span class="tlaGNC">   115389894 :         auto cmp = cross_a &lt;=&gt; cross_b;</span></span>
+<span id="L306"><span class="lineNum">     306</span>         [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 69143920 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 46245974 times"> + </span>]:<span class="tlaGNC">   115389894 :         if (cmp != 0) return cmp;</span></span>
+<span id="L307"><span class="lineNum">     307</span>   [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 7395528 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 13&quot; was taken 38850446 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 2106851 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 5288677 times"> + </span>]:<span class="tlaGNC">    46245974 :         return b.m_feefrac.size &lt;=&gt; a.m_feefrac.size;</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :     }</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             : </span>
+<span id="L310"><span class="lineNum">     310</span>                 :             :     // Support conversion back to underlying FeeFrac, which allows using std::max().</span>
+<span id="L311"><span class="lineNum">     311</span>                 :<span class="tlaGNC">    26529764 :     operator const T&amp;() const noexcept { return m_feefrac; }</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :             : };</span>
+<span id="L313"><span class="lineNum">     313</span>                 :             : </span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : #endif // BITCOIN_UTIL_FEEFRAC_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
