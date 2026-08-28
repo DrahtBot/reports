@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/common/run_command.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/common">src/common</a> - run_command.cpp<span style="font-size: 80%;"> (source / <a href="run_command.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-28 14:25:27</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">60</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2022-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;common/run_command.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;tinyformat.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;univalue.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/string.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;util/subprocess.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;sstream&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;stdexcept&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :<span class="tlaUNC">           0 : UniValue RunCommandParseJSON(const std::vector&lt;std::string&gt;&amp; cmd_args, const std::string&amp; str_std_in)</span></span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : {</span>
+<span id="L18"><span class="lineNum">      18</span>                 :<span class="tlaUNC">           0 :     namespace sp = subprocess;</span></span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : </span>
+<span id="L20"><span class="lineNum">      20</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 86&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     UniValue result_json;</span></span>
+<span id="L21"><span class="lineNum">      21</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 86&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::istringstream stdout_stream;</span></span>
+<span id="L22"><span class="lineNum">      22</span>         [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 84&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::istringstream stderr_stream;</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>         [<span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;4 -&gt; 8&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (cmd_args.empty()) return UniValue::VNULL;</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>   [<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 82&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 82&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :     auto c = sp::Popen(cmd_args, sp::input{sp::PIPE}, sp::output{sp::PIPE}, sp::error{sp::PIPE});</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 82&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;11 -&gt; 12&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;11 -&gt; 82&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;12 -&gt; 13&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="exception branch &quot;12 -&gt; 57&quot; was not executed"> # </span>]
+<span id="L27"><span class="lineNum">      27</span>         [<span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;14 -&gt; 19&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!str_std_in.empty()) {</span></span>
+<span id="L28"><span class="lineNum">      28</span>         [<span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;15 -&gt; 17&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         c.send(str_std_in);</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     }</span>
+<span id="L30"><span class="lineNum">      30</span>   [<span class="tlaUNC" title="fallthrough branch &quot;19 -&gt; 20&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;19 -&gt; 80&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;20 -&gt; 77&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     auto [out_res, err_res] = c.communicate();</span></span>
+<span id="L31"><span class="lineNum">      31</span>   [<span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;20 -&gt; 77&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;22 -&gt; 23&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;22 -&gt; 59&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     stdout_stream.str(std::string{out_res.buf.begin(), out_res.buf.end()});</span></span>
+<span id="L32"><span class="lineNum">      32</span>   [<span class="tlaUNC" title="fallthrough branch &quot;24 -&gt; 25&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;24 -&gt; 77&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;26 -&gt; 27&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;26 -&gt; 61&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     stderr_stream.str(std::string{err_res.buf.begin(), err_res.buf.end()});</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>         [<span class="tlaUNC" title="fallthrough branch &quot;28 -&gt; 29&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;28 -&gt; 73&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::string result;</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaUNC">           0 :     std::string error;</span></span>
+<span id="L36"><span class="lineNum">      36</span>         [<span class="tlaUNC" title="fallthrough branch &quot;28 -&gt; 29&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;28 -&gt; 73&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::getline(stdout_stream, result);</span></span>
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaUNC" title="fallthrough branch &quot;29 -&gt; 30&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;29 -&gt; 73&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::getline(stderr_stream, error);</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : </span>
+<span id="L39"><span class="lineNum">      39</span>         [<span class="tlaUNC" title="fallthrough branch &quot;30 -&gt; 31&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;30 -&gt; 38&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     const int n_error = c.retcode();</span></span>
+<span id="L40"><span class="lineNum">      40</span>   [<span class="tlaUNC" title="fallthrough branch &quot;30 -&gt; 31&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;30 -&gt; 38&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;32 -&gt; 33&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;32 -&gt; 67&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :     if (n_error) throw std::runtime_error(strprintf(&quot;RunCommandParseJSON error: process(%s) returned %d: %s\n&quot;, util::Join(cmd_args, &quot; &quot;), n_error, error));</span></span>
+<span class="lineNum">        </span>    <span class="tlaUNC" title="fallthrough branch &quot;33 -&gt; 34&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;33 -&gt; 65&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;34 -&gt; 35&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;34 -&gt; 63&quot; was not executed"> # </span>]
+<span id="L41"><span class="lineNum">      41</span>   [<span class="tlaUNC" title="fallthrough branch &quot;38 -&gt; 39&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;38 -&gt; 40&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;40 -&gt; 41&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;40 -&gt; 73&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :     if (!result_json.read(result)) throw std::runtime_error(&quot;Unable to parse JSON: &quot; + result);</span></span>
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;41 -&gt; 42&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;41 -&gt; 47&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;43 -&gt; 44&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;43 -&gt; 71&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;44 -&gt; 45&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="exception branch &quot;44 -&gt; 69&quot; was not executed"> # </span>]
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaUNC">           0 :     return result_json;</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaUNC">           0 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/script/script.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/script">src/script</a> - script.cpp<span style="font-size: 80%;"> (source / <a href="script.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">242</td>
+            <td class="headerCovTableEntry">242</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-28 14:25:27</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntry">17</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryHi">95.7&nbsp;%</td>
+            <td class="headerCovTableEntry">346</td>
+            <td class="headerCovTableEntry">331</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;script/script.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;crypto/common.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;crypto/hex_base.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;hash.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/hash_type.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;compare&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;string&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :<span class="tlaGNC">      670694 : CScriptID::CScriptID(const CScript&amp; in) : BaseHash(Hash160(in)) {}</span></span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :<span class="tlaGNC">    12632862 : std::string GetOpName(opcodetype opcode)</span></span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : {</span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">    12632862 :     switch (opcode)</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="branch &quot;2 -&gt; 3&quot; was taken 1569 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 3 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 5&quot; was taken 4 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 6&quot; was taken 3 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 7&quot; was taken 16295 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 8&quot; was taken 85110 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 9&quot; was taken 245290 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 10&quot; was taken 184471 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 11&quot; was taken 46533 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 12&quot; was taken 24683 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 13&quot; was taken 27349 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 14&quot; was taken 13521 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 15&quot; was taken 15742 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 16&quot; was taken 154422 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 17&quot; was taken 27805 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 18&quot; was taken 19209 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 19&quot; was taken 116132 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 20&quot; was taken 20661 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 21&quot; was taken 64759 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 22&quot; was taken 16192 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 23&quot; was taken 29114 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 24&quot; was taken 31063 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 25&quot; was taken 1631774 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 26&quot; was taken 18037 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 27&quot; was taken 29273 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 28&quot; was taken 22326 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 29&quot; was taken 37686 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 30&quot; was taken 41360 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 31&quot; was taken 61184 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 32&quot; was taken 53841 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 33&quot; was taken 81025 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 34&quot; was taken 157508 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 35&quot; was taken 30644 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 36&quot; was taken 22074 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 37&quot; was taken 19835 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 38&quot; was taken 14958 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 39&quot; was taken 56951 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 40&quot; was taken 27555 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 41&quot; was taken 63534 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 42&quot; was taken 42899 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 43&quot; was taken 38526 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 44&quot; was taken 39574 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 45&quot; was taken 24830 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 46&quot; was taken 49613 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 47&quot; was taken 197289 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 48&quot; was taken 21104 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 49&quot; was taken 21494 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 50&quot; was taken 36102 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 51&quot; was taken 58831 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 52&quot; was taken 468561 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 53&quot; was taken 20371 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 54&quot; was taken 22660 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 55&quot; was taken 268549 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 56&quot; was taken 61949 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 57&quot; was taken 25816 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 58&quot; was taken 16776 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 59&quot; was taken 45605 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 60&quot; was taken 24694 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 61&quot; was taken 22493 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 62&quot; was taken 19198 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 63&quot; was taken 208026 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 64&quot; was taken 49094 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 65&quot; was taken 22533 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 66&quot; was taken 22076 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 67&quot; was taken 21632 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 68&quot; was taken 17988 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 69&quot; was taken 28879 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 70&quot; was taken 14666 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 71&quot; was taken 34740 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 72&quot; was taken 19711 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 73&quot; was taken 23380 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 74&quot; was taken 173699 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 75&quot; was taken 18071 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 76&quot; was taken 13880 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 77&quot; was taken 25366 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 78&quot; was taken 93238 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 79&quot; was taken 21031 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 80&quot; was taken 62156 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 81&quot; was taken 48021 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 82&quot; was taken 27470 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 83&quot; was taken 27871 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 84&quot; was taken 54017 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 85&quot; was taken 18941 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 86&quot; was taken 29146 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 87&quot; was taken 28206 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 88&quot; was taken 16752 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 89&quot; was taken 1101398 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 90&quot; was taken 77852 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 91&quot; was taken 28331 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 92&quot; was taken 37250 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 93&quot; was taken 27121 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 94&quot; was taken 21693 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 95&quot; was taken 30214 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 96&quot; was taken 17695 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 97&quot; was taken 226785 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 98&quot; was taken 44351 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 99&quot; was taken 31774 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 100&quot; was taken 134657 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 101&quot; was taken 44910 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 102&quot; was taken 1329458 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 103&quot; was taken 138741 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 104&quot; was taken 35198 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 105&quot; was taken 613307 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 106&quot; was taken 104506 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;2 -&gt; 107&quot; was taken 25083 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 108&quot; was taken 52762 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 109&quot; was taken 18912 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 110&quot; was taken 21535 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 111&quot; was taken 25748 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="branch &quot;2 -&gt; 112&quot; was taken 17233 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 113&quot; was taken 26258 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 114&quot; was taken 34280 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 115&quot; was taken 284482 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="branch &quot;2 -&gt; 116&quot; was taken 1924309 times"> + </span>]
+<span id="L22"><span class="lineNum">      22</span>                 :             :     {</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     // push value</span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">        1569 :     case OP_0                      : return &quot;0&quot;;</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">           3 :     case OP_PUSHDATA1              : return &quot;OP_PUSHDATA1&quot;;</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">           4 :     case OP_PUSHDATA2              : return &quot;OP_PUSHDATA2&quot;;</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :<span class="tlaGNC">           3 :     case OP_PUSHDATA4              : return &quot;OP_PUSHDATA4&quot;;</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">       16295 :     case OP_1NEGATE                : return &quot;-1&quot;;</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">       85110 :     case OP_RESERVED               : return &quot;OP_RESERVED&quot;;</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">      245290 :     case OP_1                      : return &quot;1&quot;;</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaGNC">      184471 :     case OP_2                      : return &quot;2&quot;;</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">       46533 :     case OP_3                      : return &quot;3&quot;;</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">       24683 :     case OP_4                      : return &quot;4&quot;;</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">       27349 :     case OP_5                      : return &quot;5&quot;;</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">       13521 :     case OP_6                      : return &quot;6&quot;;</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">       15742 :     case OP_7                      : return &quot;7&quot;;</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">      154422 :     case OP_8                      : return &quot;8&quot;;</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">       27805 :     case OP_9                      : return &quot;9&quot;;</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">       19209 :     case OP_10                     : return &quot;10&quot;;</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">      116132 :     case OP_11                     : return &quot;11&quot;;</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">       20661 :     case OP_12                     : return &quot;12&quot;;</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">       64759 :     case OP_13                     : return &quot;13&quot;;</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">       16192 :     case OP_14                     : return &quot;14&quot;;</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">       29114 :     case OP_15                     : return &quot;15&quot;;</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">       31063 :     case OP_16                     : return &quot;16&quot;;</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     // control</span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">     1631774 :     case OP_NOP                    : return &quot;OP_NOP&quot;;</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">       18037 :     case OP_VER                    : return &quot;OP_VER&quot;;</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">       29273 :     case OP_IF                     : return &quot;OP_IF&quot;;</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">       22326 :     case OP_NOTIF                  : return &quot;OP_NOTIF&quot;;</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">       37686 :     case OP_VERIF                  : return &quot;OP_VERIF&quot;;</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">       41360 :     case OP_VERNOTIF               : return &quot;OP_VERNOTIF&quot;;</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">       61184 :     case OP_ELSE                   : return &quot;OP_ELSE&quot;;</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">       53841 :     case OP_ENDIF                  : return &quot;OP_ENDIF&quot;;</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">       81025 :     case OP_VERIFY                 : return &quot;OP_VERIFY&quot;;</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">      157508 :     case OP_RETURN                 : return &quot;OP_RETURN&quot;;</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : </span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     // stack ops</span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">       30644 :     case OP_TOALTSTACK             : return &quot;OP_TOALTSTACK&quot;;</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">       22074 :     case OP_FROMALTSTACK           : return &quot;OP_FROMALTSTACK&quot;;</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">       19835 :     case OP_2DROP                  : return &quot;OP_2DROP&quot;;</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">       14958 :     case OP_2DUP                   : return &quot;OP_2DUP&quot;;</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">       56951 :     case OP_3DUP                   : return &quot;OP_3DUP&quot;;</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">       27555 :     case OP_2OVER                  : return &quot;OP_2OVER&quot;;</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">       63534 :     case OP_2ROT                   : return &quot;OP_2ROT&quot;;</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">       42899 :     case OP_2SWAP                  : return &quot;OP_2SWAP&quot;;</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">       38526 :     case OP_IFDUP                  : return &quot;OP_IFDUP&quot;;</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">       39574 :     case OP_DEPTH                  : return &quot;OP_DEPTH&quot;;</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">       24830 :     case OP_DROP                   : return &quot;OP_DROP&quot;;</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">       49613 :     case OP_DUP                    : return &quot;OP_DUP&quot;;</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">      197289 :     case OP_NIP                    : return &quot;OP_NIP&quot;;</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">       21104 :     case OP_OVER                   : return &quot;OP_OVER&quot;;</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">       21494 :     case OP_PICK                   : return &quot;OP_PICK&quot;;</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">       36102 :     case OP_ROLL                   : return &quot;OP_ROLL&quot;;</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">       58831 :     case OP_ROT                    : return &quot;OP_ROT&quot;;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">      468561 :     case OP_SWAP                   : return &quot;OP_SWAP&quot;;</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">       20371 :     case OP_TUCK                   : return &quot;OP_TUCK&quot;;</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : </span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     // splice ops</span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">       22660 :     case OP_CAT                    : return &quot;OP_CAT&quot;;</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      268549 :     case OP_SUBSTR                 : return &quot;OP_SUBSTR&quot;;</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">       61949 :     case OP_LEFT                   : return &quot;OP_LEFT&quot;;</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">       25816 :     case OP_RIGHT                  : return &quot;OP_RIGHT&quot;;</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">       16776 :     case OP_SIZE                   : return &quot;OP_SIZE&quot;;</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : </span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     // bit logic</span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">       45605 :     case OP_INVERT                 : return &quot;OP_INVERT&quot;;</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">       24694 :     case OP_AND                    : return &quot;OP_AND&quot;;</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaGNC">       22493 :     case OP_OR                     : return &quot;OP_OR&quot;;</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">       19198 :     case OP_XOR                    : return &quot;OP_XOR&quot;;</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">      208026 :     case OP_EQUAL                  : return &quot;OP_EQUAL&quot;;</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">       49094 :     case OP_EQUALVERIFY            : return &quot;OP_EQUALVERIFY&quot;;</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">       22533 :     case OP_RESERVED1              : return &quot;OP_RESERVED1&quot;;</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">       22076 :     case OP_RESERVED2              : return &quot;OP_RESERVED2&quot;;</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :     // numeric</span>
+<span id="L98"><span class="lineNum">      98</span>                 :<span class="tlaGNC">       21632 :     case OP_1ADD                   : return &quot;OP_1ADD&quot;;</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC">       17988 :     case OP_1SUB                   : return &quot;OP_1SUB&quot;;</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">       28879 :     case OP_2MUL                   : return &quot;OP_2MUL&quot;;</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">       14666 :     case OP_2DIV                   : return &quot;OP_2DIV&quot;;</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">       34740 :     case OP_NEGATE                 : return &quot;OP_NEGATE&quot;;</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">       19711 :     case OP_ABS                    : return &quot;OP_ABS&quot;;</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">       23380 :     case OP_NOT                    : return &quot;OP_NOT&quot;;</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">      173699 :     case OP_0NOTEQUAL              : return &quot;OP_0NOTEQUAL&quot;;</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">       18071 :     case OP_ADD                    : return &quot;OP_ADD&quot;;</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">       13880 :     case OP_SUB                    : return &quot;OP_SUB&quot;;</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :<span class="tlaGNC">       25366 :     case OP_MUL                    : return &quot;OP_MUL&quot;;</span></span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">       93238 :     case OP_DIV                    : return &quot;OP_DIV&quot;;</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaGNC">       21031 :     case OP_MOD                    : return &quot;OP_MOD&quot;;</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">       62156 :     case OP_LSHIFT                 : return &quot;OP_LSHIFT&quot;;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :<span class="tlaGNC">       48021 :     case OP_RSHIFT                 : return &quot;OP_RSHIFT&quot;;</span></span>
+<span id="L113"><span class="lineNum">     113</span>                 :<span class="tlaGNC">       27470 :     case OP_BOOLAND                : return &quot;OP_BOOLAND&quot;;</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">       27871 :     case OP_BOOLOR                 : return &quot;OP_BOOLOR&quot;;</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :<span class="tlaGNC">       54017 :     case OP_NUMEQUAL               : return &quot;OP_NUMEQUAL&quot;;</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">       18941 :     case OP_NUMEQUALVERIFY         : return &quot;OP_NUMEQUALVERIFY&quot;;</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">       29146 :     case OP_NUMNOTEQUAL            : return &quot;OP_NUMNOTEQUAL&quot;;</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :<span class="tlaGNC">       28206 :     case OP_LESSTHAN               : return &quot;OP_LESSTHAN&quot;;</span></span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">       16752 :     case OP_GREATERTHAN            : return &quot;OP_GREATERTHAN&quot;;</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">     1101398 :     case OP_LESSTHANOREQUAL        : return &quot;OP_LESSTHANOREQUAL&quot;;</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">       77852 :     case OP_GREATERTHANOREQUAL     : return &quot;OP_GREATERTHANOREQUAL&quot;;</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">       28331 :     case OP_MIN                    : return &quot;OP_MIN&quot;;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">       37250 :     case OP_MAX                    : return &quot;OP_MAX&quot;;</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">       27121 :     case OP_WITHIN                 : return &quot;OP_WITHIN&quot;;</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :             : </span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     // crypto</span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaGNC">       21693 :     case OP_RIPEMD160              : return &quot;OP_RIPEMD160&quot;;</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">       30214 :     case OP_SHA1                   : return &quot;OP_SHA1&quot;;</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">       17695 :     case OP_SHA256                 : return &quot;OP_SHA256&quot;;</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaGNC">      226785 :     case OP_HASH160                : return &quot;OP_HASH160&quot;;</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">       44351 :     case OP_HASH256                : return &quot;OP_HASH256&quot;;</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">       31774 :     case OP_CODESEPARATOR          : return &quot;OP_CODESEPARATOR&quot;;</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">      134657 :     case OP_CHECKSIG               : return &quot;OP_CHECKSIG&quot;;</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">       44910 :     case OP_CHECKSIGVERIFY         : return &quot;OP_CHECKSIGVERIFY&quot;;</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">     1329458 :     case OP_CHECKMULTISIG          : return &quot;OP_CHECKMULTISIG&quot;;</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">      138741 :     case OP_CHECKMULTISIGVERIFY    : return &quot;OP_CHECKMULTISIGVERIFY&quot;;</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     // expansion</span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">       35198 :     case OP_NOP1                   : return &quot;OP_NOP1&quot;;</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">      613307 :     case OP_CHECKLOCKTIMEVERIFY    : return &quot;OP_CHECKLOCKTIMEVERIFY&quot;;</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">      104506 :     case OP_CHECKSEQUENCEVERIFY    : return &quot;OP_CHECKSEQUENCEVERIFY&quot;;</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">       25083 :     case OP_NOP4                   : return &quot;OP_NOP4&quot;;</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">       52762 :     case OP_NOP5                   : return &quot;OP_NOP5&quot;;</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">       18912 :     case OP_NOP6                   : return &quot;OP_NOP6&quot;;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">       21535 :     case OP_NOP7                   : return &quot;OP_NOP7&quot;;</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">       25748 :     case OP_NOP8                   : return &quot;OP_NOP8&quot;;</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :<span class="tlaGNC">       17233 :     case OP_NOP9                   : return &quot;OP_NOP9&quot;;</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :<span class="tlaGNC">       26258 :     case OP_NOP10                  : return &quot;OP_NOP10&quot;;</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :             : </span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :     // Opcode added by BIP 342 (Tapscript)</span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">       34280 :     case OP_CHECKSIGADD            : return &quot;OP_CHECKSIGADD&quot;;</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : </span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaGNC">      284482 :     case OP_INVALIDOPCODE          : return &quot;OP_INVALIDOPCODE&quot;;</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : </span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :     } // no default case, so the compiler can warn about missing cases</span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">     1924309 :     return &quot;OP_UNKNOWN&quot;;</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : }</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             : </span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaGNC">    52721732 : unsigned int CScript::GetSigOpCount(bool fAccurate) const</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             : {</span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">    52721732 :     unsigned int n = 0;</span></span>
+<span id="L162"><span class="lineNum">     162</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 49478484 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 3243248 times"> + </span>]:<span class="tlaGNC">    52721732 :     const_iterator pc = begin();</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">    52721732 :     opcodetype lastOpcode = OP_INVALIDOPCODE;</span></span>
+<span id="L164"><span class="lineNum">     164</span>   [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 203529118 times"> + </span><span class="tlaGBC" title="branch &quot;17 -&gt; 21&quot; was taken 51905627 times"> + </span><span class="tlaGBC" title="branch &quot;22 -&gt; 6&quot; was taken 203529118 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;22 -&gt; 23&quot; was taken 51905627 times"> + </span>]:<span class="tlaGNC">   510869490 :     while (pc &lt; end())</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :     {</span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">   203529118 :         opcodetype opcode;</span></span>
+<span id="L167"><span class="lineNum">     167</span>         [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 202713013 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 23&quot; was taken 816105 times"> + </span>]:<span class="tlaGNC">   203529118 :         if (!GetOp(pc, opcode))</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :             break;</span>
+<span id="L169"><span class="lineNum">     169</span>         [<span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 841871 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 10&quot; was taken 201871142 times"> + </span>]:<span class="tlaGNC">   202713013 :         if (opcode == OP_CHECKSIG || opcode == OP_CHECKSIGVERIFY)</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">      841871 :             n++;</span></span>
+<span id="L171"><span class="lineNum">     171</span>         [<span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 1161135 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 16&quot; was taken 200710007 times"> + </span>]:<span class="tlaGNC">   201871142 :         else if (opcode == OP_CHECKMULTISIG || opcode == OP_CHECKMULTISIGVERIFY)</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :         {</span>
+<span id="L173"><span class="lineNum">     173</span>   [<span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 156035 times"> + </span><span class="tlaGBC" title="branch &quot;11 -&gt; 15&quot; was taken 1005100 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 9843 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 15&quot; was taken 146192 times"> + </span>]:<span class="tlaGNC">     1161135 :             if (fAccurate &amp;&amp; lastOpcode &gt;= OP_1 &amp;&amp; lastOpcode &lt;= OP_16)</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">        9843 :                 n += DecodeOP_N(lastOpcode);</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :             else</span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">     1151292 :                 n += MAX_PUBKEYS_PER_MULTISIG;</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :         }</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :         lastOpcode = opcode;</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :     }</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">    52721732 :     return n;</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : }</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             : </span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaGNC">     3938955 : unsigned int CScript::GetSigOpCount(const CScript&amp; scriptSig) const</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :             : {</span>
+<span id="L185"><span class="lineNum">     185</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 3924259 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 14696 times"> + </span>]:<span class="tlaGNC">     3938955 :     if (!IsPayToScriptHash())</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaGNC">     3924259 :         return GetSigOpCount(true);</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : </span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :     // This is a pay-to-script-hash scriptPubKey;</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :     // get the last item that the scriptSig</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :     // pushes onto the stack:</span>
+<span id="L191"><span class="lineNum">     191</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 6725 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 7971 times"> + </span>]:<span class="tlaGNC">       14696 :     const_iterator pc = scriptSig.begin();</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :<span class="tlaGNC">       14696 :     std::vector&lt;unsigned char&gt; vData;</span></span>
+<span id="L193"><span class="lineNum">     193</span>   [<span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 271068 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 16&quot; was taken 4161 times"> + </span><span class="tlaGBC" title="branch &quot;17 -&gt; 9&quot; was taken 271068 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 4161 times"> + </span>]:<span class="tlaGNC">      550458 :     while (pc &lt; scriptSig.end())</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :     {</span>
+<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">      271068 :         opcodetype opcode;</span></span>
+<span id="L196"><span class="lineNum">     196</span>   [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 271068 times"> + </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 27&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 265037 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 22&quot; was taken 6031 times"> + </span>]:<span class="tlaGNC">      271068 :         if (!scriptSig.GetOp(pc, opcode, vData))</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :             return 0;</span>
+<span id="L198"><span class="lineNum">     198</span>         [<span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 260533 times"> + </span><span class="tlaGBC" title="branch &quot;11 -&gt; 22&quot; was taken 4504 times"> + </span>]:<span class="tlaGNC">      265037 :         if (opcode &gt; OP_16)</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :             return 0;</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     }</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             : </span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     /// ... and return its opcount:</span>
+<span id="L203"><span class="lineNum">     203</span>                 :<span class="tlaGNC">        4161 :     CScript subscript(vData.begin(), vData.end());</span></span>
+<span id="L204"><span class="lineNum">     204</span>         [<span class="tlaGBC" title="fallthrough branch &quot;19 -&gt; 20&quot; was taken 4161 times"> + </span><span class="tlaUNC" title="exception branch &quot;19 -&gt; 25&quot; was not taken"> - </span>]:<span class="tlaGNC">        4161 :     return subscript.GetSigOpCount(true);</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">       18857 : }</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : </span>
+<span id="L207"><span class="lineNum">     207</span>                 :<span class="tlaGNC">     3804623 : bool CScript::IsPayToAnchor() const</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : {</span>
+<span id="L209"><span class="lineNum">     209</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 11063 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 3793560 times"> + </span>]:<span class="tlaGNC">     3804623 :     return (this-&gt;size() == 4 &amp;&amp;</span></span>
+<span id="L210"><span class="lineNum">     210</span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 124837 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 3046 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 13960 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 22&quot; was taken 113923 times"> + </span>]:<span class="tlaGNC">      255766 :         (*this)[0] == OP_1 &amp;&amp;</span></span>
+<span id="L211"><span class="lineNum">     211</span>   [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 12212 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 1748 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 13949 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 22&quot; was taken 11 times"> + </span>]:<span class="tlaGNC">       27920 :         (*this)[1] == 0x02 &amp;&amp;</span></span>
+<span id="L212"><span class="lineNum">     212</span>   [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 127883 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 22&quot; was taken 3676740 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 12203 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 1746 times"> + </span> :<span class="tlaGNC">     3832521 :         (*this)[2] == 0x4e &amp;&amp;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;16 -&gt; 17&quot; was taken 6869 times"> + </span><span class="tlaGBC" title="branch &quot;16 -&gt; 22&quot; was taken 7080 times"> + </span>]
+<span id="L213"><span class="lineNum">     213</span>   [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 6262 times"> + </span><span class="tlaGBC" title="branch &quot;17 -&gt; 19&quot; was taken 607 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;20 -&gt; 21&quot; was taken 1320 times"> + </span><span class="tlaGBC" title="branch &quot;20 -&gt; 22&quot; was taken 5549 times"> + </span>]:<span class="tlaGNC">       13738 :         (*this)[3] == 0x73);</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : }</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             : </span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">       44482 : bool CScript::IsPayToAnchor(int version, const std::vector&lt;unsigned char&gt;&amp; program)</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : {</span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">       55435 :     return version == 1 &amp;&amp;</span></span>
+<span id="L219"><span class="lineNum">     219</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 6381 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 9&quot; was taken 4572 times"> + </span>]:<span class="tlaGNC">       10953 :         program.size() == 2 &amp;&amp;</span></span>
+<span id="L220"><span class="lineNum">     220</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 10953 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 9&quot; was taken 33529 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 3185 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 9&quot; was taken 3196 times"> + </span>]:<span class="tlaGNC">       50863 :         program[0] == 0x4e &amp;&amp;</span></span>
+<span id="L221"><span class="lineNum">     221</span>         [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 250 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 2935 times"> + </span>]:<span class="tlaGNC">        3185 :         program[1] == 0x73;</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :             : }</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             : </span>
+<span id="L224"><span class="lineNum">     224</span>                 :<span class="tlaGNC">    45978469 : bool CScript::IsPayToScriptHash() const</span></span>
+<span id="L225"><span class="lineNum">     225</span>                 :             : {</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     // Extra-fast test for pay-to-script-hash CScripts:</span>
+<span id="L227"><span class="lineNum">     227</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1751662 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 44226807 times"> + </span>]:<span class="tlaGNC">    45978469 :     return (this-&gt;size() == 23 &amp;&amp;</span></span>
+<span id="L228"><span class="lineNum">     228</span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1550532 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 6883 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 1518410 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 18&quot; was taken 39005 times"> + </span>]:<span class="tlaGNC">     3114830 :             (*this)[0] == OP_HASH160 &amp;&amp;</span></span>
+<span id="L229"><span class="lineNum">     229</span>   [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1557415 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 18&quot; was taken 44421054 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 1513274 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 5136 times"> + </span> :<span class="tlaGNC">    49015289 :             (*this)[1] == 0x14 &amp;&amp;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 1506903 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 18&quot; was taken 11507 times"> + </span>]
+<span id="L230"><span class="lineNum">     230</span>   [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 1502961 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 3942 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;16 -&gt; 17&quot; was taken 17828 times"> + </span><span class="tlaGBC" title="branch &quot;16 -&gt; 18&quot; was taken 1489075 times"> + </span>]:<span class="tlaGNC">     3013806 :             (*this)[22] == OP_EQUAL);</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : }</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             : </span>
+<span id="L233"><span class="lineNum">     233</span>                 :<span class="tlaGNC">       69457 : bool CScript::IsPayToWitnessScriptHash() const</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :             : {</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :     // Extra-fast test for pay-to-witness-script-hash CScripts:</span>
+<span id="L236"><span class="lineNum">     236</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 13725 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 55732 times"> + </span>]:<span class="tlaGNC">       69457 :     return (this-&gt;size() == 34 &amp;&amp;</span></span>
+<span id="L237"><span class="lineNum">     237</span>   [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 25183 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 14&quot; was taken 44274 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 25175 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 8 times"> + </span> :<span class="tlaGNC">       94640 :             (*this)[0] == OP_0 &amp;&amp;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 25084 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 14&quot; was taken 99 times"> + </span>]
+<span id="L238"><span class="lineNum">     238</span>   [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 25081 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 3 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 6 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 14&quot; was taken 25078 times"> + </span>]:<span class="tlaGNC">       50168 :             (*this)[1] == 0x20);</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : }</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             : </span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaGNC">       50874 : bool CScript::IsPayToTaproot() const</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :             : {</span>
+<span id="L243"><span class="lineNum">     243</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 10533 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 40341 times"> + </span>]:<span class="tlaGNC">       50874 :     return (this-&gt;size() == 34 &amp;&amp;</span></span>
+<span id="L244"><span class="lineNum">     244</span>   [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 10374 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 14&quot; was taken 40500 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 10374 times"> + </span><span class="tlaUNC" title="branch &quot;5 -&gt; 7&quot; was not taken"> - </span> :<span class="tlaGNC">       61248 :             (*this)[0] == OP_1 &amp;&amp;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 9557 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 14&quot; was taken 817 times"> + </span>]
+<span id="L245"><span class="lineNum">     245</span>   [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 9557 times"> + </span><span class="tlaUNC" title="branch &quot;9 -&gt; 11&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 82 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 14&quot; was taken 9475 times"> + </span>]:<span class="tlaGNC">       19114 :             (*this)[1] == 0x20);</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :             : }</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             : </span>
+<span id="L248"><span class="lineNum">     248</span>                 :             : // A witness program is any valid CScript that consists of a 1-byte push opcode</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             : // followed by a data push between 2 and 40 bytes.</span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">   155548733 : bool CScript::IsWitnessProgram(int&amp; version, std::vector&lt;unsigned char&gt;&amp; program) const</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : {</span>
+<span id="L252"><span class="lineNum">     252</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1693531 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 153855202 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 150928683 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 25&quot; was taken 4620050 times"> + </span> :<span class="tlaGNC">   157242264 :     if (this-&gt;size() &lt; 4 || this-&gt;size() &gt; 42) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1691193 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 149237490 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 101951 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 25&quot; was taken 1589242 times"> + </span>]
+<span id="L253"><span class="lineNum">     253</span>                 :             :         return false;</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :     }</span>
+<span id="L255"><span class="lineNum">     255</span>   [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 149237490 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 101951 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 3127550 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 13&quot; was taken 146211891 times"> + </span> :<span class="tlaGNC">   298678882 :     if ((*this)[0] != OP_0 &amp;&amp; ((*this)[0] &lt; OP_1 || (*this)[0] &gt; OP_16)) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 2103853 times"> + </span><span class="tlaGBC" title="branch &quot;11 -&gt; 25&quot; was taken 1023697 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 1237240 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 25&quot; was taken 866613 times"> + </span>]
+<span id="L256"><span class="lineNum">     256</span>                 :             :         return false;</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :     }</span>
+<span id="L258"><span class="lineNum">     258</span>   [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 147408137 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 40994 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;16 -&gt; 17&quot; was taken 147295631 times"> + </span><span class="tlaGBC" title="branch &quot;16 -&gt; 25&quot; was taken 153500 times"> + </span>]:<span class="tlaGNC">   294898262 :     if ((size_t)((*this)[1] + 2) == this-&gt;size()) {</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">   147295631 :         version = DecodeOP_N((opcodetype)(*this)[0]);</span></span>
+<span id="L260"><span class="lineNum">     260</span>         [<span class="tlaGBC" title="fallthrough branch &quot;18 -&gt; 19&quot; was taken 147274959 times"> + </span><span class="tlaGBC" title="branch &quot;18 -&gt; 20&quot; was taken 20672 times"> + </span>]:<span class="tlaGNC">   441886893 :         program = std::vector&lt;unsigned char&gt;(this-&gt;begin() + 2, this-&gt;end());</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">   147295631 :         return true;</span></span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :     }</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :     return false;</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             : }</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             : </span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">    11638918 : bool CScript::IsPushOnly(const_iterator pc) const</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :             : {</span>
+<span id="L268"><span class="lineNum">     268</span>   [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 23774959 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 10&quot; was taken 11517350 times"> + </span><span class="tlaGBC" title="branch &quot;11 -&gt; 3&quot; was taken 23774959 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 11517350 times"> + </span>]:<span class="tlaGNC">    70584618 :     while (pc &lt; end())</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :     {</span>
+<span id="L270"><span class="lineNum">     270</span>                 :<span class="tlaGNC">    23774959 :         opcodetype opcode;</span></span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 23715345 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 12&quot; was taken 59614 times"> + </span>]:<span class="tlaGNC">    23774959 :         if (!GetOp(pc, opcode))</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :             return false;</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :         // Note that IsPushOnly() *does* consider OP_RESERVED to be a</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :         // push-type opcode, however execution of OP_RESERVED fails, so</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :         // it's not relevant to P2SH/BIP62 as the scriptSig would fail prior to</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :         // the P2SH special validation code being executed.</span>
+<span id="L277"><span class="lineNum">     277</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 23653391 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 12&quot; was taken 61954 times"> + </span>]:<span class="tlaGNC">    23715345 :         if (opcode &gt; OP_16)</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :             return false;</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :     }</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :     return true;</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             : }</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             : </span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">    11535833 : bool CScript::IsPushOnly() const</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :             : {</span>
+<span id="L285"><span class="lineNum">     285</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 11430163 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 105670 times"> + </span>]:<span class="tlaGNC">    23071666 :     return this-&gt;IsPushOnly(begin());</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :             : }</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             : </span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">     1473534 : std::string CScriptWitness::ToString() const</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : {</span>
+<span id="L290"><span class="lineNum">     290</span>                 :<span class="tlaGNC">     1473534 :     std::string ret = &quot;CScriptWitness(&quot;;</span></span>
+<span id="L291"><span class="lineNum">     291</span>   [<span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;14 -&gt; 16&quot; was taken 14142626 times"> + </span><span class="tlaGBC" title="branch &quot;16 -&gt; 3&quot; was taken 12669092 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;16 -&gt; 17&quot; was taken 1473534 times"> + </span>]:<span class="tlaGNC">    14142626 :     for (unsigned int i = 0; i &lt; stack.size(); i++) {</span></span>
+<span id="L292"><span class="lineNum">     292</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 12622055 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 47037 times"> + </span>]:<span class="tlaGNC">    12669092 :         if (i) {</span></span>
+<span id="L293"><span class="lineNum">     293</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 12622055 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 22&quot; was not taken"> - </span>]:<span class="tlaGNC">    12622055 :             ret += &quot;, &quot;;</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :         }</span>
+<span id="L295"><span class="lineNum">     295</span>   [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 12669092 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 12669092 times"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 22&quot; was not taken"> - </span>]:<span class="tlaGNC">    25338184 :         ret += HexStr(stack[i]);</span></span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :     }</span>
+<span id="L297"><span class="lineNum">     297</span>         [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 1473534 times"> + </span><span class="tlaUNC" title="exception branch &quot;17 -&gt; 22&quot; was not taken"> - </span>]:<span class="tlaGNC">     1473534 :     return ret + &quot;)&quot;;</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :<span class="tlaGNC">     1473534 : }</span></span>
+<span id="L299"><span class="lineNum">     299</span>                 :             : </span>
+<span id="L300"><span class="lineNum">     300</span>                 :<span class="tlaGNC">       38154 : bool CScript::HasValidOps() const</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :             : {</span>
+<span id="L302"><span class="lineNum">     302</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 27523 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 10631 times"> + </span>]:<span class="tlaGNC">       38154 :     CScript::const_iterator it = begin();</span></span>
+<span id="L303"><span class="lineNum">     303</span>   [<span class="tlaGBC" title="fallthrough branch &quot;16 -&gt; 17&quot; was taken 2696284 times"> + </span><span class="tlaGBC" title="branch &quot;16 -&gt; 20&quot; was taken 35507 times"> + </span><span class="tlaGBC" title="branch &quot;21 -&gt; 6&quot; was taken 2696284 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;21 -&gt; 22&quot; was taken 35507 times"> + </span>]:<span class="tlaGNC">     5463582 :     while (it &lt; end()) {</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">     2696284 :         opcodetype opcode;</span></span>
+<span id="L305"><span class="lineNum">     305</span>                 :<span class="tlaGNC">     2696284 :         std::vector&lt;unsigned char&gt; item;</span></span>
+<span id="L306"><span class="lineNum">     306</span>   [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 2696284 times"> + </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 23&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 2694773 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 12&quot; was taken 1511 times"> + </span> :<span class="tlaGNC">     5389969 :         if (!GetOp(it, opcode, item) || opcode &gt; MAX_OPCODE || item.size() &gt; MAX_SCRIPT_ELEMENT_SIZE) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 2693685 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 12&quot; was taken 1088 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 48 times"> + </span><span class="tlaGBC" title="branch &quot;11 -&gt; 14&quot; was taken 2693637 times"> + </span>]
+<span id="L307"><span class="lineNum">     307</span>                 :<span class="tlaGNC">        2647 :             return false;</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :         }</span>
+<span id="L309"><span class="lineNum">     309</span>                 :<span class="tlaGNC">     2696284 :     }</span></span>
+<span id="L310"><span class="lineNum">     310</span>                 :             :     return true;</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             : }</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             : </span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaGNC">   808376213 : bool GetScriptOp(CScriptBase::const_iterator&amp; pc, CScriptBase::const_iterator end, opcodetype&amp; opcodeRet, std::vector&lt;unsigned char&gt;* pvchRet)</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : {</span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaGNC">   808376213 :     opcodeRet = OP_INVALIDOPCODE;</span></span>
+<span id="L316"><span class="lineNum">     316</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 123386145 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 5&quot; was taken 684990068 times"> + </span>]:<span class="tlaGNC">   808376213 :     if (pvchRet)</span></span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 6470310 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 116915835 times"> + </span>]:<span class="tlaGNC">   123386145 :         pvchRet-&gt;clear();</span></span>
+<span id="L318"><span class="lineNum">     318</span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 807728827 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 9&quot; was taken 647386 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 807728827 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 30&quot; was taken 647386 times"> + </span>]:<span class="tlaGNC">  1616752426 :     if (pc &gt;= end)</span></span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :         return false;</span>
+<span id="L320"><span class="lineNum">     320</span>                 :             : </span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :     // Read instruction</span>
+<span id="L322"><span class="lineNum">     322</span>         [<span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 807728827 times"> + </span><span class="tlaUNC" title="branch &quot;11 -&gt; 30&quot; was not taken"> - </span>]:<span class="tlaGNC">   807728827 :     if (end - pc &lt; 1)</span></span>
+<span id="L323"><span class="lineNum">     323</span>                 :             :         return false;</span>
+<span id="L324"><span class="lineNum">     324</span>         [<span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 314246710 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 29&quot; was taken 493482117 times"> + </span>]:<span class="tlaGNC">   807728827 :     unsigned int opcode = *pc++;</span></span>
+<span id="L325"><span class="lineNum">     325</span>                 :             : </span>
+<span id="L326"><span class="lineNum">     326</span>                 :             :     // Immediate operand</span>
+<span id="L327"><span class="lineNum">     327</span>         [<span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 314246710 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 29&quot; was taken 493482117 times"> + </span>]:<span class="tlaGNC">   807728827 :     if (opcode &lt;= OP_PUSHDATA4)</span></span>
+<span id="L328"><span class="lineNum">     328</span>                 :             :     {</span>
+<span id="L329"><span class="lineNum">     329</span>                 :<span class="tlaGNC">   314246710 :         unsigned int nSize = 0;</span></span>
+<span id="L330"><span class="lineNum">     330</span>         [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 86961941 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 23&quot; was taken 227284769 times"> + </span>]:<span class="tlaGNC">   314246710 :         if (opcode &lt; OP_PUSHDATA1)</span></span>
+<span id="L331"><span class="lineNum">     331</span>                 :             :         {</span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :             nSize = opcode;</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :         }</span>
+<span id="L334"><span class="lineNum">     334</span>         [<span class="tlaGBC" title="fallthrough branch &quot;14 -&gt; 15&quot; was taken 85458411 times"> + </span><span class="tlaGBC" title="branch &quot;14 -&gt; 17&quot; was taken 1503530 times"> + </span>]:<span class="tlaGNC">    86961941 :         else if (opcode == OP_PUSHDATA1)</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :             :         {</span>
+<span id="L336"><span class="lineNum">     336</span>         [<span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 85435287 times"> + </span><span class="tlaGBC" title="branch &quot;15 -&gt; 30&quot; was taken 23124 times"> + </span>]:<span class="tlaGNC">    85458411 :             if (end - pc &lt; 1)</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :             :                 return false;</span>
+<span id="L338"><span class="lineNum">     338</span>                 :<span class="tlaGNC">    85435287 :             nSize = *pc++;</span></span>
+<span id="L339"><span class="lineNum">     339</span>                 :             :         }</span>
+<span id="L340"><span class="lineNum">     340</span>         [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 874219 times"> + </span><span class="tlaGBC" title="branch &quot;17 -&gt; 20&quot; was taken 629311 times"> + </span>]:<span class="tlaGNC">     1503530 :         else if (opcode == OP_PUSHDATA2)</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :             :         {</span>
+<span id="L342"><span class="lineNum">     342</span>         [<span class="tlaGBC" title="fallthrough branch &quot;18 -&gt; 19&quot; was taken 843269 times"> + </span><span class="tlaGBC" title="branch &quot;18 -&gt; 30&quot; was taken 30950 times"> + </span>]:<span class="tlaGNC">      874219 :             if (end - pc &lt; 2)</span></span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :                 return false;</span>
+<span id="L344"><span class="lineNum">     344</span>                 :<span class="tlaGNC">      843269 :             nSize = ReadLE16(&amp;pc[0]);</span></span>
+<span id="L345"><span class="lineNum">     345</span>                 :<span class="tlaGNC">      843269 :             pc += 2;</span></span>
+<span id="L346"><span class="lineNum">     346</span>                 :             :         }</span>
+<span id="L347"><span class="lineNum">     347</span>         [<span class="tlaGBC" title="fallthrough branch &quot;20 -&gt; 21&quot; was taken 629311 times"> + </span><span class="tlaUNC" title="branch &quot;20 -&gt; 23&quot; was not taken"> - </span>]:<span class="tlaGNC">      629311 :         else if (opcode == OP_PUSHDATA4)</span></span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :         {</span>
+<span id="L349"><span class="lineNum">     349</span>         [<span class="tlaGBC" title="fallthrough branch &quot;21 -&gt; 22&quot; was taken 604810 times"> + </span><span class="tlaGBC" title="branch &quot;21 -&gt; 30&quot; was taken 24501 times"> + </span>]:<span class="tlaGNC">      629311 :             if (end - pc &lt; 4)</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :                 return false;</span>
+<span id="L351"><span class="lineNum">     351</span>                 :<span class="tlaGNC">      604810 :             nSize = ReadLE32(&amp;pc[0]);</span></span>
+<span id="L352"><span class="lineNum">     352</span>                 :<span class="tlaGNC">      604810 :             pc += 4;</span></span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :         }</span>
+<span id="L354"><span class="lineNum">     354</span>   [<span class="tlaGBC" title="fallthrough branch &quot;23 -&gt; 24&quot; was taken 314168135 times"> + </span><span class="tlaUNC" title="branch &quot;23 -&gt; 25&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;24 -&gt; 25&quot; was taken 2458182 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 26&quot; was taken 311709953 times"> + </span>]:<span class="tlaGNC">   314168135 :         if (end - pc &lt; 0 || (unsigned int)(end - pc) &lt; nSize)</span></span>
+<span id="L355"><span class="lineNum">     355</span>                 :<span class="tlaGNC">     2458182 :             return false;</span></span>
+<span id="L356"><span class="lineNum">     356</span>         [<span class="tlaGBC" title="fallthrough branch &quot;26 -&gt; 27&quot; was taken 56166165 times"> + </span><span class="tlaGBC" title="branch &quot;26 -&gt; 28&quot; was taken 255543788 times"> + </span>]:<span class="tlaGNC">   311709953 :         if (pvchRet)</span></span>
+<span id="L357"><span class="lineNum">     357</span>                 :<span class="tlaGNC">    56166165 :             pvchRet-&gt;assign(pc, pc + nSize);</span></span>
+<span id="L358"><span class="lineNum">     358</span>                 :<span class="tlaGNC">   311709953 :         pc += nSize;</span></span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :     }</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             : </span>
+<span id="L361"><span class="lineNum">     361</span>                 :<span class="tlaGNC">   805192070 :     opcodeRet = static_cast&lt;opcodetype&gt;(opcode);</span></span>
+<span id="L362"><span class="lineNum">     362</span>                 :<span class="tlaGNC">   805192070 :     return true;</span></span>
+<span id="L363"><span class="lineNum">     363</span>                 :             : }</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             : </span>
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">     1027193 : bool IsOpSuccess(const opcodetype&amp; opcode)</span></span>
+<span id="L366"><span class="lineNum">     366</span>                 :             : {</span>
+<span id="L367"><span class="lineNum">     367</span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 1027166 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 11&quot; was taken 9 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1027147 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 11&quot; was taken 19 times"> + </span>]:<span class="tlaGNC">     1027175 :     return opcode == 80 || opcode == 98 || (opcode &gt;= 126 &amp;&amp; opcode &lt;= 129) ||</span></span>
+<span id="L368"><span class="lineNum">     368</span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1027106 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 11&quot; was taken 41 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 1027104 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 11&quot; was taken 2 times"> + </span>]:<span class="tlaGNC">     1027147 :            (opcode &gt;= 131 &amp;&amp; opcode &lt;= 134) || (opcode &gt;= 137 &amp;&amp; opcode &lt;= 138) ||</span></span>
+<span id="L369"><span class="lineNum">     369</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1027175 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 11&quot; was taken 18 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 1027091 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 11&quot; was taken 13 times"> + </span> :<span class="tlaGNC">     2054297 :            (opcode &gt;= 141 &amp;&amp; opcode &lt;= 142) || (opcode &gt;= 149 &amp;&amp; opcode &lt;= 153) ||</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 1027080 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 11&quot; was taken 11 times"> + </span>]
+<span id="L370"><span class="lineNum">     370</span>         [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 1027071 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 9 times"> + </span>]:<span class="tlaGNC">     1027080 :            (opcode &gt;= 187 &amp;&amp; opcode &lt;= 254);</span></span>
+<span id="L371"><span class="lineNum">     371</span>                 :             : }</span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : </span>
+<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaGNC">    21238316 : bool CheckMinimalPush(const std::vector&lt;unsigned char&gt;&amp; data, opcodetype opcode) {</span></span>
+<span id="L374"><span class="lineNum">     374</span>                 :             :     // Excludes OP_1NEGATE, OP_1-16 since they are by definition minimal</span>
+<span id="L375"><span class="lineNum">     375</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 21238316 times"> + </span>]:<span class="tlaGNC">    21238316 :     assert(0 &lt;= opcode &amp;&amp; opcode &lt;= OP_PUSHDATA4);</span></span>
+<span id="L376"><span class="lineNum">     376</span>   [<span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 21238316 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 16524243 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 4714073 times"> + </span>]:<span class="tlaGNC">    21238316 :     if (data.size() == 0) {</span></span>
+<span id="L377"><span class="lineNum">     377</span>                 :             :         // Should have used OP_0.</span>
+<span id="L378"><span class="lineNum">     378</span>                 :<span class="tlaGNC">    16524243 :         return opcode == OP_0;</span></span>
+<span id="L379"><span class="lineNum">     379</span>   [<span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 260520 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 11&quot; was taken 4453553 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 197664 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 62856 times"> + </span> :<span class="tlaGNC">     4714073 :     } else if (data.size() == 1 &amp;&amp; data[0] &gt;= 1 &amp;&amp; data[0] &lt;= 16) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 182453 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 19&quot; was taken 15211 times"> + </span>]
+<span id="L380"><span class="lineNum">     380</span>                 :             :         // Should have used OP_1 .. OP_16.</span>
+<span id="L381"><span class="lineNum">     381</span>                 :             :         return false;</span>
+<span id="L382"><span class="lineNum">     382</span>   [<span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 245309 times"> + </span><span class="tlaGBC" title="branch &quot;11 -&gt; 13&quot; was taken 4453553 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 241846 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 19&quot; was taken 3463 times"> + </span>]:<span class="tlaGNC">     4698862 :     } else if (data.size() == 1 &amp;&amp; data[0] == 0x81) {</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :             :         // Should have used OP_1NEGATE.</span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :         return false;</span>
+<span id="L385"><span class="lineNum">     385</span>         [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 4633174 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 15&quot; was taken 62225 times"> + </span>]:<span class="tlaGNC">     4695399 :     } else if (data.size() &lt;= 75) {</span></span>
+<span id="L386"><span class="lineNum">     386</span>                 :             :         // Must have used a direct push (opcode indicating number of bytes pushed + those bytes).</span>
+<span id="L387"><span class="lineNum">     387</span>                 :<span class="tlaGNC">     4633174 :         return opcode == data.size();</span></span>
+<span id="L388"><span class="lineNum">     388</span>         [<span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 39780 times"> + </span><span class="tlaGBC" title="branch &quot;15 -&gt; 17&quot; was taken 22445 times"> + </span>]:<span class="tlaGNC">       62225 :     } else if (data.size() &lt;= 255) {</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :             :         // Must have used OP_PUSHDATA.</span>
+<span id="L390"><span class="lineNum">     390</span>                 :<span class="tlaGNC">       39780 :         return opcode == OP_PUSHDATA1;</span></span>
+<span id="L391"><span class="lineNum">     391</span>         [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 22378 times"> + </span><span class="tlaGBC" title="branch &quot;17 -&gt; 19&quot; was taken 67 times"> + </span>]:<span class="tlaGNC">       22445 :     } else if (data.size() &lt;= 65535) {</span></span>
+<span id="L392"><span class="lineNum">     392</span>                 :             :         // Must have used OP_PUSHDATA2.</span>
+<span id="L393"><span class="lineNum">     393</span>                 :<span class="tlaGNC">       22378 :         return opcode == OP_PUSHDATA2;</span></span>
+<span id="L394"><span class="lineNum">     394</span>                 :             :     }</span>
+<span id="L395"><span class="lineNum">     395</span>                 :             :     return true;</span>
+<span id="L396"><span class="lineNum">     396</span>                 :             : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
