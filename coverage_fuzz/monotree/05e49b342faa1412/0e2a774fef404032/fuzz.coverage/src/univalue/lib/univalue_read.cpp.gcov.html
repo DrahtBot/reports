@@ -1,0 +1,570 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/univalue/lib/univalue_read.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/univalue/lib">src/univalue/lib</a> - univalue_read.cpp<span style="font-size: 80%;"> (source / <a href="univalue_read.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">271</td>
+            <td class="headerCovTableEntry">271</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-28 13:20:38</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">81.9&nbsp;%</td>
+            <td class="headerCovTableEntry">288</td>
+            <td class="headerCovTableEntry">236</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright 2014 BitPay Inc.</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2015-present The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // file COPYING or https://opensource.org/licenses/mit-license.php.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : </span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #include &lt;univalue.h&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;univalue_utffilter.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;cstring&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;string&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;string_view&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : </span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : /*</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             :  * According to stackexchange, the original json test suite wanted</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :  * to limit depth to 22.  Widely-deployed PHP bails at depth 512,</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :  * so we will follow PHP's lead, which should be more than sufficient</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :  * (further stackexchange comments indicate depth &gt; 32 rarely occurs).</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :  */</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : static constexpr size_t MAX_JSON_DEPTH = 512;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">    24902545 : static bool json_isdigit(int ch)</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : {</span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">    24902545 :     return ((ch &gt;= '0') &amp;&amp; (ch &lt;= '9'));</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : }</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : </span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : // convert hexadecimal string to unsigned integer</span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">       25483 : static const char *hatoui(const char *first, const char *last,</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :                           unsigned int&amp; out)</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : {</span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">       25483 :     unsigned int result = 0;</span></span>
+<span id="L34"><span class="lineNum">      34</span>         [<span class="tlaGBC" title="branch &quot;10 -&gt; 3&quot; was taken 101477 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 25212 times"> + </span>]:<span class="tlaGNC">      126689 :     for (; first != last; ++first)</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     {</span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">      101477 :         int digit;</span></span>
+<span id="L37"><span class="lineNum">      37</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 67780 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 33697 times"> + </span>]:<span class="tlaGNC">      101477 :         if (json_isdigit(*first))</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">       67780 :             digit = *first - '0';</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : </span>
+<span id="L40"><span class="lineNum">      40</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 24073 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 9624 times"> + </span>]:<span class="tlaGNC">       33697 :         else if (*first &gt;= 'a' &amp;&amp; *first &lt;= 'f')</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">       24073 :             digit = *first - 'a' + 10;</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : </span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 9353 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 11&quot; was taken 271 times"> + </span>]:<span class="tlaGNC">        9624 :         else if (*first &gt;= 'A' &amp;&amp; *first &lt;= 'F')</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">        9353 :             digit = *first - 'A' + 10;</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : </span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :         else</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :             break;</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">      101206 :         result = 16 * result + digit;</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     }</span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">       25483 :     out = result;</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : </span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">       25483 :     return first;</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : }</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : </span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">     5491897 : enum jtokentype getJsonToken(std::string&amp; tokenVal, unsigned int&amp; consumed,</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :                             const char *raw, const char *end)</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : {</span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">     5491897 :     tokenVal.clear();</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">     5491897 :     consumed = 0;</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">     5491897 :     const char *rawStart = raw;</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : </span>
+<span id="L64"><span class="lineNum">      64</span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 6235008 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 6&quot; was taken 9301 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 5&quot; was taken 752412 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 5482596 times"> + </span>]:<span class="tlaGNC">     6244309 :     while (raw &lt; end &amp;&amp; (json_isspace(*raw)))          // skip whitespace</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">      752412 :         raw++;</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : </span>
+<span id="L67"><span class="lineNum">      67</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 5482596 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 103&quot; was taken 9301 times"> + </span>]:<span class="tlaGNC">     5491897 :     if (raw &gt;= end)</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :         return JTOK_NONE;</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : </span>
+<span id="L70"><span class="lineNum">      70</span>   [<span class="tlaGBC" title="branch &quot;7 -&gt; 8&quot; was taken 28986 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 24207 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 10&quot; was taken 144837 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 11&quot; was taken 113856 times"> + </span> :<span class="tlaGNC">     5482596 :     switch (*raw) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;7 -&gt; 12&quot; was taken 241963 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 13&quot; was taken 460949 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 14&quot; was taken 8632 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 20&quot; was taken 4157201 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 69&quot; was taken 298364 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="branch &quot;7 -&gt; 103&quot; was taken 3601 times"> + </span>]
+<span id="L71"><span class="lineNum">      71</span>                 :             : </span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">       28986 :     case '{':</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">       28986 :         raw++;</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">       28986 :         consumed = (raw - rawStart);</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">       28986 :         return JTOK_OBJ_OPEN;</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">       24207 :     case '}':</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">       24207 :         raw++;</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">       24207 :         consumed = (raw - rawStart);</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">       24207 :         return JTOK_OBJ_CLOSE;</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">      144837 :     case '[':</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">      144837 :         raw++;</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      144837 :         consumed = (raw - rawStart);</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">      144837 :         return JTOK_ARR_OPEN;</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">      113856 :     case ']':</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">      113856 :         raw++;</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :<span class="tlaGNC">      113856 :         consumed = (raw - rawStart);</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaGNC">      113856 :         return JTOK_ARR_CLOSE;</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : </span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">      241963 :     case ':':</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaGNC">      241963 :         raw++;</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">      241963 :         consumed = (raw - rawStart);</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">      241963 :         return JTOK_COLON;</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">      460949 :     case ',':</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">      460949 :         raw++;</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">      460949 :         consumed = (raw - rawStart);</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">      460949 :         return JTOK_COMMA;</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :<span class="tlaGNC">        8632 :     case 'n':</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC">        8632 :     case 't':</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">        8632 :     case 'f':</span></span>
+<span id="L101"><span class="lineNum">     101</span>         [<span class="tlaGBC" title="fallthrough branch &quot;14 -&gt; 15&quot; was taken 6238 times"> + </span><span class="tlaGBC" title="branch &quot;14 -&gt; 16&quot; was taken 2394 times"> + </span>]:<span class="tlaGNC">        8632 :         if (!strncmp(raw, &quot;null&quot;, 4)) {</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">        6238 :             raw += 4;</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">        6238 :             consumed = (raw - rawStart);</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">        6238 :             return JTOK_KW_NULL;</span></span>
+<span id="L105"><span class="lineNum">     105</span>         [<span class="tlaGBC" title="fallthrough branch &quot;16 -&gt; 17&quot; was taken 977 times"> + </span><span class="tlaGBC" title="branch &quot;16 -&gt; 18&quot; was taken 1417 times"> + </span>]:<span class="tlaGNC">        2394 :         } else if (!strncmp(raw, &quot;true&quot;, 4)) {</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">         977 :             raw += 4;</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">         977 :             consumed = (raw - rawStart);</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :<span class="tlaGNC">         977 :             return JTOK_KW_TRUE;</span></span>
+<span id="L109"><span class="lineNum">     109</span>         [<span class="tlaGBC" title="fallthrough branch &quot;18 -&gt; 19&quot; was taken 1237 times"> + </span><span class="tlaGBC" title="branch &quot;18 -&gt; 103&quot; was taken 180 times"> + </span>]:<span class="tlaGNC">        1417 :         } else if (!strncmp(raw, &quot;false&quot;, 5)) {</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaGNC">        1237 :             raw += 5;</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">        1237 :             consumed = (raw - rawStart);</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :<span class="tlaGNC">        1237 :             return JTOK_KW_FALSE;</span></span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :         } else</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :             return JTOK_ERR;</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : </span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">     4157201 :     case '-':</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">     4157201 :     case '0':</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :<span class="tlaGNC">     4157201 :     case '1':</span></span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">     4157201 :     case '2':</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">     4157201 :     case '3':</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">     4157201 :     case '4':</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">     4157201 :     case '5':</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">     4157201 :     case '6':</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">     4157201 :     case '7':</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">     4157201 :     case '8':</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaGNC">     4157201 :     case '9': {</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :         // part 1: int</span>
+<span id="L128"><span class="lineNum">     128</span>         [<span class="tlaGBC" title="fallthrough branch &quot;20 -&gt; 21&quot; was taken 41771 times"> + </span><span class="tlaGBC" title="branch &quot;20 -&gt; 22&quot; was taken 4115430 times"> + </span>]:<span class="tlaGNC">     4157201 :         std::string numStr;</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaGNC">     4157201 :         const char *first = raw;</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : </span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">     4157201 :         const char *firstDigit = first;</span></span>
+<span id="L133"><span class="lineNum">     133</span>         [<span class="tlaGBC" title="fallthrough branch &quot;20 -&gt; 21&quot; was taken 41771 times"> + </span><span class="tlaGBC" title="branch &quot;20 -&gt; 22&quot; was taken 4115430 times"> + </span>]:<span class="tlaGNC">     4157201 :         if (!json_isdigit(*firstDigit))</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">       41771 :             firstDigit++;</span></span>
+<span id="L135"><span class="lineNum">     135</span>   [<span class="tlaGBC" title="fallthrough branch &quot;22 -&gt; 23&quot; was taken 103820 times"> + </span><span class="tlaGBC" title="branch &quot;22 -&gt; 24&quot; was taken 4053381 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;23 -&gt; 24&quot; was taken 103697 times"> + </span><span class="tlaGBC" title="branch &quot;23 -&gt; 67&quot; was taken 123 times"> + </span>]:<span class="tlaGNC">     4157201 :         if ((*firstDigit == '0') &amp;&amp; json_isdigit(firstDigit[1]))</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :             return JTOK_ERR;</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>         [<span class="tlaGBC" title="fallthrough branch &quot;24 -&gt; 25&quot; was taken 4157078 times"> + </span><span class="tlaUNC" title="exception branch &quot;24 -&gt; 104&quot; was not taken"> - </span>]:<span class="tlaGNC">     4157078 :         numStr += *raw;                       // copy first char</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">     4157078 :         raw++;</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : </span>
+<span id="L141"><span class="lineNum">     141</span>   [<span class="tlaGBC" title="fallthrough branch &quot;26 -&gt; 27&quot; was taken 41771 times"> + </span><span class="tlaGBC" title="branch &quot;26 -&gt; 29&quot; was taken 4115307 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;27 -&gt; 28&quot; was taken 41644 times"> + </span><span class="tlaGBC" title="branch &quot;27 -&gt; 29&quot; was taken 127 times"> + </span> :<span class="tlaGNC">     4157078 :         if ((*first == '-') &amp;&amp; (raw &lt; end) &amp;&amp; (!json_isdigit(*raw)))</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;28 -&gt; 29&quot; was taken 41407 times"> + </span><span class="tlaGBC" title="branch &quot;28 -&gt; 67&quot; was taken 237 times"> + </span>]
+<span id="L142"><span class="lineNum">     142</span>                 :             :             return JTOK_ERR;</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : </span>
+<span id="L144"><span class="lineNum">     144</span>   [<span class="tlaGBC" title="fallthrough branch &quot;32 -&gt; 33&quot; was taken 19815361 times"> + </span><span class="tlaGBC" title="branch &quot;32 -&gt; 34&quot; was taken 3834798 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;33 -&gt; 34&quot; was taken 322043 times"> + </span><span class="tlaGBC" title="branch &quot;33 -&gt; 35&quot; was taken 19493318 times"> + </span>]:<span class="tlaGNC">    23650159 :         while (raw &lt; end &amp;&amp; json_isdigit(*raw)) {  // copy digits</span></span>
+<span id="L145"><span class="lineNum">     145</span>         [<span class="tlaGBC" title="fallthrough branch &quot;35 -&gt; 30&quot; was taken 19493318 times"> + </span><span class="tlaUNC" title="exception branch &quot;35 -&gt; 104&quot; was not taken"> - </span>]:<span class="tlaGNC">    19493318 :             numStr += *raw;</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">    19493318 :             raw++;</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :         }</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :         // part 2: frac</span>
+<span id="L150"><span class="lineNum">     150</span>   [<span class="tlaGBC" title="branch &quot;34 -&gt; 36&quot; was taken 322043 times"> + </span><span class="tlaGBC" title="branch &quot;34 -&gt; 46&quot; was taken 3834798 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;36 -&gt; 37&quot; was taken 16633 times"> + </span><span class="tlaGBC" title="branch &quot;36 -&gt; 46&quot; was taken 305410 times"> + </span>]:<span class="tlaGNC">     4156841 :         if (raw &lt; end &amp;&amp; *raw == '.') {</span></span>
+<span id="L151"><span class="lineNum">     151</span>         [<span class="tlaGBC" title="fallthrough branch &quot;37 -&gt; 38&quot; was taken 16633 times"> + </span><span class="tlaUNC" title="exception branch &quot;37 -&gt; 104&quot; was not taken"> - </span>]:<span class="tlaGNC">       16633 :             numStr += *raw;                   // copy .</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">       16633 :             raw++;</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>   [<span class="tlaGBC" title="fallthrough branch &quot;39 -&gt; 40&quot; was taken 16571 times"> + </span><span class="tlaGBC" title="branch &quot;39 -&gt; 67&quot; was taken 62 times"> + </span><span class="tlaGBC" title="branch &quot;40 -&gt; 43&quot; was taken 16399 times"> + </span><span class="tlaGBC" title="branch &quot;40 -&gt; 67&quot; was taken 172 times"> + </span>]:<span class="tlaGNC">       16633 :             if (raw &gt;= end || !json_isdigit(*raw))</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :                 return JTOK_ERR;</span>
+<span id="L156"><span class="lineNum">     156</span>   [<span class="tlaGBC" title="fallthrough branch &quot;43 -&gt; 44&quot; was taken 339562 times"> + </span><span class="tlaGBC" title="branch &quot;43 -&gt; 46&quot; was taken 349 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;44 -&gt; 45&quot; was taken 323512 times"> + </span><span class="tlaGBC" title="branch &quot;44 -&gt; 46&quot; was taken 16050 times"> + </span>]:<span class="tlaGNC">      339911 :             while (raw &lt; end &amp;&amp; json_isdigit(*raw)) { // copy digits</span></span>
+<span id="L157"><span class="lineNum">     157</span>         [<span class="tlaGBC" title="fallthrough branch &quot;45 -&gt; 41&quot; was taken 323512 times"> + </span><span class="tlaUNC" title="exception branch &quot;45 -&gt; 104&quot; was not taken"> - </span>]:<span class="tlaGNC">      323512 :                 numStr += *raw;</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">      323512 :                 raw++;</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :             }</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :         }</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             : </span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :         // part 3: exp</span>
+<span id="L163"><span class="lineNum">     163</span>   [<span class="tlaGBC" title="fallthrough branch &quot;46 -&gt; 47&quot; was taken 321460 times"> + </span><span class="tlaGBC" title="branch &quot;46 -&gt; 64&quot; was taken 3835147 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;47 -&gt; 48&quot; was taken 310918 times"> + </span><span class="tlaGBC" title="branch &quot;47 -&gt; 49&quot; was taken 10542 times"> + </span> :<span class="tlaGNC">     4156607 :         if (raw &lt; end &amp;&amp; (*raw == 'e' || *raw == 'E')) {</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;48 -&gt; 49&quot; was taken 4168 times"> + </span><span class="tlaGBC" title="branch &quot;48 -&gt; 64&quot; was taken 306750 times"> + </span>]
+<span id="L164"><span class="lineNum">     164</span>         [<span class="tlaGBC" title="fallthrough branch &quot;49 -&gt; 50&quot; was taken 14710 times"> + </span><span class="tlaUNC" title="exception branch &quot;49 -&gt; 104&quot; was not taken"> - </span>]:<span class="tlaGNC">       14710 :             numStr += *raw;                   // copy E</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaGNC">       14710 :             raw++;</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             : </span>
+<span id="L167"><span class="lineNum">     167</span>   [<span class="tlaGBC" title="fallthrough branch &quot;51 -&gt; 52&quot; was taken 14609 times"> + </span><span class="tlaGBC" title="branch &quot;51 -&gt; 57&quot; was taken 101 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;52 -&gt; 53&quot; was taken 13106 times"> + </span><span class="tlaGBC" title="branch &quot;52 -&gt; 54&quot; was taken 1503 times"> + </span> :<span class="tlaGNC">       14710 :             if (raw &lt; end &amp;&amp; (*raw == '-' || *raw == '+')) { // copy +/-</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;53 -&gt; 54&quot; was taken 9861 times"> + </span><span class="tlaGBC" title="branch &quot;53 -&gt; 57&quot; was taken 3245 times"> + </span>]
+<span id="L168"><span class="lineNum">     168</span>         [<span class="tlaGBC" title="fallthrough branch &quot;54 -&gt; 55&quot; was taken 11364 times"> + </span><span class="tlaUNC" title="exception branch &quot;54 -&gt; 104&quot; was not taken"> - </span>]:<span class="tlaGNC">       11364 :                 numStr += *raw;</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaGNC">       11364 :                 raw++;</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :             }</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             : </span>
+<span id="L172"><span class="lineNum">     172</span>   [<span class="tlaGBC" title="fallthrough branch &quot;57 -&gt; 58&quot; was taken 14574 times"> + </span><span class="tlaGBC" title="branch &quot;57 -&gt; 67&quot; was taken 136 times"> + </span><span class="tlaGBC" title="branch &quot;58 -&gt; 61&quot; was taken 14370 times"> + </span><span class="tlaGBC" title="branch &quot;58 -&gt; 67&quot; was taken 204 times"> + </span>]:<span class="tlaGNC">       14710 :             if (raw &gt;= end || !json_isdigit(*raw))</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :                 return JTOK_ERR;</span>
+<span id="L174"><span class="lineNum">     174</span>   [<span class="tlaGBC" title="fallthrough branch &quot;61 -&gt; 62&quot; was taken 312335 times"> + </span><span class="tlaGBC" title="branch &quot;61 -&gt; 64&quot; was taken 7558 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;62 -&gt; 63&quot; was taken 305523 times"> + </span><span class="tlaGBC" title="branch &quot;62 -&gt; 64&quot; was taken 6812 times"> + </span>]:<span class="tlaGNC">      319893 :             while (raw &lt; end &amp;&amp; json_isdigit(*raw)) { // copy digits</span></span>
+<span id="L175"><span class="lineNum">     175</span>         [<span class="tlaGBC" title="fallthrough branch &quot;63 -&gt; 59&quot; was taken 305523 times"> + </span><span class="tlaUNC" title="exception branch &quot;63 -&gt; 104&quot; was not taken"> - </span>]:<span class="tlaGNC">      305523 :                 numStr += *raw;</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">      305523 :                 raw++;</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :             }</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :         }</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : </span>
+<span id="L180"><span class="lineNum">     180</span>         [<span class="tlaGBC" title="fallthrough branch &quot;64 -&gt; 65&quot; was taken 4156267 times"> + </span><span class="tlaUNC" title="exception branch &quot;64 -&gt; 104&quot; was not taken"> - </span>]:<span class="tlaGNC">     4156267 :         tokenVal = numStr;</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaGNC">     4156267 :         consumed = (raw - rawStart);</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaGNC">     4156267 :         return JTOK_NUMBER;</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaGNC">     4157201 :         }</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :             : </span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaGNC">      298364 :     case '&quot;': {</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaGNC">      298364 :         raw++;                                // skip &quot;</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : </span>
+<span id="L188"><span class="lineNum">     188</span>                 :<span class="tlaGNC">      298364 :         std::string valStr;</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">      298364 :         JSONUTF8StringFilter writer(valStr);</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC">    14176477 :         while (true) {</span></span>
+<span id="L192"><span class="lineNum">     192</span>   [<span class="tlaGBC" title="fallthrough branch &quot;71 -&gt; 72&quot; was taken 14175482 times"> + </span><span class="tlaGBC" title="branch &quot;71 -&gt; 101&quot; was taken 995 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;72 -&gt; 73&quot; was taken 14175038 times"> + </span><span class="tlaGBC" title="branch &quot;72 -&gt; 101&quot; was taken 444 times"> + </span>]:<span class="tlaGNC">    14176477 :             if (raw &gt;= end || (unsigned char)*raw &lt; 0x20)</span></span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :                 return JTOK_ERR;</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             : </span>
+<span id="L195"><span class="lineNum">     195</span>         [<span class="tlaGBC" title="fallthrough branch &quot;73 -&gt; 74&quot; was taken 34197 times"> + </span><span class="tlaGBC" title="branch &quot;73 -&gt; 91&quot; was taken 14140841 times"> + </span>]:<span class="tlaGNC">    14175038 :             else if (*raw == '\\') {</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaGNC">       34197 :                 raw++;                        // skip backslash</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :             : </span>
+<span id="L198"><span class="lineNum">     198</span>         [<span class="tlaGBC" title="fallthrough branch &quot;74 -&gt; 75&quot; was taken 34101 times"> + </span><span class="tlaGBC" title="branch &quot;74 -&gt; 101&quot; was taken 96 times"> + </span>]:<span class="tlaGNC">       34197 :                 if (raw &gt;= end)</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :                     return JTOK_ERR;</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             : </span>
+<span id="L201"><span class="lineNum">     201</span>   [<span class="tlaGBC" title="branch &quot;75 -&gt; 76&quot; was taken 1363 times"> + </span><span class="tlaGBC" title="branch &quot;75 -&gt; 77&quot; was taken 1776 times"> + </span><span class="tlaGBC" title="branch &quot;75 -&gt; 78&quot; was taken 913 times"> + </span><span class="tlaGBC" title="branch &quot;75 -&gt; 79&quot; was taken 862 times"> + </span> :<span class="tlaGNC">       34101 :                 switch (*raw) {</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;75 -&gt; 80&quot; was taken 940 times"> + </span><span class="tlaGBC" title="branch &quot;75 -&gt; 81&quot; was taken 930 times"> + </span><span class="tlaGBC" title="branch &quot;75 -&gt; 82&quot; was taken 793 times"> + </span><span class="tlaGBC" title="branch &quot;75 -&gt; 83&quot; was taken 884 times"> + </span><span class="tlaGBC" title="branch &quot;75 -&gt; 84&quot; was taken 25551 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="branch &quot;75 -&gt; 101&quot; was taken 89 times"> + </span>]
+<span id="L202"><span class="lineNum">     202</span>         [<span class="tlaGBC" title="fallthrough branch &quot;76 -&gt; 90&quot; was taken 1363 times"> + </span><span class="tlaUNC" title="exception branch &quot;76 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">        1363 :                 case '&quot;':  writer.push_back('\&quot;'); break;</span></span>
+<span id="L203"><span class="lineNum">     203</span>         [<span class="tlaGBC" title="fallthrough branch &quot;77 -&gt; 90&quot; was taken 1776 times"> + </span><span class="tlaUNC" title="exception branch &quot;77 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">        1776 :                 case '\\': writer.push_back('\\'); break;</span></span>
+<span id="L204"><span class="lineNum">     204</span>         [<span class="tlaGBC" title="fallthrough branch &quot;78 -&gt; 90&quot; was taken 913 times"> + </span><span class="tlaUNC" title="exception branch &quot;78 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">         913 :                 case '/':  writer.push_back('/'); break;</span></span>
+<span id="L205"><span class="lineNum">     205</span>         [<span class="tlaGBC" title="fallthrough branch &quot;79 -&gt; 90&quot; was taken 862 times"> + </span><span class="tlaUNC" title="exception branch &quot;79 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">         862 :                 case 'b':  writer.push_back('\b'); break;</span></span>
+<span id="L206"><span class="lineNum">     206</span>         [<span class="tlaGBC" title="fallthrough branch &quot;80 -&gt; 90&quot; was taken 940 times"> + </span><span class="tlaUNC" title="exception branch &quot;80 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">         940 :                 case 'f':  writer.push_back('\f'); break;</span></span>
+<span id="L207"><span class="lineNum">     207</span>         [<span class="tlaGBC" title="fallthrough branch &quot;81 -&gt; 90&quot; was taken 930 times"> + </span><span class="tlaUNC" title="exception branch &quot;81 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">         930 :                 case 'n':  writer.push_back('\n'); break;</span></span>
+<span id="L208"><span class="lineNum">     208</span>         [<span class="tlaGBC" title="fallthrough branch &quot;82 -&gt; 90&quot; was taken 793 times"> + </span><span class="tlaUNC" title="exception branch &quot;82 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">         793 :                 case 'r':  writer.push_back('\r'); break;</span></span>
+<span id="L209"><span class="lineNum">     209</span>         [<span class="tlaGBC" title="fallthrough branch &quot;83 -&gt; 90&quot; was taken 884 times"> + </span><span class="tlaUNC" title="exception branch &quot;83 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">         884 :                 case 't':  writer.push_back('\t'); break;</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : </span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">       25551 :                 case 'u': {</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">       25551 :                     unsigned int codepoint;</span></span>
+<span id="L213"><span class="lineNum">     213</span>   [<span class="tlaGBC" title="fallthrough branch &quot;84 -&gt; 85&quot; was taken 25483 times"> + </span><span class="tlaGBC" title="branch &quot;84 -&gt; 88&quot; was taken 68 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;86 -&gt; 87&quot; was taken 25212 times"> + </span><span class="tlaGBC" title="branch &quot;86 -&gt; 88&quot; was taken 271 times"> + </span>]:<span class="tlaGNC">       51034 :                     if (raw + 1 + 4 &gt;= end ||</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">       25483 :                         hatoui(raw + 1, raw + 1 + 4, codepoint) !=</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :                                raw + 1 + 4)</span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">         339 :                         return JTOK_ERR;</span></span>
+<span id="L217"><span class="lineNum">     217</span>         [<span class="tlaGBC" title="fallthrough branch &quot;87 -&gt; 89&quot; was taken 25212 times"> + </span><span class="tlaUNC" title="exception branch &quot;87 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">       25212 :                     writer.push_back_u(codepoint);</span></span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">       25212 :                     raw += 4;</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :<span class="tlaGNC">       25212 :                     break;</span></span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :                     }</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :                 default:</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :                     return JTOK_ERR;</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             : </span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :                 }</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             : </span>
+<span id="L226"><span class="lineNum">     226</span>                 :<span class="tlaGNC">       33673 :                 raw++;                        // skip esc'd char</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :             }</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             : </span>
+<span id="L229"><span class="lineNum">     229</span>         [<span class="tlaGBC" title="fallthrough branch &quot;91 -&gt; 92&quot; was taken 296401 times"> + </span><span class="tlaGBC" title="branch &quot;91 -&gt; 96&quot; was taken 13844440 times"> + </span>]:<span class="tlaGNC">    14140841 :             else if (*raw == '&quot;') {</span></span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaGNC">      296401 :                 raw++;                        // skip &quot;</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaGNC">      296401 :                 break;                        // stop scanning</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :             }</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             : </span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :             else {</span>
+<span id="L235"><span class="lineNum">     235</span>         [<span class="tlaGBC" title="fallthrough branch &quot;96 -&gt; 97&quot; was taken 13844440 times"> + </span><span class="tlaUNC" title="exception branch &quot;96 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">    13844440 :                 writer.push_back(static_cast&lt;unsigned char&gt;(*raw));</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaGNC">    13844440 :                 raw++;</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :             }</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :         }</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : </span>
+<span id="L240"><span class="lineNum">     240</span>   [<span class="tlaGBC" title="fallthrough branch &quot;92 -&gt; 93&quot; was taken 296304 times"> + </span><span class="tlaGBC" title="branch &quot;92 -&gt; 94&quot; was taken 97 times"> + </span><span class="tlaGBC" title="branch &quot;95 -&gt; 98&quot; was taken 296102 times"> + </span><span class="tlaGBC" title="branch &quot;95 -&gt; 101&quot; was taken 299 times"> + </span>]:<span class="tlaGNC">      592802 :         if (!writer.finalize())</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :             return JTOK_ERR;</span>
+<span id="L242"><span class="lineNum">     242</span>         [<span class="tlaGBC" title="fallthrough branch &quot;98 -&gt; 99&quot; was taken 296102 times"> + </span><span class="tlaUNC" title="exception branch &quot;98 -&gt; 106&quot; was not taken"> - </span>]:<span class="tlaGNC">      296102 :         tokenVal = valStr;</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaGNC">      296102 :         consumed = (raw - rawStart);</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaGNC">      296102 :         return JTOK_STRING;</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">      298364 :         }</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :             : </span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :     default:</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :         return JTOK_ERR;</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     }</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             : }</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             : enum expect_bits : unsigned {</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     EXP_OBJ_NAME = (1U &lt;&lt; 0),</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :     EXP_COLON = (1U &lt;&lt; 1),</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :     EXP_ARR_VALUE = (1U &lt;&lt; 2),</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :     EXP_VALUE = (1U &lt;&lt; 3),</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :     EXP_NOT_VALUE = (1U &lt;&lt; 4),</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             : };</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             : </span>
+<span id="L260"><span class="lineNum">     260</span>                 :             : #define expect(bit) (expectMask &amp; (EXP_##bit))</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             : #define setExpect(bit) (expectMask |= EXP_##bit)</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             : #define clearExpect(bit) (expectMask &amp;= ~EXP_##bit)</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             : </span>
+<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">       18023 : bool UniValue::read(std::string_view json)</span></span>
+<span id="L265"><span class="lineNum">     265</span>                 :             : {</span>
+<span id="L266"><span class="lineNum">     266</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 18023 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 9&quot; was not taken"> - </span>]:<span class="tlaGNC">       18023 :     UniValue parsed;</span></span>
+<span id="L267"><span class="lineNum">     267</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 18023 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 9&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 9612 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 8411 times"> + </span>]:<span class="tlaGNC">       18023 :     if (!parsed.read_impl(json)) {</span></span>
+<span id="L268"><span class="lineNum">     268</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 7&quot; was taken 9612 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 9&quot; was not taken"> - </span>]:<span class="tlaGNC">        9612 :         setNull();</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :         return false;</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :     }</span>
+<span id="L271"><span class="lineNum">     271</span>                 :<span class="tlaGNC">        8411 :     *this = std::move(parsed);</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaGNC">        8411 :     return true;</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC">       18023 : }</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :             : </span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">       18023 : bool UniValue::read_impl(std::string_view str_in)</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :             : {</span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">       18023 :     clear();</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">       18023 :     uint32_t expectMask = 0;</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :<span class="tlaGNC">       18023 :     std::vector&lt;UniValue*&gt; stack;</span></span>
+<span id="L281"><span class="lineNum">     281</span>                 :             : </span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaGNC">       18023 :     std::string tokenVal;</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">       18023 :     unsigned int consumed;</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaGNC">       18023 :     enum jtokentype tok = JTOK_NONE;</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :<span class="tlaGNC">       18023 :     enum jtokentype last_tok = JTOK_NONE;</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaGNC">       18023 :     const char* raw{str_in.data()};</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaGNC">       18023 :     const char* end{raw + str_in.size()};</span></span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">     1641900 :     do {</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :<span class="tlaGNC">     1641900 :         last_tok = tok;</span></span>
+<span id="L290"><span class="lineNum">     290</span>                 :             : </span>
+<span id="L291"><span class="lineNum">     291</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1641900 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 121&quot; was not taken"> - </span>]:<span class="tlaGNC">     1641900 :         tok = getJsonToken(tokenVal, consumed, raw, end);</span></span>
+<span id="L292"><span class="lineNum">     292</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1634514 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 110&quot; was taken 7386 times"> + </span>]:<span class="tlaGNC">     1641900 :         if (tok == JTOK_NONE || tok == JTOK_ERR)</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :             return false;</span>
+<span id="L294"><span class="lineNum">     294</span>                 :<span class="tlaGNC">     1634514 :         raw += consumed;</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :             : </span>
+<span id="L296"><span class="lineNum">     296</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 1014734 times"> + </span><span class="tlaGBC" title="branch &quot;6 -&gt; 9&quot; was taken 619780 times"> + </span>]:<span class="tlaGNC">     1634514 :         bool isValueOpen = jsonTokenIsValue(tok) ||</span></span>
+<span id="L297"><span class="lineNum">     297</span>         [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 840937 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 173797 times"> + </span>]:<span class="tlaGNC">     1014734 :             tok == JTOK_OBJ_OPEN || tok == JTOK_ARR_OPEN;</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :             : </span>
+<span id="L299"><span class="lineNum">     299</span>         [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 241743 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 12&quot; was taken 1392771 times"> + </span>]:<span class="tlaGNC">     1634514 :         if (expect(VALUE)) {</span></span>
+<span id="L300"><span class="lineNum">     300</span>         [<span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 241696 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 110&quot; was taken 47 times"> + </span>]:<span class="tlaGNC">      241743 :             if (!isValueOpen)</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :                 return false;</span>
+<span id="L302"><span class="lineNum">     302</span>                 :<span class="tlaGNC">      241696 :             clearExpect(VALUE);</span></span>
+<span id="L303"><span class="lineNum">     303</span>                 :             : </span>
+<span id="L304"><span class="lineNum">     304</span>         [<span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 389084 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 15&quot; was taken 1003687 times"> + </span>]:<span class="tlaGNC">     1392771 :         } else if (expect(ARR_VALUE)) {</span></span>
+<span id="L305"><span class="lineNum">     305</span>                 :<span class="tlaGNC">      389084 :             bool isArrValue = isValueOpen || (tok == JTOK_ARR_CLOSE);</span></span>
+<span id="L306"><span class="lineNum">     306</span>         [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 388964 times"> + </span><span class="tlaGBC" title="branch &quot;13 -&gt; 110&quot; was taken 120 times"> + </span>]:<span class="tlaGNC">      389084 :             if (!isArrValue)</span></span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :                 return false;</span>
+<span id="L308"><span class="lineNum">     308</span>                 :             : </span>
+<span id="L309"><span class="lineNum">     309</span>                 :<span class="tlaGNC">      388964 :             clearExpect(ARR_VALUE);</span></span>
+<span id="L310"><span class="lineNum">     310</span>                 :             : </span>
+<span id="L311"><span class="lineNum">     311</span>         [<span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 244723 times"> + </span><span class="tlaGBC" title="branch &quot;15 -&gt; 17&quot; was taken 758964 times"> + </span>]:<span class="tlaGNC">     1003687 :         } else if (expect(OBJ_NAME)) {</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaGNC">      244723 :             bool isObjName = (tok == JTOK_OBJ_CLOSE || tok == JTOK_STRING);</span></span>
+<span id="L313"><span class="lineNum">     313</span>         [<span class="tlaGBC" title="branch &quot;16 -&gt; 21&quot; was taken 244579 times"> + </span><span class="tlaGBC" title="branch &quot;16 -&gt; 110&quot; was taken 144 times"> + </span>]:<span class="tlaGNC">      244723 :             if (!isObjName)</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             :                 return false;</span>
+<span id="L315"><span class="lineNum">     315</span>                 :             : </span>
+<span id="L316"><span class="lineNum">     316</span>         [<span class="tlaGBC" title="fallthrough branch &quot;17 -&gt; 18&quot; was taken 241859 times"> + </span><span class="tlaGBC" title="branch &quot;17 -&gt; 20&quot; was taken 517105 times"> + </span>]:<span class="tlaGNC">      758964 :         } else if (expect(COLON)) {</span></span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaGBC" title="fallthrough branch &quot;18 -&gt; 19&quot; was taken 241767 times"> + </span><span class="tlaGBC" title="branch &quot;18 -&gt; 110&quot; was taken 92 times"> + </span>]:<span class="tlaGNC">      241859 :             if (tok != JTOK_COLON)</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :                 return false;</span>
+<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">      241767 :             clearExpect(COLON);</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :             : </span>
+<span id="L321"><span class="lineNum">     321</span>         [<span class="tlaGBC" title="fallthrough branch &quot;20 -&gt; 21&quot; was taken 516967 times"> + </span><span class="tlaGBC" title="branch &quot;20 -&gt; 110&quot; was taken 138 times"> + </span>]:<span class="tlaGNC">      517105 :         } else if (!expect(COLON) &amp;&amp; (tok == JTOK_COLON)) {</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :             return false;</span>
+<span id="L323"><span class="lineNum">     323</span>                 :             :         }</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             : </span>
+<span id="L325"><span class="lineNum">     325</span>         [<span class="tlaGBC" title="fallthrough branch &quot;21 -&gt; 22&quot; was taken 747450 times"> + </span><span class="tlaGBC" title="branch &quot;21 -&gt; 24&quot; was taken 886523 times"> + </span>]:<span class="tlaGNC">     1633973 :         if (expect(NOT_VALUE)) {</span></span>
+<span id="L326"><span class="lineNum">     326</span>         [<span class="tlaGBC" title="fallthrough branch &quot;22 -&gt; 23&quot; was taken 747145 times"> + </span><span class="tlaGBC" title="branch &quot;22 -&gt; 110&quot; was taken 305 times"> + </span>]:<span class="tlaGNC">      747450 :             if (isValueOpen)</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :                 return false;</span>
+<span id="L328"><span class="lineNum">     328</span>                 :<span class="tlaGNC">      747145 :             clearExpect(NOT_VALUE);</span></span>
+<span id="L329"><span class="lineNum">     329</span>                 :             :         }</span>
+<span id="L330"><span class="lineNum">     330</span>                 :             : </span>
+<span id="L331"><span class="lineNum">     331</span>   [<span class="tlaGBC" title="branch &quot;24 -&gt; 25&quot; was taken 173521 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 45&quot; was taken 138021 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 53&quot; was taken 241767 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 58&quot; was taken 460831 times"> + </span> :<span class="tlaGNC">     1633668 :         switch (tok) {</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="branch &quot;24 -&gt; 65&quot; was taken 8452 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 75&quot; was taken 315366 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 88&quot; was taken 295710 times"> + </span><span class="tlaUNC" title="branch &quot;24 -&gt; 110&quot; was not taken"> - </span>]
+<span id="L332"><span class="lineNum">     332</span>                 :             : </span>
+<span id="L333"><span class="lineNum">     333</span>                 :<span class="tlaGNC">      173521 :         case JTOK_OBJ_OPEN:</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">      173521 :         case JTOK_ARR_OPEN: {</span></span>
+<span id="L335"><span class="lineNum">     335</span>         [<span class="tlaGBC" title="fallthrough branch &quot;25 -&gt; 26&quot; was taken 144708 times"> + </span><span class="tlaGBC" title="branch &quot;25 -&gt; 27&quot; was taken 28813 times"> + </span>]:<span class="tlaGNC">      173521 :             VType utyp = (tok == JTOK_OBJ_OPEN ? VOBJ : VARR);</span></span>
+<span id="L336"><span class="lineNum">     336</span>   [<span class="tlaUNC" title="fallthrough branch &quot;27 -&gt; 28&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;27 -&gt; 29&quot; was taken 173521 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;29 -&gt; 30&quot; was taken 4366 times"> + </span><span class="tlaGBC" title="branch &quot;29 -&gt; 34&quot; was taken 169155 times"> + </span>]:<span class="tlaGNC">      173521 :             if (!stack.size()) {</span></span>
+<span id="L337"><span class="lineNum">     337</span>         [<span class="tlaGBC" title="fallthrough branch &quot;30 -&gt; 31&quot; was taken 2163 times"> + </span><span class="tlaGBC" title="branch &quot;30 -&gt; 32&quot; was taken 2203 times"> + </span>]:<span class="tlaGNC">        4366 :                 if (utyp == VOBJ)</span></span>
+<span id="L338"><span class="lineNum">     338</span>         [<span class="tlaGBC" title="fallthrough branch &quot;31 -&gt; 33&quot; was taken 2163 times"> + </span><span class="tlaUNC" title="exception branch &quot;31 -&gt; 121&quot; was not taken"> - </span>]:<span class="tlaGNC">        2163 :                     setObject();</span></span>
+<span id="L339"><span class="lineNum">     339</span>                 :             :                 else</span>
+<span id="L340"><span class="lineNum">     340</span>         [<span class="tlaGBC" title="fallthrough branch &quot;32 -&gt; 33&quot; was taken 2203 times"> + </span><span class="tlaUNC" title="exception branch &quot;32 -&gt; 121&quot; was not taken"> - </span>]:<span class="tlaGNC">        2203 :                     setArray();</span></span>
+<span id="L341"><span class="lineNum">     341</span>         [<span class="tlaGBC" title="fallthrough branch &quot;33 -&gt; 39&quot; was taken 4366 times"> + </span><span class="tlaUNC" title="exception branch &quot;33 -&gt; 121&quot; was not taken"> - </span>]:<span class="tlaGNC">        4366 :                 stack.push_back(this);</span></span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :             } else {</span>
+<span id="L343"><span class="lineNum">     343</span>                 :<span class="tlaGNC">      169155 :                 UniValue tmpVal(utyp);</span></span>
+<span id="L344"><span class="lineNum">     344</span>                 :<span class="tlaGNC">      169155 :                 UniValue *top = stack.back();</span></span>
+<span id="L345"><span class="lineNum">     345</span>         [<span class="tlaGBC" title="fallthrough branch &quot;36 -&gt; 37&quot; was taken 169155 times"> + </span><span class="tlaUNC" title="exception branch &quot;36 -&gt; 113&quot; was not taken"> - </span>]:<span class="tlaGNC">      169155 :                 top-&gt;values.push_back(tmpVal);</span></span>
+<span id="L346"><span class="lineNum">     346</span>                 :             : </span>
+<span id="L347"><span class="lineNum">     347</span>                 :<span class="tlaGNC">      169155 :                 UniValue *newTop = &amp;(top-&gt;values.back());</span></span>
+<span id="L348"><span class="lineNum">     348</span>         [<span class="tlaGBC" title="fallthrough branch &quot;37 -&gt; 38&quot; was taken 169155 times"> + </span><span class="tlaUNC" title="exception branch &quot;37 -&gt; 113&quot; was not taken"> - </span>]:<span class="tlaGNC">      169155 :                 stack.push_back(newTop);</span></span>
+<span id="L349"><span class="lineNum">     349</span>                 :<span class="tlaGNC">      169155 :             }</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             : </span>
+<span id="L351"><span class="lineNum">     351</span>   [<span class="tlaUNC" title="fallthrough branch &quot;39 -&gt; 40&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;39 -&gt; 41&quot; was taken 173521 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;41 -&gt; 42&quot; was taken 173517 times"> + </span><span class="tlaGBC" title="branch &quot;41 -&gt; 110&quot; was taken 4 times"> + </span>]:<span class="tlaGNC">      173521 :             if (stack.size() &gt; MAX_JSON_DEPTH)</span></span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :                 return false;</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             : </span>
+<span id="L354"><span class="lineNum">     354</span>         [<span class="tlaGBC" title="fallthrough branch &quot;42 -&gt; 43&quot; was taken 28813 times"> + </span><span class="tlaGBC" title="branch &quot;42 -&gt; 44&quot; was taken 144704 times"> + </span>]:<span class="tlaGNC">      173517 :             if (utyp == VOBJ)</span></span>
+<span id="L355"><span class="lineNum">     355</span>                 :<span class="tlaGNC">       28813 :                 setExpect(OBJ_NAME);</span></span>
+<span id="L356"><span class="lineNum">     356</span>                 :             :             else</span>
+<span id="L357"><span class="lineNum">     357</span>                 :<span class="tlaGNC">      144704 :                 setExpect(ARR_VALUE);</span></span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :             break;</span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :             }</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             : </span>
+<span id="L361"><span class="lineNum">     361</span>                 :<span class="tlaGNC">      138021 :         case JTOK_OBJ_CLOSE:</span></span>
+<span id="L362"><span class="lineNum">     362</span>                 :<span class="tlaGNC">      138021 :         case JTOK_ARR_CLOSE: {</span></span>
+<span id="L363"><span class="lineNum">     363</span>   [<span class="tlaUNC" title="fallthrough branch &quot;45 -&gt; 46&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;45 -&gt; 47&quot; was taken 138021 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;47 -&gt; 48&quot; was taken 137907 times"> + </span><span class="tlaGBC" title="branch &quot;47 -&gt; 110&quot; was taken 114 times"> + </span> :<span class="tlaGNC">      138021 :             if (!stack.size() || (last_tok == JTOK_COMMA))</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;48 -&gt; 49&quot; was taken 137852 times"> + </span><span class="tlaGBC" title="branch &quot;48 -&gt; 110&quot; was taken 55 times"> + </span>]
+<span id="L364"><span class="lineNum">     364</span>                 :             :                 return false;</span>
+<span id="L365"><span class="lineNum">     365</span>                 :             : </span>
+<span id="L366"><span class="lineNum">     366</span>         [<span class="tlaGBC" title="fallthrough branch &quot;49 -&gt; 50&quot; was taken 113736 times"> + </span><span class="tlaGBC" title="branch &quot;49 -&gt; 51&quot; was taken 24116 times"> + </span>]:<span class="tlaGNC">      137852 :             VType utyp = (tok == JTOK_OBJ_CLOSE ? VOBJ : VARR);</span></span>
+<span id="L367"><span class="lineNum">     367</span>                 :<span class="tlaGNC">      137852 :             UniValue *top = stack.back();</span></span>
+<span id="L368"><span class="lineNum">     368</span>         [<span class="tlaGBC" title="fallthrough branch &quot;51 -&gt; 52&quot; was taken 137735 times"> + </span><span class="tlaGBC" title="branch &quot;51 -&gt; 110&quot; was taken 117 times"> + </span>]:<span class="tlaGNC">      137852 :             if (utyp != top-&gt;getType())</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :             :                 return false;</span>
+<span id="L370"><span class="lineNum">     370</span>                 :             : </span>
+<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaGNC">      137735 :             stack.pop_back();</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :<span class="tlaGNC">      137735 :             clearExpect(OBJ_NAME);</span></span>
+<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaGNC">      137735 :             setExpect(NOT_VALUE);</span></span>
+<span id="L374"><span class="lineNum">     374</span>                 :<span class="tlaGNC">      137735 :             break;</span></span>
+<span id="L375"><span class="lineNum">     375</span>                 :             :             }</span>
+<span id="L376"><span class="lineNum">     376</span>                 :             : </span>
+<span id="L377"><span class="lineNum">     377</span>                 :<span class="tlaGNC">      241767 :         case JTOK_COLON: {</span></span>
+<span id="L378"><span class="lineNum">     378</span>   [<span class="tlaUNC" title="fallthrough branch &quot;53 -&gt; 54&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;53 -&gt; 55&quot; was taken 241767 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;55 -&gt; 56&quot; was taken 241767 times"> + </span><span class="tlaUNC" title="branch &quot;55 -&gt; 110&quot; was not taken"> - </span>]:<span class="tlaGNC">      241767 :             if (!stack.size())</span></span>
+<span id="L379"><span class="lineNum">     379</span>                 :             :                 return false;</span>
+<span id="L380"><span class="lineNum">     380</span>                 :             : </span>
+<span id="L381"><span class="lineNum">     381</span>                 :<span class="tlaGNC">      241767 :             UniValue *top = stack.back();</span></span>
+<span id="L382"><span class="lineNum">     382</span>         [<span class="tlaGBC" title="fallthrough branch &quot;56 -&gt; 57&quot; was taken 241767 times"> + </span><span class="tlaUNC" title="branch &quot;56 -&gt; 110&quot; was not taken"> - </span>]:<span class="tlaGNC">      241767 :             if (top-&gt;getType() != VOBJ)</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :             :                 return false;</span>
+<span id="L384"><span class="lineNum">     384</span>                 :             : </span>
+<span id="L385"><span class="lineNum">     385</span>                 :<span class="tlaGNC">      241767 :             setExpect(VALUE);</span></span>
+<span id="L386"><span class="lineNum">     386</span>                 :<span class="tlaGNC">      241767 :             break;</span></span>
+<span id="L387"><span class="lineNum">     387</span>                 :             :             }</span>
+<span id="L388"><span class="lineNum">     388</span>                 :             : </span>
+<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaGNC">      460831 :         case JTOK_COMMA: {</span></span>
+<span id="L390"><span class="lineNum">     390</span>         [<span class="tlaUNC" title="fallthrough branch &quot;58 -&gt; 59&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;58 -&gt; 60&quot; was taken 460831 times"> + </span>]:<span class="tlaGNC">      460831 :             if (!stack.size() ||</span></span>
+<span id="L391"><span class="lineNum">     391</span>   [<span class="tlaGBC" title="fallthrough branch &quot;60 -&gt; 61&quot; was taken 460675 times"> + </span><span class="tlaGBC" title="branch &quot;60 -&gt; 110&quot; was taken 156 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;61 -&gt; 62&quot; was taken 460675 times"> + </span><span class="tlaUNC" title="branch &quot;61 -&gt; 110&quot; was not taken"> - </span>]:<span class="tlaGNC">      460831 :                 (last_tok == JTOK_COMMA) || (last_tok == JTOK_ARR_OPEN))</span></span>
+<span id="L392"><span class="lineNum">     392</span>                 :             :                 return false;</span>
+<span id="L393"><span class="lineNum">     393</span>                 :             : </span>
+<span id="L394"><span class="lineNum">     394</span>                 :<span class="tlaGNC">      460675 :             UniValue *top = stack.back();</span></span>
+<span id="L395"><span class="lineNum">     395</span>         [<span class="tlaGBC" title="fallthrough branch &quot;62 -&gt; 63&quot; was taken 216035 times"> + </span><span class="tlaGBC" title="branch &quot;62 -&gt; 64&quot; was taken 244640 times"> + </span>]:<span class="tlaGNC">      460675 :             if (top-&gt;getType() == VOBJ)</span></span>
+<span id="L396"><span class="lineNum">     396</span>                 :<span class="tlaGNC">      216035 :                 setExpect(OBJ_NAME);</span></span>
+<span id="L397"><span class="lineNum">     397</span>                 :             :             else</span>
+<span id="L398"><span class="lineNum">     398</span>                 :<span class="tlaGNC">      244640 :                 setExpect(ARR_VALUE);</span></span>
+<span id="L399"><span class="lineNum">     399</span>                 :             :             break;</span>
+<span id="L400"><span class="lineNum">     400</span>                 :             :             }</span>
+<span id="L401"><span class="lineNum">     401</span>                 :             : </span>
+<span id="L402"><span class="lineNum">     402</span>                 :<span class="tlaGNC">        8452 :         case JTOK_KW_NULL:</span></span>
+<span id="L403"><span class="lineNum">     403</span>                 :<span class="tlaGNC">        8452 :         case JTOK_KW_TRUE:</span></span>
+<span id="L404"><span class="lineNum">     404</span>                 :<span class="tlaGNC">        8452 :         case JTOK_KW_FALSE: {</span></span>
+<span id="L405"><span class="lineNum">     405</span>      [<span class="tlaGBC" title="branch &quot;65 -&gt; 66&quot; was taken 977 times"> + </span><span class="tlaGBC" title="branch &quot;65 -&gt; 67&quot; was taken 1237 times"> + </span><span class="tlaGBC" title="branch &quot;65 -&gt; 68&quot; was taken 6238 times"> + </span>]:<span class="tlaGNC">        8452 :             UniValue tmpVal;</span></span>
+<span id="L406"><span class="lineNum">     406</span>      [<span class="tlaGBC" title="branch &quot;65 -&gt; 66&quot; was taken 977 times"> + </span><span class="tlaGBC" title="branch &quot;65 -&gt; 67&quot; was taken 1237 times"> + </span><span class="tlaGBC" title="branch &quot;65 -&gt; 68&quot; was taken 6238 times"> + </span>]:<span class="tlaGNC">        8452 :             switch (tok) {</span></span>
+<span id="L407"><span class="lineNum">     407</span>                 :             :             case JTOK_KW_NULL:</span>
+<span id="L408"><span class="lineNum">     408</span>                 :             :                 // do nothing more</span>
+<span id="L409"><span class="lineNum">     409</span>                 :             :                 break;</span>
+<span id="L410"><span class="lineNum">     410</span>                 :<span class="tlaGNC">         977 :             case JTOK_KW_TRUE:</span></span>
+<span id="L411"><span class="lineNum">     411</span>         [<span class="tlaGBC" title="fallthrough branch &quot;66 -&gt; 68&quot; was taken 977 times"> + </span><span class="tlaUNC" title="exception branch &quot;66 -&gt; 115&quot; was not taken"> - </span>]:<span class="tlaGNC">         977 :                 tmpVal.setBool(true);</span></span>
+<span id="L412"><span class="lineNum">     412</span>                 :             :                 break;</span>
+<span id="L413"><span class="lineNum">     413</span>                 :<span class="tlaGNC">        1237 :             case JTOK_KW_FALSE:</span></span>
+<span id="L414"><span class="lineNum">     414</span>         [<span class="tlaGBC" title="fallthrough branch &quot;67 -&gt; 68&quot; was taken 1237 times"> + </span><span class="tlaUNC" title="exception branch &quot;67 -&gt; 115&quot; was not taken"> - </span>]:<span class="tlaGNC">        1237 :                 tmpVal.setBool(false);</span></span>
+<span id="L415"><span class="lineNum">     415</span>                 :             :                 break;</span>
+<span id="L416"><span class="lineNum">     416</span>                 :             :             default: /* impossible */ break;</span>
+<span id="L417"><span class="lineNum">     417</span>                 :             :             }</span>
+<span id="L418"><span class="lineNum">     418</span>                 :             : </span>
+<span id="L419"><span class="lineNum">     419</span>   [<span class="tlaUNC" title="fallthrough branch &quot;68 -&gt; 69&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;68 -&gt; 70&quot; was taken 8452 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 71&quot; was taken 344 times"> + </span><span class="tlaGBC" title="branch &quot;70 -&gt; 72&quot; was taken 8108 times"> + </span>]:<span class="tlaGNC">        8452 :             if (!stack.size()) {</span></span>
+<span id="L420"><span class="lineNum">     420</span>         [<span class="tlaGBC" title="fallthrough branch &quot;71 -&gt; 74&quot; was taken 344 times"> + </span><span class="tlaUNC" title="exception branch &quot;71 -&gt; 115&quot; was not taken"> - </span>]:<span class="tlaGNC">         344 :                 *this = tmpVal;</span></span>
+<span id="L421"><span class="lineNum">     421</span>                 :             :                 break;</span>
+<span id="L422"><span class="lineNum">     422</span>                 :             :             }</span>
+<span id="L423"><span class="lineNum">     423</span>                 :             : </span>
+<span id="L424"><span class="lineNum">     424</span>                 :<span class="tlaGNC">        8108 :             UniValue *top = stack.back();</span></span>
+<span id="L425"><span class="lineNum">     425</span>         [<span class="tlaGBC" title="fallthrough branch &quot;72 -&gt; 73&quot; was taken 8108 times"> + </span><span class="tlaUNC" title="exception branch &quot;72 -&gt; 115&quot; was not taken"> - </span>]:<span class="tlaGNC">        8108 :             top-&gt;values.push_back(tmpVal);</span></span>
+<span id="L426"><span class="lineNum">     426</span>                 :             : </span>
+<span id="L427"><span class="lineNum">     427</span>                 :<span class="tlaGNC">        8108 :             setExpect(NOT_VALUE);</span></span>
+<span id="L428"><span class="lineNum">     428</span>                 :<span class="tlaGNC">        8108 :             break;</span></span>
+<span id="L429"><span class="lineNum">     429</span>                 :<span class="tlaGNC">        8452 :             }</span></span>
+<span id="L430"><span class="lineNum">     430</span>                 :             : </span>
+<span id="L431"><span class="lineNum">     431</span>                 :<span class="tlaGNC">      315366 :         case JTOK_NUMBER: {</span></span>
+<span id="L432"><span class="lineNum">     432</span>         [<span class="tlaUNC" title="fallthrough branch &quot;75 -&gt; 76&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;75 -&gt; 77&quot; was taken 315366 times"> + </span>]:<span class="tlaGNC">      630732 :             UniValue tmpVal(VNUM, tokenVal);</span></span>
+<span id="L433"><span class="lineNum">     433</span>   [<span class="tlaUNC" title="fallthrough branch &quot;81 -&gt; 82&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;81 -&gt; 83&quot; was taken 315366 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;83 -&gt; 84&quot; was taken 2411 times"> + </span><span class="tlaGBC" title="branch &quot;83 -&gt; 85&quot; was taken 312955 times"> + </span>]:<span class="tlaGNC">      315366 :             if (!stack.size()) {</span></span>
+<span id="L434"><span class="lineNum">     434</span>         [<span class="tlaGBC" title="fallthrough branch &quot;84 -&gt; 87&quot; was taken 2411 times"> + </span><span class="tlaUNC" title="exception branch &quot;84 -&gt; 117&quot; was not taken"> - </span>]:<span class="tlaGNC">        2411 :                 *this = tmpVal;</span></span>
+<span id="L435"><span class="lineNum">     435</span>                 :             :                 break;</span>
+<span id="L436"><span class="lineNum">     436</span>                 :             :             }</span>
+<span id="L437"><span class="lineNum">     437</span>                 :             : </span>
+<span id="L438"><span class="lineNum">     438</span>                 :<span class="tlaGNC">      312955 :             UniValue *top = stack.back();</span></span>
+<span id="L439"><span class="lineNum">     439</span>         [<span class="tlaGBC" title="fallthrough branch &quot;85 -&gt; 86&quot; was taken 312955 times"> + </span><span class="tlaUNC" title="exception branch &quot;85 -&gt; 117&quot; was not taken"> - </span>]:<span class="tlaGNC">      312955 :             top-&gt;values.push_back(tmpVal);</span></span>
+<span id="L440"><span class="lineNum">     440</span>                 :             : </span>
+<span id="L441"><span class="lineNum">     441</span>                 :<span class="tlaGNC">      312955 :             setExpect(NOT_VALUE);</span></span>
+<span id="L442"><span class="lineNum">     442</span>                 :<span class="tlaGNC">      312955 :             break;</span></span>
+<span id="L443"><span class="lineNum">     443</span>                 :<span class="tlaGNC">      315366 :             }</span></span>
+<span id="L444"><span class="lineNum">     444</span>                 :             : </span>
+<span id="L445"><span class="lineNum">     445</span>                 :<span class="tlaGNC">      295710 :         case JTOK_STRING: {</span></span>
+<span id="L446"><span class="lineNum">     446</span>         [<span class="tlaGBC" title="fallthrough branch &quot;88 -&gt; 89&quot; was taken 241952 times"> + </span><span class="tlaGBC" title="branch &quot;88 -&gt; 91&quot; was taken 53758 times"> + </span>]:<span class="tlaGNC">      295710 :             if (expect(OBJ_NAME)) {</span></span>
+<span id="L447"><span class="lineNum">     447</span>                 :<span class="tlaGNC">      241952 :                 UniValue *top = stack.back();</span></span>
+<span id="L448"><span class="lineNum">     448</span>         [<span class="tlaGBC" title="fallthrough branch &quot;89 -&gt; 90&quot; was taken 241952 times"> + </span><span class="tlaUNC" title="exception branch &quot;89 -&gt; 121&quot; was not taken"> - </span>]:<span class="tlaGNC">      241952 :                 top-&gt;keys.push_back(tokenVal);</span></span>
+<span id="L449"><span class="lineNum">     449</span>                 :<span class="tlaGNC">      241952 :                 clearExpect(OBJ_NAME);</span></span>
+<span id="L450"><span class="lineNum">     450</span>                 :<span class="tlaGNC">      241952 :                 setExpect(COLON);</span></span>
+<span id="L451"><span class="lineNum">     451</span>                 :             :             } else {</span>
+<span id="L452"><span class="lineNum">     452</span>         [<span class="tlaUNC" title="fallthrough branch &quot;91 -&gt; 92&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;91 -&gt; 93&quot; was taken 53758 times"> + </span>]:<span class="tlaGNC">      107516 :                 UniValue tmpVal(VSTR, tokenVal);</span></span>
+<span id="L453"><span class="lineNum">     453</span>   [<span class="tlaUNC" title="fallthrough branch &quot;97 -&gt; 98&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;97 -&gt; 99&quot; was taken 53758 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;99 -&gt; 100&quot; was taken 3893 times"> + </span><span class="tlaGBC" title="branch &quot;99 -&gt; 101&quot; was taken 49865 times"> + </span>]:<span class="tlaGNC">       53758 :                 if (!stack.size()) {</span></span>
+<span id="L454"><span class="lineNum">     454</span>         [<span class="tlaGBC" title="fallthrough branch &quot;100 -&gt; 103&quot; was taken 3893 times"> + </span><span class="tlaUNC" title="exception branch &quot;100 -&gt; 119&quot; was not taken"> - </span>]:<span class="tlaGNC">        3893 :                     *this = tmpVal;</span></span>
+<span id="L455"><span class="lineNum">     455</span>                 :<span class="tlaGNC">        3893 :                     break;</span></span>
+<span id="L456"><span class="lineNum">     456</span>                 :             :                 }</span>
+<span id="L457"><span class="lineNum">     457</span>                 :<span class="tlaGNC">       49865 :                 UniValue *top = stack.back();</span></span>
+<span id="L458"><span class="lineNum">     458</span>         [<span class="tlaGBC" title="fallthrough branch &quot;101 -&gt; 102&quot; was taken 49865 times"> + </span><span class="tlaUNC" title="exception branch &quot;101 -&gt; 119&quot; was not taken"> - </span>]:<span class="tlaGNC">       49865 :                 top-&gt;values.push_back(tmpVal);</span></span>
+<span id="L459"><span class="lineNum">     459</span>                 :<span class="tlaGNC">       53758 :             }</span></span>
+<span id="L460"><span class="lineNum">     460</span>                 :             : </span>
+<span id="L461"><span class="lineNum">     461</span>                 :<span class="tlaGNC">      291817 :             setExpect(NOT_VALUE);</span></span>
+<span id="L462"><span class="lineNum">     462</span>                 :<span class="tlaGNC">      291817 :             break;</span></span>
+<span id="L463"><span class="lineNum">     463</span>                 :             :             }</span>
+<span id="L464"><span class="lineNum">     464</span>                 :             : </span>
+<span id="L465"><span class="lineNum">     465</span>                 :             :         default:</span>
+<span id="L466"><span class="lineNum">     466</span>                 :             :             return false;</span>
+<span id="L467"><span class="lineNum">     467</span>                 :             :         }</span>
+<span id="L468"><span class="lineNum">     468</span>         [<span class="tlaGBC" title="branch &quot;106 -&gt; 4&quot; was taken 1623877 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;106 -&gt; 107&quot; was taken 9345 times"> + </span>]:<span class="tlaGNC">     1633222 :     } while (!stack.empty ());</span></span>
+<span id="L469"><span class="lineNum">     469</span>                 :             : </span>
+<span id="L470"><span class="lineNum">     470</span>                 :             :     /* Check that nothing follows the initial construct (parsed above).  */</span>
+<span id="L471"><span class="lineNum">     471</span>         [<span class="tlaGBC" title="fallthrough branch &quot;107 -&gt; 108&quot; was taken 9345 times"> + </span><span class="tlaUNC" title="exception branch &quot;107 -&gt; 121&quot; was not taken"> - </span>]:<span class="tlaGNC">        9345 :     tok = getJsonToken(tokenVal, consumed, raw, end);</span></span>
+<span id="L472"><span class="lineNum">     472</span>         [<span class="tlaGBC" title="fallthrough branch &quot;108 -&gt; 109&quot; was taken 934 times"> + </span><span class="tlaGBC" title="branch &quot;108 -&gt; 110&quot; was taken 8411 times"> + </span>]:<span class="tlaGNC">        9345 :     if (tok != JTOK_NONE)</span></span>
+<span id="L473"><span class="lineNum">     473</span>                 :<span class="tlaGNC">         934 :         return false;</span></span>
+<span id="L474"><span class="lineNum">     474</span>                 :             : </span>
+<span id="L475"><span class="lineNum">     475</span>                 :             :     return true;</span>
+<span id="L476"><span class="lineNum">     476</span>                 :<span class="tlaGNC">       18023 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

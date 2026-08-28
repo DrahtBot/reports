@@ -1,0 +1,600 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/ipc/libmultiprocess/src/mp/proxy.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/ipc/libmultiprocess/src/mp">src/ipc/libmultiprocess/src/mp</a> - proxy.cpp<span style="font-size: 80%;"> (source / <a href="proxy.cpp.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">56.1&nbsp;%</td>
+            <td class="headerCovTableEntry">239</td>
+            <td class="headerCovTableEntry">134</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-08-28 13:20:38</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">52.8&nbsp;%</td>
+            <td class="headerCovTableEntry">36</td>
+            <td class="headerCovTableEntry">19</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">27.9&nbsp;%</td>
+            <td class="headerCovTableEntry">419</td>
+            <td class="headerCovTableEntry">117</td>
+          </tr>
+                  <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #include &lt;mp/proxy.h&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #include &lt;mp/proxy-io.h&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;mp/proxy-types.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;mp/proxy.capnp.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;mp/type-threadmap.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;mp/util.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : </span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;atomic&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;capnp/capability.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;capnp/common.h&gt; // IWYU pragma: keep</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;capnp/rpc.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;condition_variable&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;future&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;kj/async.h&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;kj/async-io.h&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;kj/async-prelude.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;kj/common.h&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;kj/debug.h&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #include &lt;kj/exception.h&gt;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #include &lt;kj/function.h&gt;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #include &lt;kj/memory.h&gt;</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : #include &lt;kj/string.h&gt;</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : #include &lt;map&gt;</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : #include &lt;stdexcept&gt;</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : #include &lt;string&gt;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : #include &lt;sys/socket.h&gt;</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : #include &lt;thread&gt;</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : #include &lt;tuple&gt;</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : #include &lt;unistd.h&gt;</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : #include &lt;utility&gt;</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : </span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : namespace mp {</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : </span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">       21568 : thread_local ThreadContext g_thread_context; // NOLINT(bitcoin-nontrivial-threadlocal)</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :             : </span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaUNC">           0 : void LoggingErrorHandler::taskFailed(kj::Exception&amp;&amp; exception)</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : {</span>
+<span id="L48"><span class="lineNum">      48</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     KJ_LOG(ERROR, &quot;Uncaught exception in daemonized task.&quot;, exception);</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaUNC">           0 :     MP_LOG(m_loop, Log::Error) &lt;&lt; &quot;Uncaught exception in daemonized task.&quot;;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 14&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;7 -&gt; 8&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 18&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 18&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="exception branch &quot;10 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;11 -&gt; 12&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;11 -&gt; 16&quot; was not executed"> # </span>]
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">        5394 : EventLoopRef::EventLoopRef(EventLoop&amp; loop, Lock* lock) : m_loop(&amp;loop), m_lock(lock)</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : {</span>
+<span id="L54"><span class="lineNum">      54</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 5390 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 4 times"> + </span>]:<span class="tlaGNC">        5394 :     auto loop_lock{PtrOrValue{m_lock, m_loop-&gt;m_mutex}};</span></span>
+<span id="L55"><span class="lineNum">      55</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 5394 times"> + </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">        5394 :     loop_lock-&gt;assert_locked(m_loop-&gt;m_mutex);</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">        5394 :     m_loop-&gt;m_num_refs += 1;</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">        5394 : }</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : </span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : // Due to the conditionals in this function, MP_NO_TSA is required to avoid</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : // error &quot;error: mutex 'loop_lock' is not held on every path through here</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : // [-Wthread-safety-analysis]&quot;</span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">        5395 : void EventLoopRef::reset(bool relock) MP_NO_TSA</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : {</span>
+<span id="L64"><span class="lineNum">      64</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 5394 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 26&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">        5395 :     if (auto* loop{m_loop}) {</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">        5394 :         m_loop = nullptr;</span></span>
+<span id="L66"><span class="lineNum">      66</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 5390 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 4 times"> + </span>]:<span class="tlaGNC">        5394 :         auto loop_lock{PtrOrValue{m_lock, loop-&gt;m_mutex}};</span></span>
+<span id="L67"><span class="lineNum">      67</span>         [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 5394 times"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 29&quot; was not taken"> - </span>]:<span class="tlaGNC">        5394 :         loop_lock-&gt;assert_locked(loop-&gt;m_mutex);</span></span>
+<span id="L68"><span class="lineNum">      68</span>         [<span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 5394 times"> + </span>]:<span class="tlaGNC">        5394 :         assert(loop-&gt;m_num_refs &gt; 0);</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">        5394 :         loop-&gt;m_num_refs -= 1;</span></span>
+<span id="L70"><span class="lineNum">      70</span>   [<span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 5394 times"> + </span><span class="tlaUNC" title="exception branch &quot;11 -&gt; 29&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 24&quot; was taken 5393 times"> + </span>]:<span class="tlaGNC">        5394 :         if (loop-&gt;done()) {</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">           1 :             loop-&gt;m_cv.notify_all();</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">           1 :             int post_fd{loop-&gt;m_post_fd};</span></span>
+<span id="L73"><span class="lineNum">      73</span>   [<span class="tlaGBC" title="fallthrough branch &quot;14 -&gt; 15&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;14 -&gt; 29&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;15 -&gt; 29&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :             loop_lock-&gt;unlock();</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">           1 :             char buffer = 0;</span></span>
+<span id="L75"><span class="lineNum">      75</span>   [<span class="tlaGBC" title="fallthrough branch &quot;16 -&gt; 17&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;16 -&gt; 29&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;19 -&gt; 20&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;19 -&gt; 29&quot; was not taken"> - </span>]:<span class="tlaGNC">           2 :             KJ_SYSCALL(write(post_fd, &amp;buffer, 1)); // NOLINT(bugprone-suspicious-semicolon)</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :             // By default, do not try to relock `loop_lock` after writing,</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :             // because the event loop could wake up and destroy itself and the</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :             // mutex might no longer exist.</span>
+<span id="L79"><span class="lineNum">      79</span>   [<span class="tlaGBC" title="branch &quot;18 -&gt; 22&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;18 -&gt; 24&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;22 -&gt; 23&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;22 -&gt; 29&quot; was not taken"> - </span> :<span class="tlaGNC">        5394 :             if (relock) loop_lock-&gt;lock();</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;23 -&gt; 24&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 29&quot; was not taken"> - </span>]
+<span id="L80"><span class="lineNum">      80</span>                 :             :         }</span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">        5394 :     }</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">        5395 : }</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : </span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">           2 : ProxyContext::ProxyContext(Connection* connection) : connection(connection), loop{*connection-&gt;m_loop} {}</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : </span>
+<span id="L86"><span class="lineNum">      86</span>                 :<span class="tlaGNC">           2 : Connection::~Connection()</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : {</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     // Connection destructor is always called on the event loop thread. If this</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     // is a local disconnect, it will trigger I/O, so this needs to run on the</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     // event loop thread, and if there was a remote disconnect, this is called</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :     // by an onDisconnect callback directly from the event loop thread.</span>
+<span id="L92"><span class="lineNum">      92</span>         [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 2 times"> + </span>]:<span class="tlaGNC">           2 :     assert(std::this_thread::get_id() == m_loop-&gt;m_thread_id);</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : </span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     // Try to cancel any calls that may be executing.</span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 2 times"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 32&quot; was not taken"> - </span>]:<span class="tlaGNC">           2 :     m_canceler.cancel(&quot;Interrupted by disconnect&quot;);</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :     // Shut down RPC system first, since this will garbage collect any</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             :     // ProxyServer objects that were not freed before the connection was closed.</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     // Typically all ProxyServer objects associated with this connection will be</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     // freed before this call returns. However that will not be the case if</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :     // there are asynchronous IPC calls over this connection still currently</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :     // executing. In that case, Cap'n Proto will destroy the ProxyServer objects</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :     // after the calls finish.</span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">           2 :     m_rpc_system.reset();</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : </span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     // ProxyClient cleanup handlers are in sync list, and ProxyServer cleanup</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     // handlers are in the async list.</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     //</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     // The ProxyClient cleanup handlers are synchronous because they are fast</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     // and don't do anything besides release capnp resources and reset state so</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     // future calls to client methods immediately throw exceptions instead of</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     // trying to communicate across the socket. The synchronous callbacks set</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     // ProxyClient capability pointers to null, so new method calls on client</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     // objects fail without triggering i/o or relying on event loop which may go</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     // out of scope or trigger obscure capnp i/o errors.</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     //</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     // The ProxyServer cleanup handlers call user defined destructors on the server</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :     // object, which can run arbitrary blocking bitcoin code so they have to run</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :     // asynchronously in a different thread. The asynchronous cleanup functions</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     // intentionally aren't started until after the synchronous cleanup</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :     // functions run, so client objects are fully disconnected before bitcoin</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     // code in the destructors are run. This way if the bitcoin code tries to</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :     // make client requests the requests will just fail immediately instead of</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     // sending i/o or accessing the event loop.</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :     //</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :     // The context where Connection objects are destroyed and this destructor is invoked</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     // is different depending on whether this is an outgoing connection being used</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :     // to make an Init.makeX call() (e.g. Init.makeNode or Init.makeWalletClient) or an incoming</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :     // connection implementing the Init interface and handling the Init.makeX() calls.</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :     //</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :     // Either way when a connection is closed, capnp behavior is to call all</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     // ProxyServer object destructors first, and then trigger an onDisconnect</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :     // callback.</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     //</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :     // On incoming side of the connection, the onDisconnect callback is written</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :     // to delete the Connection object from the m_incoming_connections and call</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :     // this destructor which calls Connection::disconnect.</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :     //</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     // On the outgoing side, the Connection object is owned by top level client</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :     // object client, which onDisconnect handler doesn't have ready access to,</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     // so onDisconnect handler just calls Connection::disconnect directly</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     // instead.</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     //</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :     // Either way disconnect code runs in the event loop thread and called both</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     // on clean and unclean shutdowns. In unclean shutdown case when the</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :     // connection is broken, sync and async cleanup lists will be filled with</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :     // callbacks. In the clean shutdown case both lists will be empty.</span>
+<span id="L148"><span class="lineNum">     148</span>         [<span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 2 times"> + </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 32&quot; was not taken"> - </span>]:<span class="tlaGNC">           2 :     Lock lock{m_loop-&gt;m_mutex};</span></span>
+<span id="L149"><span class="lineNum">     149</span>         [<span class="tlaUNC" title="branch &quot;14 -&gt; 10&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;14 -&gt; 15&quot; was taken 2 times"> + </span>]:<span class="tlaGNC">           2 :     while (!m_sync_cleanup_fns.empty()) {</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaUNC">           0 :         CleanupList fn;</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaUNC">           0 :         fn.splice(fn.begin(), m_sync_cleanup_fns, m_sync_cleanup_fns.begin());</span></span>
+<span id="L152"><span class="lineNum">     152</span>         [<span class="tlaUNC" title="fallthrough branch &quot;11 -&gt; 12&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;11 -&gt; 27&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         Unlock(lock, fn.front());</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L154"><span class="lineNum">     154</span>   [<span class="tlaGBC" title="fallthrough branch &quot;18 -&gt; 19&quot; was taken 2 times"> + </span><span class="tlaUNC" title="exception branch &quot;18 -&gt; 36&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;20 -&gt; 21&quot; was taken 2 times"> + </span><span class="tlaUNC" title="exception branch &quot;20 -&gt; 40&quot; was not taken"> - </span> :<span class="tlaGNC">           2 : }</span></span>
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;22 -&gt; 23&quot; was taken 2 times"> + </span><span class="tlaUNC" title="exception branch &quot;22 -&gt; 44&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;23 -&gt; 24&quot; was taken 2 times"> + </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 46&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;24 -&gt; 25&quot; was taken 2 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="exception branch &quot;24 -&gt; 48&quot; was not taken"> - </span>]
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">           1 : CleanupIt Connection::addSyncCleanup(std::function&lt;void()&gt; fn)</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : {</span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">           1 :     const Lock lock(m_loop-&gt;m_mutex);</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :     // Add cleanup callbacks to the front of list, so sync cleanup functions run</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     // in LIFO order. This is a good approach because sync cleanup functions are</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :     // added as client objects are created, and it is natural to clean up</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :     // objects in the reverse order they were created. In practice, however,</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :     // order should not be significant because the cleanup callbacks run</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             :     // synchronously in a single batch when the connection is broken, and they</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :     // only reset the connection pointers in the client objects without actually</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :     // deleting the client objects.</span>
+<span id="L167"><span class="lineNum">     167</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     return m_sync_cleanup_fns.emplace(m_sync_cleanup_fns.begin(), std::move(fn));</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             : </span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">           1 : void Connection::removeSyncCleanup(CleanupIt it)</span></span>
+<span id="L171"><span class="lineNum">     171</span>                 :             : {</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :     // Require cleanup functions to be removed on the event loop thread to avoid</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :     // needing to deal with them being removed in the middle of a disconnect.</span>
+<span id="L174"><span class="lineNum">     174</span>         [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :     assert(std::this_thread::get_id() == m_loop-&gt;m_thread_id);</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaGNC">           1 :     const Lock lock(m_loop-&gt;m_mutex);</span></span>
+<span id="L176"><span class="lineNum">     176</span>         [<span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;8 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     m_sync_cleanup_fns.erase(it);</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :             : </span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaGNC">           1 : void EventLoop::addAsyncCleanup(std::function&lt;void()&gt; fn)</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :             : {</span>
+<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaGNC">           1 :     const Lock lock(m_mutex);</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :     // Add async cleanup callbacks to the back of the list. Unlike the sync</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :     // cleanup list, this list order is more significant because it determines</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :     // the order server objects are destroyed when there is a sudden disconnect,</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :     // and it is possible objects may need to be destroyed in a certain order.</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :     // This function is called in ProxyServerBase destructors, and since capnp</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :     // destroys ProxyServer objects in LIFO order, we should preserve this</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :     // order, and add cleanup callbacks to the end of the list so they can be</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :     // run starting from the beginning of the list.</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :     //</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :     // In bitcoin core, running these callbacks in the right order is</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     // particularly important for the wallet process, because it uses blocking</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     // shared_ptrs and requires Chain::Notification pointers owned by the node</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :     // process to be destroyed before the WalletLoader objects owned by the node</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :     // process, otherwise shared pointer counts of the CWallet objects (which</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :     // inherit from Chain::Notification) will not be 1 when WalletLoader</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :     // destructor runs and it will wait forever for them to be released.</span>
+<span id="L198"><span class="lineNum">     198</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     m_async_fns-&gt;emplace_back(std::move(fn));</span></span>
+<span id="L199"><span class="lineNum">     199</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     startAsyncThread();</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :             : </span>
+<span id="L202"><span class="lineNum">     202</span>                 :<span class="tlaGNC">           1 : EventLoop::EventLoop(const char* exe_name, LogOptions log_opts, void* context)</span></span>
+<span id="L203"><span class="lineNum">     203</span>                 :<span class="tlaGNC">           1 :     : m_exe_name(exe_name),</span></span>
+<span id="L204"><span class="lineNum">     204</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 37&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :       m_io_context(kj::setupAsyncIo()),</span></span>
+<span id="L205"><span class="lineNum">     205</span>   [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 35&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 13&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :       m_task_set(new kj::TaskSet(m_error_handler)),</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :<span class="tlaGNC">           1 :       m_log_opts(std::move(log_opts)),</span></span>
+<span id="L207"><span class="lineNum">     207</span>   [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 35&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 17&quot; was not taken"> - </span>]:<span class="tlaGNC">           3 :       m_context(context)</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : {</span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">           1 :     int fds[2];</span></span>
+<span id="L210"><span class="lineNum">     210</span>   [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 17&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 17&quot; was not taken"> - </span>]:<span class="tlaGNC">           2 :     KJ_SYSCALL(socketpair(AF_UNIX, SOCK_STREAM, 0, fds));</span></span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">           1 :     m_wait_fd = fds[0];</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">           1 :     m_post_fd = fds[1];</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : </span>
+<span id="L215"><span class="lineNum">     215</span>                 :<span class="tlaGNC">           1 : EventLoop::~EventLoop()</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :             : {</span>
+<span id="L217"><span class="lineNum">     217</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 48&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     if (m_async_thread.joinable()) m_async_thread.join();</span></span>
+<span id="L218"><span class="lineNum">     218</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 48&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     const Lock lock(m_mutex);</span></span>
+<span id="L219"><span class="lineNum">     219</span>   [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;5 -&gt; 8&quot; was taken 1 time"> + </span><span class="tlaUNC" title="fallthrough branch &quot;6 -&gt; 7&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 45&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     KJ_ASSERT(m_post_fn == nullptr);</span></span>
+<span id="L220"><span class="lineNum">     220</span>   [<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;8 -&gt; 11&quot; was taken 1 time"> + </span><span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 45&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     KJ_ASSERT(!m_async_fns);</span></span>
+<span id="L221"><span class="lineNum">     221</span>   [<span class="tlaUNC" title="fallthrough branch &quot;11 -&gt; 12&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;11 -&gt; 14&quot; was taken 1 time"> + </span><span class="tlaUNC" title="fallthrough branch &quot;12 -&gt; 13&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;12 -&gt; 45&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     KJ_ASSERT(m_wait_fd == -1);</span></span>
+<span id="L222"><span class="lineNum">     222</span>   [<span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;14 -&gt; 17&quot; was taken 1 time"> + </span><span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;15 -&gt; 45&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     KJ_ASSERT(m_post_fd == -1);</span></span>
+<span id="L223"><span class="lineNum">     223</span>   [<span class="tlaUNC" title="fallthrough branch &quot;17 -&gt; 18&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;17 -&gt; 20&quot; was taken 1 time"> + </span><span class="tlaUNC" title="fallthrough branch &quot;18 -&gt; 19&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;18 -&gt; 45&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     KJ_ASSERT(m_num_refs == 0);</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : </span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :     // Spin event loop. wait for any promises triggered by RPC shutdown.</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     // auto cleanup = kj::evalLater([]{});</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :     // cleanup.wait(m_io_context.waitScope);</span>
+<span id="L228"><span class="lineNum">     228</span>         [<span class="tlaGBC" title="fallthrough branch &quot;30 -&gt; 31&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;30 -&gt; 68&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 : }</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :             : </span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaGNC">           1 : void EventLoop::loop()</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : {</span>
+<span id="L232"><span class="lineNum">     232</span>         [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :     assert(!g_thread_context.loop_thread);</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :<span class="tlaGNC">           1 :     g_thread_context.loop_thread = true;</span></span>
+<span id="L234"><span class="lineNum">     234</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     KJ_DEFER(g_thread_context.loop_thread = false);</span></span>
+<span id="L235"><span class="lineNum">     235</span>                 :             : </span>
+<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaGNC">           1 :     {</span></span>
+<span id="L237"><span class="lineNum">     237</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 128&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :         const Lock lock(m_mutex);</span></span>
+<span id="L238"><span class="lineNum">     238</span>         [<span class="tlaUNC" title="fallthrough branch &quot;7 -&gt; 8&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :         assert(!m_async_fns);</span></span>
+<span id="L239"><span class="lineNum">     239</span>         [<span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;10 -&gt; 12&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :         m_async_fns.emplace();</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :             : </span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaGNC">           1 :     kj::Own&lt;kj::AsyncIoStream&gt; wait_stream{</span></span>
+<span id="L243"><span class="lineNum">     243</span>         [<span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;12 -&gt; 128&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :         m_io_context.lowLevelProvider-&gt;wrapSocketFd(m_wait_fd, kj::LowLevelAsyncIoProvider::TAKE_OWNERSHIP)};</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaGNC">           1 :     int post_fd{m_post_fd};</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">           1 :     char buffer = 0;</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :<span class="tlaGNC">       10779 :     for (;;) {</span></span>
+<span id="L247"><span class="lineNum">     247</span>   [<span class="tlaGBC" title="fallthrough branch &quot;14 -&gt; 15&quot; was taken 5390 times"> + </span><span class="tlaUNC" title="exception branch &quot;14 -&gt; 126&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 5390 times"> + </span><span class="tlaUNC" title="exception branch &quot;15 -&gt; 98&quot; was not taken"> - </span> :<span class="tlaGNC">        5390 :         const size_t read_bytes = wait_stream-&gt;read(&amp;buffer, 0, 1).wait(m_io_context.waitScope);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;16 -&gt; 17&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;16 -&gt; 18&quot; was taken 5390 times"> + </span>]
+<span id="L248"><span class="lineNum">     248</span>   [<span class="tlaUNC" title="fallthrough branch &quot;18 -&gt; 19&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;18 -&gt; 22&quot; was taken 5390 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;20 -&gt; 101&quot; was not taken"> - </span>]:<span class="tlaGNC">        5390 :         if (read_bytes != 1) throw std::logic_error(&quot;EventLoop wait_stream closed unexpectedly&quot;);</span></span>
+<span id="L249"><span class="lineNum">     249</span>         [<span class="tlaGBC" title="fallthrough branch &quot;22 -&gt; 23&quot; was taken 5390 times"> + </span><span class="tlaUNC" title="exception branch &quot;22 -&gt; 126&quot; was not taken"> - </span>]:<span class="tlaGNC">        5390 :         Lock lock(m_mutex);</span></span>
+<span id="L250"><span class="lineNum">     250</span>         [<span class="tlaGBC" title="fallthrough branch &quot;23 -&gt; 24&quot; was taken 5389 times"> + </span><span class="tlaGBC" title="branch &quot;23 -&gt; 52&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">        5390 :         if (m_post_fn) {</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :             // m_post_fn throwing is never expected. If it does happen, the caller</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :             // of EventLoop::post() will return without any indication of failure,</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :             // which will likely cause other bugs. Log the error and continue.</span>
+<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaGNC">       10778 :             KJ_IF_MAYBE(exception, kj::runCatchingExceptions([&amp;]() MP_REQUIRES(m_mutex) { Unlock(lock, *m_post_fn); })) {</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 5&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;24 -&gt; 25&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="exception branch &quot;24 -&gt; 113&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;25 -&gt; 26&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;25 -&gt; 28&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;28 -&gt; 29&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;28 -&gt; 31&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;31 -&gt; 32&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="branch &quot;31 -&gt; 48&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;48 -&gt; 49&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;48 -&gt; 51&quot; was taken 5389 times"> + </span>]
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaUNC">           0 :                 MP_LOG(*this, Log::Error) &lt;&lt; &quot;EventLoop: m_post_fn threw: &quot; &lt;&lt; kj::str(*exception).cStr();</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;32 -&gt; 33&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;32 -&gt; 109&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;33 -&gt; 34&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;33 -&gt; 47&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;35 -&gt; 36&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;35 -&gt; 107&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;36 -&gt; 37&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;36 -&gt; 107&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;37 -&gt; 38&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;37 -&gt; 105&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;38 -&gt; 39&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;38 -&gt; 105&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;39 -&gt; 40&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;39 -&gt; 105&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;40 -&gt; 41&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;40 -&gt; 105&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;43 -&gt; 44&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;43 -&gt; 103&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;47 -&gt; 48&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="exception branch &quot;47 -&gt; 109&quot; was not executed"> # </span>]
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaUNC">           0 :             }</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">        5389 :             m_post_fn = nullptr;</span></span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">        5389 :             m_cv.notify_all();</span></span>
+<span id="L259"><span class="lineNum">     259</span>   [<span class="tlaGBC" title="fallthrough branch &quot;52 -&gt; 53&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;52 -&gt; 113&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;53 -&gt; 54&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;53 -&gt; 57&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :         } else if (done()) {</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :             // Intentionally do not break if m_post_fn was set, even if done()</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :             // would return true, to ensure that the EventLoopRef write(post_fd)</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :             // call always succeeds and the loop does not exit between the time</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :             // that the done condition is set and the write call is made.</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :             break;</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :         }</span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">        5389 :     }</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">           3 :     MP_LOG(*this, Log::Info) &lt;&lt; &quot;EventLoop::loop done, cancelling event listeners.&quot;;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;59 -&gt; 60&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;59 -&gt; 126&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;60 -&gt; 61&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;60 -&gt; 69&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;62 -&gt; 63&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;62 -&gt; 118&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;63 -&gt; 64&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;63 -&gt; 118&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;64 -&gt; 65&quot; was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;64 -&gt; 116&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;65 -&gt; 66&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;65 -&gt; 116&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;66 -&gt; 67&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;66 -&gt; 116&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;69 -&gt; 70&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;69 -&gt; 126&quot; was not taken"> - </span>]
+<span id="L268"><span class="lineNum">     268</span>         [<span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 71&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;70 -&gt; 72&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     m_task_set.reset();</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">           3 :     MP_LOG(*this, Log::Info) &lt;&lt; &quot;EventLoop::loop bye.&quot;;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;72 -&gt; 73&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;72 -&gt; 126&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;73 -&gt; 74&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;73 -&gt; 82&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;75 -&gt; 76&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;75 -&gt; 122&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;76 -&gt; 77&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;76 -&gt; 122&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;77 -&gt; 78&quot; was taken 1 time"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;77 -&gt; 120&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;78 -&gt; 79&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;78 -&gt; 120&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;79 -&gt; 80&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;79 -&gt; 120&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;82 -&gt; 83&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;82 -&gt; 126&quot; was not taken"> - </span>]
+<span id="L270"><span class="lineNum">     270</span>         [<span class="tlaGBC" title="fallthrough branch &quot;83 -&gt; 84&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;83 -&gt; 126&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     wait_stream = nullptr;</span></span>
+<span id="L271"><span class="lineNum">     271</span>   [<span class="tlaGBC" title="fallthrough branch &quot;85 -&gt; 86&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;85 -&gt; 126&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;87 -&gt; 89&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;87 -&gt; 126&quot; was not taken"> - </span>]:<span class="tlaGNC">           2 :     KJ_SYSCALL(::close(post_fd));</span></span>
+<span id="L272"><span class="lineNum">     272</span>         [<span class="tlaGBC" title="fallthrough branch &quot;88 -&gt; 91&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;88 -&gt; 126&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     const Lock lock(m_mutex);</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC">           1 :     m_wait_fd = -1;</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaGNC">           1 :     m_post_fd = -1;</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">           1 :     m_async_fns.reset();</span></span>
+<span id="L276"><span class="lineNum">     276</span>         [<span class="tlaGBC" title="fallthrough branch &quot;93 -&gt; 94&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;93 -&gt; 95&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     m_cv.notify_all();</span></span>
+<span id="L277"><span class="lineNum">     277</span>         [<span class="tlaGBC" title="fallthrough branch &quot;95 -&gt; 96&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;95 -&gt; 128&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 : }</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">        5389 : void EventLoop::post(kj::Function&lt;void()&gt; fn)</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :             : {</span>
+<span id="L281"><span class="lineNum">     281</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 5&quot; was taken 5389 times"> + </span>]:<span class="tlaGNC">        5389 :     if (std::this_thread::get_id() == m_thread_id) {</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaUNC">           0 :         fn();</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaUNC">           0 :         return;</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :     }</span>
+<span id="L285"><span class="lineNum">     285</span>                 :<span class="tlaGNC">        5389 :     Lock lock(m_mutex);</span></span>
+<span id="L286"><span class="lineNum">     286</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 21&quot; was not taken"> - </span>]:<span class="tlaGNC">        5389 :     EventLoopRef ref(*this, &amp;lock);</span></span>
+<span id="L287"><span class="lineNum">     287</span>         [<span class="tlaUNC" title="branch &quot;9 -&gt; 8&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 5389 times"> + </span>]:<span class="tlaGNC">        5389 :     m_cv.wait(lock.m_lock, [this]() MP_REQUIRES(m_mutex) { return m_post_fn == nullptr; });</span></span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">        5389 :     m_post_fn = &amp;fn;</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :<span class="tlaGNC">        5389 :     int post_fd{m_post_fd};</span></span>
+<span id="L290"><span class="lineNum">     290</span>         [<span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 19&quot; was not taken"> - </span>]:<span class="tlaGNC">        5389 :     Unlock(lock, [&amp;] {</span></span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaGNC">        5389 :         char buffer = 0;</span></span>
+<span id="L292"><span class="lineNum">     292</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not taken"> - </span>]:<span class="tlaGNC">       10778 :         KJ_SYSCALL(write(post_fd, &amp;buffer, 1));</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :<span class="tlaGNC">        5389 :     });</span></span>
+<span id="L294"><span class="lineNum">     294</span>         [<span class="tlaGBC" title="branch &quot;13 -&gt; 12&quot; was taken 4836 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 5389 times"> + </span>]:<span class="tlaGNC">       10225 :     m_cv.wait(lock.m_lock, [this, &amp;fn]() MP_REQUIRES(m_mutex) { return m_post_fn != &amp;fn; });</span></span>
+<span id="L295"><span class="lineNum">     295</span>         [<span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 5389 times"> + </span><span class="tlaUNC" title="branch &quot;15 -&gt; 17&quot; was not taken"> - </span>]:<span class="tlaGNC">       10778 : }</span></span>
+<span id="L296"><span class="lineNum">     296</span>                 :             : </span>
+<span id="L297"><span class="lineNum">     297</span>                 :<span class="tlaGNC">           1 : void EventLoop::startAsyncThread()</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :             : {</span>
+<span id="L299"><span class="lineNum">     299</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :     assert (std::this_thread::get_id() == m_thread_id);</span></span>
+<span id="L300"><span class="lineNum">     300</span>         [<span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :     if (m_async_thread.joinable()) {</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :         // Notify to wake up the async thread if it is already running.</span>
+<span id="L302"><span class="lineNum">     302</span>                 :<span class="tlaUNC">           0 :         m_cv.notify_all();</span></span>
+<span id="L303"><span class="lineNum">     303</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 1 time"> + </span><span class="tlaUNC" title="branch &quot;6 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :     } else if (!m_async_fns-&gt;empty()) {</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">           1 :         m_async_thread = std::thread([this] {</span></span>
+<span id="L305"><span class="lineNum">     305</span>                 :<span class="tlaGNC">           1 :             Lock lock(m_mutex);</span></span>
+<span id="L306"><span class="lineNum">     306</span>         [<span class="tlaGBC" title="branch &quot;15 -&gt; 4&quot; was taken 2 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :             while (m_async_fns) {</span></span>
+<span id="L307"><span class="lineNum">     307</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 13&quot; was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :                 if (!m_async_fns-&gt;empty()) {</span></span>
+<span id="L308"><span class="lineNum">     308</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 23&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :                     EventLoopRef ref{*this, &amp;lock};</span></span>
+<span id="L309"><span class="lineNum">     309</span>                 :<span class="tlaGNC">           1 :                     const std::function&lt;void()&gt; fn = std::move(m_async_fns-&gt;front());</span></span>
+<span id="L310"><span class="lineNum">     310</span>                 :<span class="tlaGNC">           1 :                     m_async_fns-&gt;pop_front();</span></span>
+<span id="L311"><span class="lineNum">     311</span>         [<span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 19&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :                     Unlock(lock, fn);</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :                     // Important to relock because of the wait() call below.</span>
+<span id="L313"><span class="lineNum">     313</span>         [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 19&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :                     ref.reset(/*relock=*/true);</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             :                     // Continue without waiting in case there are more async_fns</span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaGNC">           1 :                     continue;</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaGNC">           1 :                 }</span></span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;13 -&gt; 23&quot; was not taken"> - </span>]:<span class="tlaGNC">           1 :                 m_cv.wait(lock.m_lock);</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :             }</span>
+<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">           2 :         });</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :     }</span>
+<span id="L321"><span class="lineNum">     321</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :             : </span>
+<span id="L323"><span class="lineNum">     323</span>                 :<span class="tlaGNC">        5395 : bool EventLoop::done() const</span></span>
+<span id="L324"><span class="lineNum">     324</span>                 :             : {</span>
+<span id="L325"><span class="lineNum">     325</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 5395 times"> + </span>]:<span class="tlaGNC">        5395 :     assert(m_num_refs &gt;= 0);</span></span>
+<span id="L326"><span class="lineNum">     326</span>   [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 3 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 7&quot; was taken 5392 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 2 times"> + </span>]:<span class="tlaGNC">        5395 :     return m_num_refs == 0 &amp;&amp; m_async_fns-&gt;empty();</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :             : }</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             : </span>
+<span id="L329"><span class="lineNum">     329</span>                 :<span class="tlaUNC">           0 : std::tuple&lt;ConnThread, bool&gt; SetThread(GuardedRef&lt;ConnThreads&gt; threads, Connection* connection, const std::function&lt;Thread::Client()&gt;&amp; make_thread)</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :             : {</span>
+<span id="L331"><span class="lineNum">     331</span>         [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     assert(std::this_thread::get_id() == connection-&gt;m_loop-&gt;m_thread_id);</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :<span class="tlaUNC">           0 :     ConnThread thread;</span></span>
+<span id="L333"><span class="lineNum">     333</span>                 :<span class="tlaUNC">           0 :     bool inserted;</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaUNC">           0 :     {</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :<span class="tlaUNC">           0 :         const Lock lock(threads.mutex);</span></span>
+<span id="L336"><span class="lineNum">     336</span>   [<span class="tlaUNC" title="fallthrough branch &quot;6 -&gt; 7&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 21&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;7 -&gt; 8&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;7 -&gt; 9&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         std::tie(thread, inserted) = threads.ref.try_emplace(connection);</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L338"><span class="lineNum">     338</span>         [<span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;9 -&gt; 20&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (inserted) {</span></span>
+<span id="L339"><span class="lineNum">     339</span>         [<span class="tlaUNC" title="fallthrough branch &quot;11 -&gt; 12&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;11 -&gt; 24&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         thread-&gt;second.emplace(make_thread(), connection, /* destroy_connection= */ false);</span></span>
+<span id="L340"><span class="lineNum">     340</span>   [<span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;14 -&gt; 26&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;15 -&gt; 17&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         thread-&gt;second-&gt;m_disconnect_cb = connection-&gt;addSyncCleanup([threads, thread] {</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :             :             // Note: it is safe to use the `thread` iterator in this cleanup</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :             // function, because the iterator would only be invalid if the map entry</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :             // was removed, and if the map entry is removed the ProxyClient&lt;Thread&gt;</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :             // destructor unregisters the cleanup.</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             : </span>
+<span id="L346"><span class="lineNum">     346</span>                 :             :             // Connection is being destroyed before thread client is, so reset</span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :             // thread client m_disconnect_cb member so thread client destructor does not</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :             // try to unregister this callback after connection is destroyed.</span>
+<span id="L349"><span class="lineNum">     349</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :             thread-&gt;second-&gt;m_disconnect_cb.reset();</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :             : </span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :             // Remove connection pointer about to be destroyed from the map</span>
+<span id="L352"><span class="lineNum">     352</span>                 :<span class="tlaUNC">           0 :             const Lock lock(threads.mutex);</span></span>
+<span id="L353"><span class="lineNum">     353</span>         [<span class="tlaUNC" title="fallthrough branch &quot;7 -&gt; 8&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;7 -&gt; 9&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :             threads.ref.erase(thread);</span></span>
+<span id="L354"><span class="lineNum">     354</span>         [<span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;15 -&gt; 17&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         });</span></span>
+<span id="L355"><span class="lineNum">     355</span>                 :             :     }</span>
+<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaUNC">           0 :     return {thread, inserted};</span></span>
+<span id="L357"><span class="lineNum">     357</span>                 :             : }</span>
+<span id="L358"><span class="lineNum">     358</span>                 :             : </span>
+<span id="L359"><span class="lineNum">     359</span>                 :<span class="tlaUNC">           0 : ProxyClient&lt;Thread&gt;::~ProxyClient()</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :             : {</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :     // If thread is being destroyed before connection is destroyed, remove the</span>
+<span id="L362"><span class="lineNum">     362</span>                 :             :     // cleanup callback that was registered to handle the connection being</span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     // destroyed before the thread being destroyed.</span>
+<span id="L364"><span class="lineNum">     364</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 5&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (m_disconnect_cb) {</span></span>
+<span id="L365"><span class="lineNum">     365</span>                 :             :         // Remove disconnect callback on the event loop thread with</span>
+<span id="L366"><span class="lineNum">     366</span>                 :             :         // loop-&gt;sync(), so if the connection is broken there is not a race</span>
+<span id="L367"><span class="lineNum">     367</span>                 :             :         // between this thread trying to remove the callback and the disconnect</span>
+<span id="L368"><span class="lineNum">     368</span>                 :             :         // handler attempting to call it.</span>
+<span id="L369"><span class="lineNum">     369</span>                 :<span class="tlaUNC">           0 :         m_context.loop-&gt;sync([&amp;]() {</span></span>
+<span id="L370"><span class="lineNum">     370</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :             if (m_disconnect_cb) {</span></span>
+<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaUNC">           0 :                 m_context.connection-&gt;removeSyncCleanup(*m_disconnect_cb);</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :             :             }</span>
+<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaUNC">           0 :         });</span></span>
+<span id="L374"><span class="lineNum">     374</span>                 :             :     }</span>
+<span id="L375"><span class="lineNum">     375</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L376"><span class="lineNum">     376</span>                 :             : </span>
+<span id="L377"><span class="lineNum">     377</span>                 :<span class="tlaUNC">           0 : ProxyServer&lt;Thread&gt;::ProxyServer(Connection&amp; connection, ThreadContext&amp; thread_context, std::thread&amp;&amp; thread)</span></span>
+<span id="L378"><span class="lineNum">     378</span>         [<span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 8&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     : m_loop{*connection.m_loop}, m_thread_context(thread_context), m_thread(std::move(thread))</span></span>
+<span id="L379"><span class="lineNum">     379</span>                 :             : {</span>
+<span id="L380"><span class="lineNum">     380</span>         [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 7&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     assert(m_thread_context.waiter.get() != nullptr);</span></span>
+<span id="L381"><span class="lineNum">     381</span>                 :<span class="tlaUNC">           0 : }</span></span>
+<span id="L382"><span class="lineNum">     382</span>                 :             : </span>
+<span id="L383"><span class="lineNum">     383</span>                 :<span class="tlaUNC">           0 : ProxyServer&lt;Thread&gt;::~ProxyServer()</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :             : {</span>
+<span id="L385"><span class="lineNum">     385</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 8&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!m_thread.joinable()) return;</span></span>
+<span id="L386"><span class="lineNum">     386</span>                 :             :     // Stop async thread and wait for it to exit. Need to wait because the</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             :     // m_thread handle needs to outlive the thread to avoid &quot;terminate called</span>
+<span id="L388"><span class="lineNum">     388</span>                 :             :     // without an active exception&quot; error. An alternative to waiting would be</span>
+<span id="L389"><span class="lineNum">     389</span>                 :             :     // detach the thread, but this would introduce nondeterminism which could</span>
+<span id="L390"><span class="lineNum">     390</span>                 :             :     // make code harder to debug or extend.</span>
+<span id="L391"><span class="lineNum">     391</span>         [<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;8 -&gt; 10&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     assert(m_thread_context.waiter.get());</span></span>
+<span id="L392"><span class="lineNum">     392</span>                 :<span class="tlaUNC">           0 :     std::unique_ptr&lt;Waiter&gt; waiter;</span></span>
+<span id="L393"><span class="lineNum">     393</span>                 :<span class="tlaUNC">           0 :     {</span></span>
+<span id="L394"><span class="lineNum">     394</span>         [<span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 27&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         const Lock lock(m_thread_context.waiter-&gt;m_mutex);</span></span>
+<span id="L395"><span class="lineNum">     395</span>                 :             :         //! Reset thread context waiter pointer, as shutdown signal for done</span>
+<span id="L396"><span class="lineNum">     396</span>                 :             :         //! lambda passed as waiter-&gt;wait() argument in makeThread code below.</span>
+<span id="L397"><span class="lineNum">     397</span>                 :<span class="tlaUNC">           0 :         waiter = std::move(m_thread_context.waiter);</span></span>
+<span id="L398"><span class="lineNum">     398</span>                 :             :         //! Assert waiter is idle. This destructor shouldn't be getting called if it is busy.</span>
+<span id="L399"><span class="lineNum">     399</span>         [<span class="tlaUNC" title="fallthrough branch &quot;12 -&gt; 13&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;12 -&gt; 14&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         assert(!waiter-&gt;m_fn);</span></span>
+<span id="L400"><span class="lineNum">     400</span>                 :             :         // Clear client maps now to avoid deadlock in m_thread.join() call</span>
+<span id="L401"><span class="lineNum">     401</span>                 :             :         // below. The maps contain Thread::Client objects that need to be</span>
+<span id="L402"><span class="lineNum">     402</span>                 :             :         // destroyed from the event loop thread (this thread), which can't</span>
+<span id="L403"><span class="lineNum">     403</span>                 :             :         // happen if this thread is busy calling join.</span>
+<span id="L404"><span class="lineNum">     404</span>                 :<span class="tlaUNC">           0 :         m_thread_context.request_threads.clear();</span></span>
+<span id="L405"><span class="lineNum">     405</span>                 :<span class="tlaUNC">           0 :         m_thread_context.callback_threads.clear();</span></span>
+<span id="L406"><span class="lineNum">     406</span>                 :             :         //! Ping waiter.</span>
+<span id="L407"><span class="lineNum">     407</span>         [<span class="tlaUNC" title="fallthrough branch &quot;17 -&gt; 18&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;17 -&gt; 19&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         waiter-&gt;m_cv.notify_all();</span></span>
+<span id="L408"><span class="lineNum">     408</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L409"><span class="lineNum">     409</span>         [<span class="tlaUNC" title="fallthrough branch &quot;19 -&gt; 20&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;19 -&gt; 27&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     m_thread.join();</span></span>
+<span id="L410"><span class="lineNum">     410</span>   [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;21 -&gt; 22&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;21 -&gt; 23&quot; was not executed"> # </span> :<span class="tlaUNC">           0 : }</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;29 -&gt; 30&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;29 -&gt; 31&quot; was not executed"> # </span>]
+<span id="L411"><span class="lineNum">     411</span>                 :             : </span>
+<span id="L412"><span class="lineNum">     412</span>                 :<span class="tlaUNC">           0 : kj::Promise&lt;void&gt; ProxyServer&lt;Thread&gt;::getName(GetNameContext context)</span></span>
+<span id="L413"><span class="lineNum">     413</span>                 :             : {</span>
+<span id="L414"><span class="lineNum">     414</span>   [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :     context.getResults().setResult(m_thread_context.thread_name);</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 10&quot; was not executed"> # </span>]
+<span id="L415"><span class="lineNum">     415</span>                 :<span class="tlaUNC">           0 :     return kj::READY_NOW;</span></span>
+<span id="L416"><span class="lineNum">     416</span>                 :             : }</span>
+<span id="L417"><span class="lineNum">     417</span>                 :             : </span>
+<span id="L418"><span class="lineNum">     418</span>                 :<span class="tlaUNC">           0 : ProxyServer&lt;ThreadMap&gt;::ProxyServer(Connection&amp; connection) : m_connection(connection) {}</span></span>
+<span id="L419"><span class="lineNum">     419</span>                 :             : </span>
+<span id="L420"><span class="lineNum">     420</span>                 :<span class="tlaUNC">           0 : kj::Promise&lt;void&gt; ProxyServer&lt;ThreadMap&gt;::makePool(MakePoolContext context)</span></span>
+<span id="L421"><span class="lineNum">     421</span>                 :             : {</span>
+<span id="L422"><span class="lineNum">     422</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 6&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (!m_connection.m_thread_pool.empty()) {</span></span>
+<span id="L423"><span class="lineNum">     423</span>         [<span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 39&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         throw std::runtime_error(&quot;makePool called on connection with existing pool&quot;);</span></span>
+<span id="L424"><span class="lineNum">     424</span>                 :             :     }</span>
+<span id="L425"><span class="lineNum">     425</span>                 :<span class="tlaUNC">           0 :     EventLoop&amp; loop{*m_connection.m_loop};</span></span>
+<span id="L426"><span class="lineNum">     426</span>                 :<span class="tlaUNC">           0 :     const uint32_t count = context.getParams().getCount();</span></span>
+<span id="L427"><span class="lineNum">     427</span>         [<span class="tlaUNC" title="branch &quot;36 -&gt; 11&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;36 -&gt; 37&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     for (uint32_t i = 0; i &lt; count; ++i) {</span></span>
+<span id="L428"><span class="lineNum">     428</span>         [<span class="tlaUNC" title="fallthrough branch &quot;12 -&gt; 13&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;12 -&gt; 41&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         const std::string thread_name = &quot;pool/&quot; + std::to_string(i);</span></span>
+<span id="L429"><span class="lineNum">     429</span>         [<span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;14 -&gt; 58&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         std::promise&lt;ThreadContext*&gt; thread_context;</span></span>
+<span id="L430"><span class="lineNum">     430</span>         [<span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;15 -&gt; 17&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         std::thread thread([&amp;loop, &amp;thread_context, thread_name]() {</span></span>
+<span id="L431"><span class="lineNum">     431</span>   [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 33&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 31&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :             g_thread_context.thread_name = ThreadName(loop.m_exe_name) + &quot; (&quot; + thread_name + &quot;)&quot;;</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 27&quot; was not executed"> # </span>]
+<span id="L432"><span class="lineNum">     432</span>         [<span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;15 -&gt; 35&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :             g_thread_context.waiter = std::make_unique&lt;Waiter&gt;();</span></span>
+<span id="L433"><span class="lineNum">     433</span>                 :<span class="tlaUNC">           0 :             Lock lock(g_thread_context.waiter-&gt;m_mutex);</span></span>
+<span id="L434"><span class="lineNum">     434</span>   [<span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;20 -&gt; 37&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;21 -&gt; 22&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;21 -&gt; 37&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :             thread_context.set_value(&amp;g_thread_context);</span></span>
+<span id="L435"><span class="lineNum">     435</span>   [<span class="tlaUNC" title="fallthrough branch &quot;22 -&gt; 23&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;22 -&gt; 37&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 37&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :             g_thread_context.waiter-&gt;wait(lock, [] { return !g_thread_context.waiter; });</span></span>
+<span id="L436"><span class="lineNum">     436</span>         [<span class="tlaUNC" title="fallthrough branch &quot;19 -&gt; 20&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;19 -&gt; 43&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         });</span></span>
+<span id="L437"><span class="lineNum">     437</span>   [<span class="tlaUNC" title="fallthrough branch &quot;21 -&gt; 22&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;21 -&gt; 54&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 45&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :         auto thread_server = kj::heap&lt;ProxyServer&lt;Thread&gt;&gt;(m_connection, *thread_context.get_future().get(), std::move(thread));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;24 -&gt; 25&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;24 -&gt; 45&quot; was not executed"> # </span>]
+<span id="L438"><span class="lineNum">     438</span>   [<span class="tlaUNC" title="fallthrough branch &quot;29 -&gt; 30&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;29 -&gt; 50&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;30 -&gt; 31&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;30 -&gt; 52&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :         m_connection.m_thread_pool.push_back({m_connection.m_threads.add(kj::mv(thread_server))});</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;31 -&gt; 32&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;31 -&gt; 54&quot; was not executed"> # </span>]
+<span id="L439"><span class="lineNum">     439</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L440"><span class="lineNum">     440</span>                 :<span class="tlaUNC">           0 :     return kj::READY_NOW;</span></span>
+<span id="L441"><span class="lineNum">     441</span>   [<span class="tlaUNC" title="fallthrough branch &quot;27 -&gt; 28&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;27 -&gt; 50&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;28 -&gt; 29&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;28 -&gt; 48&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 : }</span></span>
+<span id="L442"><span class="lineNum">     442</span>                 :             : </span>
+<span id="L443"><span class="lineNum">     443</span>                 :<span class="tlaUNC">           0 : kj::Promise&lt;void&gt; ProxyServer&lt;ThreadMap&gt;::makeThread(MakeThreadContext context)</span></span>
+<span id="L444"><span class="lineNum">     444</span>                 :             : {</span>
+<span id="L445"><span class="lineNum">     445</span>                 :<span class="tlaUNC">           0 :     EventLoop&amp; loop{*m_connection.m_loop};</span></span>
+<span id="L446"><span class="lineNum">     446</span>         [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     if (loop.testing_hook_makethread) loop.testing_hook_makethread();</span></span>
+<span id="L447"><span class="lineNum">     447</span>                 :<span class="tlaUNC">           0 :     const std::string from = context.getParams().getName();</span></span>
+<span id="L448"><span class="lineNum">     448</span>         [<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 52&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::promise&lt;ThreadContext*&gt; thread_context;</span></span>
+<span id="L449"><span class="lineNum">     449</span>         [<span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;9 -&gt; 11&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     std::thread thread([&amp;loop, &amp;thread_context, from]() {</span></span>
+<span id="L450"><span class="lineNum">     450</span>   [<span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 35&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 33&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :         g_thread_context.thread_name = ThreadName(loop.m_exe_name) + &quot; (from &quot; + from + &quot;)&quot;;</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 29&quot; was not executed"> # </span>]
+<span id="L451"><span class="lineNum">     451</span>         [<span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;15 -&gt; 37&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         g_thread_context.waiter = std::make_unique&lt;Waiter&gt;();</span></span>
+<span id="L452"><span class="lineNum">     452</span>                 :<span class="tlaUNC">           0 :         Lock lock(g_thread_context.waiter-&gt;m_mutex);</span></span>
+<span id="L453"><span class="lineNum">     453</span>   [<span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;20 -&gt; 39&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;21 -&gt; 22&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;21 -&gt; 39&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         thread_context.set_value(&amp;g_thread_context);</span></span>
+<span id="L454"><span class="lineNum">     454</span>   [<span class="tlaUNC" title="fallthrough branch &quot;22 -&gt; 23&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;22 -&gt; 24&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 39&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         if (loop.testing_hook_makethread_created) loop.testing_hook_makethread_created();</span></span>
+<span id="L455"><span class="lineNum">     455</span>                 :             :         // Wait for shutdown signal from ProxyServer&lt;Thread&gt; destructor (signal</span>
+<span id="L456"><span class="lineNum">     456</span>                 :             :         // is just waiter getting set to null.)</span>
+<span id="L457"><span class="lineNum">     457</span>   [<span class="tlaUNC" title="fallthrough branch &quot;24 -&gt; 25&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;24 -&gt; 39&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;25 -&gt; 26&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;25 -&gt; 39&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :         g_thread_context.waiter-&gt;wait(lock, [] { return !g_thread_context.waiter; });</span></span>
+<span id="L458"><span class="lineNum">     458</span>         [<span class="tlaUNC" title="fallthrough branch &quot;13 -&gt; 14&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;13 -&gt; 34&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     });</span></span>
+<span id="L459"><span class="lineNum">     459</span>   [<span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;15 -&gt; 48&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;17 -&gt; 18&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;17 -&gt; 36&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :     auto thread_server = kj::heap&lt;ProxyServer&lt;Thread&gt;&gt;(m_connection, *thread_context.get_future().get(), std::move(thread));</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;18 -&gt; 19&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;18 -&gt; 36&quot; was not executed"> # </span>]
+<span id="L460"><span class="lineNum">     460</span>         [<span class="tlaUNC" title="fallthrough branch &quot;21 -&gt; 22&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;21 -&gt; 39&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     auto thread_client = m_connection.m_threads.add(kj::mv(thread_server));</span></span>
+<span id="L461"><span class="lineNum">     461</span>   [<span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 41&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;24 -&gt; 25&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;24 -&gt; 41&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     context.getResults().setResult(kj::mv(thread_client));</span></span>
+<span id="L462"><span class="lineNum">     462</span>   [<span class="tlaUNC" title="fallthrough branch &quot;27 -&gt; 28&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;27 -&gt; 44&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;28 -&gt; 29&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;28 -&gt; 46&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     return kj::READY_NOW;</span></span>
+<span id="L463"><span class="lineNum">     463</span>   [<span class="tlaUNC" title="fallthrough branch &quot;29 -&gt; 30&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;29 -&gt; 48&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;54 -&gt; 55&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;54 -&gt; 58&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 : }</span></span>
+<span id="L464"><span class="lineNum">     464</span>                 :             : </span>
+<span id="L465"><span class="lineNum">     465</span>                 :             : std::atomic&lt;int&gt; server_reqs{0};</span>
+<span id="L466"><span class="lineNum">     466</span>                 :             : </span>
+<span id="L467"><span class="lineNum">     467</span>                 :<span class="tlaGNC">       21562 : std::string LongThreadName(const char* exe_name)</span></span>
+<span id="L468"><span class="lineNum">     468</span>                 :             : {</span>
+<span id="L469"><span class="lineNum">     469</span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 21559 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 3 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;6 -&gt; 7&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 3 times"> + </span>]:<span class="tlaGNC">       21562 :     return g_thread_context.thread_name.empty() ? ThreadName(exe_name) : g_thread_context.thread_name;</span></span>
+<span id="L470"><span class="lineNum">     470</span>                 :             : }</span>
+<span id="L471"><span class="lineNum">     471</span>                 :             : </span>
+<span id="L472"><span class="lineNum">     472</span>                 :<span class="tlaUNC">           0 : kj::StringPtr KJ_STRINGIFY(Log v)</span></span>
+<span id="L473"><span class="lineNum">     473</span>                 :             : {</span>
+<span id="L474"><span class="lineNum">     474</span>   [<span class="tlaUNC" title="branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 6&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :     switch (v) {</span></span>
+<span class="lineNum">        </span>       <span class="tlaUNC" title="branch &quot;2 -&gt; 7&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 8&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 9&quot; was not executed"> # </span>]
+<span id="L475"><span class="lineNum">     475</span>                 :<span class="tlaUNC">           0 :         case Log::Trace:   return &quot;Trace&quot;;</span></span>
+<span id="L476"><span class="lineNum">     476</span>                 :<span class="tlaUNC">           0 :         case Log::Debug:   return &quot;Debug&quot;;</span></span>
+<span id="L477"><span class="lineNum">     477</span>                 :<span class="tlaUNC">           0 :         case Log::Info:    return &quot;Info&quot;;</span></span>
+<span id="L478"><span class="lineNum">     478</span>                 :<span class="tlaUNC">           0 :         case Log::Warning: return &quot;Warning&quot;;</span></span>
+<span id="L479"><span class="lineNum">     479</span>                 :<span class="tlaUNC">           0 :         case Log::Error:   return &quot;Error&quot;;</span></span>
+<span id="L480"><span class="lineNum">     480</span>                 :<span class="tlaUNC">           0 :         case Log::Raise:   return &quot;Raise&quot;;</span></span>
+<span id="L481"><span class="lineNum">     481</span>                 :             :     }</span>
+<span id="L482"><span class="lineNum">     482</span>                 :<span class="tlaUNC">           0 :     return &quot;&lt;Log?&gt;&quot;;</span></span>
+<span id="L483"><span class="lineNum">     483</span>                 :             : }</span>
+<span id="L484"><span class="lineNum">     484</span>                 :             : } // namespace mp</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
