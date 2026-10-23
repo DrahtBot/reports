@@ -1,0 +1,455 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/dbwrapper.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - dbwrapper.h<span style="font-size: 80%;"> (source / <a href="dbwrapper.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">93.7&nbsp;%</td>
+            <td class="headerCovTableEntry">79</td>
+            <td class="headerCovTableEntry">74</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-10-23 02:47:14</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">60.0&nbsp;%</td>
+            <td class="headerCovTableEntry">100</td>
+            <td class="headerCovTableEntry">60</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">48.4&nbsp;%</td>
+            <td class="headerCovTableEntry">161</td>
+            <td class="headerCovTableEntry">78</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2012-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_DBWRAPPER_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_DBWRAPPER_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;attributes.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;serialize.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;streams.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;util/byte_units.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;util/check.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;util/expected.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;util/fs.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;util/not_null.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;util/obfuscation.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;cstddef&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;cstdint&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;exception&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;memory&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;span&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : #include &lt;stdexcept&gt;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #include &lt;string&gt;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : </span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : namespace leveldb {</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : class Env;</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : } // namespace leveldb</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : inline constexpr size_t DBWRAPPER_PREALLOC_KEY_SIZE = 64;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : inline constexpr size_t DBWRAPPER_PREALLOC_VALUE_SIZE = 1024;</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : inline constexpr size_t DBWRAPPER_MAX_FILE_SIZE{32_MiB};</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : //! User-controlled performance and debug options.</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : struct DBOptions {</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     //! Compact database on startup.</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     bool force_compact = false;</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : };</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : </span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : //! Application-specific storage settings.</span>
+<span id="L43"><span class="lineNum">      43</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 5306 times"> + </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 11&quot; was not taken"> - </span>]:<span class="tlaGNC">      263712 : struct DBParams {</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 2542 times"> + </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 39&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 4272 times"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 19&quot; was not taken"> - </span>]
+<span id="L44"><span class="lineNum">      44</span>                 :             :     //! Location in the filesystem where leveldb data will be stored.</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     fs::path path;</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     //! Configures various leveldb cache settings.</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     uint64_t cache_bytes;</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     //! If true, use leveldb's memory environment.</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     bool memory_only = false;</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     //! If true, remove all existing data.</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     bool wipe_data = false;</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     //! If true, store data obfuscated via simple XOR. If false, XOR with a</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :     //! zero'd byte array.</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     bool obfuscate = false;</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :     //! If true, build a LevelDB bloom filter to accelerate point lookups.</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :     bool bloom_filter = true;</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :     //! Passed-through options.</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :     DBOptions options{};</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     //! If non-null, use this as the leveldb::Env instead of the default.</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     //! Caller retains ownership.</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     leveldb::Env* testing_env = nullptr;</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     //! Maximum LevelDB SST file size. Larger values reduce the frequency</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     //! of compactions but increase their duration.</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     size_t max_file_size = DBWRAPPER_MAX_FILE_SIZE;</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             : };</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : </span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : class dbwrapper_error : public std::runtime_error</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : {</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             : public:</span>
+<span id="L70"><span class="lineNum">      70</span>         [<span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 14&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     explicit dbwrapper_error(const std::string&amp; msg) : std::runtime_error(msg) {}</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 26&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;14 -&gt; 30&quot; was not executed"> # </span>]
+<span id="L71"><span class="lineNum">      71</span>                 :             : };</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : class CDBWrapper;</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : </span>
+<span id="L75"><span class="lineNum">      75</span>                 :             : /** These should be considered an implementation detail of the specific database.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :  */</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : namespace dbwrapper_private {</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : /** Work around circular dependency, as well as for testing in dbwrapper_tests.</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :  * Database obfuscation should be considered an implementation detail of the</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :  * specific database.</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :  */</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : const Obfuscation&amp; GetObfuscation(const CDBWrapper&amp;);</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : }; // namespace dbwrapper_private</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : </span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : bool DestroyDB(const std::string&amp; path_str);</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             : </span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : /** Batch of changes queued to be written to a CDBWrapper */</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : class CDBBatch</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : {</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :     friend class CDBWrapper;</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : </span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : private:</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :     const CDBWrapper &amp;parent;</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : </span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :     struct WriteBatchImpl;</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :     const std::unique_ptr&lt;WriteBatchImpl&gt; m_impl_batch;</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : </span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     DataStream m_key_scratch{};</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     DataStream m_value_scratch{};</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : </span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :     void WriteImpl(std::span&lt;const std::byte&gt; key, DataStream&amp; value);</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :     void EraseImpl(std::span&lt;const std::byte&gt; key);</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             : </span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : public:</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     /**</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :      * @param[in] _parent   CDBWrapper that this batch is to be submitted to</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :      */</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :     explicit CDBBatch(const CDBWrapper&amp; _parent);</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     ~CDBBatch();</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     void Clear();</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             : </span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     template &lt;typename K, typename V&gt;</span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">     9868280 :     void Write(const K&amp; key, const V&amp; value)</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :     {</span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">     9868280 :         ScopedDataStreamUsage scoped_key{m_key_scratch}, scoped_value{m_value_scratch};</span></span>
+<span id="L117"><span class="lineNum">     117</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 9868280 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 14&quot; was not taken"> - </span>]:<span class="tlaGNC">     9868280 :         m_key_scratch &lt;&lt; key;</span></span>
+<span id="L118"><span class="lineNum">     118</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 9868280 times"> + </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 14&quot; was not taken"> - </span>]:<span class="tlaGNC">     9868280 :         m_value_scratch &lt;&lt; value;</span></span>
+<span id="L119"><span class="lineNum">     119</span>   [<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;8 -&gt; 10&quot; was taken 9868280 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 9868280 times"> + </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 14&quot; was not taken"> - </span>]:<span class="tlaGNC">     9868280 :         WriteImpl(m_key_scratch, m_value_scratch);</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">     9868280 :     }</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :             : </span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :     template &lt;typename K&gt;</span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">     6497597 :     void Erase(const K&amp; key)</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :     {</span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">     6497597 :         ScopedDataStreamUsage scoped_key{m_key_scratch};</span></span>
+<span id="L126"><span class="lineNum">     126</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 6497597 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">     6497597 :         m_key_scratch &lt;&lt; key;</span></span>
+<span id="L127"><span class="lineNum">     127</span>   [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 6497597 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 6497597 times"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">     6497597 :         EraseImpl(m_key_scratch);</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">     6497597 :     }</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :     size_t ApproximateSize() const;</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : };</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : </span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : class CDBIterator</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : {</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             : public:</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :     struct IteratorImpl;</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             : </span>
+<span id="L138"><span class="lineNum">     138</span>                 :             : private:</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     const CDBWrapper &amp;parent;</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :     const std::unique_ptr&lt;IteratorImpl&gt; m_impl_iter;</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     DataStream m_scratch{};</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : </span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     void SeekImpl(std::span&lt;const std::byte&gt; key);</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :     std::span&lt;const std::byte&gt; GetKeyImpl() const;</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     std::span&lt;const std::byte&gt; GetValueImpl() const;</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : </span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : public:</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :     /**</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :      * @param[in] _parent          Parent CDBWrapper instance.</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :      * @param[in] _piter           The original leveldb iterator.</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :      */</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :     CDBIterator(const CDBWrapper&amp; _parent, std::unique_ptr&lt;IteratorImpl&gt; _piter);</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :     ~CDBIterator();</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : </span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     bool Valid() const;</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : </span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :     void SeekToFirst();</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">      205263 :     template&lt;typename K&gt; void Seek(const K&amp; key) {</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">      205263 :         ScopedDataStreamUsage scoped_scratch{m_scratch};</span></span>
+<span id="L162"><span class="lineNum">     162</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 205263 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">      205263 :         m_scratch &lt;&lt; key;</span></span>
+<span id="L163"><span class="lineNum">     163</span>   [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 205263 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 205263 times"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">      205263 :         SeekImpl(m_scratch);</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">      205263 :     }</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             : </span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :     void Next();</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : </span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">     7506195 :     template&lt;typename K&gt; bool GetKey(K&amp; key) {</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :         try {</span>
+<span id="L170"><span class="lineNum">     170</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 7506195 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 7466619 times"> + </span><span class="tlaGBC" title="exception branch &quot;3 -&gt; 6&quot; was taken 39576 times"> + </span>]:<span class="tlaGNC">     7506195 :             SpanReader ssKey{GetKeyImpl()};</span></span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaGNC">     7506195 :             ssKey &gt;&gt; key;</span></span>
+<span id="L172"><span class="lineNum">     172</span>         [<span class="tlaUNC" title="fallthrough branch &quot;6 -&gt; 7&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 39576 times"> + </span>]:<span class="tlaGNC">       39576 :         } catch (const std::exception&amp;) {</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :             return false;</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :         }</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :         return true;</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     }</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : </span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaGNC">     7318776 :     template&lt;typename V&gt; bool GetValue(V&amp; value) {</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :         try {</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">     7318776 :             ScopedDataStreamUsage scoped_scratch{m_scratch};</span></span>
+<span id="L181"><span class="lineNum">     181</span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 7318776 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 14&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 7318776 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 14&quot; was not taken"> - </span>]:<span class="tlaGNC">     7318776 :             m_scratch.write(GetValueImpl());</span></span>
+<span id="L182"><span class="lineNum">     182</span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 7318776 times"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 14&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;6 -&gt; 7&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 7318776 times"> + </span>]:<span class="tlaGNC">     7318776 :             dbwrapper_private::GetObfuscation(parent)(m_scratch);</span></span>
+<span id="L183"><span class="lineNum">     183</span>         [<span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 7318776 times"> + </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 14&quot; was not taken"> - </span>]:<span class="tlaGNC">     7318776 :             m_scratch &gt;&gt; value;</span></span>
+<span id="L184"><span class="lineNum">     184</span>         [<span class="tlaUNC" title="fallthrough branch &quot;16 -&gt; 17&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;16 -&gt; 18&quot; was not taken"> - </span>]:<span class="tlaGNC">     7318776 :         } catch (const std::exception&amp;) {</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :             return false;</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :         }</span>
+<span id="L187"><span class="lineNum">     187</span>                 :<span class="tlaGNC">     7318776 :         return true;</span></span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :     }</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             : };</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : struct LevelDBContext;</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : </span>
+<span id="L193"><span class="lineNum">     193</span>                 :             : class CDBWrapper</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             : {</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :     friend const Obfuscation&amp; dbwrapper_private::GetObfuscation(const CDBWrapper&amp;);</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             : private:</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :     //! holds all leveldb-specific fields of this class</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :     util::NotNullUniquePtr&lt;LevelDBContext&gt; m_db_context;</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : </span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :     //! the name of this database</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     std::string m_name;</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : </span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     //! optional XOR-obfuscation of the database</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :     Obfuscation m_obfuscation;</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             : </span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :     //! obfuscation key storage key, null-prefixed to avoid collisions</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :     inline static const std::string OBFUSCATION_KEY{&quot;\000obfuscate_key&quot;, 14}; // explicit size to avoid truncation at leading \0</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             : </span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     std::optional&lt;std::string&gt; ReadImpl(std::span&lt;const std::byte&gt; key) const;</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :     bool ExistsImpl(std::span&lt;const std::byte&gt; key) const;</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :     size_t EstimateSizeImpl(std::span&lt;const std::byte&gt; key1, std::span&lt;const std::byte&gt; key2) const;</span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">    12423154 :     auto&amp; DBContext() const LIFETIMEBOUND { return *m_db_context; }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 272160 times"> + </span><span class="tlaUNC" title="exception branch &quot;5 -&gt; 12&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 53705 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 20&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 7334013 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 23&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 11325 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 273957 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;7 -&gt; 10&quot; was taken 3229488 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 111548 times"> + </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 101280 times"> + </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 10268 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 111548 times"> + </span><span class="tlaUNC" title="branch &quot;11 -&gt; 13&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;15 -&gt; 16&quot; was taken 111548 times"> + </span><span class="tlaUNC" title="branch &quot;15 -&gt; 17&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;19 -&gt; 20&quot; was taken 16014 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;19 -&gt; 21&quot; was taken 95534 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;23 -&gt; 24&quot; was taken 111548 times"> + </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 157&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;27 -&gt; 28&quot; was taken 95534 times"> + </span><span class="tlaGBC" title="branch &quot;27 -&gt; 30&quot; was taken 16014 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;49 -&gt; 50&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;49 -&gt; 51&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;69 -&gt; 70&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;69 -&gt; 71&quot; was taken 111548 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;74 -&gt; 75&quot; was taken 111548 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="exception branch &quot;74 -&gt; 140&quot; was not taken"> - </span>]
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>                 :             : public:</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :     CDBWrapper(const DBParams&amp; params);</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :     ~CDBWrapper();</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : </span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :     CDBWrapper(const CDBWrapper&amp;) = delete;</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :     CDBWrapper&amp; operator=(const CDBWrapper&amp;) = delete;</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             : </span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaGNC">        4286 :     struct ReadFailure {</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :         enum class Code {</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :             DeserializationError,   //!&lt; Key exists but value could not be deserialized.</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :             DatabaseError,          //!&lt; Unexpected internal DB error.</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :         };</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             : </span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :         Code status;</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :         std::string err_msg;</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     };</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             : </span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :     using ReadStatus = util::Expected&lt;bool, ReadFailure&gt;;</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             : </span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :     /**</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :      * Read and deserialize a value from the database, with explicit error discrimination.</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :      *</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :      * Unlike Read(), this method distinguishes between a missing key, a deserialization</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :      * failure (DeserializationError), and an internal DB error (DatabaseError),</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :      * enabling callers to treat data corruption differently from an absent entry.</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             :      *</span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :      * @note Callers are expected to provide well-formed keys; key serialization</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :      *       is the only operation that may throw.</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :      *</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :      * @param[in]  key    The key to look up.</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :      * @param[out] value  Populated with the deserialized value when the returned</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :      *                    Expected holds true; indeterminate otherwise.</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :      * @return On success, true if the key was found (value populated) or false if</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :      *         the key was absent. On failure, a ReadFailure describing the error.</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :      */</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     template &lt;typename K, typename V&gt;</span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">     7334013 :     [[nodiscard]] ReadStatus TryRead(const K&amp; key, V&amp; value) const</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :     {</span>
+<span id="L252"><span class="lineNum">     252</span> [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 7113335 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 45&quot; was not taken"> - </span>][<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 220678 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 45&quot; was not taken"> - </span>]:<span class="tlaGNC">     7334013 :         DataStream ssKey{};</span></span>
+<span id="L253"><span class="lineNum">     253</span> [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 7113335 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 45&quot; was not taken"> - </span>][<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 220678 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 45&quot; was not taken"> - </span>]:<span class="tlaGNC">     7334013 :         ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :         // Key serialization is the only operation that may throw.</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :         // Callers are expected to provide well-formed keys.</span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">     7334013 :         ssKey &lt;&lt; key;</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :             : </span>
+<span id="L258"><span class="lineNum">     258</span>         [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 7334013 times"> + </span>]:<span class="tlaGNC">     7334013 :         std::optional&lt;std::string&gt; strValue;</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :         try {</span>
+<span id="L260"><span class="lineNum">     260</span>   [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 7113335 times"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 19&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 3295615 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 3817720 times"> + </span>]:<span class="tlaGNC">    14668026 :             strValue = ReadImpl(ssKey);</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 220678 times"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 19&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 23976 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 196702 times"> + </span>]
+<span id="L261"><span class="lineNum">     261</span>         [<span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 3319591 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 4014422 times"> + </span>]:<span class="tlaGNC">     7334013 :             if (!strValue) {</span></span>
+<span id="L262"><span class="lineNum">     262</span>                 :<span class="tlaGNC">     3319591 :                 return false; // not found</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :             }</span>
+<span id="L264"><span class="lineNum">     264</span> [<span class="tlaUNC" title="fallthrough branch &quot;19 -&gt; 20&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;19 -&gt; 21&quot; was not taken"> - </span>][<span class="tlaUNC" title="fallthrough branch &quot;19 -&gt; 20&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;19 -&gt; 21&quot; was not taken"> - </span>]:<span class="tlaUNC">           0 :         } catch (const std::exception&amp; e) {</span></span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaUNC">           0 :             return util::Unexpected(ReadFailure{ReadFailure::Code::DatabaseError, e.what()});</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :         }</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             : </span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :         try {</span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">     4014422 :             std::span ssValue{MakeWritableByteSpan(*strValue)};</span></span>
+<span id="L270"><span class="lineNum">     270</span>         [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 4012279 times"> + </span><span class="tlaUNC" title="exception branch &quot;13 -&gt; 31&quot; was not taken"> - </span>]:<span class="tlaGNC">     4014422 :             m_obfuscation(ssValue);</span></span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaGBC" title="fallthrough branch &quot;13 -&gt; 14&quot; was taken 4012279 times"> + </span><span class="tlaUNC" title="exception branch &quot;13 -&gt; 31&quot; was not taken"> - </span>]:<span class="tlaGNC">     4014422 :             SpanReader{ssValue} &gt;&gt; value;</span></span>
+<span id="L272"><span class="lineNum">     272</span> [<span class="tlaUNC" title="fallthrough branch &quot;31 -&gt; 32&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;31 -&gt; 33&quot; was taken 2143 times"> + </span>][<span class="tlaUNC" title="fallthrough branch &quot;31 -&gt; 32&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;31 -&gt; 33&quot; was not taken"> - </span>]:<span class="tlaGNC">        2143 :         } catch (const std::exception&amp; e) {</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC">        2143 :             return util::Unexpected(ReadFailure{ReadFailure::Code::DeserializationError, e.what()});</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :         }</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             : </span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">     4012279 :         return true;</span></span>
+<span id="L277"><span class="lineNum">     277</span>   [<span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 29&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;35 -&gt; 36&quot; was taken 2143 times"> + </span><span class="tlaUNC" title="exception branch &quot;35 -&gt; 41&quot; was not taken"> - </span>]:<span class="tlaGNC">     7336156 :     }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 29&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;35 -&gt; 36&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;35 -&gt; 41&quot; was not taken"> - </span>]
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :     /**</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :      * Wrapper around TryRead() that preserves the original Read() semantics:</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :      * returns true on success, false if the key is absent or deserialization</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :      * fails, and throws dbwrapper_error on an internal DB error.</span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :      *</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :      * Prefer TryRead() when the caller needs to distinguish between a missing</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :      * key and a corrupt value.</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :      */</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :     template &lt;typename K, typename V&gt;</span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">     3703720 :     bool Read(const K&amp; key, V&amp; value) const</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :     {</span>
+<span id="L290"><span class="lineNum">     290</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 3701577 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 6&quot; was taken 2143 times"> + </span>]:<span class="tlaGNC">     3703720 :         const ReadStatus res = TryRead(key,value);</span></span>
+<span id="L291"><span class="lineNum">     291</span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 3701577 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 6&quot; was taken 2143 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 3701577 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 16&quot; was not taken"> - </span>]:<span class="tlaGNC">     3703720 :         if (res.has_value()) return res.value();</span></span>
+<span id="L292"><span class="lineNum">     292</span>      [<span class="tlaUNC" title="branch &quot;7 -&gt; 8&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;7 -&gt; 11&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;7 -&gt; 12&quot; was taken 2143 times"> + </span>]:<span class="tlaGNC">        2143 :         switch (const auto&amp; [err_code, err_msg] = res.error(); err_code) {</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :             case ReadFailure::Code::DeserializationError: return false;</span>
+<span id="L294"><span class="lineNum">     294</span>         [<span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;9 -&gt; 14&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :             case ReadFailure::Code::DatabaseError: throw dbwrapper_error(err_msg);</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :         } // no default case, so the compiler can warn about missing cases</span>
+<span id="L296"><span class="lineNum">     296</span>                 :<span class="tlaUNC">           0 :         std::abort(); // unreachable</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :<span class="tlaGNC">     3703720 :     }</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :             : </span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :     template &lt;typename K, typename V&gt;</span>
+<span id="L300"><span class="lineNum">     300</span>                 :<span class="tlaGNC">       97250 :     void Write(const K&amp; key, const V&amp; value, bool fSync = false)</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :     {</span>
+<span id="L302"><span class="lineNum">     302</span>                 :<span class="tlaGNC">       97250 :         CDBBatch batch(*this);</span></span>
+<span id="L303"><span class="lineNum">     303</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 97250 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 7&quot; was not taken"> - </span>]:<span class="tlaGNC">       97250 :         batch.Write(key, value);</span></span>
+<span id="L304"><span class="lineNum">     304</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 97250 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 7&quot; was not taken"> - </span>]:<span class="tlaGNC">       97250 :         WriteBatch(batch, fSync);</span></span>
+<span id="L305"><span class="lineNum">     305</span>                 :<span class="tlaGNC">       97250 :     }</span></span>
+<span id="L306"><span class="lineNum">     306</span>                 :             : </span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :     template &lt;typename K&gt;</span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaGNC">       53705 :     bool Exists(const K&amp; key) const</span></span>
+<span id="L309"><span class="lineNum">     309</span>                 :             :     {</span>
+<span id="L310"><span class="lineNum">     310</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 53705 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">       53705 :         DataStream ssKey{};</span></span>
+<span id="L311"><span class="lineNum">     311</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 53705 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">       53705 :         ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></span>
+<span id="L312"><span class="lineNum">     312</span>         [<span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 53705 times"> + </span>]:<span class="tlaGNC">       53705 :         ssKey &lt;&lt; key;</span></span>
+<span id="L313"><span class="lineNum">     313</span>         [<span class="tlaGBC" title="fallthrough branch &quot;7 -&gt; 8&quot; was taken 53705 times"> + </span><span class="tlaUNC" title="exception branch &quot;7 -&gt; 10&quot; was not taken"> - </span>]:<span class="tlaGNC">       53705 :         return ExistsImpl(ssKey);</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaGNC">       53705 :     }</span></span>
+<span id="L315"><span class="lineNum">     315</span>                 :             : </span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :     template &lt;typename K&gt;</span>
+<span id="L317"><span class="lineNum">     317</span>                 :<span class="tlaGNC">      103680 :     void Erase(const K&amp; key, bool fSync = false)</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :     {</span>
+<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">      103680 :         CDBBatch batch(*this);</span></span>
+<span id="L320"><span class="lineNum">     320</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 103680 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 7&quot; was not taken"> - </span>]:<span class="tlaGNC">      103680 :         batch.Erase(key);</span></span>
+<span id="L321"><span class="lineNum">     321</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 103680 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 7&quot; was not taken"> - </span>]:<span class="tlaGNC">      103680 :         WriteBatch(batch, fSync);</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :<span class="tlaGNC">      103680 :     }</span></span>
+<span id="L323"><span class="lineNum">     323</span>                 :             : </span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :     void WriteBatch(CDBBatch&amp; batch, bool fSync = false);</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             : </span>
+<span id="L326"><span class="lineNum">     326</span>                 :             :     //! Perform a blocking full compaction of the underlying LevelDB.</span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :     void CompactFull();</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             : </span>
+<span id="L329"><span class="lineNum">     329</span>                 :             :     //! Return a LevelDB property value, if available.</span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     std::optional&lt;std::string&gt; GetProperty(const std::string&amp; property) const;</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             : </span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :     // Get an estimate of LevelDB memory usage (in bytes).</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :     size_t DynamicMemoryUsage() const;</span>
+<span id="L334"><span class="lineNum">     334</span>                 :             : </span>
+<span id="L335"><span class="lineNum">     335</span>                 :             :     CDBIterator* NewIterator();</span>
+<span id="L336"><span class="lineNum">     336</span>                 :             : </span>
+<span id="L337"><span class="lineNum">     337</span>                 :             :     /**</span>
+<span id="L338"><span class="lineNum">     338</span>                 :             :      * Return true if the database managed by this class contains no entries.</span>
+<span id="L339"><span class="lineNum">     339</span>                 :             :      */</span>
+<span id="L340"><span class="lineNum">     340</span>                 :             :     bool IsEmpty();</span>
+<span id="L341"><span class="lineNum">     341</span>                 :             : </span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :     //! Probe an unopened database for a key prefix. Return true if a database at</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :     //! path exists and contains at least 1 entry beginning with prefix; missing</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :     //! or empty databases return false, and database errors throw dbwrapper_error.</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             :     static bool HasKeyStartingWith(const fs::path&amp; path, uint8_t prefix);</span>
+<span id="L346"><span class="lineNum">     346</span>                 :             : </span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :     template&lt;typename K&gt;</span>
+<span id="L348"><span class="lineNum">     348</span>                 :<span class="tlaGNC">      155489 :     size_t EstimateSize(const K&amp; key_begin, const K&amp; key_end) const</span></span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :     {</span>
+<span id="L350"><span class="lineNum">     350</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 155489 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 16&quot; was not taken"> - </span>]:<span class="tlaGNC">      155489 :         DataStream ssKey1{}, ssKey2{};</span></span>
+<span id="L351"><span class="lineNum">     351</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 155489 times"> + </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 16&quot; was not taken"> - </span>]:<span class="tlaGNC">      155489 :         ssKey1.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></span>
+<span id="L352"><span class="lineNum">     352</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 155489 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 16&quot; was not taken"> - </span>]:<span class="tlaGNC">      155489 :         ssKey2.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);</span></span>
+<span id="L353"><span class="lineNum">     353</span>         [<span class="tlaGBC" title="fallthrough branch &quot;6 -&gt; 7&quot; was taken 155489 times"> + </span><span class="tlaUNC" title="exception branch &quot;6 -&gt; 16&quot; was not taken"> - </span>]:<span class="tlaGNC">      155489 :         ssKey1 &lt;&lt; key_begin;</span></span>
+<span id="L354"><span class="lineNum">     354</span>         [<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;8 -&gt; 10&quot; was taken 155489 times"> + </span>]:<span class="tlaGNC">      155489 :         ssKey2 &lt;&lt; key_end;</span></span>
+<span id="L355"><span class="lineNum">     355</span>   [<span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 155489 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 155489 times"> + </span><span class="tlaUNC" title="exception branch &quot;12 -&gt; 16&quot; was not taken"> - </span>]:<span class="tlaGNC">      155489 :         return EstimateSizeImpl(ssKey1, ssKey2);</span></span>
+<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaGNC">      155489 :     }</span></span>
+<span id="L357"><span class="lineNum">     357</span>                 :             : };</span>
+<span id="L358"><span class="lineNum">     358</span>                 :             : </span>
+<span id="L359"><span class="lineNum">     359</span>                 :             : #endif // BITCOIN_DBWRAPPER_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

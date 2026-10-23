@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/wallet/scan.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/wallet">src/wallet</a> - scan.h<span style="font-size: 80%;"> (source / <a href="scan.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">11.1&nbsp;%</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">1</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-10-23 02:47:14</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">0.0&nbsp;%</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2026-present The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : </span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : #ifndef BITCOIN_WALLET_SCAN_H</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : #define BITCOIN_WALLET_SCAN_H</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : </span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;util/time.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;atomic&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;functional&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : namespace wallet {</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : class CWallet;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : </span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : /** Result of a wallet scan */</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : struct ScanResult {</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :     enum { SUCCESS, FAILURE, USER_ABORT } status = SUCCESS;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :     //! Hash and height of most recent block that was successfully scanned.</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :     //! Unset if no blocks were scanned due to read errors or the chain</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :     //! being empty.</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :     uint256 last_scanned_block;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :     std::optional&lt;int&gt; last_scanned_height;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : </span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :     //! Height of the most recent block that could not be scanned due to</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     //! read errors or pruning. Will be set if status is FAILURE, unset if</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :     //! status is SUCCESS, and may or may not be set if status is</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :     //! USER_ABORT.</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :     uint256 last_failed_block;</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : };</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : </span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : /** RAII object to check and reserve a wallet rescan */</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : class WalletRescanReserver</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : {</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : private:</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     using Clock = std::chrono::steady_clock;</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     using NowFn = std::function&lt;Clock::time_point()&gt;;</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     CWallet&amp; m_wallet;</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     bool m_could_reserve{false};</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     NowFn m_now;</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : public:</span>
+<span id="L45"><span class="lineNum">      45</span>         [<span class="tlaUNC" title="fallthrough branch &quot;87 -&gt; 88&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;87 -&gt; 128&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     explicit WalletRescanReserver(CWallet&amp; w) : m_wallet(w) {}</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : </span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     bool reserve(bool with_passphrase = false);</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     bool isReserved() const;</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : </span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     Clock::time_point now() const { return m_now ? m_now() : Clock::now(); };</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     void setNow(NowFn now) { m_now = std::move(now); }</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             : </span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :     ~WalletRescanReserver();</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : };</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : </span>
+<span id="L57"><span class="lineNum">      57</span>                 :             : class ChainScanner {</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             : private:</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     CWallet&amp; m_wallet;</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : </span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :     std::atomic&lt;bool&gt; m_abort{false};</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     std::atomic&lt;bool&gt; m_scanning{false};</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     std::atomic&lt;bool&gt; m_scanning_with_passphrase{false};</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     std::atomic&lt;SteadyClock::time_point&gt; m_scanning_start{SteadyClock::time_point{}};</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     std::atomic&lt;double&gt; m_scanning_progress{0};</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : </span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :     //! Progress window and tip tracked across Scan loop iterations. The</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     //! current block's progress is a plain local in Scan; only the window</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     //! bounds are shared with the helpers, and UpdateTipIfChanged is the</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     //! sole mutator.</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     struct LoopState {</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :         double progress_begin{0};</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :         double progress_end{0};</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :         uint256 tip_hash;</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :     };</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : </span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :     //! Locate block_hash in the chain, queueing its active-chain successor</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     //! into next_block if it exists and is within the scan range. Returns</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :     //! whether the block itself is still in the active chain.</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     bool QueueNextBlock(const uint256&amp; block_hash, int block_height, std::optional&lt;std::pair&lt;uint256, int&gt;&gt;&amp; next_block, std::optional&lt;int&gt; max_height);</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     bool ScanBlock(const uint256&amp; block_hash, int block_height, bool save_progress);</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :     void UpdateProgress(const LoopState&amp; state, double progress_current, int block_height);</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :     void UpdateTipIfChanged(LoopState&amp; state);</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : </span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :     //! Only WalletRescanReserver may reserve and release scans, so that</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :     //! reservations are always managed RAII-style.</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :     friend class WalletRescanReserver;</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :     bool TryReserve(bool with_passphrase = false);</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :     void Release();</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             : </span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : public:</span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">        9683 :     explicit ChainScanner(CWallet&amp; wallet) : m_wallet(wallet) {}</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : </span>
+<span id="L94"><span class="lineNum">      94</span>         [<span class="tlaUNC" title="fallthrough branch &quot;13 -&gt; 14&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;13 -&gt; 17&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     void Abort() { m_abort = true; }</span></span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaUNC" title="fallthrough branch &quot;57 -&gt; 58&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;57 -&gt; 67&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool IsAborting() const { return m_abort; }</span></span>
+<span id="L96"><span class="lineNum">      96</span>         [<span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;4 -&gt; 6&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     bool IsScanning() const { return m_scanning; }</span></span>
+<span id="L97"><span class="lineNum">      97</span>   [<span class="tlaUNC" title="fallthrough branch &quot;22 -&gt; 23&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;22 -&gt; 28&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;15 -&gt; 21&quot; was not executed"> # </span> :<span class="tlaUNC">           0 :     bool IsScanningWithPassphrase() const { return m_scanning_with_passphrase; }</span></span>
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;15 -&gt; 16&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;15 -&gt; 21&quot; was not executed"> # </span>]
+<span id="L98"><span class="lineNum">      98</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 5&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     SteadyClock::duration ScanningDuration() const { return m_scanning ? SteadyClock::now() - m_scanning_start.load() : SteadyClock::duration{}; }</span></span>
+<span id="L99"><span class="lineNum">      99</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not executed"> # </span>]:<span class="tlaUNC">           0 :     double ScanningProgress() const { return m_scanning ? m_scanning_progress.load() : 0; }</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :     /** Scan active chain for relevant transactions after importing keys. Should</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :      * be called whenever new keys are added to the wallet, with the oldest key</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :      * creation time.</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :      * @return Earliest timestamp that could be successfully scanned from. Timestamp</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :      * returned will be higher than startTime if relevant blocks could not be read. */</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     int64_t ScanFromTime(int64_t startTime, const WalletRescanReserver&amp; reserver);</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : </span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     /**</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :      * Scan the block chain (starting in start_block) for transactions</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :      * from or to us. If max_height is not set, the</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :      * mempool will be scanned as well.</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :      *</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :      * @param[in] start_block Scan starting block. If block is not on the active</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :      *                        chain, the scan will return SUCCESS immediately.</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :      * @param[in] start_height Height of start_block</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :      * @param[in] max_height  Optional max scanning height. If unset there is</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :      *                        no maximum and scanning can continue to the tip</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :      *</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :      * @return ScanResult returning scan information and indicating success or</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :      *         failure. Return status will be set to SUCCESS if scan was</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :      *         successful. FAILURE if a complete rescan was not possible (due to</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :      *         pruning or corruption). USER_ABORT if the rescan was aborted before</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :      *         it could complete.</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :      *</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :      * @pre Caller needs to make sure start_block (and the optional stop_block) are on</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :      * the main chain after the addition of any new keys you want to detect</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :      * transactions for.</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :      */</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :     ScanResult Scan(const uint256&amp; start_block, int start_height, std::optional&lt;int&gt; max_height,</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             :                     const WalletRescanReserver&amp; reserver, bool save_progress);</span>
+<span id="L131"><span class="lineNum">     131</span>                 :             : </span>
+<span id="L132"><span class="lineNum">     132</span>                 :             : };</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : </span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : } // namespace wallet</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             : </span>
+<span id="L136"><span class="lineNum">     136</span>                 :             : #endif // BITCOIN_WALLET_SCAN_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

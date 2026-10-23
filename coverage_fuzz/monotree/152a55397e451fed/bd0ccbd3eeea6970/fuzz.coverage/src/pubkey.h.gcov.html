@@ -1,0 +1,570 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/pubkey.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src">src</a> - pubkey.h<span style="font-size: 80%;"> (source / <a href="pubkey.h.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">108</td>
+            <td class="headerCovTableEntry">108</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-10-23 02:47:14</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">93.1&nbsp;%</td>
+            <td class="headerCovTableEntry">29</td>
+            <td class="headerCovTableEntry">27</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">54.9&nbsp;%</td>
+            <td class="headerCovTableEntry">477</td>
+            <td class="headerCovTableEntry">262</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // Copyright (c) 2009-2010 Satoshi Nakamoto</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : // Copyright (c) 2009-present The Bitcoin Core developers</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : // Copyright (c) 2017 The Zcash developers</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : </span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : #ifndef BITCOIN_PUBKEY_H</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : #define BITCOIN_PUBKEY_H</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : </span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;hash.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;serialize.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;span.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;uint256.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : </span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;array&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;cassert&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;cstring&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;optional&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;span&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;vector&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : </span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : inline constexpr unsigned int BIP32_EXTKEY_SIZE = 74;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : inline constexpr unsigned int BIP32_EXTKEY_WITH_VERSION_SIZE = 78;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : </span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : using KeyFingerprint = std::array&lt;unsigned char, 4&gt;;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : /** A reference to a CKey: the Hash160 of its serialized public key */</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : class CKeyID : public uint160</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             : {</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : public:</span>
+<span id="L31"><span class="lineNum">      31</span>   [<span class="tlaGBC" title="branch &quot;3 -&gt; 4&quot; was taken 12516 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 17&quot; was taken 30411 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 40&quot; was taken 43844 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 52&quot; was taken 103241 times"> + </span> :<span class="tlaGNC">     2331722 :     CKeyID() : uint160() {}</span></span>
+<span class="lineNum">        </span>       <span class="tlaGBC" title="branch &quot;3 -&gt; 65&quot; was taken 49481 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 90&quot; was taken 23151 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 109&quot; was taken 5310 times"> + </span>]
+<span id="L32"><span class="lineNum">      32</span> [<span class="tlaGBC" title="fallthrough branch &quot;43 -&gt; 44&quot; was taken 28931 times"> + </span><span class="tlaGBC" title="branch &quot;43 -&gt; 47&quot; was taken 14913 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;14 -&gt; 15&quot; was taken 107623 times"> + </span><span class="tlaUNC" title="exception branch &quot;14 -&gt; 80&quot; was not taken"> - </span>]:<span class="tlaGNC">    25131145 :     explicit CKeyID(const uint160&amp; in) : uint160(in) {}</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;45 -&gt; 46&quot; was taken 28107 times"> + </span><span class="tlaUNC" title="exception branch &quot;45 -&gt; 268&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;59 -&gt; 60&quot; was taken 120875 times"> + </span><span class="tlaUNC" title="exception branch &quot;59 -&gt; 268&quot; was not taken"> - </span>]
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">     9482868 :     KeyFingerprint fingerprint() const</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     {</span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">     9482868 :         KeyFingerprint ret;</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">     9482868 :         std::copy_n(begin(), ret.size(), ret.begin());</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">     9482868 :         return ret;</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     }</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : };</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : /** An encapsulated public key. */</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : class CPubKey</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             : {</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : public:</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     /**</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :      * secp256k1:</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :      */</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     static constexpr unsigned int SIZE                   = 65;</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     static constexpr unsigned int COMPRESSED_SIZE        = 33;</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     static constexpr unsigned int SIGNATURE_SIZE         = 72;</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     static constexpr unsigned int COMPACT_SIGNATURE_SIZE = 65;</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     /**</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :      * see www.keylength.com</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :      * script supports up to 75 for single byte push</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :      */</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :     static_assert(</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :         SIZE &gt;= COMPRESSED_SIZE,</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :         &quot;COMPRESSED_SIZE is larger than SIZE&quot;);</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             : </span>
+<span id="L60"><span class="lineNum">      60</span>                 :             : private:</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :     /**</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :      * Just store the serialized data.</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :      * Its length can very cheaply be computed from the first byte.</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :      */</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :     unsigned char vch[SIZE];</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : </span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :     //! Compute the length of a pubkey with a given first byte.</span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">    79550905 :     unsigned int static GetLen(unsigned char chHeader)</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :     {</span>
+<span id="L71"><span class="lineNum">      71</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 2442594 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 6&quot; was taken 77108311 times"> + </span>]:<span class="tlaGNC">    79550905 :         if (chHeader == 2 || chHeader == 3)</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :             return COMPRESSED_SIZE;</span>
+<span id="L73"><span class="lineNum">      73</span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 1630936 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 811658 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 40331 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 1590605 times"> + </span>]:<span class="tlaGNC">     2442594 :         if (chHeader == 4 || chHeader == 6 || chHeader == 7)</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">      851989 :             return SIZE;</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :         return 0;</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :     }</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             : </span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :     //! Set this key data to be invalid</span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">    18865220 :     void Invalidate()</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :     {</span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">    18865220 :         vch[0] = 0xFF;</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">      176164 :     }</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :             : </span>
+<span id="L84"><span class="lineNum">      84</span>                 :             : public:</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : </span>
+<span id="L86"><span class="lineNum">      86</span>                 :<span class="tlaGNC">     1118487 :     bool static ValidSize(const std::vector&lt;unsigned char&gt; &amp;vch) {</span></span>
+<span id="L87"><span class="lineNum">      87</span>   [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 1118487 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 997778 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 7&quot; was taken 120709 times"> + </span> :<span class="tlaGNC">     1118487 :       return vch.size() &gt; 0 &amp;&amp; GetLen(vch[0]) == vch.size();</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 40792 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 956986 times"> + </span>]
+<span id="L88"><span class="lineNum">      88</span>                 :             :     }</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             : </span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :     //! Construct an invalid public key.</span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">    18689056 :     CPubKey()</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">    16541762 :     {</span></span>
+<span id="L93"><span class="lineNum">      93</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 2264584 times"> + </span><span class="tlaGBC" title="exception branch &quot;2 -&gt; 16&quot; was taken 1571 times"> + </span>]:<span class="tlaGNC">    17137652 :         Invalidate();</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;48 -&gt; 49&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;48 -&gt; 79&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;42 -&gt; 43&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;42 -&gt; 52&quot; was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 7895 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 12&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;44 -&gt; 45&quot; was taken 1360047 times"> + </span><span class="tlaUNC" title="exception branch &quot;44 -&gt; 132&quot; was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;320 -&gt; 325&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;320 -&gt; 518&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;342 -&gt; 347&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;342 -&gt; 518&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="fallthrough branch &quot;81 -&gt; 82&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;81 -&gt; 83&quot; was not executed"> # </span>][<span class="tlaGBC" title="fallthrough branch &quot;320 -&gt; 325&quot; was taken 5476 times"> + </span><span class="tlaGBC" title="exception branch &quot;320 -&gt; 518&quot; was taken 15 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;342 -&gt; 347&quot; was taken 7499 times"> + </span><span class="tlaGBC" title="exception branch &quot;342 -&gt; 518&quot; was taken 23 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;81 -&gt; 82&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;81 -&gt; 83&quot; was taken 15363 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 11 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="exception branch &quot;2 -&gt; 5&quot; was taken 8 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;79 -&gt; 80&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="exception branch &quot;79 -&gt; 370&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;227 -&gt; 228&quot; was taken 1064 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;227 -&gt; 376&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;270 -&gt; 271&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;270 -&gt; 272&quot; was taken 1064 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;318 -&gt; 319&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="exception branch &quot;318 -&gt; 400&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="fallthrough branch &quot;324 -&gt; 325&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="exception branch &quot;324 -&gt; 402&quot; was not taken"> - </span>][<span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 16&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;12 -&gt; 13&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;12 -&gt; 23&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 8&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>       <span class="tlaUNC" title="exception branch &quot;3 -&gt; 30&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;3 -&gt; 43&quot; was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;25 -&gt; 5&quot; was taken 227421 times"> + </span><span class="tlaUNC" title="exception branch &quot;25 -&gt; 79&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;45 -&gt; 27&quot; was taken 39365 times"> + </span><span class="tlaUNC" title="exception branch &quot;45 -&gt; 89&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 52&quot; was taken 10243 times"> + </span><span class="tlaUNC" title="exception branch &quot;70 -&gt; 99&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;45 -&gt; 46&quot; was taken 28107 times"> + </span><span class="tlaUNC" title="exception branch &quot;45 -&gt; 268&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;59 -&gt; 60&quot; was taken 120875 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;59 -&gt; 268&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;46 -&gt; 47&quot; was taken 84895 times"> + </span><span class="tlaGBC" title="branch &quot;46 -&gt; 53&quot; was taken 13717 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;32 -&gt; 33&quot; was taken 2147 times"> + </span><span class="tlaGBC" title="branch &quot;32 -&gt; 34&quot; was taken 271932 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 1711420 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 18&quot; was taken 1614001 times"> + </span>]
+<span id="L94"><span class="lineNum">      94</span>                 :             :     }</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : </span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :     //! Initialize a public key using begin/end iterators to byte data.</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :     template &lt;typename T&gt;</span>
+<span id="L98"><span class="lineNum">      98</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1676841 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 5&quot; was taken 31759 times"> + </span>]:<span class="tlaGNC">     5731010 :     void Set(const T pbegin, const T pend)</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     {</span>
+<span id="L100"><span class="lineNum">     100</span> [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1709942 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 6&quot; was taken 31759 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 3989309 times"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 5&quot; was not taken"> - </span>]:<span class="tlaGNC">     5731010 :         int len = pend == pbegin ? 0 : GetLen(pbegin[0]);</span></span>
+<span id="L101"><span class="lineNum">     101</span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 1622957 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 6&quot; was taken 86985 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 45057 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 1577900 times"> + </span>]:<span class="tlaGNC">     5699251 :         if (len &amp;&amp; len == (pend - pbegin))</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 3947135 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 42174 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 3946986 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 149 times"> + </span>]
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">     5557987 :             memcpy(vch, (unsigned char*)&amp;pbegin[0], len);</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :         else</span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">      173023 :             Invalidate();</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">     5731010 :     }</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : </span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     //! Construct a public key using begin/end iterators to byte data.</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :     template &lt;typename T&gt;</span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">      124858 :     CPubKey(const T pbegin, const T pend)</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :     {</span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">      124858 :         Set(pbegin, pend);</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     }</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             : </span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     //! Construct a public key from a byte vector.</span>
+<span id="L115"><span class="lineNum">     115</span>                 :<span class="tlaGNC">     1636415 :     explicit CPubKey(std::span&lt;const uint8_t&gt; _vch)</span></span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">     1636415 :     {</span></span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">     1636415 :         Set(_vch.begin(), _vch.end());</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :<span class="tlaGNC">     1636415 :     }</span></span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : </span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :     //! Simple read-only vector-like interface to the pubkey data.</span>
+<span id="L121"><span class="lineNum">     121</span> [<span class="tlaGBC" title="fallthrough branch &quot;66 -&gt; 67&quot; was taken 3 times"> + </span><span class="tlaGBC" title="branch &quot;66 -&gt; 68&quot; was taken 77670 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 71&quot; was taken 6382 times"> + </span><span class="tlaUNC" title="exception branch &quot;70 -&gt; 419&quot; was not taken"> - </span>]:<span class="tlaGNC">    39743079 :     unsigned int size() const { return GetLen(vch[0]); }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;9 -&gt; 11&quot; was taken 1009623 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 6277091 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 71&quot; was taken 1993 times"> + </span><span class="tlaUNC" title="exception branch &quot;70 -&gt; 94&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;111 -&gt; 112&quot; was taken 836 times"> + </span><span class="tlaUNC" title="exception branch &quot;111 -&gt; 191&quot; was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;58 -&gt; 59&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;58 -&gt; 60&quot; was taken 1064 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;73 -&gt; 74&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="exception branch &quot;73 -&gt; 410&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="branch &quot;280 -&gt; 279&quot; was taken 35112 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;280 -&gt; 281&quot; was taken 1064 times"> + </span>][<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 23&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 31&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;84 -&gt; 85&quot; was taken 2125 times"> + </span><span class="tlaUNC" title="exception branch &quot;84 -&gt; 160&quot; was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;70 -&gt; 71&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;70 -&gt; 94&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;111 -&gt; 112&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;111 -&gt; 191&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;261 -&gt; 262&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;261 -&gt; 1434&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;314 -&gt; 315&quot; was taken 9 times"> + </span><span class="tlaUNC" title="exception branch &quot;314 -&gt; 1482&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;702 -&gt; 703&quot; was taken 3 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;702 -&gt; 1722&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;712 -&gt; 713&quot; was taken 3 times"> + </span><span class="tlaUNC" title="exception branch &quot;712 -&gt; 1720&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;744 -&gt; 745&quot; was taken 21 times"> + </span><span class="tlaUNC" title="exception branch &quot;744 -&gt; 1756&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;751 -&gt; 752&quot; was taken 21 times"> + </span><span class="tlaUNC" title="exception branch &quot;751 -&gt; 1756&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;801 -&gt; 802&quot; was taken 17 times"> + </span><span class="tlaUNC" title="exception branch &quot;801 -&gt; 1790&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;808 -&gt; 809&quot; was taken 17 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;808 -&gt; 1790&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;975 -&gt; 976&quot; was taken 46 times"> + </span><span class="tlaUNC" title="exception branch &quot;975 -&gt; 1891&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;1136 -&gt; 1137&quot; was taken 17 times"> + </span><span class="tlaUNC" title="exception branch &quot;1136 -&gt; 1997&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;1146 -&gt; 1147&quot; was taken 12 times"> + </span><span class="tlaUNC" title="exception branch &quot;1146 -&gt; 1995&quot; was not taken"> - </span>]
+<span id="L122"><span class="lineNum">     122</span>         [<span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 71&quot; was taken 7446 times"> + </span><span class="tlaUNC" title="exception branch &quot;70 -&gt; 419&quot; was not taken"> - </span>]:<span class="tlaGNC">     5725713 :     const unsigned char* data() const { return vch; }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 71&quot; was taken 1993 times"> + </span><span class="tlaUNC" title="exception branch &quot;70 -&gt; 94&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;111 -&gt; 112&quot; was taken 836 times"> + </span><span class="tlaUNC" title="exception branch &quot;111 -&gt; 191&quot; was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 23&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;8 -&gt; 9&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 31&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="fallthrough branch &quot;84 -&gt; 85&quot; was taken 1336041 times"> + </span><span class="tlaUNC" title="exception branch &quot;84 -&gt; 160&quot; was not taken"> - </span>][<span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 16&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;20 -&gt; 66&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 66&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="exception branch &quot;9 -&gt; 51&quot; was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;70 -&gt; 71&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;70 -&gt; 94&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;111 -&gt; 112&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;111 -&gt; 191&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;261 -&gt; 262&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;261 -&gt; 1434&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;314 -&gt; 315&quot; was taken 9 times"> + </span><span class="tlaUNC" title="exception branch &quot;314 -&gt; 1482&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;702 -&gt; 703&quot; was taken 3 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;702 -&gt; 1722&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;712 -&gt; 713&quot; was taken 3 times"> + </span><span class="tlaUNC" title="exception branch &quot;712 -&gt; 1720&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;744 -&gt; 745&quot; was taken 21 times"> + </span><span class="tlaUNC" title="exception branch &quot;744 -&gt; 1756&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;751 -&gt; 752&quot; was taken 21 times"> + </span><span class="tlaUNC" title="exception branch &quot;751 -&gt; 1756&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;801 -&gt; 802&quot; was taken 17 times"> + </span><span class="tlaUNC" title="exception branch &quot;801 -&gt; 1790&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;808 -&gt; 809&quot; was taken 17 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="exception branch &quot;808 -&gt; 1790&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;975 -&gt; 976&quot; was taken 46 times"> + </span><span class="tlaUNC" title="exception branch &quot;975 -&gt; 1891&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;1136 -&gt; 1137&quot; was taken 17 times"> + </span><span class="tlaUNC" title="exception branch &quot;1136 -&gt; 1997&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;1146 -&gt; 1147&quot; was taken 12 times"> + </span><span class="tlaUNC" title="exception branch &quot;1146 -&gt; 1995&quot; was not taken"> - </span>]
+<span id="L123"><span class="lineNum">     123</span> [<span class="tlaUNC" title="fallthrough branch &quot;72 -&gt; 73&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;72 -&gt; 74&quot; was taken 77373 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;254 -&gt; 255&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="exception branch &quot;254 -&gt; 394&quot; was not taken"> - </span>]:<span class="tlaGNC">     6465369 :     const unsigned char* begin() const { return vch; }</span></span>
+<span id="L124"><span class="lineNum">     124</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 27003 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 13&quot; was not taken"> - </span>]:<span class="tlaGNC">      406715 :     const unsigned char* end() const { return vch + size(); }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="branch &quot;65 -&gt; 67&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;65 -&gt; 68&quot; was taken 1064 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;251 -&gt; 252&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="exception branch &quot;251 -&gt; 410&quot; was not taken"> - </span>]
+<span id="L125"><span class="lineNum">     125</span>         [<span class="tlaGBC" title="fallthrough branch &quot;25 -&gt; 26&quot; was taken 28381 times"> + </span><span class="tlaUNC" title="branch &quot;25 -&gt; 27&quot; was not taken"> - </span>]:<span class="tlaGNC">       63493 :     const unsigned char&amp; operator[](unsigned int pos) const { return vch[pos]; }</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :             : </span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :     //! Comparator implementation.</span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">     1739094 :     friend bool operator==(const CPubKey&amp; a, const CPubKey&amp; b)</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :     {</span>
+<span id="L130"><span class="lineNum">     130</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1737509 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 5&quot; was taken 1585 times"> + </span>]:<span class="tlaGNC">     1739094 :         return a.vch[0] == b.vch[0] &amp;&amp;</span></span>
+<span id="L131"><span class="lineNum">     131</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 556 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 1736953 times"> + </span>]:<span class="tlaGNC">     1737509 :                memcmp(a.vch, b.vch, a.size()) == 0;</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     }</span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">    25883783 :     friend bool operator&lt;(const CPubKey&amp; a, const CPubKey&amp; b)</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :     {</span>
+<span id="L135"><span class="lineNum">     135</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 24014348 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 6&quot; was taken 1869435 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 22530642 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 6&quot; was taken 1483706 times"> + </span>]:<span class="tlaGNC">    25883783 :         return a.vch[0] &lt; b.vch[0] ||</span></span>
+<span id="L136"><span class="lineNum">     136</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 9605358 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 12925284 times"> + </span>]:<span class="tlaGNC">    22530642 :                (a.vch[0] == b.vch[0] &amp;&amp; memcmp(a.vch, b.vch, a.size()) &lt; 0);</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :     }</span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">       45097 :     friend bool operator&gt;(const CPubKey&amp; a, const CPubKey&amp; b)</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :     {</span>
+<span id="L140"><span class="lineNum">     140</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 31620 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 6&quot; was taken 13477 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 31620 times"> + </span><span class="tlaUNC" title="branch &quot;3 -&gt; 6&quot; was not taken"> - </span>]:<span class="tlaGNC">       45097 :         return a.vch[0] &gt; b.vch[0] ||</span></span>
+<span id="L141"><span class="lineNum">     141</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 19945 times"> + </span><span class="tlaGBC" title="branch &quot;4 -&gt; 6&quot; was taken 11675 times"> + </span>]:<span class="tlaGNC">       31620 :                (a.vch[0] == b.vch[0] &amp;&amp; memcmp(a.vch, b.vch, a.size()) &gt; 0);</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :     }</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : </span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :     //! Implement serialization, as if this was a byte vector.</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">       33076 :     void Serialize(Stream&amp; s) const</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :     {</span>
+<span id="L148"><span class="lineNum">     148</span>                 :<span class="tlaGNC">       33076 :         unsigned int len = size();</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">       33076 :         ::WriteCompactSize(s, len);</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaGNC">       33076 :         s &lt;&lt; std::span{vch, len};</span></span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">       33076 :     }</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaGNC">       13936 :     void Unserialize(Stream&amp; s)</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :     {</span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">       13936 :         const unsigned int len(::ReadCompactSize(s));</span></span>
+<span id="L156"><span class="lineNum">     156</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 12045 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 7&quot; was taken 1271 times"> + </span>]:<span class="tlaGNC">       13316 :         if (len &lt;= SIZE) {</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">       12045 :             s &gt;&gt; std::span{vch, len};</span></span>
+<span id="L158"><span class="lineNum">     158</span>         [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 2285 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 9&quot; was taken 9216 times"> + </span>]:<span class="tlaGNC">       11501 :             if (len != size()) {</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaGNC">        2285 :                 Invalidate();</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :             }</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :         } else {</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :             // invalid pubkey, skip available data</span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">        1271 :             s.ignore(len);</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">         856 :             Invalidate();</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :         }</span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">       12357 :     }</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : </span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :     //! Get the KeyID of this public key (hash of its serialization)</span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaGNC">    24813061 :     CKeyID GetID() const</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :     {</span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaGNC">    24813061 :         return CKeyID(Hash160(std::span{vch}.first(size())));</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :     }</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             : </span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :     //! Get the 256-bit hash of this public key.</span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaGNC">       30856 :     uint256 GetHash() const</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :     {</span>
+<span id="L177"><span class="lineNum">     177</span>                 :<span class="tlaGNC">       30856 :         return Hash(std::span{vch}.first(size()));</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     }</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : </span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :     /*</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :      * Check syntactic correctness.</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :      *</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :      * When setting a pubkey (Set()) or deserializing fails (its header bytes</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :      * don't match the length of the data), the size is set to 0. Thus,</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :      * by checking size, one can observe whether Set() or deserialization has</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :      * failed.</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :      *</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :      * This does not check for more than that. In particular, it does not verify</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :      * that the coordinates correspond to a point on the curve (see IsFullyValid()</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :      * for that instead).</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             :      *</span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :      * Note that this is consensus critical as CheckECDSASignature() calls it!</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :      */</span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">     4837511 :     bool IsValid() const</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :     {</span>
+<span id="L196"><span class="lineNum">     196</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 31999 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 8&quot; was taken 6316896 times"> + </span>]:<span class="tlaGNC">    11113519 :         return size() &gt; 0;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 107269 times"> + </span><span class="tlaUNC" title="branch &quot;5 -&gt; 17&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 103905 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 17&quot; was taken 105964 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;52 -&gt; 53&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;52 -&gt; 58&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;26 -&gt; 27&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;26 -&gt; 32&quot; was taken 1064 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="fallthrough branch &quot;55 -&gt; 56&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;55 -&gt; 61&quot; was taken 1064 times"> + </span>][<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 1427603 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 122430 times"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 8&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 350223 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 5&quot; was taken 64491 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 230239 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="branch &quot;2 -&gt; 12&quot; was taken 2089 times"> + </span>][<span class="tlaUNC" title="branch &quot;5 -&gt; 7&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 7&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="branch &quot;5 -&gt; 9&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;4 -&gt; 5&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;4 -&gt; 7&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 7&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>          <span class="tlaUNC" title="fallthrough branch &quot;5 -&gt; 6&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;5 -&gt; 7&quot; was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;27 -&gt; 28&quot; was taken 162981 times"> + </span><span class="tlaGBC" title="branch &quot;27 -&gt; 29&quot; was taken 23765 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;79 -&gt; 80&quot; was taken 29603 times"> + </span><span class="tlaGBC" title="branch &quot;79 -&gt; 82&quot; was taken 250 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;65 -&gt; 66&quot; was taken 98612 times"> + </span><span class="tlaUNC" title="exception branch &quot;65 -&gt; 79&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;34 -&gt; 35&quot; was taken 271932 times"> + </span><span class="tlaGBC" title="branch &quot;34 -&gt; 41&quot; was taken 2147 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;41 -&gt; 42&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>       <span class="tlaGBC" title="branch &quot;41 -&gt; 43&quot; was taken 273250 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;60 -&gt; 61&quot; was taken 485081 times"> + </span><span class="tlaGBC" title="branch &quot;60 -&gt; 66&quot; was taken 901745 times"> + </span>]
+<span id="L197"><span class="lineNum">     197</span>                 :             :     }</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             : </span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :     /** Check if a public key is a syntactically valid compressed or uncompressed key. */</span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">      486444 :     bool IsValidNonHybrid() const noexcept</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :     {</span>
+<span id="L202"><span class="lineNum">     202</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 486434 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 10 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 4086 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 482348 times"> + </span>]:<span class="tlaGNC">      486444 :         return size() &gt; 0 &amp;&amp; (vch[0] == 0x02 || vch[0] == 0x03 || vch[0] == 0x04);</span></span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :     }</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             : </span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :     //! fully validate whether this is a valid public key (more expensive than IsValid())</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :     bool IsFullyValid() const;</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : </span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :     //! Check whether this is a compressed public key.</span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">      333588 :     bool IsCompressed() const</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :     {</span>
+<span id="L211"><span class="lineNum">     211</span> [<span class="tlaGBC" title="fallthrough branch &quot;46 -&gt; 47&quot; was taken 38980 times"> + </span><span class="tlaGBC" title="branch &quot;46 -&gt; 116&quot; was taken 2465 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 21224 times"> + </span><span class="tlaUNC" title="exception branch &quot;8 -&gt; 12&quot; was not taken"> - </span>]:<span class="tlaGNC">      334652 :         return size() == COMPRESSED_SIZE;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 1064 times"> + </span><span class="tlaGBC" title="branch &quot;11 -&gt; 13&quot; was taken 1064 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 23194 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 11&quot; was taken 158 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 975 times"> + </span><span class="tlaGBC" title="branch &quot;5 -&gt; 7&quot; was taken 133307 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;34 -&gt; 35&quot; was taken 2 times"> + </span><span class="tlaGBC" title="branch &quot;34 -&gt; 36&quot; was taken 99818 times"> + </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="fallthrough branch &quot;11 -&gt; 12&quot; was taken 7596 times"> + </span><span class="tlaGBC" title="branch &quot;11 -&gt; 24&quot; was taken 549 times"> + </span>][<span class="tlaUNC" title="branch &quot;65 -&gt; 67&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;65 -&gt; 68&quot; was taken 1064 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;286 -&gt; 287&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;286 -&gt; 288&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;291 -&gt; 292&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;291 -&gt; 293&quot; was taken 1064 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;330 -&gt; 331&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaGBC" title="branch &quot;330 -&gt; 332&quot; was taken 1064 times"> + </span>][<span class="tlaUNC" title="fallthrough branch &quot;35 -&gt; 36&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;35 -&gt; 39&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;88 -&gt; 89&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="branch &quot;88 -&gt; 92&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;9 -&gt; 10&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;9 -&gt; 12&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;13 -&gt; 14&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="branch &quot;13 -&gt; 18&quot; was not executed"> # </span>]
+<span id="L212"><span class="lineNum">     212</span>                 :             :     }</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :     /**</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :      * Verify a DER signature (~72 bytes).</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :      * If this public key is not fully valid, the return value will be false.</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :      */</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :     bool Verify(const uint256&amp; hash, const std::vector&lt;unsigned char&gt;&amp; vchSig) const;</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : </span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :     /**</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :      * Check whether a signature is normalized (lower-S).</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :      */</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :     static bool CheckLowS(const std::vector&lt;unsigned char&gt;&amp; vchSig);</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : </span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :     //! Recover a public key from a compact signature.</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     bool RecoverCompact(const uint256&amp; hash, const std::vector&lt;unsigned char&gt;&amp; vchSig);</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : </span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     //! Turn this public key into an uncompressed public key.</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     bool Decompress();</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             : </span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :     //! Derive BIP32 child pubkey.</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :     [[nodiscard]] bool Derive(CPubKey&amp; pubkeyChild, ChainCode &amp;ccChild, unsigned int nChild, const ChainCode&amp; cc, uint256* bip32_tweak_out = nullptr) const;</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             : };</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             : </span>
+<span id="L235"><span class="lineNum">     235</span>                 :             : class XOnlyPubKey</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             : {</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             : private:</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :     uint256 m_keydata;</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : </span>
+<span id="L240"><span class="lineNum">     240</span>                 :             : public:</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :     /** Nothing Up My Sleeve point H</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :      *  Used as an internal key for provably disabling the key path spend</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :      *  see BIP341 for more details */</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :     static const XOnlyPubKey NUMS_H;</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             : </span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :     /** Construct an empty x-only pubkey. */</span>
+<span id="L247"><span class="lineNum">     247</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 128385 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 99&quot; was not taken"> - </span>]:<span class="tlaGNC">     1097105 :     XOnlyPubKey() = default;</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;127 -&gt; 128&quot; was taken 92416 times"> + </span><span class="tlaUNC" title="exception branch &quot;127 -&gt; 257&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 304699 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;2 -&gt; 4&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;3 -&gt; 5&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>  <span class="tlaUNC" title="fallthrough branch &quot;3 -&gt; 4&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 53236 times"> + </span>][<span class="tlaUNC" title="fallthrough branch &quot;7 -&gt; 8&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;7 -&gt; 9&quot; was taken 107609 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;21 -&gt; 22&quot; was taken 6680 times"> + </span><span class="tlaUNC" title="exception branch &quot;21 -&gt; 46&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 208424 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 10&quot; was not taken"> - </span>]
+<span id="L248"><span class="lineNum">     248</span>                 :             : </span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :     XOnlyPubKey(const XOnlyPubKey&amp;) = default;</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :     XOnlyPubKey&amp; operator=(const XOnlyPubKey&amp;) = default;</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             :     /** Determine if this pubkey is fully valid. This is true for approximately 50% of all</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :      *  possible 32-byte arrays. If false, VerifySchnorr, CheckTapTweak and CreateTapTweak</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :      *  will always fail. */</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :     bool IsFullyValid() const;</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             : </span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :     /** Test whether this is the 0 key (the result of default construction). This implies</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :      *  !IsFullyValid(). */</span>
+<span id="L259"><span class="lineNum">     259</span>   [<span class="tlaGBC" title="fallthrough branch &quot;30 -&gt; 31&quot; was taken 20115 times"> + </span><span class="tlaGBC" title="branch &quot;30 -&gt; 37&quot; was taken 23631 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;93 -&gt; 94&quot; was taken 18628 times"> + </span><span class="tlaGBC" title="branch &quot;93 -&gt; 100&quot; was taken 23649 times"> + </span>]:<span class="tlaGNC">      333634 :     bool IsNull() const { return m_keydata.IsNull(); }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;30 -&gt; 31&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;30 -&gt; 37&quot; was not taken"> - </span><span class="tlaUNC" title="fallthrough branch &quot;93 -&gt; 94&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;93 -&gt; 100&quot; was not taken"> - </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;674 -&gt; 675&quot; was taken 1 time"> + </span><span class="tlaGBC" title="branch &quot;674 -&gt; 683&quot; was taken 111 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;1029 -&gt; 1030&quot; was taken 2 times"> + </span><span class="tlaGBC" title="branch &quot;1029 -&gt; 1038&quot; was taken 100 times"> + </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;24 -&gt; 25&quot; was taken 13256 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 31&quot; was taken 1176 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;29 -&gt; 30&quot; was taken 22 times"> + </span><span class="tlaGBC" title="branch &quot;29 -&gt; 31&quot; was taken 13234 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;24 -&gt; 25&quot; was taken 425 times"> + </span><span class="tlaGBC" title="branch &quot;24 -&gt; 26&quot; was taken 7426 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;65 -&gt; 66&quot; was taken 18262 times"> + </span><span class="tlaGBC" title="branch &quot;65 -&gt; 72&quot; was taken 171 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 71&quot; was taken 8 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="branch &quot;70 -&gt; 72&quot; was taken 18254 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;43 -&gt; 44&quot; was taken 68 times"> + </span><span class="tlaGBC" title="branch &quot;43 -&gt; 45&quot; was taken 9939 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;35 -&gt; 36&quot; was taken 210 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaGBC" title="branch &quot;35 -&gt; 37&quot; was taken 23106 times"> + </span>]
+<span id="L260"><span class="lineNum">     260</span>                 :             : </span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :     /** Construct an x-only pubkey from exactly 32 bytes. */</span>
+<span id="L262"><span class="lineNum">     262</span> [<span class="tlaUNC" title="fallthrough branch &quot;22 -&gt; 23&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;22 -&gt; 24&quot; was taken 235 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;110 -&gt; 111&quot; was taken 487111 times"> + </span><span class="tlaGBC" title="exception branch &quot;110 -&gt; 208&quot; was taken 10 times"> + </span>]:<span class="tlaGNC">     2985553 :     constexpr explicit XOnlyPubKey(std::span&lt;const unsigned char&gt; bytes) : m_keydata{bytes} {}</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;30 -&gt; 31&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;30 -&gt; 40&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;25 -&gt; 26&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;25 -&gt; 105&quot; was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;11 -&gt; 12&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;11 -&gt; 13&quot; was taken 3590 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;14 -&gt; 15&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;14 -&gt; 16&quot; was taken 3590 times"> + </span> 
+<span class="lineNum">        </span>    <span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 214 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 16&quot; was taken 35326 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 1066 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 16&quot; was taken 18568 times"> + </span>]
+<span id="L263"><span class="lineNum">     263</span>                 :             : </span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :     /** Construct an x-only pubkey from a normal pubkey. */</span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">     2407891 :     explicit XOnlyPubKey(const CPubKey&amp; pubkey) : XOnlyPubKey(std::span{pubkey}.subspan(1, 32)) {}</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :             : </span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :     /** Verify a Schnorr signature against this public key.</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :      *</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :      * sigbytes must be exactly 64 bytes.</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :      */</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :     bool VerifySchnorr(const uint256&amp; msg, std::span&lt;const unsigned char&gt; sigbytes) const;</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : </span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :     /** Compute the Taproot tweak as specified in BIP341, with *this as internal</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :      * key:</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :      *  - if merkle_root == nullptr: H_TapTweak(xonly_pubkey)</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :      *  - otherwise:                 H_TapTweak(xonly_pubkey || *merkle_root)</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :      *</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :      * Note that the behavior of this function with merkle_root != nullptr is</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :      * consensus critical.</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :      */</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :     uint256 ComputeTapTweakHash(const uint256* merkle_root) const;</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             : </span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :     /** Verify that this is a Taproot tweaked output point, against a specified internal key,</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :      *  Merkle root, and parity. */</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :     bool CheckTapTweak(const XOnlyPubKey&amp; internal, const uint256&amp; merkle_root, bool parity) const;</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             : </span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :     /** Construct a Taproot tweaked output point with this point as internal key. */</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :     std::optional&lt;std::pair&lt;XOnlyPubKey, bool&gt;&gt; CreateTapTweak(const uint256* merkle_root) const;</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : </span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     /** Returns a list of CKeyIDs for the CPubKeys that could have been used to create this XOnlyPubKey.</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :      * As the CKeyID is the Hash160(full pubkey), the produced CKeyIDs are for the versions of this</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :      * XOnlyPubKey with 0x02 and 0x03 prefixes.</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             :      * This is needed for key lookups since keys are indexed by CKeyID.</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :      */</span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :     std::vector&lt;CKeyID&gt; GetKeyIDs() const;</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :     /** Returns this XOnlyPubKey with 0x02 and 0x03 prefixes */</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :     std::vector&lt;CPubKey&gt; GetCPubKeys() const;</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             : </span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :     CPubKey GetEvenCorrespondingCPubKey() const;</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             : </span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :     const unsigned char&amp; operator[](int pos) const { return *(m_keydata.begin() + pos); }</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :     static constexpr size_t size() { return decltype(m_keydata)::size(); }</span>
+<span id="L303"><span class="lineNum">     303</span>         [<span class="tlaGBC" title="fallthrough branch &quot;19 -&gt; 20&quot; was taken 103 times"> + </span><span class="tlaUNC" title="exception branch &quot;19 -&gt; 45&quot; was not taken"> - </span>]:<span class="tlaGNC">      472003 :     const unsigned char* data() const { return m_keydata.begin(); }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;19 -&gt; 20&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;19 -&gt; 61&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;23 -&gt; 47&quot; was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;530 -&gt; 531&quot; was taken 33 times"> + </span><span class="tlaUNC" title="exception branch &quot;530 -&gt; 1616&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;621 -&gt; 622&quot; was taken 22 times"> + </span><span class="tlaUNC" title="exception branch &quot;621 -&gt; 1684&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;675 -&gt; 676&quot; was taken 1 time"> + </span><span class="tlaUNC" title="exception branch &quot;675 -&gt; 1851&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;1030 -&gt; 1031&quot; was taken 2 times"> + </span><span class="tlaUNC" title="exception branch &quot;1030 -&gt; 2058&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;1081 -&gt; 1082&quot; was taken 19 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="exception branch &quot;1081 -&gt; 1971&quot; was not taken"> - </span>]
+<span id="L304"><span class="lineNum">     304</span> [<span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;20 -&gt; 22&quot; was not executed"> # </span>][<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 125090 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">     2948430 :     const unsigned char* begin() const { return m_keydata.begin(); }</span></span>
+<span id="L305"><span class="lineNum">     305</span> [<span class="tlaUNC" title="fallthrough branch &quot;20 -&gt; 21&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;20 -&gt; 22&quot; was not executed"> # </span>][<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 125090 times"> + </span><span class="tlaUNC" title="exception branch &quot;4 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">     2948430 :     const unsigned char* end() const { return m_keydata.end(); }</span></span>
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">         768 :     unsigned char* data() { return m_keydata.begin(); }</span></span>
+<span id="L307"><span class="lineNum">     307</span>         [<span class="tlaUNC" title="fallthrough branch &quot;39 -&gt; 40&quot; was not executed"> # </span><span class="tlaUNC" title="exception branch &quot;39 -&gt; 57&quot; was not executed"> # </span>]:<span class="tlaGNC">      672204 :     unsigned char* begin() { return m_keydata.begin(); }</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaGNC">        7260 :     unsigned char* end() { return m_keydata.end(); }</span></span>
+<span id="L309"><span class="lineNum">     309</span>         [<span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;10 -&gt; 12&quot; was taken 80956 times"> + </span>]:<span class="tlaGNC">      104044 :     bool operator==(const XOnlyPubKey&amp; other) const { return m_keydata == other.m_keydata; }</span></span>
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;27 -&gt; 28&quot; was taken 35 times"> + </span><span class="tlaGBC" title="branch &quot;27 -&gt; 50&quot; was taken 9 times"> + </span><span class="tlaUNC" title="fallthrough branch &quot;43 -&gt; 44&quot; was not taken"> - </span><span class="tlaUNC" title="branch &quot;43 -&gt; 46&quot; was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 712 times"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 5&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 1140 times"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 6&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;97 -&gt; 98&quot; was taken 7685 times"> + </span><span class="tlaUNC" title="exception branch &quot;97 -&gt; 169&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 7685 times"> + </span><span class="tlaUNC" title="branch &quot;9 -&gt; 24&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;44 -&gt; 45&quot; was taken 5800 times"> + </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="branch &quot;44 -&gt; 60&quot; was not taken"> - </span>]
+<span id="L310"><span class="lineNum">     310</span>                 :<span class="tlaGNC">     8264392 :     bool operator&lt;(const XOnlyPubKey&amp; other) const { return m_keydata &lt; other.m_keydata; }</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :             : </span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :     //! Implement serialization without length prefixes since it is a fixed length</span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaGNC">       32905 :     SERIALIZE_METHODS(XOnlyPubKey, obj) { READWRITE(obj.m_keydata); }</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : };</span>
+<span id="L315"><span class="lineNum">     315</span>                 :             : </span>
+<span id="L316"><span class="lineNum">     316</span>                 :             : /** An ElligatorSwift-encoded public key. */</span>
+<span id="L317"><span class="lineNum">     317</span>                 :             : struct EllSwiftPubKey</span>
+<span id="L318"><span class="lineNum">     318</span>                 :             : {</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             : private:</span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :     static constexpr size_t SIZE = 64;</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :     std::array&lt;std::byte, SIZE&gt; m_pubkey;</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             : </span>
+<span id="L323"><span class="lineNum">     323</span>                 :             : public:</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :     /** Default constructor creates all-zero pubkey (which is valid). */</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             :     EllSwiftPubKey() noexcept = default;</span>
+<span id="L326"><span class="lineNum">     326</span>                 :             : </span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :     /** Construct a new ellswift public key from a given serialization. */</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             :     EllSwiftPubKey(std::span&lt;const std::byte&gt; ellswift) noexcept;</span>
+<span id="L329"><span class="lineNum">     329</span>                 :             : </span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :     /** Decode to normal compressed CPubKey (for debugging purposes). */</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             :     CPubKey Decode() const;</span>
+<span id="L332"><span class="lineNum">     332</span>                 :             : </span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :     // Read-only access for serialization.</span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">       12630 :     const std::byte* data() const { return m_pubkey.data(); }</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :             :     static constexpr size_t size() { return SIZE; }</span>
+<span id="L336"><span class="lineNum">     336</span>                 :<span class="tlaGNC">        5278 :     auto begin() const { return m_pubkey.cbegin(); }</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaGNC">        5278 :     auto end() const { return m_pubkey.cend(); }</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :             : </span>
+<span id="L339"><span class="lineNum">     339</span>                 :<span class="tlaGNC">        4521 :     bool friend operator==(const EllSwiftPubKey&amp; a, const EllSwiftPubKey&amp; b)</span></span>
+<span id="L340"><span class="lineNum">     340</span>                 :             :     {</span>
+<span id="L341"><span class="lineNum">     341</span>   [<span class="tlaUNC" title="fallthrough branch &quot;23 -&gt; 24&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;23 -&gt; 25&quot; was taken 1507 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;30 -&gt; 31&quot; was taken 1492 times"> + </span><span class="tlaGBC" title="branch &quot;30 -&gt; 34&quot; was taken 15 times"> + </span> :<span class="tlaGNC">        4506 :         return a.m_pubkey == b.m_pubkey;</span></span>
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;34 -&gt; 35&quot; was taken 500 times"> + </span><span class="tlaGBC" title="branch &quot;34 -&gt; 38&quot; was taken 1007 times"> + </span>]
+<span id="L342"><span class="lineNum">     342</span>                 :             :     }</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             : };</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             : </span>
+<span id="L345"><span class="lineNum">     345</span> [<span class="tlaUNC" title="fallthrough branch &quot;81 -&gt; 82&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;81 -&gt; 83&quot; was taken 15363 times"> + </span>][<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 2143686 times"> + </span><span class="tlaUNC" title="exception branch &quot;2 -&gt; 16&quot; was not taken"> - </span>]:<span class="tlaGNC">    20603164 : struct CExtPubKey {</span></span>
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;10 -&gt; 11&quot; was not taken"> - </span><span class="tlaUNC" title="exception branch &quot;10 -&gt; 16&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 1264 times"> + </span><span class="tlaUNC" title="exception branch &quot;12 -&gt; 23&quot; was not taken"> - </span>]
+<span class="lineNum">        </span>   [<span class="tlaUNC" title="fallthrough branch &quot;48 -&gt; 49&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;48 -&gt; 79&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;52 -&gt; 53&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;52 -&gt; 58&quot; was not executed"> # </span> 
+<span class="lineNum">        </span> <span class="tlaUNC" title="fallthrough branch &quot;143 -&gt; 144&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;143 -&gt; 152&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;160 -&gt; 161&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;160 -&gt; 162&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;42 -&gt; 43&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>    <span class="tlaUNC" title="branch &quot;42 -&gt; 52&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;55 -&gt; 56&quot; was not executed"> # </span><span class="tlaUNC" title="branch &quot;55 -&gt; 61&quot; was not executed"> # </span><span class="tlaUNC" title="fallthrough branch &quot;123 -&gt; 124&quot; was not executed"> # </span> 
+<span class="lineNum">        </span>             <span class="tlaUNC" title="branch &quot;123 -&gt; 125&quot; was not executed"> # </span>]
+<span class="lineNum">        </span>   [<span class="tlaGBC" title="fallthrough branch &quot;25 -&gt; 5&quot; was taken 227421 times"> + </span><span class="tlaUNC" title="exception branch &quot;25 -&gt; 79&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;45 -&gt; 27&quot; was taken 39365 times"> + </span><span class="tlaUNC" title="exception branch &quot;45 -&gt; 89&quot; was not taken"> - </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="fallthrough branch &quot;70 -&gt; 52&quot; was taken 10243 times"> + </span><span class="tlaUNC" title="exception branch &quot;70 -&gt; 99&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;91 -&gt; 92&quot; was taken 110916 times"> + </span><span class="tlaUNC" title="exception branch &quot;91 -&gt; 123&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;32 -&gt; 33&quot; was taken 2147 times"> + </span> 
+<span class="lineNum">        </span> <span class="tlaGBC" title="branch &quot;32 -&gt; 34&quot; was taken 271932 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 1711420 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 18&quot; was taken 1614001 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;26 -&gt; 27&quot; was taken 911 times"> + </span><span class="tlaGBC" title="branch &quot;26 -&gt; 28&quot; was taken 562168 times"> + </span> 
+<span class="lineNum">        </span>          <span class="tlaGBC" title="fallthrough branch &quot;32 -&gt; 33&quot; was taken 492373 times"> + </span><span class="tlaGBC" title="branch &quot;32 -&gt; 36&quot; was taken 70706 times"> + </span>]
+<span id="L346"><span class="lineNum">     346</span>                 :             :     unsigned char version[4];</span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :     unsigned char nDepth;</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :     KeyFingerprint fingerprint;</span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :     unsigned int nChild;</span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :     ChainCode chaincode;</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :     CPubKey pubkey;</span>
+<span id="L352"><span class="lineNum">     352</span>                 :             : </span>
+<span id="L353"><span class="lineNum">     353</span>                 :<span class="tlaGNC">      248666 :     friend bool operator==(const CExtPubKey &amp;a, const CExtPubKey &amp;b)</span></span>
+<span id="L354"><span class="lineNum">     354</span>                 :             :     {</span>
+<span id="L355"><span class="lineNum">     355</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 248666 times"> + </span><span class="tlaUNC" title="branch &quot;3 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">      248666 :         return a.nDepth == b.nDepth &amp;&amp;</span></span>
+<span id="L356"><span class="lineNum">     356</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 248666 times"> + </span><span class="tlaUNC" title="branch &quot;3 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">      248666 :             a.fingerprint == b.fingerprint &amp;&amp;</span></span>
+<span id="L357"><span class="lineNum">     357</span>         [<span class="tlaGBC" title="fallthrough branch &quot;4 -&gt; 5&quot; was taken 248666 times"> + </span><span class="tlaUNC" title="branch &quot;4 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">      248666 :             a.nChild == b.nChild &amp;&amp;</span></span>
+<span id="L358"><span class="lineNum">     358</span>   [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 248666 times"> + </span><span class="tlaUNC" title="branch &quot;2 -&gt; 8&quot; was not taken"> - </span><span class="tlaGBC" title="fallthrough branch &quot;5 -&gt; 6&quot; was taken 248666 times"> + </span><span class="tlaUNC" title="branch &quot;5 -&gt; 8&quot; was not taken"> - </span>]:<span class="tlaGNC">      497332 :             a.chaincode == b.chaincode &amp;&amp;</span></span>
+<span id="L359"><span class="lineNum">     359</span>         [<span class="tlaUNC" title="fallthrough branch &quot;6 -&gt; 7&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;6 -&gt; 8&quot; was taken 248666 times"> + </span>]:<span class="tlaGNC">      248666 :             a.pubkey == b.pubkey;</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :     }</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             : </span>
+<span id="L362"><span class="lineNum">     362</span>                 :<span class="tlaGNC">       99975 :     friend bool operator&lt;(const CExtPubKey &amp;a, const CExtPubKey &amp;b)</span></span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     {</span>
+<span id="L364"><span class="lineNum">     364</span>         [<span class="tlaGBC" title="fallthrough branch &quot;2 -&gt; 3&quot; was taken 45097 times"> + </span><span class="tlaGBC" title="branch &quot;2 -&gt; 5&quot; was taken 54878 times"> + </span>]:<span class="tlaGNC">       99975 :         if (a.pubkey &lt; b.pubkey) {</span></span>
+<span id="L365"><span class="lineNum">     365</span>                 :             :             return true;</span>
+<span id="L366"><span class="lineNum">     366</span>         [<span class="tlaGBC" title="fallthrough branch &quot;3 -&gt; 4&quot; was taken 11675 times"> + </span><span class="tlaGBC" title="branch &quot;3 -&gt; 5&quot; was taken 33422 times"> + </span>]:<span class="tlaGNC">       45097 :         } else if (a.pubkey &gt; b.pubkey) {</span></span>
+<span id="L367"><span class="lineNum">     367</span>                 :             :             return false;</span>
+<span id="L368"><span class="lineNum">     368</span>                 :             :         }</span>
+<span id="L369"><span class="lineNum">     369</span>                 :<span class="tlaGNC">       11675 :         return a.chaincode &lt; b.chaincode;</span></span>
+<span id="L370"><span class="lineNum">     370</span>                 :             :     }</span>
+<span id="L371"><span class="lineNum">     371</span>                 :             : </span>
+<span id="L372"><span class="lineNum">     372</span>                 :<span class="tlaGNC">     5026039 :     KeyFingerprint id_key_fingerprint() const</span></span>
+<span id="L373"><span class="lineNum">     373</span>                 :             :     {</span>
+<span id="L374"><span class="lineNum">     374</span>                 :<span class="tlaGNC">     5026039 :         return pubkey.GetID().fingerprint();</span></span>
+<span id="L375"><span class="lineNum">     375</span>                 :             :     }</span>
+<span id="L376"><span class="lineNum">     376</span>                 :             : </span>
+<span id="L377"><span class="lineNum">     377</span>                 :             :     //! BIP32 serialization without the version bytes (BIP32_EXTKEY_SIZE bytes)</span>
+<span id="L378"><span class="lineNum">     378</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L379"><span class="lineNum">     379</span>                 :<span class="tlaGNC">     2847912 :     void Serialize(Stream&amp; s) const</span></span>
+<span id="L380"><span class="lineNum">     380</span>                 :             :     {</span>
+<span id="L381"><span class="lineNum">     381</span>         [<span class="tlaUNC" title="fallthrough branch &quot;2 -&gt; 3&quot; was not taken"> - </span><span class="tlaGBC" title="branch &quot;2 -&gt; 4&quot; was taken 2847912 times"> + </span>]:<span class="tlaGNC">     2847912 :         assert(pubkey.size() == CPubKey::COMPRESSED_SIZE);</span></span>
+<span id="L382"><span class="lineNum">     382</span>                 :<span class="tlaGNC">     2847912 :         s &lt;&lt; nDepth &lt;&lt; fingerprint &lt;&lt; Using&lt;BigEndianFormatter&lt;4&gt;&gt;(nChild) &lt;&lt; chaincode &lt;&lt; std::span{pubkey.data(), CPubKey::COMPRESSED_SIZE};</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :<span class="tlaGNC">     2847912 :     }</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :     template &lt;typename Stream&gt;</span>
+<span id="L385"><span class="lineNum">     385</span>                 :<span class="tlaGNC">       95453 :     void Unserialize(Stream&amp; s)</span></span>
+<span id="L386"><span class="lineNum">     386</span>                 :             :     {</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             :         std::array&lt;unsigned char, CPubKey::COMPRESSED_SIZE&gt; ser_pubkey;</span>
+<span id="L388"><span class="lineNum">     388</span>                 :<span class="tlaGNC">       95453 :         s &gt;&gt; nDepth &gt;&gt; fingerprint &gt;&gt; Using&lt;BigEndianFormatter&lt;4&gt;&gt;(nChild) &gt;&gt; chaincode &gt;&gt; ser_pubkey;</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaGNC">       95453 :         pubkey.Set(ser_pubkey.begin(), ser_pubkey.end());</span></span>
+<span id="L390"><span class="lineNum">     390</span>   [<span class="tlaGBC" title="fallthrough branch &quot;8 -&gt; 9&quot; was taken 34071 times"> + </span><span class="tlaGBC" title="branch &quot;8 -&gt; 11&quot; was taken 61382 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;9 -&gt; 10&quot; was taken 31463 times"> + </span><span class="tlaGBC" title="branch &quot;9 -&gt; 13&quot; was taken 2608 times"> + </span> :<span class="tlaGNC">       95453 :         if ((nDepth == 0 &amp;&amp; (nChild != 0 || fingerprint != KeyFingerprint{})) || !pubkey.IsFullyValid()) pubkey = CPubKey();</span></span>
+<span class="lineNum">        </span>    <span class="tlaGBC" title="fallthrough branch &quot;10 -&gt; 11&quot; was taken 30991 times"> + </span><span class="tlaGBC" title="branch &quot;10 -&gt; 13&quot; was taken 472 times"> + </span><span class="tlaGBC" title="fallthrough branch &quot;12 -&gt; 13&quot; was taken 44943 times"> + </span><span class="tlaGBC" title="branch &quot;12 -&gt; 14&quot; was taken 47430 times"> + </span>]
+<span id="L391"><span class="lineNum">     391</span>                 :<span class="tlaGNC">       95453 :     }</span></span>
+<span id="L392"><span class="lineNum">     392</span>                 :             :     [[nodiscard]] bool Derive(CExtPubKey&amp; out, unsigned int nChild, uint256* bip32_tweak_out = nullptr) const;</span>
+<span id="L393"><span class="lineNum">     393</span>                 :             : };</span>
+<span id="L394"><span class="lineNum">     394</span>                 :             : </span>
+<span id="L395"><span class="lineNum">     395</span>                 :             : #endif // BITCOIN_PUBKEY_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

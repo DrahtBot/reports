@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - fuzz_coverage.info - src/node/block_template_manager.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory src/node">src/node</a> - block_template_manager.h</td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">fuzz_coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-10-23 02:47:14</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">-</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+          </tr>
+                  <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : // Copyright (c) The Bitcoin Core developers</span>
+<span id="L2"><span class="lineNum">       2</span>              : // Distributed under the MIT software license, see the accompanying</span>
+<span id="L3"><span class="lineNum">       3</span>              : // file COPYING or http://www.opensource.org/licenses/mit-license.php.</span>
+<span id="L4"><span class="lineNum">       4</span>              : </span>
+<span id="L5"><span class="lineNum">       5</span>              : #ifndef BITCOIN_NODE_BLOCK_TEMPLATE_MANAGER_H</span>
+<span id="L6"><span class="lineNum">       6</span>              : #define BITCOIN_NODE_BLOCK_TEMPLATE_MANAGER_H</span>
+<span id="L7"><span class="lineNum">       7</span>              : </span>
+<span id="L8"><span class="lineNum">       8</span>              : #include &lt;node/mining_types.h&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>              : #include &lt;util/time.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>              : </span>
+<span id="L11"><span class="lineNum">      11</span>              : #include &lt;memory&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>              : #include &lt;optional&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>              : #include &lt;string&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>              : </span>
+<span id="L15"><span class="lineNum">      15</span>              : class CBlock;</span>
+<span id="L16"><span class="lineNum">      16</span>              : class ChainstateManager;</span>
+<span id="L17"><span class="lineNum">      17</span>              : class CTxMemPool;</span>
+<span id="L18"><span class="lineNum">      18</span>              : class uint256;</span>
+<span id="L19"><span class="lineNum">      19</span>              : </span>
+<span id="L20"><span class="lineNum">      20</span>              : namespace interfaces {</span>
+<span id="L21"><span class="lineNum">      21</span>              : struct BlockRef;</span>
+<span id="L22"><span class="lineNum">      22</span>              : } // namespace interfaces</span>
+<span id="L23"><span class="lineNum">      23</span>              : </span>
+<span id="L24"><span class="lineNum">      24</span>              : namespace node {</span>
+<span id="L25"><span class="lineNum">      25</span>              : class KernelNotifications;</span>
+<span id="L26"><span class="lineNum">      26</span>              : struct CBlockTemplate;</span>
+<span id="L27"><span class="lineNum">      27</span>              : </span>
+<span id="L28"><span class="lineNum">      28</span>              : /**</span>
+<span id="L29"><span class="lineNum">      29</span>              :  * Creates block templates, submits solved blocks, and provides tip-waiting</span>
+<span id="L30"><span class="lineNum">      30</span>              :  * helpers for mining code. Owns the init-time block creation args.</span>
+<span id="L31"><span class="lineNum">      31</span>              :  */</span>
+<span id="L32"><span class="lineNum">      32</span> <span class="tlaGNC">        3331 : class BlockTemplateManager</span></span>
+<span id="L33"><span class="lineNum">      33</span>              : {</span>
+<span id="L34"><span class="lineNum">      34</span>              : private:</span>
+<span id="L35"><span class="lineNum">      35</span>              :     CTxMemPool&amp; m_mempool;</span>
+<span id="L36"><span class="lineNum">      36</span>              :     ChainstateManager&amp; m_chainman;</span>
+<span id="L37"><span class="lineNum">      37</span>              :     KernelNotifications&amp; m_notifications;</span>
+<span id="L38"><span class="lineNum">      38</span>              :     const BlockCreateOptions m_block_create_args;</span>
+<span id="L39"><span class="lineNum">      39</span>              : </span>
+<span id="L40"><span class="lineNum">      40</span>              : public:</span>
+<span id="L41"><span class="lineNum">      41</span>              :     explicit BlockTemplateManager(CTxMemPool&amp; mempool,</span>
+<span id="L42"><span class="lineNum">      42</span>              :                                   ChainstateManager&amp; chainman,</span>
+<span id="L43"><span class="lineNum">      43</span>              :                                   KernelNotifications&amp; notifications,</span>
+<span id="L44"><span class="lineNum">      44</span>              :                                   BlockCreateOptions block_create_args = {});</span>
+<span id="L45"><span class="lineNum">      45</span>              : </span>
+<span id="L46"><span class="lineNum">      46</span>              :     /** @return the block creation args set during node init. */</span>
+<span id="L47"><span class="lineNum">      47</span> <span class="tlaGNC">           2 :     const BlockCreateOptions&amp; BlockCreateArgs() const { return m_block_create_args; }</span></span>
+<span id="L48"><span class="lineNum">      48</span>              : </span>
+<span id="L49"><span class="lineNum">      49</span>              :     /** Create a fresh block template, applying init-time defaults to any unset options. */</span>
+<span id="L50"><span class="lineNum">      50</span>              :     std::unique_ptr&lt;CBlockTemplate&gt; CreateNewTemplate(const BlockCreateOptions&amp; options);</span>
+<span id="L51"><span class="lineNum">      51</span>              : </span>
+<span id="L52"><span class="lineNum">      52</span>              :     /** Submit a block via ProcessNewBlock and capture validation state.</span>
+<span id="L53"><span class="lineNum">      53</span>              :      *  @return whether the block was accepted as a new valid block. */</span>
+<span id="L54"><span class="lineNum">      54</span>              :     bool SubmitBlock(const std::shared_ptr&lt;const CBlock&gt;&amp; block, std::string&amp; reason, std::string&amp; debug);</span>
+<span id="L55"><span class="lineNum">      55</span>              : </span>
+<span id="L56"><span class="lineNum">      56</span>              :     /** Locks cs_main.</span>
+<span id="L57"><span class="lineNum">      57</span>              :      *  @return the active chain tip, or nullopt if none exists. */</span>
+<span id="L58"><span class="lineNum">      58</span>              :     std::optional&lt;interfaces::BlockRef&gt; GetTip();</span>
+<span id="L59"><span class="lineNum">      59</span>              : </span>
+<span id="L60"><span class="lineNum">      60</span>              :     /** Wait for the tip to differ from @p current_tip or timeout.</span>
+<span id="L61"><span class="lineNum">      61</span>              :      *  Waits indefinitely during startup for a non-null tip.</span>
+<span id="L62"><span class="lineNum">      62</span>              :      *  @return the current tip, or nullopt if the node is shutting down or</span>
+<span id="L63"><span class="lineNum">      63</span>              :      *  interrupt is set (not when the timeout is reached). */</span>
+<span id="L64"><span class="lineNum">      64</span>              :     std::optional&lt;interfaces::BlockRef&gt; WaitTipChanged(const uint256&amp; current_tip, MillisecondsDouble&amp; timeout, bool&amp; interrupt);</span>
+<span id="L65"><span class="lineNum">      65</span>              : </span>
+<span id="L66"><span class="lineNum">      66</span>              :     /** Convenience overload for in-process callers (e.g. RPC) that have no</span>
+<span id="L67"><span class="lineNum">      67</span>              :      *  interrupt handle. Takes the timeout by value so the caller's variable is</span>
+<span id="L68"><span class="lineNum">      68</span>              :      *  left unchanged; the wait still ends on chain shutdown. */</span>
+<span id="L69"><span class="lineNum">      69</span>              :     std::optional&lt;interfaces::BlockRef&gt; WaitTipChanged(const uint256&amp; current_tip, MillisecondsDouble timeout = MillisecondsDouble::max());</span>
+<span id="L70"><span class="lineNum">      70</span>              : </span>
+<span id="L71"><span class="lineNum">      71</span>              :     /**</span>
+<span id="L72"><span class="lineNum">      72</span>              :      * Wait while the best known header extends the current chain tip AND at</span>
+<span id="L73"><span class="lineNum">      73</span>              :      * least one block is being added to the tip every 3 seconds. If the tip is</span>
+<span id="L74"><span class="lineNum">      74</span>              :      * sufficiently far behind, allow up to 20 seconds for the next tip update.</span>
+<span id="L75"><span class="lineNum">      75</span>              :      *</span>
+<span id="L76"><span class="lineNum">      76</span>              :      * It's not safe to keep waiting, because a malicious miner could announce</span>
+<span id="L77"><span class="lineNum">      77</span>              :      * a header and delay revealing the block, causing all other miners using</span>
+<span id="L78"><span class="lineNum">      78</span>              :      * this software to stall. At the same time, we need to balance between the</span>
+<span id="L79"><span class="lineNum">      79</span>              :      * default waiting time being brief, but not ending the cooldown prematurely</span>
+<span id="L80"><span class="lineNum">      80</span>              :      * when a random block is slow to download (or process).</span>
+<span id="L81"><span class="lineNum">      81</span>              :      *</span>
+<span id="L82"><span class="lineNum">      82</span>              :      * The cooldown only applies to createNewBlock(), which is typically called</span>
+<span id="L83"><span class="lineNum">      83</span>              :      * once per connected client. Subsequent templates are provided by</span>
+<span id="L84"><span class="lineNum">      84</span>              :      * waitNext().</span>
+<span id="L85"><span class="lineNum">      85</span>              :      *</span>
+<span id="L86"><span class="lineNum">      86</span>              :      * @param last_tip tip at the start of the cooldown window.</span>
+<span id="L87"><span class="lineNum">      87</span>              :      * @param interrupt_mining set to true to interrupt the cooldown.</span>
+<span id="L88"><span class="lineNum">      88</span>              :      *</span>
+<span id="L89"><span class="lineNum">      89</span>              :      * @returns false if interrupted.</span>
+<span id="L90"><span class="lineNum">      90</span>              :      */</span>
+<span id="L91"><span class="lineNum">      91</span>              :     bool CooldownIfHeadersAhead(const interfaces::BlockRef&amp; last_tip, bool&amp; interrupt_mining);</span>
+<span id="L92"><span class="lineNum">      92</span>              : </span>
+<span id="L93"><span class="lineNum">      93</span>              :     /** Interrupt a blocking wait. */</span>
+<span id="L94"><span class="lineNum">      94</span>              :     void InterruptWait(bool&amp; interrupt_wait);</span>
+<span id="L95"><span class="lineNum">      95</span>              : </span>
+<span id="L96"><span class="lineNum">      96</span>              :     /** Return a new block template when fees rise to a certain threshold or</span>
+<span id="L97"><span class="lineNum">      97</span>              :      *  after a new tip; return nullptr if timeout is reached. */</span>
+<span id="L98"><span class="lineNum">      98</span>              :     std::unique_ptr&lt;CBlockTemplate&gt; WaitAndCreateNewBlock(</span>
+<span id="L99"><span class="lineNum">      99</span>              :         const std::unique_ptr&lt;CBlockTemplate&gt;&amp; block_template,</span>
+<span id="L100"><span class="lineNum">     100</span>              :         const BlockWaitOptions&amp; wait_options,</span>
+<span id="L101"><span class="lineNum">     101</span>              :         const BlockCreateOptions&amp; create_options,</span>
+<span id="L102"><span class="lineNum">     102</span>              :         bool&amp; interrupt_wait);</span>
+<span id="L103"><span class="lineNum">     103</span>              : };</span>
+<span id="L104"><span class="lineNum">     104</span>              : } // namespace node</span>
+<span id="L105"><span class="lineNum">     105</span>              : </span>
+<span id="L106"><span class="lineNum">     106</span>              : #endif // BITCOIN_NODE_BLOCK_TEMPLATE_MANAGER_H</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 2.5.0-full</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
